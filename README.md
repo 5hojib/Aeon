@@ -4,7 +4,7 @@ Base Repo : https://github.com/weebzone/WZML
 
 # Edit Config From Here .
 
-Upload token.pickle and service accounts here.
+# Upload token.pickle and service accounts here.
 
 # Support Group 
 
