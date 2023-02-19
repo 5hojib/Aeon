@@ -12,7 +12,7 @@ Upload token.pickle and service accounts json here.
 This docker is unable to extract accounts.zip . So create a folder name accounts and upload all service accounts json in accounts folder.
 If you add anything in heroku branch you need to run workflow to load changes .
 
-# Torrent and magnet mirroring with /qb command will down your bot and your account will suspend . So use on /mirror for torrent and magnet . Just remember dont use /qb for anything .
+# Torrent and magnet mirroring with /qb command will down your bot and your account will suspend . So use only /mirror for torrent and magnet . Just remember dont use /qb for anything .
 
 # Support Group 
 
