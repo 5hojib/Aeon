@@ -674,7 +674,7 @@ if len(BASE_URL) == 0:
 
 UPSTREAM_REPO = environ.get('UPSTREAM_REPO', '')
 if len(UPSTREAM_REPO) == 0:
-   UPSTREAM_REPO = 'https://github.com/weebzone/WZML'
+   UPSTREAM_REPO = 'https://github.com/SN-ABDULLAH-AL-NOMAN/SN-MLTB'
 
 UPSTREAM_BRANCH = environ.get('UPSTREAM_BRANCH', '')
 if len(UPSTREAM_BRANCH) == 0:
@@ -689,9 +689,9 @@ if len(SAFE_MODE) == 0:
     log_warning('SAFE_MODE Is Not Enabled')
     SAFE_MODE = ''
 else:
-    BOT_PM.lower() == 'true'
-    FORCE_BOT_PM.lower() == 'true'
-    SAFE_MODE.lower() == 'true'
+    BOT_PM = 'True'
+    FORCE_BOT_PM = 'True'
+    SAFE_MODE = 'True'
 
 config_dict = {'ANILIST_ENABLED': ANILIST_ENABLED,
                'AS_DOCUMENT': AS_DOCUMENT,
