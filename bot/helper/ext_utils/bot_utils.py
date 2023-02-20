@@ -52,19 +52,19 @@ class MirrorStatus:
         STATUS_SPLITTING = "Split"
         STATUS_CHECKING = "CheckUp"
         STATUS_SEEDING = "Seed"
-        STATUS_CONVERTING = "↔️ Convert"
+        STATUS_CONVERTING = "Convert"
 
 class EngineStatus:
-    STATUS_ARIA = "Aria2c📶"
-    STATUS_GD = "Google Api♻️"
-    STATUS_MEGA = "MegaSDK⭕️"
-    STATUS_QB = "qBittorrent🦠"
-    STATUS_TG = "Pyrogram💥"
-    STATUS_YT = "YT-dlp🌟"
-    STATUS_EXT = "Extract | pExtract⚔️"
-    STATUS_SPLIT_MERGE = "FFmpeg🍿"
-    STATUS_ZIP = "p7zip🛠"
-    STATUS_QUEUE = "Sleep💤"
+    STATUS_ARIA = "Aria2c"
+    STATUS_GD = "Google Api"
+    STATUS_MEGA = "MegaSDK"
+    STATUS_QB = "qBittorrent"
+    STATUS_TG = "Pyrogram"
+    STATUS_YT = "YT-dlp"
+    STATUS_EXT = "pExtract"
+    STATUS_SPLIT_MERGE = "FFmpeg"
+    STATUS_ZIP = "p7zip"
+    STATUS_QUEUE = "Sleep"
 
     
 SIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
