@@ -41,11 +41,11 @@ class MirrorStatus:
         STATUS_SEEDING = "🌧 Seed"
         STATUS_CONVERTING = "↔️ Convert"
     else:
-        STATUS_UPLOADING = "Upload"
-        STATUS_DOWNLOADING = "Download"
-        STATUS_CLONING = "Clone"
-        STATUS_QUEUEDL = "QueueDl"
-        STATUS_QUEUEUP = "QueueUp"
+        STATUS_UPLOADING = "Uploading"
+        STATUS_DOWNLOADING = "Downloading"
+        STATUS_CLONING = "Cloning"
+        STATUS_QUEUEDL = "Queue Download"
+        STATUS_QUEUEUP = "Queue Upload"
         STATUS_PAUSED = "Pause"
         STATUS_ARCHIVING = "Archive"
         STATUS_EXTRACTING = "Extract"
@@ -262,7 +262,7 @@ def get_readable_message():
                     msg += f"\n<b>├ Speed:</b> {download.speed()}"
                     msg += f"\n<b>├ ETA:</b> {download.eta()}"
                     msg += f"<b> | Elapsed: </b>{get_readable_time(time() - download.message.date.timestamp())}"
-                    msg += f"\n<b>├ Engine :</b> {download.eng()}"
+                    
 
                 if hasattr(download, 'seeders_num'):
                     try:
