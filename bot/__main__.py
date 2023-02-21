@@ -92,16 +92,16 @@ def stats(update, context):
 
     else:
             stats = f'<b><u>Bot Statistics</u></b>\n' \
-                    f'<b>┌</b>Updated On: {last_commit}\n'\
-                    f'<b>├</b>Uptime: {currentTime}\n'\
-                    f'<b>├</b>Version: {version}\n'\
-                    f'<b>├</b>OS Uptime: {osUptime}\n'\
-                    f'<b>├</b>CPU: [{progress_bar(cpuUsage)}] {cpuUsage}%\n'\
-                    f'<b>├</b>RAM: [{progress_bar(mem_p)}] {mem_p}%\n'\
-                    f'<b>├</b>Disk: [{progress_bar(disk)}] {disk}%\n'\
-                    f'<b>├</b>Disk Free: {free}\n'\
-                    f'<b>├</b>Uploaded Data: {sent}\n'\
-                    f'<b>└</b>Downloaded Data: {recv}\n\n'
+                    f'<b>┌ Updated On:</b> {last_commit}\n'\
+                    f'<b>├ Uptime:</b> {currentTime}\n'\
+                    f'<b>├ Version:</b> {version}\n'\
+                    f'<b>├ OS Uptime:</b> {osUptime}\n'\
+                    f'<b>├ CPU:</b> [{progress_bar(cpuUsage)}] {cpuUsage}%\n'\
+                    f'<b>├ RAM:</b> [{progress_bar(mem_p)}] {mem_p}%\n'\
+                    f'<b>├ Disk:</b> [{progress_bar(disk)}] {disk}%\n'\
+                    f'<b>├ Disk Free:</b> {free}\n'\
+                    f'<b>├ Uploaded Data:</b> {sent}\n'\
+                    f'<b>└ Downloaded Data:</b> {recv}\n\n'
 
 
 
@@ -468,10 +468,10 @@ def main():
             chat_id, msg_id = map(int, f)
         try:
             msg = f"Bot Restarted Successfully!\n"
-            msg += f"<b>┌</b>Date: {date}\n"
-            msg += f"<b>├</b>Time: {time}\n"
-            msg += f"<b>├</b>Time Zone: {timez}\n"
-            msg += f"<b>└</b>Repo Version: {version}"            
+            msg += f"<b>┌ Date:</b> {date}\n"
+            msg += f"<b>├ Time:</b> {time}\n"
+            msg += f"<b>├ Time Zone:</b> {timez}\n"
+            msg += f"<b>└ Repo Version:</b> {version}"            
             bot.edit_message_text(msg, chat_id, msg_id)
         except Exception as e:
             LOGGER.info(e)
