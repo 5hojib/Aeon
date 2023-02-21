@@ -52,7 +52,7 @@ def stats(update, context):
             botVersion = check_output(["git log -1 --date=format:v%y.%m%d.%H%M --pretty=format:%cd"], shell=True).decode()
         else:
             last_commit = check_output(["git log -1 --date=short --pretty=format:'%cd'"], shell=True).decode()
-            last_commit_time = check_output(["git log -1 --date=short --pretty=format:'From: %cr'"], shell=True).decode()
+            last_commit_time = check_output(["git log -1 --date=short --pretty=format:'%cr'"], shell=True).decode()
             botVersion = check_output(["git log -1 --date=format:v%y.%m%d.%H%M --pretty=format:%cd"], shell=True).decode()
     else:
         botVersion = 'No UPSTREAM_REPO'
@@ -94,7 +94,7 @@ def stats(update, context):
     else:
             stats = f'<b><u>Bot Statistics</u></b>\n' \
                     f'<b>┌ Updated On:</b> {last_commit}\n'\
-                    f'<b>├ </b>{last_commit_time}\n'\
+                    f'<b>├ From:</b>{last_commit_time}\n'\
                     f'<b>├ Uptime:</b> {currentTime}\n'\
                     f'<b>├ Version:</b> {version}\n'\
                     f'<b>├ OS Uptime:</b> {osUptime}\n'\
