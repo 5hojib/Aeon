@@ -96,9 +96,9 @@ def stats(update, context):
                     f'<b>├ Uptime:</b> {currentTime}\n'\
                     f'<b>├ Version:</b> {version}\n'\
                     f'<b>├ OS Uptime:</b> {osUptime}\n'\
-                    f'<b>├ CPU:</b> [{progress_bar(cpuUsage)}] {cpuUsage}%\n'\
-                    f'<b>├ RAM:</b> [{progress_bar(mem_p)}] {mem_p}%\n'\
-                    f'<b>├ Disk:</b> [{progress_bar(disk)}] {disk}%\n'\
+                    f'<b>├ CPU Used:</b> {progress_bar(cpuUsage)} {cpuUsage}%\n'\
+                    f'<b>├ RAM Used:</b> {progress_bar(mem_p)} {mem_p}%\n'\
+                    f'<b>├ Disk Used:</b> {progress_bar(disk)} {disk}%\n'\
                     f'<b>├ Disk Free:</b> {free}\n'\
                     f'<b>├ Uploaded Data:</b> {sent}\n'\
                     f'<b>└ Downloaded Data:</b> {recv}\n\n'
