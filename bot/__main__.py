@@ -91,17 +91,17 @@ def stats(update, context):
                     f'🔻 Download Data: {recv}\n\n'
 
     else:
-            stats = f'<b>    📊 Bot Statistics </b>\n' \
-                    f'Updated On: {last_commit}\n'\
-                    f'Uptime: {currentTime}\n'\
-                    f'Version: {version}\n'\
-                    f'OS Uptime: {osUptime}\n'\
-                    f'CPU: [{progress_bar(cpuUsage)}] {cpuUsage}%\n'\
-                    f'RAM: [{progress_bar(mem_p)}] {mem_p}%\n'\
-                    f'Disk: [{progress_bar(disk)}] {disk}%\n'\
-                    f'Disk Free: {free}\n'\
-                    f'Upload Data: {sent}\n'\
-                    f'Download Data: {recv}\n\n'
+            stats = f'<b><u>Bot Statistics</u></b>\n' \
+                    f'<b>┌</b>Updated On: {last_commit}\n'\
+                    f'<b>├</b>Uptime: {currentTime}\n'\
+                    f'<b>├</b>Version: {version}\n'\
+                    f'<b>├</b>OS Uptime: {osUptime}\n'\
+                    f'<b>├</b>CPU: [{progress_bar(cpuUsage)}] {cpuUsage}%\n'\
+                    f'<b>├</b>RAM: [{progress_bar(mem_p)}] {mem_p}%\n'\
+                    f'<b>├</b>Disk: [{progress_bar(disk)}] {disk}%\n'\
+                    f'<b>├</b>Disk Free: {free}\n'\
+                    f'<b>├</b>Uploaded Data: {sent}\n'\
+                    f'<b>└</b>Downloaded Data: {recv}\n\n'
 
 
 
