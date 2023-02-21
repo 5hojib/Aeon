@@ -94,7 +94,7 @@ def stats(update, context):
     else:
             stats = f'<b><u>Bot Statistics</u></b>\n' \
                     f'<b>┌ Updated On:</b> {last_commit}\n'\
-                    f'<b>├ </b>{last_commit_time}
+                    f'<b>├ </b>{last_commit_time}\n'\
                     f'<b>├ Uptime:</b> {currentTime}\n'\
                     f'<b>├ Version:</b> {version}\n'\
                     f'<b>├ OS Uptime:</b> {osUptime}\n'\
