@@ -272,7 +272,8 @@ class MirrorLeechListener:
             slmsg += f"👥 Added by: {self.tag} | <code>{self.user_id}</code>\n\n"
         else:
             slmsg = f"Name: <{NAME_FONT}>{escape(name)}</{NAME_FONT}>\n\n"
-            slmsg += f"Size: {size}\n"
+            slmsg += f"\n"
+            slmsg += f"┌ Size: {size}\n"
             slmsg += f"Added by: {self.tag} | <code>{self.user_id}</code>\n\n"
         if 'link_logs' in user_data:
             try:
@@ -345,7 +346,7 @@ class MirrorLeechListener:
         if config_dict['EMOJI_THEME']:
             msg = f"<b>🗂️ Name: </b><{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n<b>📐 Size: </b>{size}"
         else:
-            msg = f"<b>Name: </b><{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n<b>Size: </b>{size}"
+            msg = f"<b>Name: </b><{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n<b>┌ Size: </b>{size}"
 
         if self.isLeech:
             if config_dict['SOURCE_LINK']:
@@ -467,7 +468,7 @@ class MirrorLeechListener:
             if config_dict['EMOJI_THEME']:
                 msg += f'\n<b>📦 Type: </b>{typ}'
             else:
-                msg += f'\n<b>Type: </b>{typ}'
+                msg += f'\n<b>├ Type: </b>{typ}'
             if typ == "Folder":
                 if config_dict['EMOJI_THEME']:
                     msg += f'\n<b>🗃️ SubFolders: </b>{folders}'
