@@ -1,4 +1,4 @@
-# SN-MLTB # Fully Based On WZML . 
+# Fully Based On WZML . 
 
 Base Repo : https://github.com/weebzone/WZML
 
