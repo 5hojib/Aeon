@@ -257,6 +257,7 @@ def get_readable_message():
                     msg += f"\n<b>├⛓️ Engine :</b> {download.eng()}"
 
                 else:
+                    msg += "\n\n"
                     msg += f"\n<b>├ {get_progress_bar_string(download)}</b> {download.progress()}"
                     msg += f"\n<b>├ Process:</b> {get_readable_file_size(download.processed_bytes())} of {download.size()}"
                     msg += f"\n<b>├ Speed:</b> {download.speed()}"
