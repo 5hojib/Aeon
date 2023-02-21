@@ -243,7 +243,7 @@ def start_clone(listelem):
                 if config_dict['EMOJI_THEME']:
                     cc = f'\n<b>╰👤 #Clone_By: </b>{tag}\n\n'
                 else:
-                    cc = f'\n<b>╰ #Clone_By: </b>{tag}\n\n'
+                    cc = f'\n<b>└ Cloned By: </b>{tag}\n\n'
                 if config_dict['PICS']:
                     sendPhoto(result + cc, bot, message, rchoice(config_dict['PICS']), button)
                 else:
@@ -286,7 +286,7 @@ def start_clone(listelem):
                         if config_dict['EMOJI_THEME']:
                             cc = f'\n<b>╰👤 #Clone_By: </b>{tag}\n\n'
                         else:
-                            cc = f'\n<b>╰ #Clone_By: </b>{tag}\n\n'
+                            cc = f'\n<b>└ Cloned By: </b>{tag}\n\n'
                         if config_dict['PICS']:
                             sendPhoto(result + cc, bot, message, rchoice(config_dict['PICS']), button)
                         else:
@@ -335,7 +335,7 @@ def start_clone(listelem):
     if config_dict['EMOJI_THEME']:
         cc = f'\n<b>╰👤 #Clone_By: </b>{tag}\n\n'
     else:
-        cc = f'\n<b>╰ #Clone_By: </b>{tag}\n\n'
+        cc = f'\n<b>└ Cloned By: </b>{tag}\n\n'
     if button.build_menu(2) in ["cancelled", ""]:
         sendMessage(f"{tag} {result}", bot, message)
     else:
