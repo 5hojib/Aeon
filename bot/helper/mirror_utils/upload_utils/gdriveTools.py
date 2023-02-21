@@ -419,7 +419,7 @@ class GoogleDriveHelper:
                     msg += f'\n<b>📦 Size: </b>{get_readable_file_size(int(meta.get("size", 0)))}'
                     msg += f'\n<b>♻ Type: </b>{mime_type}'
                 else:
-                    msg += f'\n<b>├ Size: </b>{get_readable_file_size(int(meta.get("size", 0)))}'
+                    msg += f'\n<b>┌ Size: </b>{get_readable_file_size(int(meta.get("size", 0)))}'
                     msg += f'\n<b>├ Type: </b>{mime_type}'
                 if INDEX_URL := INDEXURL:
                     url_path = rquote(f'{file.get("name")}', safe='')
@@ -764,9 +764,9 @@ class GoogleDriveHelper:
                     msg += f'\n<b>🗃️ SubFolders: </b>{self.__total_folders}'
                 else:
                     msg += f'<b>Name: </b><code>{name}</code>'
-                    msg += f'\n<b>Size: </b>{get_readable_file_size(self.__total_bytes)}'
-                    msg += f'\n<b>Type: </b>Folder'
-                    msg += f'\n<b>SubFolders: </b>{self.__total_folders}'
+                    msg += f'\n<b>┌ Size: </b>{get_readable_file_size(self.__total_bytes)}'
+                    msg += f'\n<b>├ Type: </b>Folder'
+                    msg += f'\n<b>├ SubFolders: </b>{self.__total_folders}'
             else:
                 if config_dict['EMOJI_THEME']:
                     msg += f'<b>🗂️ Name: </b><code>{name}</code>'
@@ -780,7 +780,7 @@ class GoogleDriveHelper:
                     msg += f'\n<b>📦 Size: </b>{get_readable_file_size(self.__total_bytes)}'
                     msg += f'\n<b>♻ Type: </b>{mime_type}'
                 else:
-                    msg += f'\n<b>├ Size: </b>{get_readable_file_size(self.__total_bytes)}'
+                    msg += f'\n<b>┌ Size: </b>{get_readable_file_size(self.__total_bytes)}'
                     msg += f'\n<b>├ Type: </b>{mime_type}'
             if config_dict['EMOJI_THEME']:
                 msg += f'\n<b>🗂️ Files: </b>{self.__total_files}'
