@@ -397,7 +397,7 @@ class MirrorLeechListener:
             if config_dict['EMOJI_THEME']:
                 msg += f'\n<b>📚 Total Files: </b>{folders}'
             else:
-                msg += f'\n<b>Total Files: </b>{folders}'
+                msg += f'\n<b>├ Total Files: </b>{folders}'
             if typ != 0:
                 if config_dict['EMOJI_THEME']:
                     msg += f'\n<b>💀 Corrupted Files: </b>{typ}'
@@ -407,8 +407,8 @@ class MirrorLeechListener:
                 msg += f'\n<b>⌛ It Tooks:</b> {get_readable_time(time() - self.message.date.timestamp())}'
                 msg += f'\n<b>👤 Leech By: </b>{self.tag}\n\n'
             else: 
-                msg += f'\n<b>It Tooks:</b> {get_readable_time(time() - self.message.date.timestamp())}'
-                msg += f'\n<b>Leech By: </b>{self.tag}\n\n'
+                msg += f'\n<b>├ It Tooks:</b> {get_readable_time(time() - self.message.date.timestamp())}'
+                msg += f'\n<b>└ Leeched By: </b>{self.tag}\n\n'
 
             if not self.isPrivate and config_dict['SAVE_MSG']:
                 buttons.sbutton('Save This Message', 'save', 'footer')
@@ -473,20 +473,20 @@ class MirrorLeechListener:
                     msg += f'\n<b>🗃️ SubFolders: </b>{folders}'
                     msg += f'\n<b>🗂️ Files: </b>{files}'
                 else:
-                    msg += f'\n<b>SubFolders: </b>{folders}'
-                    msg += f'\n<b>Files: </b>{files}'
+                    msg += f'\n<b>├ SubFolders: </b>{folders}'
+                    msg += f'\n<b>├ Files: </b>{files}'
             if config_dict['EMOJI_THEME']:
                 msg += f'\n<b>⌛ It Tooks:</b> {get_readable_time(time() - self.message.date.timestamp())}'
                 msg += f'\n<b>👤 Mirror By: </b>{self.tag}\n\n'
             else:
-                msg += f'\n<b>It Tooks:</b> {get_readable_time(time() - self.message.date.timestamp())}'
-                msg += f'\n<b>Mirror By: </b>{self.tag}\n\n' 
+                msg += f'\n<b>├ It Tooks:</b> {get_readable_time(time() - self.message.date.timestamp())}'
+                msg += f'\n<b>└ Mirrored By:</b> {self.tag}\n\n' 
             buttons = ButtonMaker()
             link = short_url(link, user_id_)
             if config_dict['DISABLE_DRIVE_LINK'] and self.message.chat.type != 'private':
                 pass
             else:
-                buttons.buildbutton("☁️ Drive Link", link)
+                buttons.buildbutton("Drive Link", link)
             LOGGER.info(f'Done Uploading {name}')
             _, INDEXURL = getGDriveUploadUtils(user_id_, self.u_index, self.c_index)
             if INDEX_URL:= INDEXURL:
@@ -495,14 +495,14 @@ class MirrorLeechListener:
                 if typ == "Folder":
                     share_url += '/'
                     share_url = short_url(share_url, user_id_)
-                    buttons.buildbutton("⚡ Index Link", share_url)
+                    buttons.buildbutton("Index Link", share_url)
                 else:
                     share_url = short_url(share_url, user_id_)
-                    buttons.buildbutton("⚡ Index Link", share_url)
+                    buttons.buildbutton("Index Link", share_url)
                     if config_dict['VIEW_LINK']:
                         share_urls = f'{INDEX_URL}/{url_path}?a=view'
                         share_urls = short_url(share_urls, user_id_)
-                        buttons.buildbutton("🌐 View Link", share_urls)
+                        buttons.buildbutton("View Link", share_urls)
                     if config_dict['SOURCE_LINK']:
                         try:
                             mesg = message_args[1]
@@ -511,13 +511,13 @@ class MirrorLeechListener:
                                     title=f"{config_dict['TITLE_NAME']} Source Link",
                                     content=mesg,
                                 )["path"]
-                                buttons.buildbutton(f"🔗 Source Link", f"https://telegra.ph/{link}")
+                                buttons.buildbutton(f"Source Link", f"https://telegra.ph/{link}")
                             elif is_url(mesg):
                                 source_link = mesg
                                 if source_link.startswith(("|", "pswd: ", "c:")):
                                     pass
                                 else:
-                                    buttons.buildbutton(f"🔗 Source Link", source_link)
+                                    buttons.buildbutton(f"Source Link", source_link)
                             else:
                                 pass
                         except Exception:
@@ -532,9 +532,9 @@ class MirrorLeechListener:
                                             title=f"{config_dict['TITLE_NAME']} Source Link",
                                             content=source_link,
                                         )["path"]
-                                        buttons.buildbutton(f"🔗 Source Link", f"https://telegra.ph/{link}")
+                                        buttons.buildbutton(f"Source Link", f"https://telegra.ph/{link}")
                                     else:
-                                        buttons.buildbutton(f"🔗 Source Link", source_link)
+                                        buttons.buildbutton(f"Source Link", source_link)
                             except Exception:
                                 pass
                     else:
