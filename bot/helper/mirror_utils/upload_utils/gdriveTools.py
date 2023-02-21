@@ -391,18 +391,18 @@ class GoogleDriveHelper:
                     msg += f'\n<b>🗂️ Files: </b>{self.__total_files}'
                 else:
                     msg += f'<b>Name: </b><code>{f_name}</code>'
-                    msg += f'\n<b>Size: </b>{get_readable_file_size(self.transferred_size)}'
-                    msg += f'\n<b>Type: </b>Folder'
-                    msg += f'\n<b>SubFolders: </b>{self.__total_folders}'
-                    msg += f'\n<b>Files: </b>{self.__total_files}'
+                    msg += f'\n<b>┌ Size: </b>{get_readable_file_size(self.transferred_size)}'
+                    msg += f'\n<b>├ Type: </b>Folder'
+                    msg += f'\n<b>├ SubFolders: </b>{self.__total_folders}'
+                    msg += f'\n<b>├ Files: </b>{self.__total_files}'
                 buttons = ButtonMaker()
                 durl = short_url(durl, self.user_id)
-                buttons.buildbutton("☁️ Drive Link", durl)
+                buttons.buildbutton("Drive Link", durl)
                 if INDEX_URL := INDEXURL:
                     url_path = rquote(f'{f_name}', safe='')
                     url = f'{INDEX_URL}/{url_path}/'
                     url = short_url(url, self.user_id)
-                    buttons.buildbutton("⚡ Index Link", url)
+                    buttons.buildbutton("Index Link", url)
             else:
                 file = self.__copyFile(meta.get('id'), GDRIVEID, meta.get('name'))
                 if config_dict['EMOJI_THEME']:
@@ -412,24 +412,24 @@ class GoogleDriveHelper:
                 durl = self.__G_DRIVE_BASE_DOWNLOAD_URL.format(file.get("id"))
                 buttons = ButtonMaker()
                 durl = short_url(durl, self.user_id)
-                buttons.buildbutton("☁️ Drive Link", durl)
+                buttons.buildbutton("Drive Link", durl)
                 if mime_type is None:
                     mime_type = 'File'
                 if config_dict['EMOJI_THEME']:
                     msg += f'\n<b>📦 Size: </b>{get_readable_file_size(int(meta.get("size", 0)))}'
                     msg += f'\n<b>♻ Type: </b>{mime_type}'
                 else:
-                    msg += f'\n<b>Size: </b>{get_readable_file_size(int(meta.get("size", 0)))}'
-                    msg += f'\n<b>Type: </b>{mime_type}'
+                    msg += f'\n<b>├ Size: </b>{get_readable_file_size(int(meta.get("size", 0)))}'
+                    msg += f'\n<b>├ Type: </b>{mime_type}'
                 if INDEX_URL := INDEXURL:
                     url_path = rquote(f'{file.get("name")}', safe='')
                     url = f'{INDEX_URL}/{url_path}'
                     url = short_url(url, self.user_id)
-                    buttons.buildbutton("⚡ Index Link", url)
+                    buttons.buildbutton("Index Link", url)
                     if config_dict['VIEW_LINK']:
                         urls = f'{INDEX_URL}/{url_path}?a=view'
                         urls = short_url(urls, self.user_id)
-                        buttons.buildbutton("🌐 View Link", urls)
+                        buttons.buildbutton("View Link", urls)
             if config_dict['BUTTON_FOUR_NAME'] != '' and config_dict['BUTTON_FOUR_URL'] != '':
                 buttons.buildbutton(f"{config_dict['BUTTON_FOUR_NAME']}", f"{config_dict['BUTTON_FOUR_URL']}")
             if config_dict['BUTTON_FIVE_NAME'] != '' and config_dict['BUTTON_FIVE_URL'] != '':
@@ -437,7 +437,7 @@ class GoogleDriveHelper:
             if config_dict['BUTTON_SIX_NAME'] != '' and config_dict['BUTTON_SIX_URL'] != '':
                 buttons.buildbutton(f"{config_dict['BUTTON_SIX_NAME']}", f"{config_dict['BUTTON_SIX_URL']}")
             if config_dict['SOURCE_LINK']:
-                buttons.buildbutton(f"🔗 Source Link", link)
+                buttons.buildbutton(f"Source Link", link)
         except Exception as err:
             if isinstance(err, RetryError):
                 LOGGER.info(f"Total Attempts: {err.last_attempt.attempt_number}")
@@ -780,12 +780,12 @@ class GoogleDriveHelper:
                     msg += f'\n<b>📦 Size: </b>{get_readable_file_size(self.__total_bytes)}'
                     msg += f'\n<b>♻ Type: </b>{mime_type}'
                 else:
-                    msg += f'\n<b>Size: </b>{get_readable_file_size(self.__total_bytes)}'
-                    msg += f'\n<b>Type: </b>{mime_type}'
+                    msg += f'\n<b>├ Size: </b>{get_readable_file_size(self.__total_bytes)}'
+                    msg += f'\n<b>├ Type: </b>{mime_type}'
             if config_dict['EMOJI_THEME']:
                 msg += f'\n<b>🗂️ Files: </b>{self.__total_files}'
             else:
-                msg += f'\n<b>Files: </b>{self.__total_files}'
+                msg += f'\n<b>├ Files: </b>{self.__total_files}'
         except Exception as err:
             if isinstance(err, RetryError):
                 LOGGER.info(f"Total Attempts: {err.last_attempt.attempt_number}")
