@@ -18,7 +18,7 @@ from bot.modules.search import initiate_search_tools
 START = 0
 STATE = 'view'
 handler_dict = {}
-default_values = {'AUTO_DELETE_MESSAGE_DURATION': 30,
+default_values = {'AUTO_DELETE_MESSAGE_DURATION': -1,
                   'AUTO_DELETE_UPLOAD_MESSAGE_DURATION': -1,
                   'BOT_PM': False,
                   'FORCE_BOT_PM': False,
@@ -34,8 +34,8 @@ default_values = {'AUTO_DELETE_MESSAGE_DURATION': 30,
                   'START_BTN1_URL': 'https://t.me/krn_adhikari',
                   'START_BTN2_NAME': 'Support Group',
                   'START_BTN2_URL': 'https://t.me/WeebZone_updates',
-                  'AUTHOR_NAME': 'WZML',
-                  'AUTHOR_URL': 'https://t.me/WeebZone_updates',
+                  'AUTHOR_NAME': 'Chishiya',
+                  'AUTHOR_URL': 'https://t.me/JuniorXcientist',
                   'TITLE_NAME': 'Chishiya',
                   'GD_INFO': 'Uploaded by WeebZone Mirror Bot',
                   'CREDIT_NAME': 'WeebZone',
