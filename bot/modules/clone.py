@@ -193,7 +193,7 @@ def start_clone(listelem):
                 msg = sendMessage(f"FILEPRESS LINK DETECTED !", bot, message)
                 link = filepress(link)
             elif is_unified:
-                msg = await sendMessage(f"UNIFIED LINK DETECTED !", c, message)
+                msg = sendMessage(f"UNIFIED LINK DETECTED !", c, message)
                 link = unified(link)
             LOGGER.info(f"Generated GDrive Link: {link}")
             deleteMessage(bot, msg)
