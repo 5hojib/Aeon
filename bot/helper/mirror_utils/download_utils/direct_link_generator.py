@@ -96,7 +96,7 @@ def direct_link_generator(link: str):
     elif is_filepress_link(link):
         return filepress(link)
     elif is_unified_link(link):
-        return unified (link)
+        return unified(link)
     elif any(x in link for x in fmed_list):
         return fembed(link)
     elif any(x in link for x in ['sbembed.com', 'watchsb.com', 'streamsb.net', 'sbplay.org']):
