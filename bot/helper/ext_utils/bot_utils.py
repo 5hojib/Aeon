@@ -598,7 +598,21 @@ def change_filename(file_, user_id_, dirpath=None, up_path=None, all_edit=True, 
 
     return up_path, file_, cap_mono
 
-def update_user_ldata(id_, key, value):
+
+def is_unified_link(url: str):
+    url1 = re_match(r'https?://(anidrive|driveroot|driveflix|indidrive|drivehub)\.in/\S+', url)
+    url = re_match(r'https?://(appdrive|driveapp|driveace|gdflix|drivelinks|drivebit|drivesharer|drivepro|driveseed|driveleech)\.\S+', url)
+    if bool(url1) == True:
+
+        return bool(url1)
+
+    elif bool(url) == True:
+
+        return bool(url)
+
+    else:
+
+        return Falsedef update_user_ldata(id_, key, value):
     if id_ in user_data:
         user_data[id_][key] = value
     else:
