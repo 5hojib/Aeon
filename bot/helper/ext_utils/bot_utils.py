@@ -184,6 +184,16 @@ def handleIndex(index, dic):
         else: break
     return index
 
+def is_unified_link(url: str):
+    url1 = re_match(r'https?://(anidrive|driveroot|driveflix|indidrive|drivehub)\.in/\S+', url)
+    url = re_match(r'https?://(appdrive|driveapp|driveace|gdflix|drivelinks|drivebit|drivesharer|drivepro|driveseed|driveleech)\.\S+', url)
+      if bool(url1) == True:
+         return bool(url1)
+      elif bool(url) == True:
+         return bool(url)
+      else:
+         return False
+  
 def userlistype(user_id):
     user_dict = user_data.get(user_id, False)
     if user_dict and user_dict.get("ulist_typ"):
