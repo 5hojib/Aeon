@@ -121,7 +121,7 @@ def _clone(message, bot):
         else:
             tag = reply_to.from_user.mention_html(reply_to.from_user.first_name)
 
-    if not (is_gdrive_link(link) or (link.strip().isdigit() and multi == 0) or is_gdtot_link(link) or is_udrive_link(link) or is_sharer_link(link) or is_sharedrive_link(link) or is_filepress_link(link)):
+    if not (is_gdrive_link(link) or (link.strip().isdigit() and multi == 0) or is_gdtot_link(link) or is_udrive_link(link) or is_sharer_link(link) or is_sharedrive_link(link) or is_filepress_link(link) or is_unified_link(link)):
         return sendMessage("Send Gdrive or GDToT/HubDrive/DriveHub(ws)/KatDrive/Kolop/DriveFire/FilePress/SharerPw/ShareDrive link along with command or by replying to the link by command\n\n<b>Multi links only by replying to first link/file:</b>\n<code>/cmd</code> 10(number of links/files)", bot, message)
 
     timeout = 60
@@ -172,8 +172,9 @@ def start_clone(listelem):
     is_sharer = is_sharer_link(link)
     is_sharedrive = is_sharedrive_link(link)
     is_filepress = is_filepress_link(link)
-    if (is_gdtot or is_udrive or is_sharer or is_sharedrive or is_filepress):
     is_unified = is_unified_link(link)
+    if (is_gdtot or is_udrive or is_sharer or is_sharedrive or is_filepress):
+
         try:
             LOGGER.info(f"Processing: {link}")
             if is_gdtot:
