@@ -18,7 +18,7 @@ from playwright.sync_api import Playwright, sync_playwright, expect
 
 from bot import LOGGER, config_dict
 from bot.helper.telegram_helper.bot_commands import BotCommands
-from bot.helper.ext_utils.bot_utils import is_gdtot_link, is_udrive_link, is_sharer_link, is_sharedrive_link, is_filepress_link
+from bot.helper.ext_utils.bot_utils import is_gdtot_link, is_udrive_link, is_sharer_link, is_sharedrive_link, is_filepress_link, is_unified_link
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 
 fmed_list = ['fembed.net', 'fembed.com', 'femax20.com', 'fcdn.stream', 'feurl.com', 'layarkacaxxi.icu',
@@ -95,6 +95,8 @@ def direct_link_generator(link: str):
         return shareDrive(link)
     elif is_filepress_link(link):
         return filepress(link)
+    elif is_unified_link(link):
+        return unified (link)
     elif any(x in link for x in fmed_list):
         return fembed(link)
     elif any(x in link for x in ['sbembed.com', 'watchsb.com', 'streamsb.net', 'sbplay.org']):
