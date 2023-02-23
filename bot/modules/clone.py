@@ -5,11 +5,11 @@ from threading import Thread
 from time import sleep, time
 
 from bot.helper.ext_utils.bot_utils import is_sudo, is_paid, get_user_task, get_category_buttons, get_readable_file_size, getUserTDs, \
-                    new_thread, get_bot_pm, is_url, is_gdrive_link, is_gdtot_link, is_udrive_link, is_sharer_link, \
+                    new_thread, is_unified_link, get_bot_pm, is_url, is_gdrive_link, is_gdtot_link, is_udrive_link, is_sharer_link, \
                     is_sharedrive_link, is_filepress_link, userlistype
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.timegap import timegap_check
-from bot.helper.mirror_utils.download_utils.direct_link_generator import gdtot, udrive, sharer_pw_dl, shareDrive, filepress
+from bot.helper.mirror_utils.download_utils.direct_link_generator import gdtot, udrive, sharer_pw_dl, shareDrive, filepress, unified
 from bot.helper.mirror_utils.status_utils.clone_status import CloneStatus
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.bot_commands import BotCommands
@@ -173,6 +173,7 @@ def start_clone(listelem):
     is_sharedrive = is_sharedrive_link(link)
     is_filepress = is_filepress_link(link)
     if (is_gdtot or is_udrive or is_sharer or is_sharedrive or is_filepress):
+    is_unified = is_unified_link(link)
         try:
             LOGGER.info(f"Processing: {link}")
             if is_gdtot:
@@ -190,6 +191,9 @@ def start_clone(listelem):
             elif is_filepress:
                 msg = sendMessage(f"FILEPRESS LINK DETECTED !", bot, message)
                 link = filepress(link)
+            elif is_unified:
+                msg = await sendMessage(f"UNIFIED LINK DETECTED !", c, message)
+                link = unified(link)
             LOGGER.info(f"Generated GDrive Link: {link}")
             deleteMessage(bot, msg)
         except DirectDownloadLinkException as e:
