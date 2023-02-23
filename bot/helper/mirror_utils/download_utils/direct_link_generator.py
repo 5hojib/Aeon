@@ -791,6 +791,84 @@ def prun(playwright: Playwright, link: str) -> str:
         raise DirectDownloadLinkException("Unable To Get Google Drive Link!")
 
 
+def unified(link) -> str:
+
+    try:
+
+        cget = cloudscraper.create_scraper().request
+
+        url = cget('GET', link).url
+
+        raw = urlparse(url)
+
+        res = cget('GET', url)
+
+    except Exception as e:
+
+        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+
+    key = re_findall('"key",\s+"(.*?)"', res.text)
+
+    if not key:
+
+        raise DirectDownloadLinkException("ERROR: Key not found!")
+
+    key = key[0]
+
+    if not etree.HTML(res.content).xpath("//button[@id='drc']"):
+
+        raise DirectDownloadLinkException("ERROR: This link don't have direct download button")
+
+    headers = {
+
+        'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundaryi3pOrWU7hGYfwwL4',
+
+        'x-token': raw.hostname,
+
+    }
+
+    data = '------WebKitFormBoundaryi3pOrWU7hGYfwwL4\r\nContent-Disposition: form-data; name="action"\r\n\r\ndirect\r\n' \
+
+        f'------WebKitFormBoundaryi3pOrWU7hGYfwwL4\r\nContent-Disposition: form-data; name="key"\r\n\r\n{key}\r\n' \
+
+        '------WebKitFormBoundaryi3pOrWU7hGYfwwL4\r\nContent-Disposition: form-data; name="action_token"\r\n\r\n\r\n' \
+
+        '------WebKitFormBoundaryi3pOrWU7hGYfwwL4--\r\n'
+
+    try:
+
+        res = cget("POST", url, cookies=res.cookies, headers=headers, data=data).json()
+
+    except Exception as e:
+
+        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+
+    if "url" not in res:
+
+        raise DirectDownloadLinkException('ERROR: Drive Link not found')
+
+    if "drive.google.com" in res["url"]:
+
+        return res["url"]
+
+    try:
+
+        res = cget('GET', res["url"])
+
+    except Exception as e:
+
+        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+
+    if (drive_link := etree.HTML(res.content).xpath("//a[contains(@class,'btn')]/@href")) and "drive.google.com" in drive_link[0]:
+
+        return drive_link[0]
+
+    else:
+
+        raise DirectDownloadLinkException('ERROR: Drive Link not found')
+
+        
+        
 def filepress(link: str) -> str:
     with sync_playwright() as playwright:
         flink = prun(playwright, link)
