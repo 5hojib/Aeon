@@ -14,6 +14,4 @@ This docker is unable to extract accounts.zip . So create a folder name accounts
 If you add anything in heroku branch you need to run workflow to load changes .
 
 
-# Support Group 
 
-https://t.me/AtrociousBotSupport
