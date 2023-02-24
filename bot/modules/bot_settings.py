@@ -519,7 +519,7 @@ def load_config():
 
     GDTOT_CRYPT = environ.get('GDTOT_CRYPT', '')
     if len(GDTOT_CRYPT) == 0:
-        GDTOT_CRYPT = ''
+        GDTOT_CRYPT = config_dict['GDTOT_CRYPT']
 
     HUBDRIVE_CRYPT = environ.get('HUBDRIVE_CRYPT', '')
     if len(HUBDRIVE_CRYPT) == 0:
