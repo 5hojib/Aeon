@@ -173,7 +173,7 @@ def start_clone(listelem):
     is_sharedrive = is_sharedrive_link(link)
     is_filepress = is_filepress_link(link)
     is_unified = is_unified_link(link)
-    if (is_gdtot or is_udrive or is_sharer or is_sharedrive or is_filepress):
+    if (is_gdtot or is_udrive or is_sharer or is_sharedrive or is_filepress or is_unified):
 
         try:
             LOGGER.info(f"Processing: {link}")
