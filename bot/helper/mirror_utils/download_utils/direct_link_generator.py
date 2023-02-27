@@ -304,8 +304,8 @@ def mediafire(url: str) -> str:
         return link[0]
     rget = create_scraper().request
     try:
-        url = rget(url).url
-        page = rget(url).text
+        url = rget('get', url).url
+        page = rget('get' url).text
     except IndexError:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     if not (link := re_findall(r"\'(https?:\/\/download\d+\.mediafire\.com\/\S+\/\S+\/\S+)\'", page)):
