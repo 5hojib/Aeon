@@ -300,17 +300,17 @@ def uptobox(url: str) -> str:
 
 
 def mediafire(url: str) -> str:
-    if link := re_findall(r'https?:\/\/download\d+\.mediafire\.com\/\S+\/\S+\/\S+', url):
-        return link[0]
+    if final_link := re_findall(r'https?:\/\/download\d+\.mediafire\.com\/\S+\/\S+\/\S+', url):
+        return final_link[0]
     rget = create_scraper().request
     try:
         url = rget(url).url
         page = rget(url).text
     except Exception as e:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
-    if not (link := re_findall(r"\'(https?:\/\/download\d+\.mediafire\.com\/\S+\/\S+\/\S+)\'", page)):
+    if not (final_link := re_findall(r"\'(https?:\/\/download\d+\.mediafire\.com\/\S+\/\S+\/\S+)\'", page)):
         raise DirectDownloadLinkException("ERROR: No links found in this page")
-    return link[0]
+    return final_link[0]
 
 
 
