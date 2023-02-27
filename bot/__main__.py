@@ -26,7 +26,7 @@ from .modules import authorize, list, cancel_mirror, mirror_status, mirror_leech
                      delete, count, users_settings, search, rss, wayback, speedtest, anilist, imdb, bt_select, mediainfo, hash, \
                      scraper, pictures, save_msg, sel_cat
 
-version = "5.1.3"
+version = "5.1.4"
 
 def progress_bar(percentage):
     p_used = config_dict['FINISHED_PROGRESS_STR']
@@ -51,7 +51,7 @@ def stats(update, context):
             last_commit = check_output(["git log -1 --date=short --pretty=format:'%cd \n🛠 From: %cr'"], shell=True).decode()
             botVersion = check_output(["git log -1 --date=format:v%y.%m%d.%H%M --pretty=format:%cd"], shell=True).decode()
         else:
-            last_commit = check_output(["git log -1 --date=short --pretty=format:'%cd'"], shell=True).decode()
+            last_commit = check_output(["TZ=Asia/Dhaka git log -1 --pretty=format:"%ad" --date=format:'%m/%d/%Y %I:%M:%S %p'"], shell=True).decode()
             last_commit_time = check_output(["git log -1 --date=short --pretty=format:'%cr'"], shell=True).decode()
             botVersion = check_output(["git log -1 --date=format:v%y.%m%d.%H%M --pretty=format:%cd"], shell=True).decode()
     else:
