@@ -2,8 +2,8 @@
 
 Base Repo : https://github.com/weebzone/WZML
 
-## Credits
+## Thanks to
 * [MLTB-Team](https://github.com/anasty17/mirror-leech-telegram-bot)
-* WZML-Team 
-* JMDKH-Team 
+* [WZML-Team](https://github.com/weebzone/WZML) 
+* [JMDKH-Team](https://github.com/junedkh/jmdkh-mltb)
 * Al-Noman 
