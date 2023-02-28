@@ -97,7 +97,7 @@ def direct_link_generator(link: str):
         return filepress(link)
     elif is_unified_link(link):
         return unified(link)
-    elif any(x in domain for x in ['wetransfer.com', 'we.tl']):
+    elif any(x in link for x in ['wetransfer.com', 'we.tl']):
         return wetransfer(link)
     elif any(x in link for x in fmed_list):
         return fembed(link)
