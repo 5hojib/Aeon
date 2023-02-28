@@ -247,7 +247,7 @@ def zippy_share(url: str) -> str:
 def wetransfer(url):
     rget = create_scraper().request
     try:
-        url = rget('GET', url).url
+        url = rget('get', url).url
         json_data = {
             'security_hash': url.split('/')[-1],
             'intent': 'entire_transfer'
