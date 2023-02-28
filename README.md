@@ -5,7 +5,7 @@
 * [SN-MLTB](https://github.com/SN-ABDULLAH-AL-NOMAN/SN-MLTB)
 
 ## Thanks To
-* Anas 
-* Junaed 
-* Karan 
-* Al-Noman
+* [Anas](https://github.com/anasty17) 
+* [Juned KH](https://github.com/junedkh) 
+* [Karan Adhikary](https://github.com/weebzone) 
+* [Al-Noman](https://github.com/SN-ABDULLAH-AL-NOMAN)
