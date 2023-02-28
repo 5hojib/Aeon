@@ -1,9 +1,11 @@
-# Fully Based On WZML . 
+## Modified from
+* [MLTB](https://github.com/anasty17/mirror-leech-telegram-bot)
+* [WZML](https://github.com/weebzone/WZML) 
+* [JMDKH](https://github.com/junedkh/jmdkh-mltb)
+* [SN-MLTB](https://github.com/SN-ABDULLAH-AL-NOMAN/SN-MLTB)
 
-Base Repo : https://github.com/weebzone/WZML
-
-## Thanks to
-* [MLTB-Team](https://github.com/anasty17/mirror-leech-telegram-bot)
-* [WZML-Team](https://github.com/weebzone/WZML) 
-* [JMDKH-Team](https://github.com/junedkh/jmdkh-mltb)
-* Al-Noman 
+## Thanks To
+* Anas 
+* Junaed 
+* Karan 
+* Al-Noman
