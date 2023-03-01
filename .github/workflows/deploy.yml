@@ -24,7 +24,7 @@ jobs:
         env:
           HD_HEROKU_API_KEY: ${{secrets.HEROKU_API_KEY}}
           HD_HEROKU_APP_NAME: ${{secrets.HEROKU_APP_NAME}}
-          OWNER_ID: ${{secrets.OWNER_ID}}
+          HD_OWNER_ID: ${{secrets.OWNER_ID}}
           TELEGRAM_API: ${{secrets.TELEGRAM_API}}
           TELEGRAM_HASH: ${{secrets.TELEGRAM_HASH}}
           DATABASE_URL: ${{secrets.DATABASE_URL}}
