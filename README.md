@@ -1,4 +1,4 @@
-**Instruction** 
+Instructions 
 ---------------------
 1. Go to settings, add action secrets with correct value.
 * `BOT_TOKEN` 
