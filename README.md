@@ -13,7 +13,7 @@ Fork or import heroku branch only . If you already fork both branch then delete 
 * `HEROKU_API` 
 * `HEROKU_APP_NAME`
 
-2. Edit Config From Here . Rename sample_config.env to config.env and fill required vars.
+2. Fill other variable in config.env
 3. Upload token.pickle and other private files from bsetting.
 
 
