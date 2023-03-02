@@ -1,7 +1,3 @@
-## Note
-
-Fork or import heroku branch only . If you already fork both branch then delete master branch . I wish it will help to protect ban from server .
-
 # Instruction
 1. Go to settings, add action secrets with correct value.
 * `BOT_TOKEN` 
