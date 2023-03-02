@@ -1,6 +1,6 @@
 # Guide in Heroku branch
 
-[![[Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
 
 ### Modified from
 * [MLTB](https://github.com/anasty17/mirror-leech-telegram-bot)
