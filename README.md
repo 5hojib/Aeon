@@ -6,7 +6,7 @@
 * `TELEGRAM_HASH`
 * `DATABASE_URL` 
 * `HEROKU_EMAIL` 
-* `HEROKU_API` 
+* `HEROKU_API_KEY` 
 * `HEROKU_APP_NAME`
 
 2. Fill other variable in config.env
