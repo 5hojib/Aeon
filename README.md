@@ -1,5 +1,5 @@
 ##    **Instruction** 
-_____________________
+---------------------
 1. Go to settings, add action secrets with correct value.
 * `BOT_TOKEN` 
 * `OWNER_ID` 
