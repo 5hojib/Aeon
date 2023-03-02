@@ -432,17 +432,17 @@ def get_readable_time(seconds: int) -> str:
     (days, remainder) = divmod(seconds, 86400)
     days = int(days)
     if days != 0:
-        result += f'{days}d'
+        result += f'{days} Days '
     (hours, remainder) = divmod(remainder, 3600)
     hours = int(hours)
     if hours != 0:
-        result += f'{hours}h'
+        result += f'{hours} Hour '
     (minutes, seconds) = divmod(remainder, 60)
     minutes = int(minutes)
     if minutes != 0:
-        result += f'{minutes}m'
+        result += f'{minutes} Minutes '
     seconds = int(seconds)
-    result += f'{seconds}s'
+    result += f'{seconds} Seconds '
     return result
 
 def is_url(url: str):
