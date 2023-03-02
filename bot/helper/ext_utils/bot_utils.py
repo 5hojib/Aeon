@@ -263,7 +263,7 @@ def get_readable_message():
                     msg += f"\n<b>├ Process:</b> {get_readable_file_size(download.processed_bytes())} of {download.size()}"
                     msg += f"\n<b>├ Speed:</b> {download.speed()}"
                     msg += f"\n<b>├ ETA:</b> {download.eta()}"
-                    msg += f"<b> | Elapsed: </b>{get_readable_time(time() - download.message.date.timestamp())}"
+                    msg += f"\n<b>├ Elapsed: </b>{get_readable_time(time() - download.message.date.timestamp())}"
                     
 
                 if hasattr(download, 'seeders_num'):
@@ -436,13 +436,13 @@ def get_readable_time(seconds: int) -> str:
     (hours, remainder) = divmod(remainder, 3600)
     hours = int(hours)
     if hours != 0:
-        result += f'{hours} Hour '
+        result += f'{hours} Hours '
     (minutes, seconds) = divmod(remainder, 60)
     minutes = int(minutes)
     if minutes != 0:
         result += f'{minutes} Minutes '
     seconds = int(seconds)
-    result += f'{seconds} Seconds '
+    result += f'{seconds} Seconds'
     return result
 
 def is_url(url: str):
