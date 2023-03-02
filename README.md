@@ -1,4 +1,4 @@
-<span style="font-size: 50px;">This is some big text</span>
+<p style="font-size: 50px;">This is some big text</p>
 
 <h1 style="font-size: 48px;">This is some really big text</h1>
 
