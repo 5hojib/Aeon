@@ -5,13 +5,13 @@ Fork or import heroku branch only . If you already fork both branch then delete 
 # Instruction
 Go to settings, add action secrets
 * `BOT_TOKEN` 
-* OWNER_ID 
-* TELEGRAM_API 
-* TELEGRAM_HASH 
-* DATABASE_URL 
-* HEROKU_EMAIL 
-* HEROKU_API 
-* HEROKU_APP_NAME
+* `OWNER_ID` 
+* `TELEGRAM_API` 
+* `TELEGRAM_HASH`
+* `DATABASE_URL` 
+* `HEROKU_EMAIL` 
+* `HEROKU_API` 
+* `HEROKU_APP_NAME`
 
 Edit Config From Here . Rename sample_config.env to config.env and fill required vars.
 Upload token.pickle in root folder.
