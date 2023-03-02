@@ -1,9 +1,9 @@
 services:
   # A Docker web service
   - type: web
-    name: wzmlty
+    name: ChishiyaPlus
     env: docker
-    region: Frankfurt
+    region: Singapore
     plan: free
     envVars:
       - key: PORT
