@@ -4,7 +4,7 @@ Fork or import heroku branch only . If you already fork both branch then delete 
 
 # Instruction
 Go to settings, add action secrets
-* 'BOT_TOKEN' 
+* `BOT_TOKEN` 
 * OWNER_ID 
 * TELEGRAM_API 
 * TELEGRAM_HASH 
