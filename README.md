@@ -1,7 +1,3 @@
-<p style="font-size: 50px;">This is some big text</p>
-
-<h1 style="font-size: 48px;">This is some really big text</h1>
-
 ##    **Instruction** 
 _____________________
 1. Go to settings, add action secrets with correct value.
@@ -16,6 +12,3 @@ _____________________
 
 2. Fill other variable in config.env
 3. Upload token.pickle and other private files from bsetting.
-
-
-
