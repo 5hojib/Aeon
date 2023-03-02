@@ -12,4 +12,5 @@
 * [Anas](https://github.com/anasty17) 
 * [Juned KH](https://github.com/junedkh) 
 * [Karan Adhikary](https://github.com/weebzone) 
-* [Al-Noman](https://github.com/SN-ABDULLAH-AL-NOMAN)
+* [Al-Noman](https://github.com/SN-ABDULLAH-AL-NOMAN) 
+* ChatGPT
