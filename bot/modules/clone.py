@@ -242,7 +242,8 @@ def start_clone(listelem):
                 else:
                     sendMessage(msg + botpm, bot, message, buttons.build_menu(2))
             else:
-                if config_dict['PICS']:
+                    cc = f'\n<b>└ Cloned By: </b>{tag}\n\n'
+                    if config_dict['PICS']:
                     sendPhoto(result + cc, bot, message, rchoice(config_dict['PICS']), button)
                 else:
                     sendMessage(result + cc, bot, message, button)
