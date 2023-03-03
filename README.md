@@ -1,6 +1,4 @@
-<a href="https://railway.app/new/template/s44PKw"><img src="https://railway.app/button.svg" alt="Deploy to Render" width="110"></a>
-
-<a href="https://render.com/deploy"><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" width="110"></a><a href="https://render.com/deploy"><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" width="110"></a>
+<a href="https://railway.app/new/template/s44PKw"><img src="https://railway.app/button.svg" alt="Deploy to Render" width="110"></a><a href="https://render.com/deploy"><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" width="110"></a>
 
 # Guide in Heroku branch
 
