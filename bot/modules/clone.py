@@ -21,6 +21,7 @@ from bot import LOGGER, download_dict, config_dict, user_data, OWNER_ID, TIME_GA
 from telegram import ParseMode
 from telegram.ext import CallbackQueryHandler, CommandHandler
 
+cc = f'\n<b>└ Cloned By: </b>{tag}\n\n'
 
 def _clone(message, bot):
     user_id = message.from_user.id
@@ -242,7 +243,6 @@ def start_clone(listelem):
                 else:
                     sendMessage(msg + botpm, bot, message, buttons.build_menu(2))
             else:
-                cc = f'\n<b>└ Cloned By: </b>{tag}\n\n'
                 if config_dict['PICS']:
                     sendPhoto(result + cc, bot, message, rchoice(config_dict['PICS']), button)
                 else:
