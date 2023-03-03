@@ -1,3 +1,5 @@
+[![hi](https://github-readme-stats.vercel.app/api/pin/?username=5hojib&repo=hk-upstream&theme=react&border_color=61dafb&border_radius=10)](https://github.com/5hojib/hk-upstream)
+
 Instructions 
 ---------------------
 1. Go to settings, add action secrets with correct value.
