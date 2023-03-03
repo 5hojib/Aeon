@@ -318,7 +318,7 @@ def start_clone(listelem):
             except TypeError:
                 pass  
 
-    if button.build_menu(2) in ["cancelled", ""]:
+    if button.build_menu(1) in ["cancelled", ""]:
         sendMessage(f"{tag} {result}", bot, message)
     else:
         LOGGER.info(f'Cloning Done: {name}')
