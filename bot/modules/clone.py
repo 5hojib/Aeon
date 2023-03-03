@@ -322,7 +322,7 @@ def start_clone(listelem):
 
         cc = f'\n<b>└ Cloned By: </b>{tag}\n\n'
    
-  if button.build_menu(2) in ["cancelled", ""]:
+    if button.build_menu(2) in ["cancelled", ""]:
         sendMessage(f"{tag} {result}", bot, message)
     else:
         LOGGER.info(f'Cloning Done: {name}')
