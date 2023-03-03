@@ -1,6 +1,6 @@
 <a align="left" href="https://github.com/5hojib/hk-upstream" title="Tidal DL Bot"><img align="left" height="115" src="https://github-readme-stats.vercel.app/api/pin/?username=5hojib&repo=hk-upstream&theme=react&border_color=61dafb&border_radius=10"></a>
   
-[![hi(https://github-readme-stats.vercel.app/api/pin/?username=5hojib&repo=hk-upstream&theme=react&border_color=61dafb&border_radius=10)](https://github.com/5hojib/hk-upstream)
+[![hi(https://github-readme-stats.vercel.app/api/pin/?username=5hojib&repo=hk-upstream&theme=react&border_color=61dafb&border_radius=10)](https://github.com/5hojib/hk-upstream)]
   
   <a href="https://render.com/deploy"><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" width="120"></a>
 
