@@ -320,8 +320,6 @@ def start_clone(listelem):
             except TypeError:
                 pass  
 
-        cc = f'\n<b>└ Cloned By: </b>{tag}\n\n'
-   
     if BOT_PM_X and message.chat.type != 'private':
         pmwarn = f"<b>I have sent files in PM.</b>\n"
     else:
