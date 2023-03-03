@@ -22,7 +22,6 @@ from telegram import ParseMode
 from telegram.ext import CallbackQueryHandler, CommandHandler
 
 cc = "f'\n<b>└ Cloned By: </b>{tag}\n\n'"
-global cc
 
 def _clone(message, bot):
     user_id = message.from_user.id
