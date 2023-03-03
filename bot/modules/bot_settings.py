@@ -450,9 +450,6 @@ def load_config():
     if len(LIST_MODE) == 0:
         LIST_MODE = "Telegraph"
 
-    EMOJI_THEME = environ.get('EMOJI_THEME', '')
-    EMOJI_THEME = EMOJI_THEME.lower() == 'true'
-
     DISABLE_DRIVE_LINK = environ.get('DISABLE_DRIVE_LINK', '')
     DISABLE_DRIVE_LINK = DISABLE_DRIVE_LINK.lower() == 'true'
 
@@ -492,24 +489,6 @@ def load_config():
     if len(START_BTN2_NAME) == 0 or len(START_BTN2_URL) == 0:   
         START_BTN2_NAME = 'Support Group'
         START_BTN2_URL = 'https://t.me/WeebZone_updates'
-
-    BUTTON_FOUR_NAME = environ.get('BUTTON_FOUR_NAME', '')
-    BUTTON_FOUR_URL = environ.get('BUTTON_FOUR_URL', '')
-    if len(BUTTON_FOUR_NAME) == 0 or len(BUTTON_FOUR_URL) == 0: 
-        BUTTON_FOUR_NAME = ''
-        BUTTON_FOUR_URL = ''
-
-    BUTTON_FIVE_NAME = environ.get('BUTTON_FIVE_NAME', '')
-    BUTTON_FIVE_URL = environ.get('BUTTON_FIVE_URL', '')
-    if len(BUTTON_FIVE_NAME) == 0 or len(BUTTON_FIVE_URL) == 0: 
-        BUTTON_FIVE_NAME = ''
-        BUTTON_FIVE_URL = ''
-
-    BUTTON_SIX_NAME = environ.get('BUTTON_SIX_NAME', '')
-    BUTTON_SIX_URL = environ.get('BUTTON_SIX_URL', '')
-    if len(BUTTON_SIX_NAME) == 0 or len(BUTTON_SIX_URL) == 0:   
-        BUTTON_SIX_NAME = ''
-        BUTTON_SIX_URL = ''
 
     SHORTENER = environ.get('SHORTENER', '')
     SHORTENER_API = environ.get('SHORTENER_API', '')
