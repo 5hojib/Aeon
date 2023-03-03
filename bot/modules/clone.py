@@ -317,11 +317,6 @@ def start_clone(listelem):
                         bot.sendMessage(chat_id=link_log, text=slmsg + upper + source_link + lower, parse_mode=ParseMode.HTML )
             except TypeError:
                 pass  
-
-    if button.build_menu(1) in ["cancelled", ""]:
-        sendMessage(f"{tag} {result}", bot, message)
-    else:
-        LOGGER.info(f'Cloning Done: {name}')
     if BOT_PM_X and message.chat.type != 'private':
         pmwarn = f"<b>I have sent files in PM.</b>\n"
     else:
