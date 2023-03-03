@@ -508,24 +508,6 @@ if len(START_BTN2_NAME) == 0 or len(START_BTN2_URL) == 0:
     START_BTN2_NAME = 'Support Group'
     START_BTN2_URL = 'https://t.me/WeebZone_updates'
 
-BUTTON_FOUR_NAME = environ.get('BUTTON_FOUR_NAME', '')
-BUTTON_FOUR_URL = environ.get('BUTTON_FOUR_URL', '')
-if len(BUTTON_FOUR_NAME) == 0 or len(BUTTON_FOUR_URL) == 0:
-    BUTTON_FOUR_NAME = ''
-    BUTTON_FOUR_URL = ''
-
-BUTTON_FIVE_NAME = environ.get('BUTTON_FIVE_NAME', '')
-BUTTON_FIVE_URL = environ.get('BUTTON_FIVE_URL', '')
-if len(BUTTON_FIVE_NAME) == 0 or len(BUTTON_FIVE_URL) == 0:
-    BUTTON_FIVE_NAME = ''
-    BUTTON_FIVE_URL = ''
-
-BUTTON_SIX_NAME = environ.get('BUTTON_SIX_NAME', '')
-BUTTON_SIX_URL = environ.get('BUTTON_SIX_URL', '')
-if len(BUTTON_SIX_NAME) == 0 or len(BUTTON_SIX_URL) == 0:
-    BUTTON_SIX_NAME = ''
-    BUTTON_SIX_URL = ''
-
 SHORTENER = environ.get('SHORTENER', '')
 SHORTENER_API = environ.get('SHORTENER_API', '')
 if len(SHORTENER) == 0 or len(SHORTENER_API) == 0:
@@ -703,12 +685,6 @@ config_dict = {'ANILIST_ENABLED': ANILIST_ENABLED,
                'BASE_URL': BASE_URL,
                'BOT_TOKEN': BOT_TOKEN,
                'BOT_PM': BOT_PM,
-               'BUTTON_FOUR_NAME': BUTTON_FOUR_NAME,
-               'BUTTON_FOUR_URL': BUTTON_FOUR_URL,
-               'BUTTON_FIVE_NAME': BUTTON_FIVE_NAME,
-               'BUTTON_FIVE_URL': BUTTON_FIVE_URL,
-               'BUTTON_SIX_NAME': BUTTON_SIX_NAME,
-               'BUTTON_SIX_URL': BUTTON_SIX_URL,
                'CAPTION_FONT': CAPTION_FONT,
                'CREDIT_NAME': CREDIT_NAME,
                'CLONE_ENABLED': CLONE_ENABLED,
@@ -724,7 +700,6 @@ config_dict = {'ANILIST_ENABLED': ANILIST_ENABLED,
                'OWNER_ID': OWNER_ID,
                'EQUAL_SPLITS': EQUAL_SPLITS,
                'EXTENSION_FILTER': EXTENSION_FILTER,
-               'EMOJI_THEME': EMOJI_THEME,
                'GDRIVE_ID': GDRIVE_ID,               
                'IGNORE_PENDING_REQUESTS': IGNORE_PENDING_REQUESTS,
                'INCOMPLETE_TASK_NOTIFIER': INCOMPLETE_TASK_NOTIFIER,
