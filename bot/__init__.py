@@ -465,9 +465,6 @@ LIST_MODE = environ.get('LIST_MODE', '')
 if len(LIST_MODE) == 0:
     LIST_MODE = "Telegraph"
 
-EMOJI_THEME = environ.get('EMOJI_THEME', '')
-EMOJI_THEME = EMOJI_THEME.lower() == 'true'
-
 DISABLE_DRIVE_LINK = environ.get('DISABLE_DRIVE_LINK', '')
 DISABLE_DRIVE_LINK = DISABLE_DRIVE_LINK.lower() == 'true'
 
