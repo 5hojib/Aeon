@@ -78,31 +78,17 @@ def stats(update, context):
     mem_t = get_readable_file_size(memory.total)
     mem_a = get_readable_file_size(memory.available)
     mem_u = get_readable_file_size(memory.used)
-    if config_dict['EMOJI_THEME']:
-            stats = f'<b>       📊 Bot Statistics </b>\n' \
-                    f'🛠 Updated On: {last_commit}\n'\
-                    f'⌛ Uptime: {currentTime}\n'\
-                    f'🤖 Version: {version}\n'\
-                    f'🟢 OS Uptime: {osUptime}\n'\
-                    f'🖥️ CPU: [{progress_bar(cpuUsage)}] {cpuUsage}%\n'\
-                    f'🎮 RAM: [{progress_bar(mem_p)}] {mem_p}%\n'\
-                    f'💾 Disk: [{progress_bar(disk)}] {disk}%\n'\
-                    f'💿 Disk Free: {free}\n'\
-                    f'🔺 Upload Data: {sent}\n'\
-                    f'🔻 Download Data: {recv}\n\n'
-
-    else:
-            stats = f'<b><u>Bot Statistics</u></b>\n' \
-                    f'<b>┌ Updated On:</b> {last_commit}\n'\
-                    f'<b>├ Updated From:</b> {last_commit_time}\n'\
-                    f'<b>├ Bot Uptime:</b> {currentTime}\n'\
-                    f'<b>├ Repo Version:</b> {version}\n'\
-                    f'<b>├ CPU Used:</b> {progress_bar(cpuUsage)} {cpuUsage}%\n'\
-                    f'<b>├ RAM Used:</b> {progress_bar(mem_p)} {mem_p}%\n'\
-                    f'<b>├ Disk Used:</b> {progress_bar(disk)} {disk}%\n'\
-                    f'<b>├ Disk Free:</b> {free}\n'\
-                    f'<b>├ Uploaded Data:</b> {sent}\n'\
-                    f'<b>└ Downloaded Data:</b> {recv}\n\n'
+    stats = f'<b><u>Bot Statistics</u></b>\n' \
+            f'<b>┌ Updated On:</b> {last_commit}\n'\
+            f'<b>├ Updated From:</b> {last_commit_time}\n'\
+            f'<b>├ Bot Uptime:</b> {currentTime}\n'\
+            f'<b>├ Repo Version:</b> {version}\n'\
+            f'<b>├ CPU Used:</b> {progress_bar(cpuUsage)} {cpuUsage}%\n'\
+            f'<b>├ RAM Used:</b> {progress_bar(mem_p)} {mem_p}%\n'\
+            f'<b>├ Disk Used:</b> {progress_bar(disk)} {disk}%\n'\
+            f'<b>├ Disk Free:</b> {free}\n'\
+            f'<b>├ Uploaded Data:</b> {sent}\n'\
+            f'<b>└ Downloaded Data:</b> {recv}\n\n'
 
 
 
@@ -123,25 +109,14 @@ def stats(update, context):
         zip_unzip = 'No Limit Set' if ZIP_UNZIP_LIMIT == '' else f'{ZIP_UNZIP_LIMIT}GB/Link'
         total_task = 'No Limit Set' if TOTAL_TASKS_LIMIT == '' else f'{TOTAL_TASKS_LIMIT} Total Tasks/Time'
         user_task = 'No Limit Set' if USER_TASKS_LIMIT == '' else f'{USER_TASKS_LIMIT} Tasks/user'
-
-        if config_dict['EMOJI_THEME']: 
-            stats += f'<b>🤖 Bot Limitations </b>\n'\
-                     f'🧲 Torrent/Direct: {torrent_direct}\n'\
-                     f'🔐 Zip/Unzip: {zip_unzip}\n'\
-                     f'🔷 Leech: {leech_limit}\n'\
-                     f'♻️ Clone: {clone_limit}\n'\
-                     f'🔰 Mega: {mega_limit}\n'\
-                     f'💣 Total Tasks: {total_task}\n'\
-                     f'🔫 User Tasks: {user_task}\n\n'
-        else: 
-            stats += f'<b>🤖 Bot Limitations </b>\n'\
-                     f'Torrent/Direct: {torrent_direct}\n'\
-                     f'Zip/Unzip: {zip_unzip}\n'\
-                     f'Leech: {leech_limit}\n'\
-                     f'Clone: {clone_limit}\n'\
-                     f'Mega: {mega_limit}\n'\
-                     f'Total Tasks: {total_task}\n'\
-                     f'User Tasks: {user_task}\n\n'
+        stats += f'<b>Bot Limitations </b>\n'\
+                 f'Torrent/Direct: {torrent_direct}\n'\
+                 f'Zip/Unzip: {zip_unzip}\n'\
+                 f'Leech: {leech_limit}\n'\
+                 f'Clone: {clone_limit}\n'\
+                 f'Mega: {mega_limit}\n'\
+                 f'Total Tasks: {total_task}\n'\
+                 f'User Tasks: {user_task}\n\n'
 
     if config_dict['PICS']:
         sendPhoto(stats, context.bot, update.message, rchoice(config_dict['PICS']))
@@ -321,12 +296,8 @@ help_admin = telegraph.create_page(
 
 def bot_help(update, context):
     button = ButtonMaker()
-    if config_dict['EMOJI_THEME']:
-        button.buildbutton("👤 User", f"https://telegra.ph/{help_user}")
-        button.buildbutton("🛡️ Admin", f"https://telegra.ph/{help_admin}")
-    else:
-        button.buildbutton("User", f"https://telegra.ph/{help_user}")
-        button.buildbutton("Admin", f"https://telegra.ph/{help_admin}")
+    button.buildbutton("User", f"https://telegra.ph/{help_user}")
+    button.buildbutton("Admin", f"https://telegra.ph/{help_admin}")
     sendMessage(help_string, context.bot, update.message, button.build_menu(2))
 
 
