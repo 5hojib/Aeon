@@ -21,7 +21,7 @@ from bot import LOGGER, download_dict, config_dict, user_data, OWNER_ID, TIME_GA
 from telegram import ParseMode
 from telegram.ext import CallbackQueryHandler, CommandHandler
 
-cc = f'\n<b>└ Cloned By: </b>{tag}\n\n'
+cc = "f'\n<b>└ Cloned By: </b>{tag}\n\n'"
 global cc
 
 def _clone(message, bot):
