@@ -322,10 +322,6 @@ def start_clone(listelem):
 
         cc = f'\n<b>└ Cloned By: </b>{tag}\n\n'
    
-    if button.build_menu(1) in ["cancelled", ""]:
-        sendMessage(f"{tag} {result}", bot, message)
-    else:
-        LOGGER.info(f'Cloning Done: {name}')
     if BOT_PM_X and message.chat.type != 'private':
         pmwarn = f"<b>I have sent files in PM.</b>\n"
     else:
