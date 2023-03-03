@@ -266,15 +266,10 @@ class MirrorLeechListener:
         BOT_PM_X = get_bot_pm(user_id_)     
         
         NAME_FONT = config_dict['NAME_FONT']
-        if config_dict['EMOJI_THEME']:
-            slmsg = f"🗂️ Name: <{NAME_FONT}>{escape(name)}</{NAME_FONT}>\n\n"
-            slmsg += f"📐 Size: {size}\n"
-            slmsg += f"👥 Added by: {self.tag} | <code>{self.user_id}</code>\n\n"
-        else:
-            slmsg = f"Name: <{NAME_FONT}>{escape(name)}</{NAME_FONT}>\n\n"
-            slmsg += f"\n"
-            slmsg += f"┌ Size: {size}\n"
-            slmsg += f"Added by: {self.tag} | <code>{self.user_id}</code>\n\n"
+        slmsg = f"Name: <{NAME_FONT}>{escape(name)}</{NAME_FONT}>\n\n"
+        slmsg += f"\n"
+        slmsg += f"┌ Size: {size}\n"
+        slmsg += f"Added by: {self.tag} | <code>{self.user_id}</code>\n\n"
         if 'link_logs' in user_data:
             try:
                 upper = f"‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒\n"
@@ -304,35 +299,23 @@ class MirrorLeechListener:
             if self.message.chat.type == 'private':
                 warnmsg = ''
             else:
-                if config_dict['EMOJI_THEME']:
-                    warnmsg = f'<b>❗ This message will be deleted in <i>{auto_delete_message} minutes</i> from this group.</b>\n'
-                else:
-                    warnmsg = f'<b>This message will be deleted in <i>{auto_delete_message} minutes</i> from this group.</b>\n'
+                warnmsg = f'<b>This message will be deleted in <i>{auto_delete_message} minutes</i> from this group.</b>\n'
         else:
             warnmsg = ''
         if BOT_PM_X and self.message.chat.type != 'private':
-            if config_dict['EMOJI_THEME']:
-                pmwarn = f"<b>😉 I have sent files in PM.</b>\n"
-            else:
-                pmwarn = f"<b>I have sent files in PM.</b>\n"
+            pmwarn = f"<b>I have sent files in PM.</b>\n"
         elif self.message.chat.type == 'private':
             pmwarn = ''
         else:
             pmwarn = ''
         if 'mirror_logs' in user_data and self.message.chat.type != 'private':
-            if config_dict['EMOJI_THEME']:
-                logwarn = f"<b>⚠️ I have sent files in Mirror Log Channel. Join <a href=\"{config_dict['MIRROR_LOG_URL']}\">Mirror Log channel</a> </b>\n"
-            else:
-                logwarn = f"<b>I have sent files in Mirror Log Channel. Join <a href=\"{config_dict['MIRROR_LOG_URL']}\">Mirror Log channel</a> </b>\n"
+            logwarn = f"<b>I have sent files in Mirror Log Channel. Join <a href=\"{config_dict['MIRROR_LOG_URL']}\">Mirror Log channel</a> </b>\n"
         elif self.message.chat.type == 'private':
             logwarn = ''
         else:
             logwarn = ''
         if 'is_leech_log' in user_data and self.message.chat.type != 'private':
-            if config_dict['EMOJI_THEME']:
-                logleechwarn = f"<b>⚠️ I have sent files in Leech Log Channel. Join <a href=\"{config_dict['LEECH_LOG_URL']}\">Leech Log channel</a> </b>\n"
-            else:
-                logleechwarn = f"<b>I have sent files in Leech Log Channel. Join <a href=\"{config_dict['LEECH_LOG_URL']}\">Leech Log channel</a> </b>\n"
+            logleechwarn = f"<b>I have sent files in Leech Log Channel. Join <a href=\"{config_dict['LEECH_LOG_URL']}\">Leech Log channel</a> </b>\n"
         elif self.message.chat.type == 'private':
             logleechwarn = ''
         else:
@@ -343,10 +326,7 @@ class MirrorLeechListener:
 
 
 
-        if config_dict['EMOJI_THEME']:
-            msg = f"<b>🗂️ Name: </b><{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n<b>📐 Size: </b>{size}"
-        else:
-            msg = f"<b>Name: </b><{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n\n<b>┌ Size: </b>{size}"
+        msg = f"<b>Name: </b><{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n\n<b>┌ Size: </b>{size}"
 
         if self.isLeech:
             if config_dict['SOURCE_LINK']:
@@ -395,21 +375,11 @@ class MirrorLeechListener:
             # else:
             #     botstart = ''
 
-            if config_dict['EMOJI_THEME']:
-                msg += f'\n<b>📚 Total Files: </b>{folders}'
-            else:
-                msg += f'\n<b>├ Total Files: </b>{folders}'
+            msg += f'\n<b>├ Total Files: </b>{folders}'
             if typ != 0:
-                if config_dict['EMOJI_THEME']:
-                    msg += f'\n<b>💀 Corrupted Files: </b>{typ}'
-                else:
-                    msg += f'\n<b>Corrupted Files: </b>{typ}'
-            if config_dict['EMOJI_THEME']:
-                msg += f'\n<b>⌛ It Tooks:</b> {get_readable_time(time() - self.message.date.timestamp())}'
-                msg += f'\n<b>👤 Leech By: </b>{self.tag}\n\n'
-            else: 
-                msg += f'\n<b>├ It Tooks:</b> {get_readable_time(time() - self.message.date.timestamp())}'
-                msg += f'\n<b>└ Leeched By: </b>{self.tag}\n\n'
+                msg += f'\n<b>Corrupted Files: </b>{typ}'
+            msg += f'\n<b>├ It Tooks:</b> {get_readable_time(time() - self.message.date.timestamp())}'
+            msg += f'\n<b>└ Leeched By: </b>{self.tag}\n\n'
 
             if not self.isPrivate and config_dict['SAVE_MSG']:
                 buttons.sbutton('Save This Message', 'save', 'footer')
@@ -465,23 +435,12 @@ class MirrorLeechListener:
                 return     
 
         else:
-            if config_dict['EMOJI_THEME']:
-                msg += f'\n<b>📦 Type: </b>{typ}'
-            else:
-                msg += f'\n<b>├ Type: </b>{typ}'
+            msg += f'\n<b>├ Type: </b>{typ}'
             if typ == "Folder":
-                if config_dict['EMOJI_THEME']:
-                    msg += f'\n<b>🗃️ SubFolders: </b>{folders}'
-                    msg += f'\n<b>🗂️ Files: </b>{files}'
-                else:
-                    msg += f'\n<b>├ SubFolders: </b>{folders}'
-                    msg += f'\n<b>├ Files: </b>{files}'
-            if config_dict['EMOJI_THEME']:
-                msg += f'\n<b>⌛ It Tooks:</b> {get_readable_time(time() - self.message.date.timestamp())}'
-                msg += f'\n<b>👤 Mirror By: </b>{self.tag}\n\n'
-            else:
-                msg += f'\n<b>├ It Tooks:</b> {get_readable_time(time() - self.message.date.timestamp())}'
-                msg += f'\n<b>└ Mirrored By:</b> {self.tag}\n\n' 
+                msg += f'\n<b>├ SubFolders: </b>{folders}'
+                msg += f'\n<b>├ Files: </b>{files}'
+            msg += f'\n<b>├ It Tooks:</b> {get_readable_time(time() - self.message.date.timestamp())}'
+            msg += f'\n<b>└ Mirrored By:</b> {self.tag}\n\n' 
             buttons = ButtonMaker()
             link = short_url(link, user_id_)
             if config_dict['DISABLE_DRIVE_LINK'] and self.message.chat.type != 'private':
@@ -597,10 +556,7 @@ class MirrorLeechListener:
                 return
 
         if BOT_PM_X and self.message.chat.type != 'private':
-            if config_dict['EMOJI_THEME']:
-                bmsg = f"<b>🗂️ Name: </b><{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n"
-            else:
-                bmsg = f"<b>Name: </b><{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n"
+            bmsg = f"<b>Name: </b><{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n"
             botpm = f"<b>\nHey {self.tag}!, I have sent your stuff in PM.</b>\n"
             buttons = ButtonMaker()
             b_uname = bot.get_me().username
