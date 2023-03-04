@@ -19,7 +19,7 @@
 * [Al-Noman](https://github.com/SN-ABDULLAH-AL-NOMAN) 
 * ChatGPT
 
-<ul style="font-size: small;">
+<ul style="font-size: x-small;">
   <li>Item 1</li>
   <li>Item 2</li>
   <li>Item 3</li>
