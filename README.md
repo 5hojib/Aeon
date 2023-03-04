@@ -20,6 +20,6 @@
 * ChatGPT
 
 
-- <span style="font-size: 8px">Item 1</span>
-- <span style="font-size: 8px">Item 2</span>
+- <sub>Item 1
+- <sub>Item 2
 - <span style="font-size: 8px">Item 3</span>
