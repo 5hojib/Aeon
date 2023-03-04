@@ -18,8 +18,3 @@
 * [Karan Adhikary](https://github.com/weebzone) 
 * [Al-Noman](https://github.com/SN-ABDULLAH-AL-NOMAN) 
 * ChatGPT
-
-
-- <sub>Item 1
-- <sub>Item 2
-- <span style="font-size: 8px">Item 3</span>
