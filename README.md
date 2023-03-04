@@ -24,3 +24,7 @@
   <li>Item 2</li>
   <li>Item 3</li>
 </ul>
+
+- <span style="font-size: 8px">Item 1</span>
+- <span style="font-size: 8px">Item 2</span>
+- <span style="font-size: 8px">Item 3</span>
