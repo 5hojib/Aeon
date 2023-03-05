@@ -349,13 +349,12 @@ def main():
                 config_dict['PICS'].append(o)
 
     if config_dict['WALLFLARE_SEARCH']:
-        try:
-            for page in range(1,20):
-                r2 = rget(f"https://www.wallpaperflare.com/search?wallpaper={config_dict['WALLFLARE_SEARCH']}&width=1280&height=720&page={page}")
-                soup2 = BeautifulSoup(r2.text, "html.parser")
-                x = soup2.select('img[data-src^="https://c4.wallpaperflare.com/wallpaper"]')  
-                for img in x:
-                    config_dict['PICS'].append(o)
+        for page in range(1,20):
+            r2 = rget(f"https://www.wallpaperflare.com/search?wallpaper={config_dict['WALLFLARE_SEARCH']}&width=1280&height=720&page={page}")
+            soup2 = BeautifulSoup(r2.text, "html.parser")
+            x = soup2.select('img[data-src^="https://c4.wallpaperflare.com/wallpaper"]')  
+            for img in x:
+                config_dict['PICS'].append(img['data-src'])
         except Exception as err:
             LOGGER.info(f"WallFlare Error: {err}")
 
