@@ -355,7 +355,7 @@ def main():
                 soup2 = BeautifulSoup(r2.text, "html.parser")
                 x = soup2.select('img[data-src^="https://c4.wallpaperflare.com/wallpaper"]')  
                 for img in x:
-                    config_dict['PICS'].append(img['data-src'])
+                    config_dict['PICS'].append(o)
         except Exception as err:
             LOGGER.info(f"WallFlare Error: {err}")
 
