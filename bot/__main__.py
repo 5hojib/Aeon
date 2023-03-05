@@ -355,9 +355,7 @@ def main():
             x = soup2.select('img[data-src^="https://c4.wallpaperflare.com/wallpaper"]')  
             for img in x:
                 config_dict['PICS'].append(img['data-src'])
-        except Exception as err:
-            LOGGER.info(f"WallFlare Error: {err}")
-
+       
     if config_dict['PIXABAY_API_KEY']:
         try:
             PIXABAY_ENDPOINT = f"https://pixabay.com/api/?key={config_dict['PIXABAY_API_KEY']}&image_type=all&orientation=horizontal&min_width=1280&min_height=720&per_page=200&safesearch=true&editors_choice=true"
