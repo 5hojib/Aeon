@@ -74,7 +74,7 @@ def stats(update, context):
     mem_t = get_readable_file_size(memory.total)
     mem_a = get_readable_file_size(memory.available)
     mem_u = get_readable_file_size(memory.used)
-    stats = f'<b><u>Bot Statistics</u></b>\n' \
+    stats = f'<b><u>Bot Statistics</u></b>\n\n' \
             f'<b>┌ Updated On:</b> {last_commit}\n'\
             f'<b>├ Updated From:</b> {last_commit_time}\n'\
             f'<b>├ Bot Uptime:</b> {currentTime}\n'\
