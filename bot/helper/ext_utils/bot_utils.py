@@ -645,18 +645,21 @@ def bot_sys_stats():
         if stats.status() == MirrorStatus.STATUS_SPLITTING:
             num_split += 1
     return f"""
-Modified by {config_dict['CREDIT_NAME']}
+Modified by Chishiya.
 
 Tasks: {tasks}
 
-CPU: {progress_bar(cpu)} {cpu}%
-RAM: {progress_bar(mem)} {mem}%
-DISK: {progress_bar(disk)} {disk}%
+CPU: {cpu}%
+RAM: {mem}%
+DISK: {disk}%
 
-SENT: {sent} | RECV: {recv}
+SENT DATA: {sent}
+RECEIVED DATA: {recv}
 
-DLs: {num_active} | ULs: {num_upload} | SEEDING: {num_seeding}
-ZIP: {num_zip} | UNZIP: {num_unzip} | SPLIT: {num_split}
+Downloads: {num_active}
+Uploads: {num_upload} | SEEDING: {num_seeding}
+ZIP: {num_zip}
+UNZIP: {num_unzip}
 """
     return stats
 dispatcher.add_handler(
