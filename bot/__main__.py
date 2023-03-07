@@ -75,13 +75,13 @@ def stats(update, context):
     mem_a = get_readable_file_size(memory.available)
     mem_u = get_readable_file_size(memory.used)
     stats = f'<b><u>Bot Statistics</u></b>\n\n' \
-            f'<b>┌ Updated On:</b> {last_commit}\n'\
+            f'<b>┌ Updated:</b> {last_commit}\n'\
             f'<b>├ Updated From:</b> {last_commit_time}\n'\
-            f'<b>├ Bot Uptime:</b> {currentTime}\n'\
+            f'<b>├ Uptime:</b> {currentTime}\n'\
             f'<b>├ Repo Version:</b> {version}\n'\
-            f'<b>├ CPU Used:</b> {progress_bar(cpuUsage)} {cpuUsage}%\n'\
-            f'<b>├ RAM Used:</b> {progress_bar(mem_p)} {mem_p}%\n'\
-            f'<b>├ Disk Used:</b> {progress_bar(disk)} {disk}%\n'\
+            f'<b>├ CPU Used:</b> {cpuUsage}%\n'\
+            f'<b>├ RAM Used:</b> {mem_p}%\n'\
+            f'<b>├ Disk Used:</b> {disk}%\n'\
             f'<b>├ Disk Free:</b> {free}\n'\
             f'<b>├ Uploaded Data:</b> {sent}\n'\
             f'<b>└ Downloaded Data:</b> {recv}\n\n'
