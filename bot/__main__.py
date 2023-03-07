@@ -48,7 +48,7 @@ now=datetime.now(timezone(f'{timez}'))
 def stats(update, context):
     if ospath.exists('.git'):
         last_commit = check_output(["git log -1 --pretty=format:%ad --date=format:'%m/%d/%Y %I:%M:%S %p'"], shell=True).decode()
-        last_commit_time = check_output(["git log -1 --date=short --pretty=format:'%cr'"], shell=True).decode()
+        commit_from = check_output(["git log -1 --date=short --pretty=format:'%cr'"], shell=True).decode()
         botVersion = check_output(["git log -1 --date=format:v%y.%m%d.%H%M --pretty=format:%cd"], shell=True).decode()
     else:
         botVersion = 'No UPSTREAM_REPO'
@@ -76,7 +76,7 @@ def stats(update, context):
     mem_u = get_readable_file_size(memory.used)
     stats = f'<b><u>Bot Statistics</u></b>\n\n' \
             f'<b>┌ Updated:</b> {last_commit}\n'\
-            f'<b>├ Updated From:</b> {last_commit_time}\n'\
+            f'<b>├ Updated From:</b> {commit_from}\n'\
             f'<b>├ Uptime:</b> {currentTime}\n'\
             f'<b>├ Repo Version:</b> {version}\n'\
             f'<b>├ CPU Used:</b> {cpuUsage}%\n'\
