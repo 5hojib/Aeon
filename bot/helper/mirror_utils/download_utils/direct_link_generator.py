@@ -214,10 +214,10 @@ def zippy_share(url: str) -> str:
     js_script = str(js_script)
 
     try:
-        omg = re.findall(r"\.omg.=.(.*?);", js_script)[0]
+        omg = re_findall(r"\.omg.=.(.*?);", js_script)[0]
         mtk = (eval(omg) * (int(omg.split("%")[0])%3)) + 18
-        uri1 = "d/" + re.findall(r'.\"\/d\/(.*?)\/\"\+', js_script)[0]
-        uri2 = re.findall(r'\)\+\"\/(.*?)\"\;', js_script)[0]
+        uri1 = "d/" + re_findall(r'.\"\/d\/(.*?)\/\"\+', js_script)[0]
+        uri2 = re_findall(r'\)\+\"\/(.*?)\"\;', js_script)[0]
     except:
         try:
             var_a = re_findall(r"var.a.=.(\d+)", js_script)[0]
