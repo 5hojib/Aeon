@@ -22,6 +22,7 @@ def speedtest(update, context):
     currentTime = get_readable_time(time() - botStartTime)
     string_speed = f'''
 <b><u>SPEEDTEST INFO</u></b>
+
 <b>┌ Upload:</b> <code>{speed_convert(result['upload'], False)}</code>
 <b>├ Download:</b>  <code>{speed_convert(result['download'], False)}</code>
 <b>├ Ping:</b> <code>{result['ping']} ms</code>
@@ -29,7 +30,9 @@ def speedtest(update, context):
 <b>├ Data Sent:</b> <code>{get_readable_file_size(int(result['bytes_sent']))}</code>
 <b>└ Data Received:</b> <code>{get_readable_file_size(int(result['bytes_received']))}</code>
 
+
 <b><u>SPEEDTEST SERVER</u></b>
+
 <b>┌ Name:</b> <code>{result['server']['name']}</code>
 <b>├ Country:</b> <code>{result['server']['country']}, {result['server']['cc']}</code>
 <b>├ Sponsor:</b> <code>{result['server']['sponsor']}</code>
@@ -37,7 +40,9 @@ def speedtest(update, context):
 <b>├ Latitude:</b> <code>{result['server']['lat']}</code>
 <b>└ Longitude:</b> <code>{result['server']['lon']}</code>
 
+
 <u><b>CLIENT DETAILS</b></u>
+
 <b>┌ IP Address:</b> <code>{result['client']['ip']}</code>
 <b>├ Latitude:</b> <code>{result['client']['lat']}</code>
 <b>├ Longitude:</b> <code>{result['client']['lon']}</code>
