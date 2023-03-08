@@ -57,6 +57,7 @@ def stats(update, context):
     currentTime = get_readable_time(time() - botStartTime)
     current = now.strftime('%m/%d %I:%M:%S %p')
     osUptime = get_readable_time(time() - boot_time())
+    started = get_readable_time(botStartTime)
     total, used, free, disk= disk_usage('/')
     total = get_readable_file_size(total)
     used = get_readable_file_size(used)
@@ -80,6 +81,9 @@ def stats(update, context):
             f'<b>• Updated:</b> {commit_date}\n'\
             f'<b>• At:</b>{commit_time}\n'\
             f'<b>• </b>{commit_from}\n'\
+            f'\n'\
+            f'<b>Bot info</b>\n\n'\
+            f'<b>• Started:</b> {started}\n'\
             f'<b>• Uptime:</b> {currentTime}\n'\
             f'\n'\
             f'<b>System info</b>\n\n'\
