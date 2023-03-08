@@ -57,7 +57,7 @@ def stats(update, context):
     currentTime = get_readable_time(time() - botStartTime)
     current = now.strftime('%m/%d %I:%M:%S %p')
     osUptime = get_readable_time(time() - boot_time())
-    started = botStartTime()
+    started = botStartTime
     total, used, free, disk= disk_usage('/')
     total = get_readable_file_size(total)
     used = get_readable_file_size(used)
