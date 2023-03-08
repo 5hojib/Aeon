@@ -47,7 +47,6 @@ now=datetime.now(timezone(f'{timez}'))
 
 def stats(update, context):
     if ospath.exists('.git'):
-        last_commit = check_output(["git log -1 --pretty=format:%ad --date=format:'%m/%d/%Y %I:%M:%S %p'"], shell=True).decode()
         commit_from = check_output(["git log -1 --date=short --pretty=format:'%cr'"], shell=True).decode()
         commit_date = check_output(["git log -1 --date=format:'%d %B %Y' --pretty=format:'%ad'"], shell=True).decode()
         commit_time = check_output(["git log -1 --date=format:'%I:%M:%S %p' --pretty=format:'%ad'"], shell=True).decode()
@@ -79,13 +78,13 @@ def stats(update, context):
     stats = f'<b><u>Bot Statistics</u></b>\n\n' \
             f'<b>┌ Updated:</b> {commit_date}\n'\
             f'<b>├ At:</b>{commit_time}\n'\
-            f'<b>├</b> {commit_from}\n'\
+            f'<b>├ </b>{commit_from}\n'\
             f'<b>├ Uptime:</b> {currentTime}\n'\
-            f'<b>├ Repo Version:</b> {version}\n'\
-            f'<b>├ CPU Used:</b> {cpuUsage}%\n'\
-            f'<b>├ RAM Used:</b> {mem_p}%\n'\
-            f'<b>├ Disk Used:</b> {disk}%\n'\
-            f'<b>├ Disk Free:</b> {free}\n'\
+            f'<b>├ Repository Version:</b> {version}\n'\
+            f'<b>├ CPU Usage:</b> {cpuUsage}%\n'\
+            f'<b>├ RAM Usage:</b> {mem_p}%\n'\
+            f'<b>├ Disk Usage:</b> {disk}%\n'\
+            f'<b>├ Free Disk Space:</b> {free}\n'\
             f'<b>├ Uploaded Data:</b> {sent}\n'\
             f'<b>└ Downloaded Data:</b> {recv}\n\n'
 
