@@ -75,18 +75,20 @@ def stats(update, context):
     mem_t = get_readable_file_size(memory.total)
     mem_a = get_readable_file_size(memory.available)
     mem_u = get_readable_file_size(memory.used)
-    stats = f'<b><u>Bot Statistics</u></b>\n\n' \
-            f'<b>┌ Updated:</b> {commit_date}\n'\
-            f'<b>├ At:</b>{commit_time}\n'\
-            f'<b>├ </b>{commit_from}\n'\
-            f'<b>├ Uptime:</b> {currentTime}\n'\
-            f'<b>├ Repository Version:</b> {version}\n'\
-            f'<b>├ CPU Usage:</b> {cpuUsage}%\n'\
-            f'<b>├ RAM Usage:</b> {mem_p}%\n'\
-            f'<b>├ Disk Usage:</b> {disk}%\n'\
-            f'<b>├ Free Disk Space:</b> {free}\n'\
-            f'<b>├ Uploaded Data:</b> {sent}\n'\
-            f'<b>└ Downloaded Data:</b> {recv}\n\n'
+    stats = f'<b>Repository info</b>\n\n' \
+            f'<b>• Repository Version:</b> {version}\n'\
+            f'<b>• Updated:</b> {commit_date}\n'\
+            f'<b>• At:</b>{commit_time}\n'\
+            f'<b>• </b>{commit_from}\n'\
+            f'<b>• Uptime:</b> {currentTime}\n'\
+            f'\n'\
+            f'<b>System info</b>\n\n'\
+            f'<b>• CPU Usage:</b> {cpuUsage}%\n'\
+            f'<b>• RAM Usage:</b> {mem_p}%\n'\
+            f'<b>• Disk Usage:</b> {disk}%\n'\
+            f'<b>• Free Disk Space:</b> {free}\n'\
+            f'<b>• Uploaded Data:</b> {sent}\n'\
+            f'<b>• Downloaded Data:</b> {recv}\n\n'
 
 
 
