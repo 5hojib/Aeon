@@ -1,5 +1,4 @@
 from telegram.ext import CommandHandler
-from telegram.ext import CommandHandler
 from bot import dispatcher, BASE_URL, alive
 from bot.helper.telegram_helper.message_utils import sendMessage
 from bot.helper.telegram_helper.filters import CustomFilters
@@ -8,7 +7,7 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 
 def sleep(update, context):
     if BASE_URL is None:
-        sendMessage('BASE_URL_OF_BOT not provided!', context.bot, update.message)
+        sendMessage('BASE_URL not provided!', context.bot, update.message)
     elif alive.returncode is None:
         alive.kill()
         msg = 'Your bot will sleep in 30 minute maximum.\n\n'
