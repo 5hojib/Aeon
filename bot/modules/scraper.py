@@ -86,7 +86,7 @@ def scrapper(update, context):
             sendMessage(gd_txt, context.bot, update.message)
 
     elif "teluguflix" in link:
-        sent = await sendMessage('Running Scrape ...', c, message)
+        sent = sendMessage('Running Scrape ...', context.bot, update.message)
         gd_txt = ""
         r = rget(link)
         soup = BeautifulSoup(r.text, "html.parser")
