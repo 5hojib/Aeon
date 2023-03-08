@@ -98,7 +98,7 @@ def scrapper(update, context):
             title = link.get_text()
             gd_txt += f"{no}. <code>{title}</code>\n{gdlk}\n\n"
             editMessage(gd_txt, sent)
-            await asleep(1.5)
+            asleep(1.5)
             if len(gd_txt) > 4000:
                 sent = sendMessage("<i>Running More Scrape ...</i>", context.bot, update.message)
                 gd_txt = ""
