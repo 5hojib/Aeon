@@ -155,28 +155,6 @@ def scrapper(update, context):
             if len(gd_txt) > 4000:
                 sent = sendMessage("<i>Running More Scrape ...</i>", context.bot, update.message)
                 gd_txt = ""
-    elif "toonworld4all" in link:
-        sent = sendMessage('Running Scrape ...', context.bot, update.message)
-        gd_txt, no = "", 0
-        client = requests.session()
-        r = client.get(link).text
-        soup = BeautifulSoup (r, "html.parser")
-        for a in soup.find_all("a"):
-                   c= a.get("href")
-                   if "redirect/main.php?" in c:
-                       download = rget(c, stream=True, allow_redirects=False)
-                       link = download.headers["location"]
-                       g = rock(link)
-                       if "gdtot" in g:
-                           t = client.get(g).text
-                           soupt = BeautifulSoup(t, "html.parser")
-                           title = soupt.title
-                           no += 1
-                           gd_txt += f"{(title.text).replace('GDToT | ' , '')}\n{g}\n\n"
-                           editMessage(gd_txt, sent)
-                           if len(gd_txt) > 4000:
-                               sent = sendMessage("<i>Running More Scrape ...</i>", context.bot, update.message)
-                               gd_txt = ""
     elif "skymovieshd" in link:
         sent = sendMessage('Running Scrape ...', context.bot, update.message)
         gd_txt = ""
