@@ -1,5 +1,5 @@
 from telegram.ext import CommandHandler
-
+from telegram.ext import CommandHandler
 from bot import dispatcher, BASE_URL, alive
 from bot.helper.telegram_helper.message_utils import sendMessage
 from bot.helper.telegram_helper.filters import CustomFilters
@@ -18,6 +18,4 @@ def sleep(update, context):
     else:
         sendMessage('Ping have been stopped, your bot will sleep in less than 30 min.', context.bot, update.message)
 
-
 sleep_handler = CommandHandler("sleep", callback=sleep, filters=CustomFilters.owner_filter | CustomFilters.sudo_user)
-dispatcher.add_handler(sleep_handler)
