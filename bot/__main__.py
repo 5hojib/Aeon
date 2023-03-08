@@ -83,8 +83,8 @@ def stats(update, context):
             f'<b>• </b>{commit_from}\n'\
             f'\n'\
             f'<b>Bot info</b>\n\n'\
-            f'<b>• Started:</b> {started}\n'\
             f'<b>• Uptime:</b> {currentTime}\n'\
+            f'<b>• System:</b> {osUptime}\n'\
             f'\n'\
             f'<b>System info</b>\n\n'\
             f'<b>• CPU Usage:</b> {cpuUsage}%\n'\
