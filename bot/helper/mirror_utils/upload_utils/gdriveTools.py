@@ -383,7 +383,6 @@ class GoogleDriveHelper:
                     self.deletefile(durl)
                     return "your clone has been stopped and cloned data has been deleted!", "cancelled"
                 _, f_name, _ = change_filename(meta.get("name"), self.user_id, all_edit=False, mirror_type=True)
-                if config_dict['EMOJI_THEME']:
                 msg += f'<b>Name: </b><code>{f_name}</code>'
                 msg += f'\n<b>Size: </b>{get_readable_file_size(self.transferred_size)}'
                 msg += f'\n<b>Type: </b>Folder'
