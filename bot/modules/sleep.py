@@ -2,8 +2,6 @@ from telegram.ext import CommandHandler
 from bot import dispatcher, BASE_URL, alive
 from bot.helper.telegram_helper.message_utils import sendMessage
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.bot_commands import BotCommands
-
 
 def sleep(update, context):
     if BASE_URL is None:
