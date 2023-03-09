@@ -26,14 +26,14 @@ def imdb_search(update: Update, context: CallbackContext):
             movie = imdb.get_movie(movieid)
             if not movie:
                 return editMessage("<i>No Results Found</i>", k)
-            buttons.sbutton(f"🎬 {movie.get('title')} ({movie.get('year')})", f"imdb {user_id} movie {movieid}")
+            buttons.sbutton(f"{movie.get('title')} ({movie.get('year')})", f"imdb {user_id} movie {movieid}")
         else:
             movies = get_poster(title, bulk=True)
             if not movies:
                 return editMessage("<i>No Results Found</i>, Try Again or Use <b>Title ID</b>", k)
             for movie in movies:
-                buttons.sbutton(f"🎬 {movie.get('title')} ({movie.get('year')})", f"imdb {user_id} movie {movie.movieID}")
-        buttons.sbutton("🚫 Close 🚫", f"imdb {user_id} close")
+                buttons.sbutton(f"{movie.get('title')} ({movie.get('year')})", f"imdb {user_id} movie {movie.movieID}")
+        buttons.sbutton("Close", f"imdb {user_id} close")
         editMessage('<b><i>Here What I found on IMDb.com</i></b>', k, buttons.build_menu(1))
     else:
         sendMessage('<i>Send Movie / TV Series Name along with /imdb Command</i>', context.bot, update.message)
