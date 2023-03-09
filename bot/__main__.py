@@ -433,11 +433,11 @@ def main():
         with open(".restartmsg") as f:
             chat_id, msg_id = map(int, f)
         try:
-            msg = f"Bot Restarted Successfully!\n"
-            msg += f"<b>┌ Date:</b> {date}\n"
-            msg += f"<b>├ Time:</b> {time}\n"
-            msg += f"<b>├ Time Zone:</b> {timez}\n"
-            msg += f"<b>└ Repo Version:</b> {version}"            
+            msg = f"Bot Restarted Successfully!\n\n"
+            msg += f"<b>• Repository Version:</b> {version}"            
+            msg += f"<b>• Date:</b> {date}\n"
+            msg += f"<b>• Time:</b> {time}\n"
+            msg += f"<b>• Time Zone:</b> {timez}\n"
             bot.edit_message_text(msg, chat_id, msg_id)
         except Exception as e:
             LOGGER.info(e)
@@ -465,7 +465,7 @@ def main():
     dispatcher.add_handler(stats_handler)
     dispatcher.add_handler(log_handler)
     updater.start_polling(drop_pending_updates=IGNORE_PENDING_REQUESTS)
-    LOGGER.info("💥 𝐁𝐨𝐭 𝐒𝐭𝐚𝐫𝐭𝐞𝐝❗")
+    LOGGER.info("𝐁𝐨𝐭 𝐒𝐭𝐚𝐫𝐭𝐞𝐝")
     signal(SIGINT, exit_clean_up)
 
 app.start()
