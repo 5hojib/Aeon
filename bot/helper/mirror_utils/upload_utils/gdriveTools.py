@@ -383,11 +383,11 @@ class GoogleDriveHelper:
                     self.deletefile(durl)
                     return "your clone has been stopped and cloned data has been deleted!", "cancelled"
                 _, f_name, _ = change_filename(meta.get("name"), self.user_id, all_edit=False, mirror_type=True)
-                msg += f'<b>Name: </b><code>{f_name}</code>'
-                msg += f'\n<b>Size: </b>{get_readable_file_size(self.transferred_size)}'
-                msg += f'\n<b>Type: </b>Folder'
-                msg += f'\n<b>SubFolders: </b>{self.__total_folders}'
-                msg += f'\n<b>Files: </b>{self.__total_files}'
+                msg += f'<b>Name: </b><code>{f_name}</code>\n'
+                msg += f'\n<b>• Size: </b>{get_readable_file_size(self.transferred_size)}'
+                msg += f'\n<b>• Type: </b>Folder'
+                msg += f'\n<b>• SubFolders: </b>{self.__total_folders}'
+                msg += f'\n<b>• Files: </b>{self.__total_files}'
                 buttons = ButtonMaker()
                 durl = short_url(durl, self.user_id)
                 buttons.buildbutton("Drive Link", durl)
