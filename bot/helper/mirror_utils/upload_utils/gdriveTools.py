@@ -724,15 +724,8 @@ class GoogleDriveHelper:
                     mime_type = 'File'
                 self.__total_files += 1
                 self.__gDrive_file(meta)
-                if config_dict['EMOJI_THEME']:
-                    msg += f'\n<b>📦 Size: </b>{get_readable_file_size(self.__total_bytes)}'
-                    msg += f'\n<b>♻ Type: </b>{mime_type}'
-                else:
-                    msg += f'\n<b>Size: </b>{get_readable_file_size(self.__total_bytes)}'
-                    msg += f'\n<b>Type: </b>{mime_type}'
-            if config_dict['EMOJI_THEME']:
-                msg += f'\n<b>🗂️ Files: </b>{self.__total_files}'
-            else:
+                msg += f'\n<b>Size: </b>{get_readable_file_size(self.__total_bytes)}'
+                msg += f'\n<b>Type: </b>{mime_type}'
                 msg += f'\n<b>Files: </b>{self.__total_files}'
         except Exception as err:
             if isinstance(err, RetryError):
