@@ -49,12 +49,12 @@ def addSudo(update, context):
         id_ = reply_message.from_user.id
     if id_:
         if is_sudo(id_):
-            msg = 'Already Sudo! 🤔'
+            msg = 'Already Sudo!'
         else:
             update_user_ldata(id_, 'is_sudo', True)
             if DATABASE_URL:
                 DbManger().update_user_data(id_)
-            msg = 'Promoted as Sudo 🤣'
+            msg = 'Promoted as Sudo!'
     else:
         msg = "Give ID or Reply To message of whom you want to Promote."
     sendMessage(msg, context.bot, update.message)
