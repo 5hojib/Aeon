@@ -434,10 +434,10 @@ def main():
             chat_id, msg_id = map(int, f)
         try:
             msg = f"Bot Restarted Successfully!\n\n"
-            msg += f"<b>• Repository Version:</b> {version}"            
+            msg += f"<b>• Repository Version:</b> {version}\n"            
             msg += f"<b>• Date:</b> {date}\n"
             msg += f"<b>• Time:</b> {time}\n"
-            msg += f"<b>• Time Zone:</b> {timez}\n"
+            msg += f"<b>• Time Zone:</b> {timez}"
             bot.edit_message_text(msg, chat_id, msg_id)
         except Exception as e:
             LOGGER.info(e)
