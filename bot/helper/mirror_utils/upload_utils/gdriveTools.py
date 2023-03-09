@@ -405,8 +405,8 @@ class GoogleDriveHelper:
                 buttons.buildbutton("Drive Link", durl)
                 if mime_type is None:
                     mime_type = 'File'
-                    msg += f'\n<b>Size: </b>{get_readable_file_size(int(meta.get("size", 0)))}'
-                    msg += f'\n<b>Type: </b>{mime_type}'
+                    msg += f'\n<b>• Size: </b>{get_readable_file_size(int(meta.get("size", 0)))}'
+                    msg += f'\n<b>• Type: </b>{mime_type}'
                 if INDEX_URL := INDEXURL:
                     url_path = rquote(f'{file.get("name")}', safe='')
                     url = f'{INDEX_URL}/{url_path}'
@@ -714,19 +714,19 @@ class GoogleDriveHelper:
             mime_type = meta.get('mimeType')
             if mime_type == self.__G_DRIVE_DIR_MIME_TYPE:
                 self.__gDrive_directory(meta)
-                msg += f'<b>Name: </b><code>{name}</code>'
-                msg += f'\n<b>Size: </b>{get_readable_file_size(self.__total_bytes)}'
-                msg += f'\n<b>Type: </b>Folder'
-                msg += f'\n<b>SubFolders: </b>{self.__total_folders}'
+                msg += f'<b>Name: </b><code>{name}\n</code>'
+                msg += f'\n<b>• Size: </b>{get_readable_file_size(self.__total_bytes)}'
+                msg += f'\n<b>• Type: </b>Folder'
+                msg += f'\n<b>• SubFolders: </b>{self.__total_folders}'
             else:
-                msg += f'<b>Name: </b><code>{name}</code>'
+                msg += f'<b>Name: </b><code>{name}\n</code>'
                 if mime_type is None:
                     mime_type = 'File'
                 self.__total_files += 1
                 self.__gDrive_file(meta)
-                msg += f'\n<b>Size: </b>{get_readable_file_size(self.__total_bytes)}'
-                msg += f'\n<b>Type: </b>{mime_type}'
-                msg += f'\n<b>Files: </b>{self.__total_files}'
+                msg += f'\n<b>• Size: </b>{get_readable_file_size(self.__total_bytes)}'
+                msg += f'\n<b>• Type: </b>{mime_type}'
+                msg += f'\n<b>• Files: </b>{self.__total_files}'
         except Exception as err:
             if isinstance(err, RetryError):
                 LOGGER.info(f"Total Attempts: {err.last_attempt.attempt_number}")
