@@ -526,13 +526,11 @@ if len(BUTTON_SIX_NAME) == 0 or len(BUTTON_SIX_URL) == 0:
     BUTTON_SIX_NAME = ''
     BUTTON_SIX_URL = ''
 
-SHORTENER = environ.get('SHORTENER', '')
-SHORTENER_API = environ.get('SHORTENER_API', '')
+SHORTENER = environ.get('SHORTENER')
+SHORTENER_API = environ.get('SHORTENER_API')
 if len(SHORTENER) == 0 or len(SHORTENER_API) == 0:
-    SHORTENER = ''
-    SHORTENER_API = ''
-SHORTENER = (SHORTENER.replace("'", '').replace('"', '').replace('[', '').replace(']', '').replace(",", "")).split()
-SHORTENER_API = (SHORTENER_API.replace("'", '').replace('"', '').replace('[', '').replace(']', '').replace(",", "")).split()
+    SHORTENER = None
+    SHORTENER_API = None
 
 
 GDTOT_CRYPT = environ.get('GDTOT_CRYPT', '')
