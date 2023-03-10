@@ -326,7 +326,7 @@ class MirrorLeechListener:
 
 
 
-        msg = f"<b>Name: </b><{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n\n<b>┌ Size: </b>{size}"
+        msg = f"<b>Name: </b><{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n\n<b>• Size: </b>{size}"
 
         if self.isLeech:
             if config_dict['SOURCE_LINK']:
