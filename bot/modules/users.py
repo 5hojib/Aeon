@@ -5,6 +5,19 @@ from telegram.ext import CommandHandler
 from bot import app, OWNER_ID, DATABASE_URL, dispatcher
 from bot.helper.telegram_helper.filters import CustomFilters
 
+def main():
+    updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
+    dp = updater.dispatcher
+    
+    # Set dc_info in bot_data
+    dc_info = updater.bot.get_me().dc_info
+    updater.bot_data['dc_info'] = dc_info
+    
+    dp.add_handler(CommandHandler("info", info))
+    
+    updater.start_polling()
+    updater.idle()
+
 
 def info(update, context):
     chat = update.effective_chat
