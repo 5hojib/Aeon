@@ -43,7 +43,7 @@ def info(update, context):
     if profile_link:
         message += f"Your permanent link is {profile_link}."
     
-    update.message.reply_text(message)
+    update.message.send_message(message)
 
 
 def dbusers(update, context):
