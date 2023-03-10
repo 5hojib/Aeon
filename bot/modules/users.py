@@ -5,23 +5,8 @@ from telegram.ext import CommandHandler
 from bot import app, OWNER_ID, DATABASE_URL, dispatcher
 from bot.helper.telegram_helper.filters import CustomFilters
 
-def main():
-    updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
-    dp = updater.dispatcher
-    
-    # Set dc_info in bot_data
-    dc_info = updater.bot.get_me().dc_info
-    updater.bot_data['dc_info'] = dc_info
-    
-    dp.add_handler(CommandHandler("info", info))
-    
-    updater.start_polling()
-    updater.idle()
-
-
 def info(update, context):
     chat = update.effective_chat
-    dc_info = context.bot_data['dc_info']
     
     if context.args:
         try:
@@ -45,11 +30,6 @@ def info(update, context):
         profile_link = None
         message = f"This is the {user.title} group and the group ID is {user.id}. \n\n" if user == chat else ""
     
-    message += f"Current DC information: \n" \
-              f"DC ID: {dc_info.id}\n" \
-              f"DC IP Address: {dc_info.ip_address}\n" \
-              f"DC Port: {dc_info.port}\n\n"
-    
     if profile_photo:
         context.bot.send_photo(chat_id=chat.id, photo=profile_photo)
 
@@ -57,7 +37,6 @@ def info(update, context):
         message += f"Your permanent link is {profile_link}."
     
     update.message.send_message(message)
-
 
 def dbusers(update, context):
     if not DATABASE_URL:
