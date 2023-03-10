@@ -1,3 +1,4 @@
+import telegram
 from telegram import Update
 from pymongo import MongoClient
 from telegram.ext import CommandHandler
