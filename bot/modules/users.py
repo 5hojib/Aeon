@@ -5,17 +5,16 @@ from telegram.ext import CommandHandler
 
 from bot import app, OWNER_ID, DATABASE_URL, dispatcher
 from bot.helper.telegram_helper.filters import CustomFilters
-
 def info(update, context):
     chat = update.effective_chat
     
     if context.args:
         try:
             user_id = int(context.args[0])
-            user = context.bot.get_chat(user_id)
+            user = context.bot.get_chat_member(chat.id, user_id).user
         except ValueError:
             username = context.args[0].replace("@", "")
-            user = context.bot.get_chat(username=username)
+            user = context.bot.get_chat_member(chat.id, username).user
     else:
         if update.message.reply_to_message:
             user = update.message.reply_to_message.from_user
