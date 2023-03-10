@@ -70,4 +70,4 @@ id_handler = CommandHandler("id", get_id)
 
 dispatcher.add_handler(dbusers_handler)
 dispatcher.add_handler(id_handler)
-dispatcher.add_handler(info)
+dispatcher.add_handler(info_handler)
