@@ -46,4 +46,4 @@ wayback - Internet archive
 restart - Restart the Bot
 stats - Bot Usage Stats
 ping - Ping the Bot
-sleep - Sleep the bot```
+sleep - Sleep the bot ```
