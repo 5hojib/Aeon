@@ -79,7 +79,7 @@ def stats(update, context):
     stats = f'<b>Repository info</b>\n\n' \
             f'<b>• Repository Version:</b> {version}\n'\
             f'<b>• Updated:</b> {commit_date}\n'\
-            f'<b>• At:</b>{commit_time}\n'\
+            f'<b>• </b>{commit_time}\n'\
             f'<b>• </b>{commit_from}\n'\
             f'\n'\
             f'<b>Bot info</b>\n\n'\
@@ -91,6 +91,7 @@ def stats(update, context):
             f'<b>• RAM Usage:</b> {mem_p}%\n'\
             f'<b>• Disk Usage:</b> {disk}%\n'\
             f'<b>• Free Disk Space:</b> {free}\n'\
+            f'<b>• Total Disk Space:</b> {total}\n'\
             f'<b>• Uploaded Data:</b> {sent}\n'\
             f'<b>• Downloaded Data:</b> {recv}\n\n'
 
