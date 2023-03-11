@@ -231,10 +231,7 @@ def start_clone(listelem):
         deleteMessage(bot, msg)
         if BOT_PM_X:
             if message.chat.type != 'private':
-                if config_dict['EMOJI_THEME']:
-                    msg = f"<b>🗂️ Name: </b><{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n"
-                else:
-                    msg = f"<b>Name: </b><{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n"
+                msg = f"<b>Name: </b><{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n"
                 botpm = f"\n<b>Hey {tag}!, I have sent your cloned links in PM.</b>\n"
                 buttons = ButtonMaker()
                 b_uname = bot.get_me().username
@@ -274,10 +271,7 @@ def start_clone(listelem):
                 delete_all_messages()
                 if BOT_PM_X:
                     if message.chat.type != 'private':
-                        if config_dict['EMOJI_THEME']:
-                            msg = f"<b>🗂️ Name: </b><{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n"
-                        else:
-                            msg = f"<b>Name: </b><{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n"
+                        msg = f"<b>Name: </b><{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n"
                         botpm = f"\n<b>Hey {tag}!, I have sent your cloned links in PM.</b>\n"
                         buttons = ButtonMaker()
                         b_uname = bot.get_me().username
@@ -308,14 +302,9 @@ def start_clone(listelem):
     message_args = mesg[0].split(' ', maxsplit=1)
     user_id = message.from_user.id
     tag = f"@{message.from_user.username}"
-    if config_dict['EMOJI_THEME']:
-        slmsg = f"╭🗂️ Name: <{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n"
-        slmsg += f"├📐 Size: {get_readable_file_size(size)}\n"
-        slmsg += f"╰👥 Added by: {tag} | <code>{user_id}</code>\n\n"
-    else:
-        slmsg = f"╭ Name: <{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n"
-        slmsg += f"├ Size: {get_readable_file_size(size)}\n"
-        slmsg += f"╰ Added by: {tag} | <code>{user_id}</code>\n\n"
+    slmsg = f"╭ Name: <{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n"
+    slmsg += f"├ Size: {get_readable_file_size(size)}\n"
+    slmsg += f"╰ Added by: {tag} | <code>{user_id}</code>\n\n"
     if 'link_logs' in user_data:
         try:
             upper = f"‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒\n"
@@ -346,17 +335,11 @@ def start_clone(listelem):
     else:
         LOGGER.info(f'Cloning Done: {name}')
     if BOT_PM_X and message.chat.type != 'private':
-        if config_dict['EMOJI_THEME']:
-            pmwarn = f"<b>😉I have sent files in PM.</b>\n"
-        else:
-            pmwarn = f"<b>I have sent files in PM.</b>\n"
+        pmwarn = f"<b>I have sent files in PM.</b>\n"
     else:
         pmwarn = ''
     if 'mirror_logs' in user_data and message.chat.type != 'private':
-        if config_dict['EMOJI_THEME']:
-            logwarn = f"<b>⚠️ I have sent files in Mirror Log Channel. Join <a href=\"{config_dict['MIRROR_LOG_URL']}\">Mirror Log channel</a> </b>\n"
-        else:
-            logwarn = f"<b>I have sent files in Mirror Log Channel. Join <a href=\"{config_dict['MIRROR_LOG_URL']}\">Mirror Log channel</a> </b>\n"
+        logwarn = f"<b>I have sent files in Mirror Log Channel. Join <a href=\"{config_dict['MIRROR_LOG_URL']}\">Mirror Log channel</a> </b>\n"
     else:
         logwarn = ''
 
@@ -368,10 +351,7 @@ def start_clone(listelem):
         if message.chat.type == 'private':
             warnmsg = ''
         else:
-            if config_dict['EMOJI_THEME']:
-                warnmsg = f'<b>❗ This message will be deleted in <i>{auto_delete_message} minutes</i> from this group.</b>\n'
-            else:
-                warnmsg = f'<b>This message will be deleted in <i>{auto_delete_message} minutes</i> from this group.</b>\n'
+            warnmsg = f'<b>This message will be deleted in <i>{auto_delete_message} minutes</i> from this group.</b>\n'
     else:
         warnmsg = ''
 
