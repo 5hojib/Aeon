@@ -399,14 +399,14 @@ class GoogleDriveHelper:
             else:
                 file = self.__copyFile(meta.get('id'), GDRIVEID, meta.get('name'))
                 msg += f'<b>Name: </b><code>{file.get("name")}</code>'
+                msg += f'\n<b>• Size: </b>{get_readable_file_size(int(meta.get("size", 0)))}'
+                msg += f'\n<b>• Type: </b>{mime_type}'
                 durl = self.__G_DRIVE_BASE_DOWNLOAD_URL.format(file.get("id"))
                 buttons = ButtonMaker()
                 durl = short_url(durl, self.user_id)
                 buttons.buildbutton("Drive Link", durl)
                 if mime_type is None:
                     mime_type = 'File'
-                    msg += f'\n<b>• Size: </b>{get_readable_file_size(int(meta.get("size", 0)))}'
-                    msg += f'\n<b>• Type: </b>{mime_type}'
                 if INDEX_URL := INDEXURL:
                     url_path = rquote(f'{file.get("name")}', safe='')
                     url = f'{INDEX_URL}/{url_path}'
