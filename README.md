@@ -64,4 +64,4 @@ usage - Heroku app usage
 ping - Ping the Bot
 help - All cmds with description
 sleep - Sleep the bot
-</details>
+
