@@ -465,9 +465,6 @@ LIST_MODE = environ.get('LIST_MODE', '')
 if len(LIST_MODE) == 0:
     LIST_MODE = "Telegraph"
 
-EMOJI_THEME = environ.get('EMOJI_THEME', '')
-EMOJI_THEME = EMOJI_THEME.lower() == 'true'
-
 DISABLE_DRIVE_LINK = environ.get('DISABLE_DRIVE_LINK', '')
 DISABLE_DRIVE_LINK = DISABLE_DRIVE_LINK.lower() == 'true'
 
@@ -722,7 +719,6 @@ config_dict = {'ANILIST_ENABLED': ANILIST_ENABLED,
                'OWNER_ID': OWNER_ID,
                'EQUAL_SPLITS': EQUAL_SPLITS,
                'EXTENSION_FILTER': EXTENSION_FILTER,
-               'EMOJI_THEME': EMOJI_THEME,
                'GDRIVE_ID': GDRIVE_ID,               
                'IGNORE_PENDING_REQUESTS': IGNORE_PENDING_REQUESTS,
                'INCOMPLETE_TASK_NOTIFIER': INCOMPLETE_TASK_NOTIFIER,
