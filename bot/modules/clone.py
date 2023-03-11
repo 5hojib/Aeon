@@ -157,6 +157,7 @@ def _auto_start_dl(msg, msg_id, time_out):
 
 @new_thread
 def start_clone(listelem):
+    cc = f'\n<b>• Cloned By: </b>{tag}\n\n'
     bot = listelem[0]
     message = listelem[1]
     c_index = listelem[2]
@@ -242,10 +243,6 @@ def start_clone(listelem):
                 else:
                     sendMessage(msg + botpm, bot, message, buttons.build_menu(2))
             else:
-                if config_dict['EMOJI_THEME']:
-                    cc = f'\n<b>╰👤 #Clone_By: </b>{tag}\n\n'
-                else:
-                    cc = f'\n<b>• Cloned By: </b>{tag}\n\n'
                 if config_dict['PICS']:
                     sendPhoto(result + cc, bot, message, rchoice(config_dict['PICS']), button)
                 else:
@@ -282,10 +279,6 @@ def start_clone(listelem):
                         else:
                             sendMessage(msg + botpm, bot, message, buttons.build_menu(2))
                     else:
-                        if config_dict['EMOJI_THEME']:
-                            cc = f'\n<b>╰👤 #Clone_By: </b>{tag}\n\n'
-                        else:
-                            cc = f'\n<b>• Cloned By: </b>{tag}\n\n'
                         if config_dict['PICS']:
                             sendPhoto(result + cc, bot, message, rchoice(config_dict['PICS']), button)
                         else:
@@ -326,10 +319,6 @@ def start_clone(listelem):
             except TypeError:
                 pass  
 
-    if config_dict['EMOJI_THEME']:
-        cc = f'\n<b>╰👤 #Clone_By: </b>{tag}\n\n'
-    else:
-        cc = f'\n<b>• Cloned By: </b>{tag}\n\n'
     if button.build_menu(2) in ["cancelled", ""]:
         sendMessage(f"{tag} {result}", bot, message)
     else:
