@@ -16,6 +16,8 @@ Instructions
 3. Upload token.pickle and other private files from bsetting.
 
 # Bot Commands
+<details>
+<summary>Click</summary>
 
 ```mirror - Mirror
 zipmirror - Mirror and upload as zip
@@ -62,3 +64,4 @@ usage - Heroku app usage
 ping - Ping the Bot
 help - All cmds with description
 sleep - Sleep the bot
+</details>
