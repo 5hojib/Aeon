@@ -45,4 +45,5 @@ hash - Get Hash of telegram files
 wayback - Internet archive 
 restart - Restart the Bot
 stats - Bot Usage Stats
-ping - Ping the Bot```
+ping - Ping the Bot
+sleep - Sleep the bot```
