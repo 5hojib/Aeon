@@ -18,3 +18,5 @@
 * [Karan Adhikary](https://github.com/weebzone) 
 * [Al-Noman](https://github.com/SN-ABDULLAH-AL-NOMAN) 
 * ChatGPT
+
+You can't donate me!
