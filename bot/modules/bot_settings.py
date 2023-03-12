@@ -891,7 +891,7 @@ def get_buttons(key=None, edit_type=None):
             buttons.sbutton(
                 int(x/10), f"botset start2 udbunits {x} {uid}", position='footer')
         msg = f'Settings ({uid}) | Page: {int(START2/10)} | State: {STATE}'
-   elif edit_type == 'editaria':
+    elif edit_type == 'editaria':
         buttons.sbutton('Back', "botset back aria")
         if key != 'newkey':
             buttons.sbutton('Default', f"botset resetaria {key}")
