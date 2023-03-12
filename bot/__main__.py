@@ -82,7 +82,7 @@ def stats(update, context):
             f'<b>• </b>{commit_time}\n'\
             f'<b>• </b>{commit_from}\n'\
             f'\n'\
-            f'<b><b>BOT INFO</u></b>\n\n'\
+            f'<b><u>BOT INFO</u></b>\n\n'\
             f'<b>• Uptime:</b> {currentTime}\n'\
             f'<b>• System:</b> {osUptime}\n'\
             f'\n'\
