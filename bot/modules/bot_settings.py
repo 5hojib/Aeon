@@ -1283,6 +1283,13 @@ def edit_bot_settings(update, context):
                 handler_dict[message.chat.id] = False
                 update_buttons(message)
         dispatcher.remove_handler(file_handler)
+    elif data[1] == 'boolvar':
+        key = data[2]
+        value = True if data[3] == "on" else False
+        config_dict[key] = value
+        await update_buttons(message, 'var')
+        if DATABASE_URL:
+            DbManger().update_config({key: value})
     elif data[1] == 'editvar' and STATE == 'edit':
         if data[2] in ['SUDO_USERS', 'IGNORE_PENDING_REQUESTS', 'CMD_SUFFIX', 'OWNER_ID',
                        'USER_SESSION_STRING', 'TELEGRAM_HASH', 'TELEGRAM_API', 'AUTHORIZED_CHATS', 'RSS_DELAY'
