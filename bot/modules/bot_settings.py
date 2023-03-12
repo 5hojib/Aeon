@@ -16,6 +16,8 @@ from bot.helper.ext_utils.queued_starter import start_from_queued
 from bot.modules.search import initiate_search_tools
 
 START = 0
+START2 = 0
+userdb_ids = []
 STATE = 'view'
 boolVars = ['ANILIST_ENABLED', 'IMDB_ENABLED', 'CLONE_ENABLED', 'LEECH_ENABLED', 'MEDIAINFO_ENABLED', 'SAME_ACC_COOKIES', 'BOT_PM', 'FORCE_BOT_PM', 'ENABLE_USR_TD', 'SAVE_MSG', 'STOP_DUPLICATE',
             'VIEW_LINK', 'SET_BOT_COMMANDS', 'IS_TEAM_DRIVE', 'USE_SERVICE_ACCOUNTS', 'WEB_PINCODE', 'EQUAL_SPLITS', 'IGNORE_PENDING_REQUESTS', 'DISABLE_DRIVE_LINK', 'INCOMPLETE_TASK_NOTIFIER',
