@@ -76,17 +76,17 @@ def stats(update, context):
     mem_t = get_readable_file_size(memory.total)
     mem_a = get_readable_file_size(memory.available)
     mem_u = get_readable_file_size(memory.used)
-    stats = f'<b>Repository info</b>\n\n' \
+    stats = f'<b><u>REPOSITORY INFO</u></b>\n\n' \
             f'<b>• Repository Version:</b> {version}\n'\
             f'<b>• Updated:</b> {commit_date}\n'\
             f'<b>• </b>{commit_time}\n'\
             f'<b>• </b>{commit_from}\n'\
             f'\n'\
-            f'<b>Bot info</b>\n\n'\
+            f'<b><b>BOT INFO</u></b>\n\n'\
             f'<b>• Uptime:</b> {currentTime}\n'\
             f'<b>• System:</b> {osUptime}\n'\
             f'\n'\
-            f'<b>System info</b>\n\n'\
+            f'<b><u>SYSTEM INFO</u></b>\n\n'\
             f'<b>• CPU Usage:</b> {cpuUsage}%\n'\
             f'<b>• RAM Usage:</b> {mem_p}%\n'\
             f'<b>• Disk Usage:</b> {disk}%\n'\
