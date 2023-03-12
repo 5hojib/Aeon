@@ -853,7 +853,46 @@ def get_buttons(key=None, edit_type=None):
             buttons.sbutton('Default', f"botset resetvar {key}")
         buttons.sbutton('Close', "botset close")
         msg = f'Send a valid value for {key}. Timeout: 60 sec'
-    elif edit_type == 'editaria':
+        if key in boolVars:
+            msg = f'Choose a valid value for {key}.'
+            buttons.sbutton('True', f"botset boolvar {key} on", 'header')
+            buttons.sbutton('False', f"botset boolvar {key} off", 'header')
+    elif edit_type == 'resetudb':
+        buttons.sbutton('Yes', 'botset resetudb del')
+        buttons.sbutton('No', 'botset resetudb')
+        msg = f"Do you want to delete {len(userdb_ids)} User's Data completely ?"
+    elif edit_type == 'editudb':
+        if key == 'newkey':
+            msg = 'Send User ID. Example: 1234xxxx'
+            buttons.sbutton('Back', "botset back udb")
+        elif key == 'newval':
+            msg = 'Send a key with value. Example: as_doc:True'
+            buttons.sbutton('Back', f"botset back udbunits {user_id}")
+        else:
+            msg = f'Send a valid value for {key}. Timeout: 60 sec'
+            buttons.sbutton('Back', f"botset back udbunits {user_id}")
+            buttons.sbutton('Delete', f"botset deleteudb {key} {user_id}")
+        buttons.sbutton('Close', "botset close")
+    elif edit_type == 'udbunits':
+        uid = int(key)
+        if uid not in user_data:
+            user_data[uid] = {}
+        for k in list(user_data[uid].keys())[START2:10+START2]:
+            buttons.sbutton(k, f"botset editudb {k} {uid}")
+        if STATE == 'view':
+            buttons.sbutton('Edit', f"botset edit udbunits {uid}")
+        else:
+            buttons.sbutton('View', f"botset view udbunits {uid}")
+        buttons.sbutton('Remove ID', f"botset resetudb rem {uid}")
+        buttons.sbutton('Add New Key', f"botset editudb newval {uid}")
+        buttons.sbutton('Back', "botset back udb")
+        buttons.sbutton('Close', "botset close")
+        for x in range(0, len(user_data[uid])-1, 10):
+            buttons.sbutton(
+                int(x/10), f"botset start2 udbunits {x} {uid}", position='footer')
+        msg = f'Settings ({uid}) | Page: {int(START2/10)} | State: {STATE}'
+    
+  elif edit_type == 'editaria':
         buttons.sbutton('Back', "botset back aria")
         if key != 'newkey':
             buttons.sbutton('Default', f"botset resetaria {key}")
