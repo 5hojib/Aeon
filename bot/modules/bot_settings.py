@@ -1287,7 +1287,7 @@ def edit_bot_settings(update, context):
         key = data[2]
         value = True if data[3] == "on" else False
         config_dict[key] = value
-        await update_buttons(message, 'var')
+        update_buttons(message, 'var')
         if DATABASE_URL:
             DbManger().update_config({key: value})
     elif data[1] == 'editvar' and STATE == 'edit':
