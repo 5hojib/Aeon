@@ -294,7 +294,10 @@ class MirrorLeechListener:
         if AUTO_DELETE_UPLOAD_MESSAGE_DURATION != -1:
             reply_to = self.message.reply_to_message
             if reply_to is not None:
-                reply_to.delete()
+                try:
+                    reply_to.delete()
+                except:
+                    pass
             auto_delete_message = int(AUTO_DELETE_UPLOAD_MESSAGE_DURATION / 60)
             if self.message.chat.type == 'private':
                 warnmsg = ''
