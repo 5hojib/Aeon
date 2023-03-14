@@ -132,7 +132,7 @@ def sendLogFile(bot, message):
         sendMessage(escape(startLine+Loglines+endLine), bot, message)
     except Exception as err:
         LOGGER.error(f"Log Display : {err}")
-    app.send_document(document='log.txt', thumb='https://cdn.jsdelivr.net/gh/5hojib/cdn@main/cat.jpg',
+    app.send_document(document='log.txt', thumb='Thumbnails/weeb.jpg',
                           reply_to_message_id=message.message_id,
                           chat_id=message.chat_id, caption=f'log.txt\n\n⏰️ UpTime: {get_readable_time(time() - botStartTime)}')
 
