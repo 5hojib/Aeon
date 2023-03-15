@@ -149,7 +149,7 @@ SA_MAIL = environ.get('SA_MAIL', '')
 if len(SA_MAIL) == 0:
     SA_MAIL = '#SA'    
 
-TGH_THUMB = 'https://cdn.jsdelivr.net/gh/5hojib/cdn@main/chishiya.jpg'
+TGH_THUMB = 'https://graph.org/file/4b95155527b50ef891d2d.jpg'
 
 path = "Thumbnails/"
 if not ospath.isdir(path):
