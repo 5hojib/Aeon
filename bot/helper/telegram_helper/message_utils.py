@@ -132,15 +132,15 @@ def sendLogFile(bot, message):
         sendMessage(escape(startLine+Loglines+endLine), bot, message)
     except Exception as err:
         LOGGER.error(f"Log Display : {err}")
-    app.send_document(document='log.txt', thumb='Thumbnails/weeb.jpg',
+    app.send_document(document='log.txt', thumb='Thumbnails/chishiya.jpg',
                           reply_to_message_id=message.message_id,
-                          chat_id=message.chat_id, caption=f'log.txt\n\n⏰️ UpTime: {get_readable_time(time() - botStartTime)}')
+                          chat_id=message.chat_id, caption=f'log.txt\n\nUpTime: {get_readable_time(time() - botStartTime)}')
 
 def sendFile(bot, message, name, caption=""):
     try:
         app.send_document(document=name, reply_to_message_id=message.message_id,
                              caption=caption, parse_mode=enums.ParseMode.HTML, chat_id=message.chat_id,
-                             thumb='Thumbnails/weeb.jpg')
+                             thumb='Thumbnails/chishiya.jpg')
         remove(name)
         return
     except FloodWait as r:
