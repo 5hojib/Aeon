@@ -663,7 +663,7 @@ def load_config():
     
     PORT = environ.get('PORT')
     srun(["pkill", "-9", "-f", "gunicorn"])
-    Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{SERVER_PORT}", shell=True)
+    Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{PORT}", shell=True)
 
     SAFE_MODE = environ.get('SAFE_MODE', '')
     if len(SAFE_MODE) == 0:
