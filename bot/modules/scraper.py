@@ -86,7 +86,7 @@ def scrapper(update, context):
             sendMessage(gd_txt, context.bot, update.message)
 
     elif "toonworld4all" in link:
-        sent = await sendMessage('Running Scrape ...', c, message)
+        sent = sendMessage('Running Scrape ...', c, message)
         gd_txt, no = "", 0
         client = requests.session()
         r = client.get(link).text
@@ -103,9 +103,9 @@ def scrapper(update, context):
                     title = soupt.title
                     no += 1
                     gd_txt += f"{(title.text).replace('Appdrive | ' , '')}\n{g}\n\n"
-                    await editMessage(gd_txt, sent)
+                    editMessage(gd_txt, sent)
                     if len(gd_txt) > 4000:
-                        sent = await sendMessage("<i>Running More Scrape ...</i>", c, message)
+                        sent = sendMessage("<i>Running More Scrape ...</i>", c, message)
                         gd_txt = ""
     
     elif "teluguflix" in link:
