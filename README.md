@@ -19,7 +19,8 @@ Instructions
 <details>
 <summary>Click</summary>
 
-```mirror - Mirror
+```
+mirror - Mirror
 zipmirror - Mirror and upload as zip
 unzipmirror - Mirror and extract files
 qbmirror - Mirror torrent using qBittorrent
