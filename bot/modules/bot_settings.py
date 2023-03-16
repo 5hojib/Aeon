@@ -660,10 +660,10 @@ def load_config():
     BASE_URL = environ.get('BASE_URL', '').rstrip("/")
     if len(BASE_URL) == 0:
         BASE_URL = ''
-        srun(["pkill", "-9", "-f", "gunicorn"])
-    else:
-        srun(["pkill", "-9", "-f", "gunicorn"])
-        Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{SERVER_PORT}", shell=True)
+    
+    PORT = environ.get('PORT')
+    srun(["pkill", "-9", "-f", "gunicorn"])
+    Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{SERVER_PORT}", shell=True)
 
     SAFE_MODE = environ.get('SAFE_MODE', '')
     if len(SAFE_MODE) == 0:
