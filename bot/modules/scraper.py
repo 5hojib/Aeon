@@ -86,7 +86,7 @@ def scrapper(update, context):
             sendMessage(gd_txt, context.bot, update.message)
 
     elif "toonworld4all" in link:
-        sent = sendMessage('Running Scrape ...', message)
+        sent = sendMessage('Running Scrape ...', context.bot, update.message)
         gd_txt, no = "", 0
         client = requests.session()
         r = client.get(link).text
