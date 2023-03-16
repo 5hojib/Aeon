@@ -86,13 +86,14 @@ def scrapper(update, context):
             sendMessage(gd_txt, context.bot, update.message)
 
     elif "toonworld4all" in link:
-        c = a.get("href")
+        c = ''
         sent = sendMessage('Running Scrape ...', c, message)
         gd_txt, no = "", 0
         client = requests.session()
         r = client.get(link).text
         soup = BeautifulSoup(r, "html.parser")
         for a in soup.find_all("a"):
+            c = a.get("href")
             if "redirect/main.php?" in c:
                 download = rget(c, stream=True, allow_redirects=False)
                 link = download.headers["location"]
