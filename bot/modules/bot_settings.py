@@ -1073,10 +1073,11 @@ def update_private_file(update, context, omsg):
         file_name = doc.file_name
         doc.get_file().download(custom_path=file_name)
         if file_name == 'accounts.zip':
-            if ospath.exists('accounts'):
+            if ospath.exists('accounts.zip'):
                 srun(["rm", "-rf", "accounts"])
-            srun(["unzip", "-q", "-o", "accounts.zip", "-x", "accounts/emails.txt"])
-            srun(["chmod", "-R", "777", "accounts"])
+                srun(["7z", "x", "-o.", "-aoa", "accounts.zip", "accounts/*.json"])
+                srun(["chmod", "-R", "777", "accounts"])
+                osremove('accounts.zip')
         elif file_name == 'list_drives.txt':
             DRIVES_IDS.clear()
             DRIVES_NAMES.clear()
