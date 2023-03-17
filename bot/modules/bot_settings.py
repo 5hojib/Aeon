@@ -1113,7 +1113,7 @@ def update_private_file(update, context, omsg):
         elif file_name == 'config.env':
             load_dotenv('config.env', override=True)
             load_config()
-            
+        update.message.delete()
     update_buttons(omsg)
     if DATABASE_URL and file_name != 'config.env':
         DbManger().update_private_file(file_name)
