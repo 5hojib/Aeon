@@ -28,8 +28,6 @@ default_values = {'AUTO_DELETE_MESSAGE_DURATION': -1,
                   'BOT_PM': False,
                   'FORCE_BOT_PM': False,
                   'UPDATE_PACKAGES': 'True',
-                  'UPSTREAM_BRANCH': 'master',
-                  'UPSTREAM_REPO': 'https://github.com/5hojib/hk-upstream',
                   'STATUS_UPDATE_INTERVAL': 1,
                   'DOWNLOAD_DIR': '/usr/src/app/downloads/',
                   'TIME_GAP': -1,
@@ -414,14 +412,6 @@ def load_config():
     SEARCH_PLUGINS = environ.get('SEARCH_PLUGINS', '')
     if len(SEARCH_PLUGINS) == 0:
         SEARCH_PLUGINS = ''
-
-    UPSTREAM_REPO = environ.get('UPSTREAM_REPO', '')
-    if len(UPSTREAM_REPO) == 0: 
-        UPSTREAM_REPO = 'https://github.com/5hojib/hk-upstream'
-
-    UPSTREAM_BRANCH = environ.get('UPSTREAM_BRANCH', '')
-    if len(UPSTREAM_BRANCH) == 0:   
-        UPSTREAM_BRANCH = 'master'
 
     UPDATE_PACKAGES = environ.get('UPDATE_PACKAGES', '')
     if len(UPDATE_PACKAGES) == 0:
