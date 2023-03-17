@@ -1113,14 +1113,7 @@ def update_private_file(update, context, omsg):
         elif file_name == 'config.env':
             load_dotenv('config.env', override=True)
             load_config()
-        if '@github.com' in config_dict['DATABASE_URL']:
-            buttons = ButtonMaker()
-            msg = 'Push to UPSTREAM_REPO ?'
-            buttons.sbutton('Yes!', f"botset push {file_name}")
-            buttons.sbutton('No', "botset close")
-            sendMessage(msg, context.bot, update.message, buttons.build_menu(2))
-        else:
-            update.message.delete()
+        update.message.delete()
     update_buttons(omsg)
     if DATABASE_URL and file_name != 'config.env':
         DbManger().update_private_file(file_name)
