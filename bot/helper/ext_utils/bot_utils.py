@@ -234,7 +234,7 @@ def get_readable_message():
         for index, download in enumerate(list(download_dict.values())[COUNT:], start=1):
             if config_dict['SAFE_MODE']:
                 msg += f""
-            else
+            else:
                 msg += f"<b>{escape(str(download.name()))}</b>"
                 msg += "\n"
                 msg += f"\n<b>┌ {download.status()} with {download.eng()}</b>"
