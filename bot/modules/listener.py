@@ -552,6 +552,10 @@ class MirrorLeechListener:
                 return
 
         if BOT_PM_X and self.message.chat.type != 'private':
+            if config_dict['SAFE_MODE']:
+                name = 'File name hidden'
+            else:
+                name = name
             bmsg = f"<b>Name: </b><{config_dict['NAME_FONT']}>{escape(name)}</{config_dict['NAME_FONT']}>\n"
             botpm = f"<b>\nHey {self.tag}!, I have sent your stuff in PM.</b>\n"
             buttons = ButtonMaker()
