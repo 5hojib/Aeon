@@ -235,13 +235,13 @@ def get_readable_message():
             if config_dict['SAFE_MODE']:
                 msg += f""
             else:
-                msg += f"<b>{escape(str(download.name()))}</b>"
+                msg += f"<b>{escape(str(download.name()))}</b>\n"
             if download.status() not in [MirrorStatus.STATUS_SEEDING, MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_CONVERTING, MirrorStatus.STATUS_QUEUEDL, MirrorStatus.STATUS_QUEUEUP]:
                 msg += f"\n<b>┌ {download.status()} with {download.eng()}</b>"
                 msg += f"\n<b>├ {get_progress_bar_string(download)}</b> {download.progress()}"
                 msg += f"\n<b>├ Process:</b> {get_readable_file_size(download.processed_bytes())} of {download.size()}"
                 msg += f"\n<b>├ Speed:</b> {download.speed()}"
-                msg += f"\n<b>├ ETA:</b> {download.eta()}"
+                msg += f"\n<b>├ Estimate:</b> {download.eta()}"
                 msg += f"\n<b>├ Elapsed: </b>{get_readable_time(time() - download.message.date.timestamp())}"
                     
 
@@ -320,7 +320,7 @@ def get_readable_message():
         sbutton = buttons.build_menu(3)
         
         if STATUS_LIMIT and tasks > STATUS_LIMIT:
-            msg += f"<b>Tasks:</b> {tasks}\n"
+            msg += f"<b>• Tasks:</b> {tasks}\n"
             buttons = ButtonMaker()
             buttons.sbutton("Previous", "status pre")
             buttons.sbutton(f"{PAGE_NO}/{PAGES}", str(THREE))
