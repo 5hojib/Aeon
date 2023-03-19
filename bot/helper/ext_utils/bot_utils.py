@@ -273,8 +273,7 @@ def get_readable_message():
                 msg += f"\n<b>└ </b><code>/{BotCommands.CancelMirror} {download.gid()}</code>"
             else:
                 msg += f"\n<b>┌ {download.status()} with {download.eng()}</b>"
-                msg += f"\n<b>┌ Size: </b>{download.size()}"
-                msg += f"\n<b>└ </b><code>/{BotCommands.CancelMirror} {download.gid()}</code>"
+                msg += f"\n<b>└ Size: </b>{download.size()}"
             msg += f"\n<b>_________________________________</b>"
             msg += "\n\n"
             if index == STATUS_LIMIT:
