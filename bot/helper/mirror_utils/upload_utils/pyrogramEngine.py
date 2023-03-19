@@ -251,12 +251,7 @@ class TgUploader:
             self.__thumb = None
 
     def __msg_to_reply(self):
-        if DUMP_CHAT:= config_dict['DUMP_CHAT']:
-            msg = self.__listener.message.text if self.__listener.isPrivate else self.__listener.message.link
-            self.__sent_msg = app.send_message(DUMP_CHAT, msg, disable_web_page_preview=True)
-            if self.__listener.dmMessage:
-                self.__sent_DMmsg = copy(self.__listener.dmMessage)
-        elif self.__listener.dmMessage:
+        if self.__listener.dmMessage:
             self.__sent_msg = app.get_messages(self.__listener.message.from_user.id, self.__listener.dmMessage.message_id)
         else:
             self.__sent_msg = app.get_messages(self.__listener.message.chat.id, self.__listener.uid)
