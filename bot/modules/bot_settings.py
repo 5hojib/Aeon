@@ -657,7 +657,7 @@ def load_config():
 
     SAFE_MODE = environ.get('SAFE_MODE', '')
     if len(SAFE_MODE) == 0:
-        SAFE_MODE = ''
+        SAFE_MODE = False
  
     config_dict.update({'AS_DOCUMENT': AS_DOCUMENT,
                         'AUTHORIZED_CHATS': AUTHORIZED_CHATS,
