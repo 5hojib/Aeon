@@ -263,7 +263,7 @@ def get_readable_message():
                     msg += f"\n<b>└ Cancel: </b><code>/{BotCommands.CancelMirror} {download.gid()}</code>"
 
             elif download.status() == MirrorStatus.STATUS_SEEDING:
-                msg += f"\n<b>├ Size: </b>{download.size()}"
+                msg += f"\n<b>┌ Size: </b>{download.size()}"
                 msg += f"\n<b>├ Engine:</b> <code>qBittorrent v4.4.2</code>"
                 msg += f"\n<b>├ Speed: </b>{download.upload_speed()}"
                 msg += f"\n<b>├ Uploaded: </b>{download.uploaded_bytes()}"
@@ -272,8 +272,9 @@ def get_readable_message():
                 msg += f"\n<b>├ Elapsed: </b>{get_readable_time(time() - download.message.date.timestamp())}"
                 msg += f"\n<b>└ </b><code>/{BotCommands.CancelMirror} {download.gid()}</code>"
             else:
-                msg += f"\n<b>├ Engine :</b> {download.eng()}"
-                msg += f"\n<b>└ Size: </b>{download.size()}"
+                msg += f"\n<b>┌ {download.status()} with {download.eng()}</b>"
+                msg += f"\n<b>┌ Size: </b>{download.size()}"
+                msg += f"\n<b>└ </b><code>/{BotCommands.CancelMirror} {download.gid()}</code>"
             msg += f"\n<b>_________________________________</b>"
             msg += "\n\n"
             if index == STATUS_LIMIT:
