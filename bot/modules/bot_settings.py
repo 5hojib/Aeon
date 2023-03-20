@@ -655,10 +655,10 @@ def load_config():
     srun(["pkill", "-9", "-f", "gunicorn"])
     Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{PORT}", shell=True)
 
-    SAFE_MODE = environ.get('SAFE_MODE', '')
-    if len(SAFE_MODE) == 0:
-        SAFE_MODE = False
  
+    SAFE_MODE = environ.get('SAFE_MODE', '')
+    SAFE_MODE = SAFE_MODE.lower() == 'FALSE'
+    
     config_dict.update({'AS_DOCUMENT': AS_DOCUMENT,
                         'AUTHORIZED_CHATS': AUTHORIZED_CHATS,
                         'AUTO_DELETE_MESSAGE_DURATION': AUTO_DELETE_MESSAGE_DURATION,
