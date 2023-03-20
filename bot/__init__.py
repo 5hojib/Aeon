@@ -667,13 +667,11 @@ if len(UPDATE_PACKAGES) == 0:
     UPDATE_PACKAGES = ''
 
 SAFE_MODE = environ.get('SAFE_MODE', '')
-if len(SAFE_MODE) == 0:
-    log_warning('SAFE_MODE Is Not Enabled')
-    SAFE_MODE = 'False'
-else:
+SAFE_MODE = SAFE_MODE.lower() == 'false'
+if SAFE_MODE = 'true':
     BOT_PM = 'True'
     FORCE_BOT_PM = 'True'
-    SAFE_MODE = 'True'
+
 
 config_dict = {'ANILIST_ENABLED': ANILIST_ENABLED,
                'AS_DOCUMENT': AS_DOCUMENT,
