@@ -233,7 +233,7 @@ def get_readable_message():
                 globals()['PAGE_NO'] -= 1
         for index, download in enumerate(list(download_dict.values())[COUNT:], start=1):
             SAFE_MODE = config_dict['SAFE_MODE']
-            if SAFE_MODE == 'true':
+            if SAFE_MODE == True:
                 msg += f""
             else:
                 msg += f"<b>{escape(str(download.name()))}</b>\n"
