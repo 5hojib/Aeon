@@ -671,6 +671,8 @@ SAFE_MODE = SAFE_MODE.lower() == 'false'
 if SAFE_MODE == 'true':
     BOT_PM = 'True'
     FORCE_BOT_PM = 'True'
+else:
+    SAFE_MODE = 'False'
 
 
 config_dict = {'ANILIST_ENABLED': ANILIST_ENABLED,
