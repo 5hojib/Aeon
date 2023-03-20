@@ -668,7 +668,7 @@ if len(UPDATE_PACKAGES) == 0:
 
 SAFE_MODE = environ.get('SAFE_MODE', '')
 SAFE_MODE = SAFE_MODE.lower() == 'false'
-if SAFE_MODE = 'true':
+if SAFE_MODE == 'true':
     BOT_PM = 'True'
     FORCE_BOT_PM = 'True'
 
