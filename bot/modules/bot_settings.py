@@ -52,6 +52,7 @@ default_values = {'AUTO_DELETE_MESSAGE_DURATION': -1,
                   'LIST_MODE': "Telegraph",
                   'SEARCH_LIMIT': 0,
                   'SAME_ACC_COOKIES': True,
+                  'SAFE_MODE': False,
                   'ENABLE_USR_TD': False,
                   'RSS_DELAY': 900,
                   'ANIME_TEMPLATE': '''<b>{ro_title}</b>({na_title})
@@ -71,7 +72,7 @@ default_values = {'AUTO_DELETE_MESSAGE_DURATION': -1,
                                      <b>Description</b>: <i>{description}</i>''',
                   'IMDB_TEMPLATE': '''<b>Title: </b> {title} [{year}]
                                       <b>Also Known As:</b> {aka}
-                                      <b>Rating ⭐️:</b> <i>{rating}</i>
+                                      <b>Rating :</b> <i>{rating}</i>
                                       <b>Release Info: </b> <a href="{url_releaseinfo}">{release_date}</a>
                                       <b>Genre: </b>{genres}
                                       <b>IMDb URL:</b> {url}
@@ -657,7 +658,7 @@ def load_config():
 
  
     SAFE_MODE = environ.get('SAFE_MODE', '')
-    SAFE_MODE = SAFE_MODE.lower() == 'FALSE'
+    SAFE_MODE = SAFE_MODE.lower() == 'false'
     
     config_dict.update({'AS_DOCUMENT': AS_DOCUMENT,
                         'AUTHORIZED_CHATS': AUTHORIZED_CHATS,
