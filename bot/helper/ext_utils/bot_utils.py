@@ -232,11 +232,7 @@ def get_readable_message():
                 globals()['COUNT'] -= STATUS_LIMIT
                 globals()['PAGE_NO'] -= 1
         for index, download in enumerate(list(download_dict.values())[COUNT:], start=1):
-            SAFE_MODE = config_dict['SAFE_MODE']
-            if SAFE_MODE == True:
-                msg += f""
-            else:
-                msg += f"<b>{escape(str(download.name()))}</b>\n"
+            msg += f"<b>{escape(str(download.name()))}</b>\n"
             if download.status() not in [MirrorStatus.STATUS_SEEDING, MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_CONVERTING, MirrorStatus.STATUS_QUEUEDL, MirrorStatus.STATUS_QUEUEUP]:
                 msg += f"\n<b>┌ {download.status()} with {download.eng()}</b>"
                 msg += f"\n<b>├ {get_progress_bar_string(download)}</b> {download.progress()}"
