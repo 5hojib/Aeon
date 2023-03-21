@@ -21,7 +21,7 @@ userdb_ids = []
 STATE = 'view'
 boolVars = ['ANILIST_ENABLED', 'IMDB_ENABLED', 'CLONE_ENABLED', 'LEECH_ENABLED', 'MEDIAINFO_ENABLED', 'SAME_ACC_COOKIES', 'BOT_PM', 'FORCE_BOT_PM', 'ENABLE_USR_TD', 'SAVE_MSG', 'STOP_DUPLICATE',
             'VIEW_LINK', 'SET_BOT_COMMANDS', 'IS_TEAM_DRIVE', 'USE_SERVICE_ACCOUNTS', 'WEB_PINCODE', 'EQUAL_SPLITS', 'IGNORE_PENDING_REQUESTS', 'DISABLE_DRIVE_LINK', 'INCOMPLETE_TASK_NOTIFIER',
-            'MIRROR_ENABLED', 'PAID_SERVICE', 'QB_LEECH_ENABLED', 'QB_MIRROR_ENABLED', 'SOURCE_LINK', 'SAFE_MODE', 'UPDATE_PACKAGES', 'WAYBACK_ENABLED', 'YTDL_ENABLED']
+            'MIRROR_ENABLED', 'PAID_SERVICE', 'QB_LEECH_ENABLED', 'QB_MIRROR_ENABLED', 'SOURCE_LINK', 'UPDATE_PACKAGES', 'WAYBACK_ENABLED', 'YTDL_ENABLED']
 handler_dict = {}
 default_values = {'AUTO_DELETE_MESSAGE_DURATION': -1,
                   'AUTO_DELETE_UPLOAD_MESSAGE_DURATION': -1,
@@ -52,7 +52,6 @@ default_values = {'AUTO_DELETE_MESSAGE_DURATION': -1,
                   'LIST_MODE': "Telegraph",
                   'SEARCH_LIMIT': 0,
                   'SAME_ACC_COOKIES': True,
-                  'SAFE_MODE': False,
                   'ENABLE_USR_TD': False,
                   'RSS_DELAY': 900,
                   'ANIME_TEMPLATE': '''<b>{ro_title}</b>({na_title})
@@ -657,8 +656,6 @@ def load_config():
     Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{PORT}", shell=True)
 
  
-    SAFE_MODE = environ.get('SAFE_MODE', '')
-    SAFE_MODE = SAFE_MODE.lower() == 'false'
     
     config_dict.update({'AS_DOCUMENT': AS_DOCUMENT,
                         'AUTHORIZED_CHATS': AUTHORIZED_CHATS,
