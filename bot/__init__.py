@@ -666,15 +666,6 @@ UPDATE_PACKAGES = environ.get('UPDATE_PACKAGES', '')
 if len(UPDATE_PACKAGES) == 0:
     UPDATE_PACKAGES = ''
 
-SAFE_MODE = environ.get('SAFE_MODE', '')
-SAFE_MODE = SAFE_MODE.lower() == 'false'
-if SAFE_MODE == True:
-    BOT_PM = True
-    FORCE_BOT_PM = True
-else:
-    SAFE_MODE = False
-
-
 config_dict = {'ANILIST_ENABLED': ANILIST_ENABLED,
                'AS_DOCUMENT': AS_DOCUMENT,
                'AUTHORIZED_CHATS': AUTHORIZED_CHATS,
@@ -801,8 +792,8 @@ config_dict = {'ANILIST_ENABLED': ANILIST_ENABLED,
                'WEB_PINCODE': WEB_PINCODE,
                'YTDLP_LIMIT': YTDLP_LIMIT,
                'MAX_PLAYLIST': MAX_PLAYLIST,
-               'YT_DLP_QUALITY': YT_DLP_QUALITY,
-               'SAFE_MODE': SAFE_MODE}
+               'YT_DLP_QUALITY': YT_DLP_QUALITY
+               
 
 if GDRIVE_ID:
     DRIVES_NAMES.append("Main")
