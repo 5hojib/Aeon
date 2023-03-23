@@ -20,9 +20,8 @@ Instructions for Heroku
 2. Fill other variable in config.env
 3. Upload token.pickle and other private files from bsetting.
 
-# Bot Commands
 <details>
-<summary>Click</summary>
+<summary>Bot commands</summary>
 
 ```
 mirror - Mirror
