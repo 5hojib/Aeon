@@ -1,6 +1,11 @@
 [![hi](https://github-readme-stats.vercel.app/api/pin/?username=5hojib&repo=hk-upstream&theme=react&border_color=61dafb&border_radius=10)](https://github.com/5hojib/hk-upstream)
 
-Instructions 
+
+  <a href="https://render.com/deploy"><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" width="120"></a>
+  
+  [Support Group](https://t.me/HK_Upstream_Chat)
+
+Instructions for Heroku
 ---------------------
 1. Go to settings, add action secrets with correct value.
 * `BOT_TOKEN` 
@@ -70,10 +75,7 @@ sleep - Sleep the bot
 
 
   
-  <a href="https://render.com/deploy"><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" width="120"></a>
-  
-  [Support Group](https://t.me/HK_Upstream_Chat)
-_______________________________
+
 
 
 
