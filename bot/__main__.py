@@ -79,8 +79,8 @@ def stats(update, context):
     stats = f'<b><u>REPOSITORY INFO</u></b>\n\n' \
             f'<b>• Repository Version:</b> {version}\n'\
             f'<b>• Updated:</b> {commit_date}\n'\
-            f'<b>• </b>{commit_time}\n'\
-            f'<b>• </b>{commit_from}\n'\
+            f'<b>• Committed on:</b>{commit_time}\n'\
+            f'<b>• From:</b>{commit_from}\n'\
             f'\n'\
             f'<b><u>BOT INFO</u></b>\n\n'\
             f'<b>• Uptime:</b> {currentTime}\n'\
@@ -114,14 +114,14 @@ def stats(update, context):
         zip_unzip = 'No Limit Set' if ZIP_UNZIP_LIMIT == '' else f'{ZIP_UNZIP_LIMIT}GB/Link'
         total_task = 'No Limit Set' if TOTAL_TASKS_LIMIT == '' else f'{TOTAL_TASKS_LIMIT} Total Tasks/Time'
         user_task = 'No Limit Set' if USER_TASKS_LIMIT == '' else f'{USER_TASKS_LIMIT} Tasks/user'
-        stats += f'<b>Bot Limitations </b>\n'\
-                 f'Torrent/Direct: {torrent_direct}\n'\
-                 f'Zip/Unzip: {zip_unzip}\n'\
-                 f'Leech: {leech_limit}\n'\
-                 f'Clone: {clone_limit}\n'\
-                 f'Mega: {mega_limit}\n'\
-                 f'Total Tasks: {total_task}\n'\
-                 f'User Tasks: {user_task}\n\n'
+        stats += f'<b><u>BOT LIMITATIONS</u></b>\n\n'\
+                 f'<b>• Torrent/Direct:</b> {torrent_direct}\n'\
+                 f'<b>• Zip/Unzip:</b> {zip_unzip}\n'\
+                 f'<b>• Leech:</b> {leech_limit}\n'\
+                 f'<b>• Clone:</b> {clone_limit}\n'\
+                 f'<b>• Mega:</b> {mega_limit}\n'\
+                 f'<b>• Total Tasks:</b> {total_task}\n'\
+                 f'<b>• User Tasks:</b> {user_task}\n\n'
 
     if config_dict['PICS']:
         sendPhoto(stats, context.bot, update.message, rchoice(config_dict['PICS']))
