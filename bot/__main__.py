@@ -76,7 +76,7 @@ def stats(update, context):
     mem_t = get_readable_file_size(memory.total)
     mem_a = get_readable_file_size(memory.available)
     mem_u = get_readable_file_size(memory.used)
-    stats = f'<b><u>REPOSITORY INFO</u></b>\n\n' \
+    stats = f'<a href="https://github.com/5hojib/hk-upstream"><b><u>REPOSITORY INFO</u></b></a>\n\n' \
             f'<b>• Repository Version:</b> {version}\n'\
             f'<b>• Updated:</b> {commit_date}\n'\
             f'<b>• Committed on:</b>{commit_time}\n'\
@@ -92,11 +92,6 @@ def stats(update, context):
             f'<b>• Disk Usage:</b> {disk}%\n'\
             f'<b>• Free Disk Space:</b> {free}\n'\
             f'<b>• Total Disk Space:</b> {total}\n'\
-            f'<b>• Uploaded Data:</b> {sent}\n'\
-            f'<b>• Downloaded Data:</b> {recv}\n\n'
-
-
-
     if config_dict['SHOW_LIMITS_IN_STATS']:
 
         TORRENT_DIRECT_LIMIT = config_dict['TORRENT_DIRECT_LIMIT']
