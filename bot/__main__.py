@@ -35,6 +35,10 @@ async def stats(client, message):
     swap = swap_memory()
     memory = virtual_memory()
     net_io = net_io_counters()
+    currentTime = get_readable_time(time() - botStartTime)
+    mem_p = memory.percent
+    osUptime = get_readable_time(time() - boot_time())
+    cpuUsage = cpu_percent(interval=0.5)
     if await aiopath.exists('.git'):
         last_commit = await cmd_exec("git log -1 --date=short --pretty=format:'%cd <b>From</b> %cr'", True)
         last_commit = last_commit[0]
