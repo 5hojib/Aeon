@@ -118,8 +118,8 @@ def get_progress_bar_string(status):
     FINISHED_PROGRESS_STR = '█' # '■'
     UN_FINISHED_PROGRESS_STR = '▒' # '□'
     MULTI_WORKING_PROGRESS_STR = '▁▂▃▄▅▆▇'
-    completed = float(status.processed_bytes() / 8)
-    total = float(status.size_raw() / 8)
+    completed = str(status.processed_bytes() / 8)
+    total = str(status.size_raw() / 8)
     p = 0 if total == 0 else round(completed * 100 / total)
     p = min(max(p, 0), 100)
     cFull = int(p // 8)
