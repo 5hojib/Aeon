@@ -29,7 +29,7 @@ from .modules import (authorize, bot_settings, bt_select, cancel_mirror,
                       count, delete, eval, drive_list, mirror_leech, rss, search,
                       shell, status, users_settings, ytdlp)
 
-
+version = "1.0.1 Initial"
 async def stats(client, message):
     total, used, free, disk = disk_usage('/')
     swap = swap_memory()
@@ -38,24 +38,30 @@ async def stats(client, message):
     if await aiopath.exists('.git'):
         last_commit = await cmd_exec("git log -1 --date=short --pretty=format:'%cd <b>From</b> %cr'", True)
         last_commit = last_commit[0]
+        commit_from = await cmd_exec("git log -1 --date=short --pretty=format:'%cr'", True)
+        commit_from = commit_from[0]
+        commit_date = await cmd_exec("git log -1 --date=format:'%d %B %Y' --pretty=format:'%ad'", True)
+        commit_date = commit_date[0]
+        commit_time = await cmd_exec("git log -1 --date=format:'%I:%M:%S %p' --pretty=format:'%ad'", True)
+        commit_time = commit_time[0]
     else:
         last_commit = 'No UPSTREAM_REPO'
-    stats = f'<b>Commit Date</b>: {last_commit}\n\n'\
-            f'<b>Bot Uptime</b>: {get_readable_time(time() - botStartTime)}\n'\
-            f'<b>OS Uptime</b>: {get_readable_time(time() - boot_time())}\n\n'\
-            f'<b>Total Disk Space </b>: {get_readable_file_size(total)}\n'\
-            f'<b>Used</b>: {get_readable_file_size(used)} | <b>Free</b>: {get_readable_file_size(free)}\n\n'\
-            f'<b>Upload</b>: {get_readable_file_size(net_io.bytes_sent)}\n'\
-            f'<b>Download</b>: {get_readable_file_size(net_io.bytes_recv)}\n\n'\
-            f'<b>CPU</b>: {cpu_percent(interval=0.5)}%\n'\
-            f'<b>RAM</b>: {memory.percent}%\n'\
-            f'<b>DISK</b>: {disk}%\n\n'\
-            f'<b>Physical Cores</b>: {cpu_count(logical=False)}\n'\
-            f'<b>Total Cores</b>: {cpu_count(logical=True)}\n\n'\
-            f'<b>SWAP</b>: {get_readable_file_size(swap.total)} | <b>Used</b>: {swap.percent}%\n'\
-            f'<b>Memory Total</b>: {get_readable_file_size(memory.total)}\n'\
-            f'<b>Memory Free</b>: {get_readable_file_size(memory.available)}\n'\
-            f'<b>Memory Used</b>: {get_readable_file_size(memory.used)}\n'
+    stats = f'<b><u>REPOSITORY INFO</u></b>\n\n' \
+            f'<b>• Repository Version:</b> {version}\n'\
+            f'<b>• Updated:</b> {commit_date}\n'\
+            f'<b>• Commited On: </b>{commit_time}\n'\
+            f'<b>• From: </b>{commit_from}\n'\
+            f'\n'\
+            f'<b><u>BOT INFO</u></b>\n\n'\
+            f'<b>• Uptime:</b> {currentTime}\n'\
+            f'<b>• System:</b> {osUptime}\n'\
+            f'\n'\
+            f'<b><u>SYSTEM INFO</u></b>\n\n'\
+            f'<b>• CPU Usage:</b> {cpuUsage}%\n'\
+            f'<b>• RAM Usage:</b> {mem_p}%\n'\
+            f'<b>• Disk Usage:</b> {disk}%\n'\
+            f'<b>• Free Disk Space:</b> {get_readable_file_size(free)}\n'\
+            f'<b>• Total Disk Space:</b> {get_readable_file_size(total)}\n'
     await sendMessage(message, stats)
 
 async def start(client, message):
@@ -63,9 +69,8 @@ async def start(client, message):
         start_string = 'Bot Started.\n' \
                     'Now I will send your files or links here.\n'
     else:
-        start_string = '🌹 Welcome To One Of A Modified Anasty Mirror Bot\n' \
-                    'This bot can Mirror all your links To Google Drive!\n' \
-                    '👨🏽‍💻 Powered By: @JMDKH_Team'
+        start_string = 'Welcome!\n' \
+                    'This bot can Mirror all your links To Google Drive!'
     await sendMessage(message, start_string)
 
 async def restart(client, message):
