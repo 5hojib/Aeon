@@ -32,7 +32,7 @@ if DATABASE_URL:
         conn.close()
 
 UPSTREAM_REPO = 'https://github.com/5hojib/hk-upstream'
-UPSTREAM_BRANCH = 'x'
+UPSTREAM_BRANCH = 'jmdkh'
 
 if UPSTREAM_REPO:
     if ospath.exists('.git'):
