@@ -114,21 +114,14 @@ def bt_selection_buttons(id_, isCanCncl=True):
     buttons.ibutton("Done Selecting", f"btsel done {gid} {id_}")
     return buttons.build_menu(2)
 
-def get_progress_bar_string(status):
-    FINISHED_PROGRESS_STR = '█' # '■'
-    UN_FINISHED_PROGRESS_STR = '▒' # '□'
-    MULTI_WORKING_PROGRESS_STR = '▁▂▃▄▅▆▇'
-    completed = str(status.processed_bytes() / 8)
-    total = str(status.size_raw() / 8)
-    p = 0 if total == 0 else round(completed * 100 / total)
-    p = min(max(p, 0), 100)
+def get_progress_bar_string(pct):
+    pct = float(pct.split('%')[0])
+    p = min(max(pct, 0), 100)
     cFull = int(p // 8)
-    cPart = float(p % 8 - 1)
-    p_str = FINISHED_PROGRESS_STR * cFull
-    if cPart >= 0:
-        p_str += MULTI_WORKING_PROGRESS_STR[cPart]
-    p_str += UN_FINISHED_PROGRESS_STR  * (12 - cFull)
+    p_str = '█' * cFull
+    p_str += '▒' * (12 - cFull)
     return f"{p_str}"
+  
 
 def get_readable_message():
     msg = ""
