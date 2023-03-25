@@ -27,7 +27,7 @@ from .helper.telegram_helper.message_utils import (editMessage, sendFile,
                                                    sendMessage)
 from .modules import (authorize, bot_settings, bt_select, cancel_mirror,
                       count, delete, eval, drive_list, mirror_leech, rss, search,
-                      shell, status, users_settings, ytdlp)
+                      shell, status, users_settings, ytdlp, mediainfo)
 
 version = "1.0.1 Initial"
 async def stats(client, message):
