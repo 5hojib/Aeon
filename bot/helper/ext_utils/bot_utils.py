@@ -29,17 +29,17 @@ PAGES = 0
 
 
 class MirrorStatus:
-    STATUS_UPLOADING = "Upload"
-    STATUS_DOWNLOADING = "Download"
-    STATUS_CLONING = "Clone"
-    STATUS_QUEUEDL = "QueueDl"
-    STATUS_QUEUEUP = "QueueUp"
+    STATUS_UPLOADING = "Uploading"
+    STATUS_DOWNLOADING = "Downloading"
+    STATUS_CLONING = "Cloning"
+    STATUS_QUEUEDL = "DL waiting"
+    STATUS_QUEUEUP = "UL waiting"
     STATUS_PAUSED = "Pause"
-    STATUS_ARCHIVING = "Archive"
-    STATUS_EXTRACTING = "Extract"
-    STATUS_SPLITTING = "Split"
+    STATUS_ARCHIVING = "Archiving"
+    STATUS_EXTRACTING = "Extracting"
+    STATUS_SPLITTING = "Splitting"
     STATUS_CHECKING = "CheckUp"
-    STATUS_SEEDING = "Seed"
+    STATUS_SEEDING = "Seeding"
 
 SIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
 
@@ -133,29 +133,29 @@ def get_readable_message():
         globals()['PAGE_NO'] -= 1
     for download in list(download_dict.values())[COUNT:STATUS_LIMIT+COUNT]:
         msg += f"<b>{escape(str(download.name()))}</b>\n\n"
-        msg += f"<b>{download.status()} with {download.engine}</b>"
+        msg += f"<b>┌ {download.status()} with {download.engine}</b>"
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
-            msg += f"\n{get_progress_bar_string(download.progress())} {download.progress()}"
-            msg += f"\n<b>Processed</b>: {download.processed_bytes()} of {download.size()}"
-            msg += f"\n<b>Speed</b>: {download.speed()} | <b>ETA</b>: {download.eta()}"
+            msg += f"\n<b>├ {get_progress_bar_string(download.progress())}</b> {download.progress()}"
+            msg += f"\n<b>├ Processed</b>: {download.processed_bytes()} of {download.size()}"
+            msg += f"\n<b>├ Speed</b>: {download.speed()}"
+            msg += f"\n<b>├ Estimated</b>: {download.eta()}"
             if hasattr(download, 'seeders_num'):
                 try:
                     msg += f"\n<b>Seeders</b>: {download.seeders_num()} | <b>Leechers</b>: {download.leechers_num()}"
                 except:
                     pass
         elif download.status() == MirrorStatus.STATUS_SEEDING:
-            msg += f"\n<b>Size</b>: {download.size()}"
-            msg += f"\n<b>Speed</b>: {download.upload_speed()}"
-            msg += f" | <b>Uploaded</b>: {download.uploaded_bytes()}"
-            msg += f"\n<b>Ratio</b>: {download.ratio()}"
-            msg += f" | <b>Time</b>: {download.seeding_time()}"
+            msg += f"\n<b>├ Size</b>: {download.size()}"
+            msg += f"\n<b>├ Speed</b>: {download.upload_speed()}"
+            msg += f"\n<b>├ Uploaded</b>: {download.uploaded_bytes()}"
+            msg += f"\n<b>├ Ratio</b>: {download.ratio()}"
+            msg += f"\n<b>├ Time</b>: {download.seeding_time()}"
         else:
-            msg += f"\n<b>Size</b>: {download.size()}"
-        msg += f"\n<b>Source</b>: {download.source}"
-        msg += f"\n<b>Elapsed</b>: {get_readable_time(time() - download.startTime)}"
-        msg += f"\n<b>Engine</b>: "
-        msg += f"\n<b>Upload</b>: {download.mode}"
-        msg += f"\n<b>Stop</b>: <code>/{BotCommands.CancelMirror} {download.gid()}</code>\n\n"
+            msg += f"\n<b>├ Size</b>: {download.size()}"
+        msg += f"\n<b>├ Source</b>: {download.source}"
+        msg += f"\n<b>├ Elapsed</b>: {get_readable_time(time() - download.startTime)}"
+        msg += f"\n<b>├ Upload</b>: {download.mode}"
+        msg += f"\n<b>├ Stop</b>: <code>/{BotCommands.CancelMirror} {download.gid()}</code>\n\n"
     if len(msg) == 0:
         return None, None
     dl_speed = 0
@@ -181,9 +181,9 @@ def get_readable_message():
                 up_speed += float(spd.split('M')[0]) * 1048576
     if tasks > STATUS_LIMIT:
         buttons = ButtonMaker()
-        buttons.ibutton("<<", "status pre")
+        buttons.ibutton("Prev", "status pre")
         buttons.ibutton(f"{PAGE_NO}/{PAGES} ({tasks})", "status ref")
-        buttons.ibutton(">>", "status nex")
+        buttons.ibutton("Next", "status nex")
         button = buttons.build_menu(3)
     msg += f"<b>CPU</b>: {cpu_percent()}% | <b>FREE</b>: {get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}"
     msg += f"\n<b>RAM</b>: {virtual_memory().percent}% | <b>UPTIME</b>: {get_readable_time(time() - botStartTime)}"
@@ -228,17 +228,17 @@ def get_readable_time(seconds):
     (days, remainder) = divmod(seconds, 86400)
     days = int(days)
     if days != 0:
-        result += f'{days}d'
+        result += f'{days} Days '
     (hours, remainder) = divmod(remainder, 3600)
     hours = int(hours)
     if hours != 0:
-        result += f'{hours}h'
+        result += f'{hours} Hours '
     (minutes, seconds) = divmod(remainder, 60)
     minutes = int(minutes)
     if minutes != 0:
-        result += f'{minutes}m'
+        result += f'{minutes} Min '
     seconds = int(seconds)
-    result += f'{seconds}s'
+    result += f'{seconds} Sec'
     return result
 
 def is_magnet(url):
