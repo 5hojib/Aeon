@@ -141,7 +141,7 @@ def get_readable_message():
             msg += f"\n<b>├ Estimated</b>: {download.eta()}"
             if hasattr(download, 'seeders_num'):
                 try:
-                    msg += f"\n<b>Seeders</b>: {download.seeders_num()} | <b>Leechers</b>: {download.leechers_num()}"
+                    msg += f"\n<b>├ Seeders</b>: {download.seeders_num()} | <b>Leechers</b>: {download.leechers_num()}"
                 except:
                     pass
         elif download.status() == MirrorStatus.STATUS_SEEDING:
@@ -155,7 +155,7 @@ def get_readable_message():
         msg += f"\n<b>├ Source</b>: {download.source}"
         msg += f"\n<b>├ Elapsed</b>: {get_readable_time(time() - download.startTime)}"
         msg += f"\n<b>├ Upload</b>: {download.mode}"
-        msg += f"\n<b>├ Stop</b>: <code>/{BotCommands.CancelMirror} {download.gid()}</code>\n\n"
+        msg += f"\n<b>└ Stop</b>: <code>/{BotCommands.CancelMirror} {download.gid()}</code>\n\n"
     if len(msg) == 0:
         return None, None
     dl_speed = 0
@@ -185,9 +185,12 @@ def get_readable_message():
         buttons.ibutton(f"{PAGE_NO}/{PAGES} ({tasks})", "status ref")
         buttons.ibutton("Next", "status nex")
         button = buttons.build_menu(3)
-    msg += f"<b>CPU</b>: {cpu_percent()}% | <b>FREE</b>: {get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}"
-    msg += f"\n<b>RAM</b>: {virtual_memory().percent}% | <b>UPTIME</b>: {get_readable_time(time() - botStartTime)}"
-    msg += f"\n<b>DL</b>: {get_readable_file_size(dl_speed)}/s | <b>UL</b>: {get_readable_file_size(up_speed)}/s"
+    msg += f"<b>BOT UPTIME</b>: {get_readable_time(time() - botStartTime)}"
+    msg += f"\n<b>FREE DISK</b>: {get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}"
+    msg += f"\n<b>CPU</b>: {cpu_percent()}%"
+    msg += f"| <b>RAM</b>: {virtual_memory().percent}%"
+    msg += f"\n<b>Total downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
+    msg += f"\n<b>Total uploading speed</b>: {get_readable_file_size(up_speed)}/s"
     return msg, button
 
 def extra_btns(buttons):
