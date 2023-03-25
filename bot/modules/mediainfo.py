@@ -61,9 +61,8 @@ def mediainfo(update, context):
     editMessage(short_url(f"https://telegra.ph/{help}", update.message.from_user.id), sent)
 
 
-authfilter = CustomFilters.authorized_chat if config_dict['MEDIAINFO_ENABLED'] is True else CustomFilters.owner_filter
-mediainfo_handler = CommandHandler(BotCommands.MediaInfoCommand, mediainfo,
-                                    filters=authfilter | CustomFilters.authorized_user)
+mediainfo_handler = CommandHandler(mediaInfo, mediainfo
+                                    | CustomFilters.authorized_user)
 
 
 dispatcher.add_handler(mediainfo_handler)
