@@ -61,8 +61,8 @@ def mediainfo(update, context):
     editMessage(short_url(f"https://telegra.ph/{help}", update.message.from_user.id), sent)
 
 
-mediainfo_handler = CommandHandler(mediaInfo, mediainfo
-                                    | CustomFilters.authorized_user)
+mediainfo_handler = CommandHandler('mediaInfo', mediainfo,
+                                   filters=CustomFilters.owner_filter | CustomFilters.authorized_user)
 
 
 dispatcher.add_handler(mediainfo_handler)
