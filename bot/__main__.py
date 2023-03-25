@@ -25,9 +25,10 @@ from .helper.telegram_helper.bot_commands import BotCommands
 from .helper.telegram_helper.filters import CustomFilters
 from .helper.telegram_helper.message_utils import (editMessage, sendFile,
                                                    sendMessage)
-from .modules import (authorize, bot_settings, bt_select, cancel_mirror,
-                      count, delete, eval, drive_list, mirror_leech, rss, search,
-                      shell, status, users_settings, ytdlp)
+from .modules import (anonymous, authorize, bot_settings, bt_select,
+                      cancel_mirror, category_select, count, delete,
+                      drive_list, eval, mirror_leech, rmdb, rss, save_message,
+                      search, shell, status, users_settings, ytdlp)
 
 version = "1.0.1 Initial"
 async def stats(client, message):
