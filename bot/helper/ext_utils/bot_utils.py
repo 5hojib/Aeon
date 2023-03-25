@@ -185,12 +185,10 @@ def get_readable_message():
         buttons.ibutton(f"{PAGE_NO}/{PAGES} ({tasks})", "status ref")
         buttons.ibutton("Next", "status nex")
         button = buttons.build_menu(3)
-    msg += f"<b>BOT UPTIME</b>: {get_readable_time(time() - botStartTime)}"
-    msg += f"\n<b>FREE DISK</b>: {get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}"
-    msg += f"\n<b>CPU</b>: {cpu_percent()}%"
-    msg += f"| <b>RAM</b>: {virtual_memory().percent}%"
-    msg += f"\n<b>Total downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
-    msg += f"\n<b>Total uploading speed</b>: {get_readable_file_size(up_speed)}/s"
+    msg += f"<b>• Bot Uptime</b>: {get_readable_time(time() - botStartTime)}"
+    msg += f"\n<b>• Free Disk</b>: {get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}"
+    msg += f"\n<b>• Total downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
+    msg += f"\n<b>• Total uploading speed</b>: {get_readable_file_size(up_speed)}/s"
     return msg, button
 
 def extra_btns(buttons):
