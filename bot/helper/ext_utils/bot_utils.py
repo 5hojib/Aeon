@@ -120,7 +120,7 @@ def get_progress_bar_string(pct):
     cFull = int(p // 8)
     p_str = '■' * cFull
     p_str += '□' * (12 - cFull)
-    return f"[{p_str}]"
+    return f"{p_str}"
 
 def get_readable_message():
     msg = ""
@@ -132,7 +132,8 @@ def get_readable_message():
         globals()['COUNT'] -= STATUS_LIMIT
         globals()['PAGE_NO'] -= 1
     for download in list(download_dict.values())[COUNT:STATUS_LIMIT+COUNT]:
-        msg += f"<b>{download.status()}</b>: <code>{escape(str(download.name()))}</code>"
+        msg += f"<b>{escape(str(download.name()))}</b>\n\n"
+        msg += f"<b>{download.status()} with {download.engine}</b>"
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
             msg += f"\n{get_progress_bar_string(download.progress())} {download.progress()}"
             msg += f"\n<b>Processed</b>: {download.processed_bytes()} of {download.size()}"
@@ -152,7 +153,7 @@ def get_readable_message():
             msg += f"\n<b>Size</b>: {download.size()}"
         msg += f"\n<b>Source</b>: {download.source}"
         msg += f"\n<b>Elapsed</b>: {get_readable_time(time() - download.startTime)}"
-        msg += f"\n<b>Engine</b>: {download.engine}"
+        msg += f"\n<b>Engine</b>: "
         msg += f"\n<b>Upload</b>: {download.mode}"
         msg += f"\n<b>Stop</b>: <code>/{BotCommands.CancelMirror} {download.gid()}</code>\n\n"
     if len(msg) == 0:
