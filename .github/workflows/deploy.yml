@@ -20,10 +20,8 @@ jobs:
           usedocker: true
           docker_heroku_process_type: web
           stack: "container"
-          region: "us"
+          region: "eu"
         env:
-          HD_HEROKU_API_KEY: ${{secrets.HEROKU_API_KEY}}
-          HD_HEROKU_APP_NAME: ${{secrets.HEROKU_APP_NAME}}
           HD_OWNER_ID: ${{secrets.OWNER_ID}}
           HD_TELEGRAM_API: ${{secrets.TELEGRAM_API}}
           HD_TELEGRAM_HASH: ${{secrets.TELEGRAM_HASH}}
