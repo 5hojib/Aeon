@@ -386,11 +386,12 @@ class MirrorLeechListener:
         else:
             msg = f'<b>Name</b>: <code>{escape(name)}</code>\n'
             msg += f'\n<b>• Size</b>: {get_readable_file_size(size)}'
-            msg += f'\n\n<b>• Type</b>: {typ}'
+            msg += f'\n<b>• Type</b>: {typ}'
             if typ == "Folder":
                 msg += f'\n<b>• SubFolders</b>: {folders}'
                 msg += f'\n<b>• Files</b>: {files}'
-            msg += f'\n<b>• Uploaded by</b>: {self.tag} | <b>Elapsed</b>: {get_readable_time(time() - self.extra_details["startTime"])}'
+            msg += f'\n<b>• Uploaded by</b>: {self.tag}'
+            msg += f'\n<b>• Elapsed</b>: {get_readable_time(time() - self.extra_details["startTime"])}'
             if not link.startswith('Path:'):
                 if config_dict['GDRIVE_ID'] != drive_id or self.select:
                     msg += f"\n\n<b>Folder id</b>: <code>{drive_id}</code>"
