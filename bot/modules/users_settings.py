@@ -376,7 +376,8 @@ Check all available formatting options <a href="https://core.telegram.org/bots/a
             await DbManger().update_user_doc(user_id)
         await editMessage(message, f'Data reset for {user_id}')
     else:
-        handler_dict[user_id] = False
+        if data[2] == 'close':
+            handler_dict[user_id] = False
         await query.answer()
         await message.reply_to_message.delete()
         await message.delete()
@@ -406,6 +407,7 @@ async def send_users_settings(client, message):
     elif userid in user_data:
         msg = f'<b>{userid}</b>:'
         if data := user_data[userid]:
+            buttons.ibutton("Close", f"userset {message.from_user.id} x")
             buttons = ButtonMaker()
             buttons.ibutton("Delete Data", f"userset {message.from_user.id} user_del {userid}")
             button = buttons.build_menu(1)
