@@ -384,7 +384,7 @@ class MirrorLeechListener:
                 await start_from_queued()
                 return
         else:
-            msg = f'<b>Name</b>: <code>{escape(name)}</code>\n'
+            msg = f'<b>Name: {escape(name)}</b>\n'
             msg += f'\n<b>• Size</b>: {get_readable_file_size(size)}'
             msg += f'\n<b>• Type</b>: {typ}'
             if typ == "Folder":
