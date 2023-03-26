@@ -468,7 +468,7 @@ class MirrorLeechListener:
             if self.uid in self.sameDir:
                 self.sameDir.remove(self.uid)
         msg = f'{self.tag} your download has been stopped due to: {escape(error)}'
-        msg += f'\n\n<b>• Elapsed</b>: {get_readable_time(time() - self.extra_details['startTime'])}'
+        msg += f"\n\n<b>• Elapsed</b>: {get_readable_time(time() - self.extra_details['startTime'])}"
         await sendMessage(self.message, msg, button)
         if self.logMessage:
             await sendMessage(self.logMessage, msg, button)
