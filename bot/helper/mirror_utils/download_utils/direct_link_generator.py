@@ -117,7 +117,7 @@ def appdrive(url: str) -> str:
     })
     account_login(client, url, account['email'], account['passwd'])
     res = client.get(url)
-    key = re_findall(r'"key",\s+"(.*?)"', res.text)[0]
+    key = findall(r'"key",\s+"(.*?)"', res.text)[0]
     ddl_btn = etree.HTML(res.content).xpath("//button[@id='drc']")
     info_parsed = parse_info(res.text)
     info_parsed['error'] = False
