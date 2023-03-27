@@ -156,22 +156,13 @@ def appdrive(url: str) -> str:
         try:  response = client.post(url, data=gen_payload(data), headers=headers).json() ;  break 
         except: data['type'] += 1   
  
-        
     if 'url' in response:
-        info_parsed['gdrive_link'] = response['url']
-    elif 'error' in response and response['error']:
-        info_parsed['error'] = True
-        info_parsed['error_message'] = response['message']
-    if urlparse(url).netloc == 'driveapp.in' and not info_parsed['error']:
-        res = client.get(info_parsed['gdrive_link'])
-        drive_link = etree.HTML(res.content).xpath("//a[contains(@class,'btn')]/@href")[0]
-        info_parsed['gdrive_link'] = drive_link
-    if not info_parsed['error']:
-        link = info_parsed.get('gdrive_link')
-        return link
-    else:
-        raise DirectDownloadLinkException(f"{info_parsed['error_message']}")
-        
+        drive_link = response["url"]
+        return drive_link
+    		     	 	
+    elif  'error' in response and response['error']: return response['message']
+    else: raise DirectDownloadLinkException("ERROR: File not found/Download limit reached")
+    
 def yandex_disk(url: str) -> str:
     """ Yandex.Disk direct link generator
     Based on https://github.com/wldhx/yadisk-direct """
