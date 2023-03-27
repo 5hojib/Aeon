@@ -110,7 +110,7 @@ def account_login(client, url, email, password):
     client.post(f'https://{urlparse(url).netloc}/login', data=data)
     
 def appdrive(url: str) -> str:
-    client = rsession()
+    client = requests.Session()
     client.headers.update({
         "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36"
     })
