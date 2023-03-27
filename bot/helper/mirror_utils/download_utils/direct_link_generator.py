@@ -97,8 +97,8 @@ def direct_link_generator(link: str):
 
 #Appdrive
 account = {
-    'email': APPDRIVE_EMAIL,
-    'passwd': APPDRIVE_PASS
+    'email': email,
+    'password': password
     }
 
 def parse_info(data):
