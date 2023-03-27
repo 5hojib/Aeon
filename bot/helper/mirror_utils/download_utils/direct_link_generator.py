@@ -1,13 +1,3 @@
-# Copyright (C) 2019 The Raphielscape Company LLC.
-#
-# Licensed under the Raphielscape Public License, Version 1.c (the "License");
-# you may not use this file except in compliance with the License.
-#
-""" Helper Module containing various sites direct links generators. This module is copied and modified as per need
-from https://github.com/AvinashReddy3108/PaperplaneExtended . I hereby take no credit of the following code other
-than the modifications. See https://github.com/AvinashReddy3108/PaperplaneExtended/commits/master/userbot/modules/direct_links.py
-for original authorship. """
-
 from base64 import standard_b64encode
 from http.cookiejar import MozillaCookieJar
 from json import loads
@@ -101,6 +91,67 @@ def direct_link_generator(link: str):
     else:
         raise DirectDownloadLinkException(f'No Direct link function found for {link}')
 
+#Appdrive
+account = {
+    'email': APPDRIVE_EMAIL,
+    'passwd': APPDRIVE_PASS
+    }
+def account_login(client, url, email, password):
+    """ AppDrive google drive link generator
+    By https://github.com/xcscxr """
+
+    if APPDRIVE_EMAIL is None:
+        raise DirectDownloadLinkException("ERROR: Appdrive  Email Password not provided")
+
+    data = {
+        'email': email,
+        'password': password
+    }
+    client.post(f'https://{urlparse(url).netloc}/login', data=data)
+    
+def appdrive(url: str) -> str:
+    client = rsession()
+    client.headers.update({
+        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36"
+    })
+    account_login(client, url, account['email'], account['passwd'])
+    res = client.get(url)
+    key = re_findall(r'"key",\s+"(.*?)"', res.text)[0]
+    ddl_btn = etree.HTML(res.content).xpath("//button[@id='drc']")
+    info_parsed = parse_info(res.text)
+    info_parsed['error'] = False
+    info_parsed['link_type'] = 'login'  # direct/login
+    headers = {
+        "Content-Type": f"multipart/form-data; boundary={'-'*4}_",
+    }
+    data = {
+        'type': 1,
+        'key': key,
+        'action': 'original'
+    }
+    if len(ddl_btn):
+        info_parsed['link_type'] = 'direct'
+        data['action'] = 'direct'
+    while data['type'] <= 3:
+        try:
+            response = client.post(url, data=gen_payload(data), headers=headers).json()
+            break
+        except: data['type'] += 1
+    if 'url' in response:
+        info_parsed['gdrive_link'] = response['url']
+    elif 'error' in response and response['error']:
+        info_parsed['error'] = True
+        info_parsed['error_message'] = response['message']
+    if urlparse(url).netloc == 'driveapp.in' and not info_parsed['error']:
+        res = client.get(info_parsed['gdrive_link'])
+        drive_link = etree.HTML(res.content).xpath("//a[contains(@class,'btn')]/@href")[0]
+        info_parsed['gdrive_link'] = drive_link
+    if not info_parsed['error']:
+        link = info_parsed.get('gdrive_link')
+        return link
+    else:
+        raise DirectDownloadLinkException(f"{info_parsed['error_message']}")
+        
 def yandex_disk(url: str) -> str:
     """ Yandex.Disk direct link generator
     Based on https://github.com/wldhx/yadisk-direct """
