@@ -152,6 +152,7 @@ def appdrive(url: str) -> str:
         info_parsed['link_type'] = 'direct'
         data['action'] = 'direct'
     response = None
+    
     while data['type'] <= 3:
         try:
             response = client.post(url, data=gen_payload(data), headers=headers).json()
