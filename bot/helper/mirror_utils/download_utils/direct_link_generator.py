@@ -133,26 +133,30 @@ def appdrive(url: str) -> str:
     client.headers.update({
         "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36"
     })
-    account_login(client, url, account['email'], account['passwd'])
-    res = client.get(url)
-    key = findall(r'"key",\s+"(.*?)"', res.text)[0]
-    ddl_btn = etree.HTML(res.content).xpath("//button[@id='drc']")
-    info_parsed = parse_info(res.text)
-    info_parsed['error'] = False
-    info_parsed['link_type'] = 'login'  # direct/login
-    headers = {
-        "Content-Type": f"multipart/form-data; boundary={'-'*4}_",
-    }
-    data = {
-        'type': 1,
-        'key': key,
-        'action': 'original'
-    }
-    if len(ddl_btn):
-        info_parsed['link_type'] = 'direct'
-        data['action'] = 'direct'
     
-    response = client.post(url, data=gen_payload(data), headers=headers).json()
+    url = client.get(url).url 
+    response = client.get(url)   
+    try:
+        key = findall('"key",\s+"(.*?)"', response.text)[0]
+        soup = BeautifulSoup(response.text,  "html.parser")
+        ddl_btn = soup.find(id="drc")
+    except:
+        return "Something went wrong. Could not generate GDrive URL for your Given Link"
+    
+    headers = { "Content-Type": f"multipart/form-data; boundary={'-'*4}_"} 
+    data = { 'type': 1,  'key': key, 'action': 'original'}
+    
+    if ddl_btn != None:  data['action'] = 'direct'
+    
+    else : account_login(client, url, appdrive_email, appdrive_password)
+    	 
+  
+        
+    while data['type'] <= 3:
+        try:  response = client.post(url, data=gen_payload(data), headers=headers).json() ;  break 
+        except: data['type'] += 1   
+ 
+        
     if 'url' in response:
         info_parsed['gdrive_link'] = response['url']
     elif 'error' in response and response['error']:
