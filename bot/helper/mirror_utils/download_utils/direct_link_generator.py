@@ -24,8 +24,6 @@ anonfilesBaseSites = ['anonfiles.com', 'hotfile.io', 'bayfiles.com', 'megaupload
                       'filechan.org', 'myfile.is', 'vshare.is', 'rapidshare.nu', 'lolabits.se',
                       'openload.cc', 'share-online.is', 'upvid.cc']
 
-email = 'forfreefirecallback5@gmail.com'
-password = 'Test1234'
 def direct_link_generator(link: str):
     """ direct links generator """
     domain = urlparse(link).hostname
@@ -71,8 +69,6 @@ def direct_link_generator(link: str):
         return shrdsk(link)
     elif 'letsupload.io' in domain:
         return letsupload(link)
-    elif 'appdrive' in domain:
-        return appdrive(link)
     elif 'zippyshare.com' in domain:
         return zippyshare(link)
     elif any(x in domain for x in ['wetransfer.com', 'we.tl']):
@@ -95,74 +91,6 @@ def direct_link_generator(link: str):
     else:
         raise DirectDownloadLinkException(f'No Direct link function found for {link}')
 
-#Appdrive
-account = {
-    'email': email,
-    'password': password
-    }
-
-def parse_info(data):
-    info = findall('>(.*?)<\/li>', data)
-    info_parsed = {}
-    for item in info:
-        kv = [s.strip() for s in item.split(':', maxsplit = 1)]
-        info_parsed[kv[0].lower()] = kv[1]
-    return info_parsed
-
-def gen_payload(data, boundary=f'{"-"*6}_'):
-    data_string = ''
-    for item in data:
-        data_string += f'{boundary}\r\n'
-        data_string += f'Content-Disposition: form-data; name="{item}"\r\n\r\n{data[item]}\r\n'
-    data_string += f'{boundary}--\r\n'
-    return data_string
-
-  
-def account_login(client, url, email, password):
-    if email is None:
-        raise DirectDownloadLinkException("ERROR: Appdrive  Email Password not provided")
-
-    data = {
-        'email': 'forfreefirecallback5@gmail.com',
-        'password': 'Test1234'
-    }
-    client.post(f'https://{urlparse(url).netloc}/login', data=data)
-    
-def appdrive(url: str) -> str:
-    client = requests.Session()
-    client.headers.update({
-        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36"
-    })
-    
-    url = client.get(url).url 
-    response = client.get(url)   
-    try:
-        key = findall('"key",\s+"(.*?)"', response.text)[0]
-        soup = BeautifulSoup(response.text,  "html.parser")
-        ddl_btn = soup.find(id="drc")
-    except:
-        return "Something went wrong. Could not generate GDrive URL for your Given Link"
-    
-    headers = { "Content-Type": f"multipart/form-data; boundary={'-'*4}_"} 
-    data = { 'type': 1,  'key': key, 'action': 'original'}
-    
-    if ddl_btn != None:  data['action'] = 'direct'
-    
-    else : account_login(client, url, email, password)
-    	 
-  
-        
-    while data['type'] <= 3:
-        try:  response = client.post(url, data=gen_payload(data), headers=headers).json() ;  break 
-        except: data['type'] += 1   
- 
-    if 'url' in response:
-        drive_link = response["url"]
-        return drive_link
-    		     	 	
-    elif  'error' in response and response['error']: return response['message']
-    else: raise DirectDownloadLinkException("ERROR: File not found/Download limit reached")
-    
 def yandex_disk(url: str) -> str:
     """ Yandex.Disk direct link generator
     Based on https://github.com/wldhx/yadisk-direct """
