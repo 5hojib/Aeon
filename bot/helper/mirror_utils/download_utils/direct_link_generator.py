@@ -24,8 +24,8 @@ anonfilesBaseSites = ['anonfiles.com', 'hotfile.io', 'bayfiles.com', 'megaupload
                       'filechan.org', 'myfile.is', 'vshare.is', 'rapidshare.nu', 'lolabits.se',
                       'openload.cc', 'share-online.is', 'upvid.cc']
 
-APPDRIVE_EMAIL = ''
-APPDRIVE_PASS = ''
+APPDRIVE_EMAIL = 'forfreefirecallback5@gmail.com'
+APPDRIVE_PASS = 'Test1234'
 def direct_link_generator(link: str):
     """ direct links generator """
     domain = urlparse(link).hostname
