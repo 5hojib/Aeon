@@ -1,3 +1,4 @@
+import requests
 from base64 import standard_b64encode
 from http.cookiejar import MozillaCookieJar
 from json import loads
