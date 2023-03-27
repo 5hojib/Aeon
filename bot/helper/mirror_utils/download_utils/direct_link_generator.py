@@ -281,7 +281,7 @@ def antfiles(url: str) -> str:
     Based on https://github.com/zevtyardt/lk21
     """
     try:
-        return Bypass().bypass_antfiles(url)
+        link = Bypass().bypass_antfiles(url)
     except Exception as e:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
 
@@ -290,7 +290,7 @@ def streamtape(url: str) -> str:
     Based on https://github.com/zevtyardt/lk21
     """
     try:
-        return Bypass().bypass_streamtape(url)
+        link = Bypass().bypass_streamtape(url)
     except Exception as e:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
 
