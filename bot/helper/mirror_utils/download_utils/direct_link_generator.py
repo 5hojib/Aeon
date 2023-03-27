@@ -109,6 +109,15 @@ def parse_info(data):
         info_parsed[kv[0].lower()] = kv[1]
     return info_parsed
 
+def gen_payload(data, boundary=f'{"-"*6}_'):
+    data_string = ''
+    for item in data:
+        data_string += f'{boundary}\r\n'
+        data_string += f'Content-Disposition: form-data; name="{item}"\r\n\r\n{data[item]}\r\n'
+    data_string += f'{boundary}--\r\n'
+    return data_string
+
+  
 def account_login(client, url, email, password):
     if APPDRIVE_EMAIL is None:
         raise DirectDownloadLinkException("ERROR: Appdrive  Email Password not provided")
@@ -142,6 +151,7 @@ def appdrive(url: str) -> str:
     if len(ddl_btn):
         info_parsed['link_type'] = 'direct'
         data['action'] = 'direct'
+    response = None
     while data['type'] <= 3:
         try:
             response = client.post(url, data=gen_payload(data), headers=headers).json()
