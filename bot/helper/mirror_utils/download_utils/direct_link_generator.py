@@ -102,7 +102,7 @@ account = {
     }
 
 def parse_info(data):
-    info = re.findall('>(.*?)<\/li>', data)
+    info = findall('>(.*?)<\/li>', data)
     info_parsed = {}
     for item in info:
         kv = [s.strip() for s in item.split(':', maxsplit = 1)]
