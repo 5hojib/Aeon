@@ -24,7 +24,7 @@ anonfilesBaseSites = ['anonfiles.com', 'hotfile.io', 'bayfiles.com', 'megaupload
                       'filechan.org', 'myfile.is', 'vshare.is', 'rapidshare.nu', 'lolabits.se',
                       'openload.cc', 'share-online.is', 'upvid.cc']
 
-APPDRIVE_EMAIL = 'forfreefirecallback5@gmail.com'
+APPDRIVE_EMAIL = ''
 APPDRIVE_PASS = 'Test1234'
 def direct_link_generator(link: str):
     """ direct links generator """
@@ -123,8 +123,8 @@ def account_login(client, url, email, password):
         raise DirectDownloadLinkException("ERROR: Appdrive  Email Password not provided")
 
     data = {
-        'email': email,
-        'password': password
+        'email': 'forfreefirecallback5@gmail.com',
+        'password': 'Test1234'
     }
     client.post(f'https://{urlparse(url).netloc}/login', data=data)
     
@@ -148,7 +148,7 @@ def appdrive(url: str) -> str:
     
     if ddl_btn != None:  data['action'] = 'direct'
     
-    else : account_login(client, url, appdrive_email, appdrive_password)
+    else : account_login(client, url, email, password)
     	 
   
         
