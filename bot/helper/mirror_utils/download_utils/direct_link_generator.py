@@ -119,7 +119,7 @@ def gen_payload(data, boundary=f'{"-"*6}_'):
 
   
 def account_login(client, url, email, password):
-    if APPDRIVE_EMAIL is None:
+    if email is None:
         raise DirectDownloadLinkException("ERROR: Appdrive  Email Password not provided")
 
     data = {
