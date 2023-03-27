@@ -23,7 +23,8 @@ anonfilesBaseSites = ['anonfiles.com', 'hotfile.io', 'bayfiles.com', 'megaupload
                       'filechan.org', 'myfile.is', 'vshare.is', 'rapidshare.nu', 'lolabits.se',
                       'openload.cc', 'share-online.is', 'upvid.cc']
 
-
+APPDRIVE_EMAIL = ''
+APPDRIVE_PASS = ''
 def direct_link_generator(link: str):
     """ direct links generator """
     domain = urlparse(link).hostname
@@ -69,6 +70,8 @@ def direct_link_generator(link: str):
         return shrdsk(link)
     elif 'letsupload.io' in domain:
         return letsupload(link)
+    elif 'appdrive' in domain:
+        return appdrive(link)
     elif 'zippyshare.com' in domain:
         return zippyshare(link)
     elif any(x in domain for x in ['wetransfer.com', 'we.tl']):
@@ -97,9 +100,6 @@ account = {
     'passwd': APPDRIVE_PASS
     }
 def account_login(client, url, email, password):
-    """ AppDrive google drive link generator
-    By https://github.com/xcscxr """
-
     if APPDRIVE_EMAIL is None:
         raise DirectDownloadLinkException("ERROR: Appdrive  Email Password not provided")
 
