@@ -21,7 +21,7 @@ from time import sleep, time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aria2p import API as ariaAPI
 from aria2p import Client as ariaClient
-from dotenv import dotenv_values, load_dotenv
+from dotenv import load_dotenv
 from pymongo import MongoClient
 from pyrogram import Client as tgClient
 from pyrogram import enums
