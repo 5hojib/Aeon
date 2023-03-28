@@ -653,7 +653,7 @@ def sharer_scraper(url):
         res = cget('GET', url, headers=header)
     except Exception as e:
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
-    key = findall('"key",\s+"(.*?)"', res.text)
+    key = re_findall('"key",\s+"(.*?)"', res.text)
     if not key:
         raise DirectDownloadLinkException("ERROR: Key not found!")
     key = key[0]
