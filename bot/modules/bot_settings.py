@@ -574,15 +574,7 @@ async def update_buttons(message, key=None, edit_type=None):
 async def edit_variable(client, message, pre_message, key):
     handler_dict[message.chat.id] = False
     value = message.text
-    if key == 'DM_MODE':
-        value = value.lower() if value.lower() in ['leech', 'mirror', 'all'] else ''
-    elif value.lower() == 'true':
-        value = True
-    elif value.lower() == 'false':
-        value = False
-        if key == 'INCOMPLETE_TASK_NOTIFIER' and DATABASE_URL:
-            await DbManger().trunc_table('tasks')
-    elif key == 'RSS_DELAY':
+    if key == 'RSS_DELAY':
         value = int(value)
         addJob(value)
     elif key == 'DOWNLOAD_DIR':
@@ -608,6 +600,8 @@ async def edit_variable(client, message, pre_message, key):
                 except Exception as e:
                     LOGGER.error(e)
         aria2_options['bt-stop-timeout'] = f'{value}'
+    elif key == 'DM_MODE':
+        value = value.lower() if value.lower() in ['leech', 'mirror', 'all'] else ''
     elif key == 'REQUEST_LIMITS':
         value = max(int(value), 5)
     elif key == 'LEECH_SPLIT_SIZE':
@@ -635,6 +629,12 @@ async def edit_variable(client, message, pre_message, key):
         value = float(value)
     elif value.isdigit() and key != 'FSUB_IDS':
         value = int(value)
+    elif value.lower() == 'true':
+        value = True
+    elif value.lower() == 'false':
+        value = False
+        if key == 'INCOMPLETE_TASK_NOTIFIER' and DATABASE_URL:
+            await DbManger().trunc_table('tasks')
     config_dict[key] = value
     await update_buttons(pre_message, 'var')
     await message.delete()
