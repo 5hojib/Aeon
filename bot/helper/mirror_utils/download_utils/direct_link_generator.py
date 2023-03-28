@@ -1,6 +1,7 @@
 import requests
 import cloudscraper
 
+from uuid import uuid4
 from os import path as ospath
 from math import pow, floor
 from http.cookiejar import MozillaCookieJar
