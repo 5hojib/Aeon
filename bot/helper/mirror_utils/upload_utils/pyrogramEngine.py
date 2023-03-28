@@ -52,16 +52,14 @@ class TgUploader:
         self.__last_msg_in_group = False
         self.__up_path = ''
         self.__sent_DMmsg = None
-        self.__upload_4gb = 0
         self.__button = None
 
     async def __upload_progress(self, current, total):
         if self.__is_cancelled:
-            if self.__upload_4gb > 0:
+            if IS_PREMIUM_USER:
                 user.stop_transmission()
-                bot.stop_transmission()
             else:
-                self.__sent_msg._client.stop_transmission()
+                bot.stop_transmission()
         chunk_size = current - self._last_uploaded
         self._last_uploaded = current
         self.uploaded_bytes += chunk_size
@@ -85,17 +83,35 @@ class TgUploader:
                 self.__sent_msg = await self.__listener.message._client.send_message(DUMP_CHAT, msg, disable_web_page_preview=True)
             if self.__listener.dmMessage:
                 self.__sent_DMmsg = self.__listener.dmMessage
+            if IS_PREMIUM_USER:
+                try:
+                    self.__sent_msg = await user.get_messages(chat_id=self.__sent_msg.chat.id, message_ids=self.__sent_msg.id)
+                except RPCError as e:
+                    await self.__listener.onUploadError(f'{e.NAME} [{e.CODE}]: {e.MESSAGE}')
+                except Exception as e:
+                    await self.__listener.onUploadError(e)
         elif IS_PREMIUM_USER:
             if not self.__listener.isSuperGroup:
                 await self.__listener.onUploadError('Use SuperGroup to leech with User!')
                 return
             self.__sent_msg = self.__listener.message
+            try:
+                self.__sent_msg = await user.get_messages(chat_id=self.__sent_msg.chat.id, message_ids=self.__sent_msg.id)
+            except RPCError as e:
+                await self.__listener.onUploadError(f'{e.NAME} [{e.CODE}]: {e.MESSAGE}')
+            except Exception as e:
+                await self.__listener.onUploadError(e)
             if self.__listener.dmMessage:
                 self.__sent_DMmsg = self.__listener.dmMessage
         elif self.__listener.dmMessage:
             self.__sent_msg = self.__listener.dmMessage
         else:
             self.__sent_msg = self.__listener.message
+
+        if ((self.__listener.isSuperGroup or config_dict['DUMP_CHAT']) and not IS_PREMIUM_USER and not self.__sent_msg.chat.has_protected_content):
+            btn = ButtonMaker()
+            btn.ibutton('Save This File', 'save', 'footer')
+            self.__button = btn.build_menu(1)
 
     async def __prepare_file(self, file_, dirpath):
         if self.__lprefix:
@@ -139,16 +155,15 @@ class TgUploader:
                 self.__up_path = new_path
         return cap_mono
 
-    async def __get_input_media(self, subkey, key):
+    async def __get_input_media(self, subkey, key, msg_list=None):
         rlist = []
         msgs = []
-        if self.__upload_4gb > 0:
-            for msg in self.__media_dict[key][subkey]:
+        if msg_list:
+            for msg in msg_list:
                 media_msg = await bot.get_messages(msg.chat.id, msg.id)
                 msgs.append(media_msg)
         else:
             msgs = self.__media_dict[key][subkey]
-        self.__sent_msg = msgs[0].reply_to_message
         for msg in msgs:
             if key == 'videos':
                 input_media = InputMediaVideo(media=msg.video.file_id, caption=msg.caption)
@@ -159,7 +174,7 @@ class TgUploader:
 
     async def __send_media_group(self, subkey, key, msgs):
         grouped_media = await self.__get_input_media(subkey, key)
-        msgs_list = await self.__sent_msg.reply_media_group(media=grouped_media,
+        msgs_list = await msgs[0].reply_to_message.reply_media_group(media=grouped_media,
                                                                      quote=True,
                                                                      disable_notification=True)
         for msg in msgs:
@@ -174,6 +189,7 @@ class TgUploader:
         if self.__sent_DMmsg:
             await sleep(0.5)
             try:
+                grouped_media = await self.__get_input_media(subkey, key, msgs_list)
                 dm_msgs_list = await self.__sent_DMmsg.reply_media_group(media=grouped_media, quote=True)
                 self.__sent_DMmsg = dm_msgs_list[-1]
             except Exception as err:
@@ -202,21 +218,6 @@ class TgUploader:
                     if self.__is_cancelled:
                         return
                     cap_mono = await self.__prepare_file(file_, dirpath)
-                    if f_size > 2097152000 and IS_PREMIUM_USER and self.__sent_msg._client.me.is_bot:
-                        self.__upload_4gb += 1
-                        LOGGER.info(f'Trying to upload file greater than {get_readable_file_size(f_size)} fetching message for user client')
-                        self.__sent_msg = await user.get_messages(chat_id=self.__sent_msg.chat.id, message_ids=self.__sent_msg.id)
-                        self.__button = None
-                    if f_size < 2097152000 and not self.__sent_msg._client.me.is_bot:
-                        LOGGER.info(f'Trying to upload file less than {get_readable_file_size(f_size)} fetching message for bot client')
-                        self.__sent_msg = await bot.get_messages(chat_id=self.__sent_msg.chat.id, message_ids=self.__sent_msg.id)
-                    if ((self.__listener.isSuperGroup or config_dict['DUMP_CHAT'])
-                        and self.__sent_msg._client.me.is_bot and not self.__sent_msg.chat.has_protected_content
-                        and not self.__button
-                    ):
-                        btn = ButtonMaker()
-                        btn.ibutton('Save This File', 'save', 'footer')
-                        self.__button = btn.build_menu(1)
                     if self.__last_msg_in_group:
                         group_lists = [x for v in self.__media_dict.values() for x in v.keys()]
                         if (match := re_match(r'.+(?=\.0*\d+$)|.+(?=\.part\d+\..+)', self.__up_path)) and match.group(0) not in group_lists:
