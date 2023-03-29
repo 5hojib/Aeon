@@ -643,7 +643,7 @@ def gdtot(url):
     path = path[0]
     raw = urlparse(token_url)
     final_url = f'{raw.scheme}://{raw.hostname}{path}'
-    return sharer_scraper(final_url)
+    return unified(final_url)
 
 def sharer_scraper(url):
     cget = create_scraper().request
