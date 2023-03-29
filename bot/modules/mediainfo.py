@@ -8,7 +8,6 @@ from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.message_utils import editMessage, sendMessage
 from bot.helper.ext_utils.telegraph_helper import telegraph
-from bot.helper.ext_utils.bot_utils import is_sudo
 
 
 @bot.on_message(filters.command(BotCommands.MediaInfoCommand) & (CustomFilters.authorized_chat | CustomFilters.authorized_user))
