@@ -1,68 +1,85 @@
-from telegram import Message
-import os
-from subprocess import run
-from bot.helper.ext_utils.shortenurl import short_url
-from telegram.ext import CommandHandler
-from bot import LOGGER, dispatcher, app, config_dict
+from os import path as ospath, remove as osremove, makedirs
+from subprocess import run as srun
+from pyrogram import filters, Client
+from pyrogram.types import Message
+from pyrogram.enums import ChatType
+from bot import LOGGER, bot, config_dict, OWNER_ID
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.message_utils import editMessage, sendMessage
 from bot.helper.ext_utils.telegraph_helper import telegraph
+from bot.helper.ext_utils.bot_utils import is_sudo
 
 
-def mediainfo(update, context):
-    message:Message = update.effective_message
+@bot.on_message(filters.command(BotCommands.MediaInfoCommand) & (CustomFilters.authorized_chat | CustomFilters.authorized_user))
+async def mediainfo(c: Client, message: Message):
+    user_id = message.from_user.id
+    if message.chat.type != ChatType.PRIVATE and user_id != OWNER_ID and not is_sudo(user_id):
+        return await sendMessage('Mediainfo is Disabled', c, message)
     mediamessage = message.reply_to_message
-    # mediainfo control +
-    process = run('mediainfo', capture_output=True, shell=True)
-    if process.stderr.decode(): return LOGGER.error("mediainfo not installed. Read readme.")
-    # mediainfo control -
+    process = srun("mediainfo", capture_output=True, shell=True)
+    if process.stderr.decode():
+        return LOGGER.error("Mediainfo Not Installed.")
     help_msg = "\n<b>By replying to message (including media):</b>"
     help_msg += f"\n<code>/{BotCommands.MediaInfoCommand}" + " {message}" + "</code>"
-    if not mediamessage: return sendMessage(help_msg, context.bot, update.message)
+    if not mediamessage:
+        return await sendMessage(help_msg, c, message)
     file = None
-    media_array = [mediamessage.document, mediamessage.video, mediamessage.audio, mediamessage.document, \
-        mediamessage.video, mediamessage.photo, mediamessage.audio, mediamessage.voice, \
-        mediamessage.animation, mediamessage.video_note, mediamessage.sticker]
+    media_array = [
+        mediamessage.document,
+        mediamessage.video,
+        mediamessage.audio,
+        mediamessage.document,
+        mediamessage.video,
+        mediamessage.photo,
+        mediamessage.audio,
+        mediamessage.voice,
+        mediamessage.animation,
+        mediamessage.video_note,
+        mediamessage.sticker,
+    ]
     for i in media_array:
         if i is not None:
             file = i
             break
-    if not file: return sendMessage(help_msg, context.bot, update.message)
-    sent = sendMessage('Running mediainfo. Downloading your file.', context.bot, update.message)
+    if not file:
+        return await sendMessage(help_msg, c, message)
+    sent = await sendMessage("Fetching Mediainfo. Downloading your file ...", c, message)
     try:
-        VtPath = os.path.join("Mediainfo", str(message.from_user.id))
-        if not os.path.exists("Mediainfo"): os.makedirs("Mediainfo")
-        if not os.path.exists(VtPath): os.makedirs(VtPath)
-        try: filename = os.path.join(VtPath, file.file_name)
-        except: filename = None
-        file = app.download_media(message=file, file_name=filename)
+        VtPath = ospath.join("Mediainfo", str(user_id))
+        if not ospath.exists("Mediainfo"):
+            makedirs("Mediainfo")
+        if not ospath.exists(VtPath):
+            makedirs(VtPath)
+        try:
+            filename = ospath.join(VtPath, file.file_name)
+        except:
+            filename = None
+        file = await c.download_media(message=file, file_name=filename)
     except Exception as e:
         LOGGER.error(e)
-        try: os.remove(file)
-        except: pass
+        try:
+            osremove(file)
+        except:
+            pass
         file = None
-    if not file: return editMessage("Error when downloading. Try again later.", sent)
-    cmd = f'mediainfo "{os.path.basename(file)}"'
+    if not file:
+        return await editMessage("Error when downloading. Try again later.", sent)
+    cmd = f'mediainfo "{ospath.basename(file)}"'
     LOGGER.info(cmd)
-    process = run(cmd, capture_output=True, shell=True, cwd=VtPath)
-    reply = f"<b>MediaInfo: {os.path.basename(file)}</b><br>"
+    process = srun(cmd, capture_output=True, shell=True, cwd=VtPath)
+    reply = f"<b>MediaInfo: {ospath.basename(file)}</b><br>"
     stderr = process.stderr.decode()
     stdout = process.stdout.decode()
     if len(stdout) != 0:
         reply += f"<b>Stdout:</b><br><br><pre>{stdout}</pre><br>"
-        # LOGGER.info(f"mediainfo - {cmd} - {stdout}")
+        LOGGER.info(f"[Mediainfo] - {cmd} - {stdout}")
     if len(stderr) != 0:
         reply += f"<b>Stderr:</b><br><br><pre>{stderr}</pre>"
-        # LOGGER.error(f"mediainfo - {cmd} - {stderr}")
-    try: os.remove(file)
-    except: pass
-    help = telegraph.create_page(title='MediaInfo', content=reply)["path"]
-    editMessage(short_url(f"https://telegra.ph/{help}", update.message.from_user.id), sent)
-
-
-mediainfo_handler = CommandHandler('mediaInfo', mediainfo,
-                                   filters=CustomFilters.owner_filter | CustomFilters.authorized_user)
-
-
-dispatcher.add_handler(mediainfo_handler)
+        LOGGER.info(f"[Mediainfo] - {cmd} - {stderr}")
+    try:
+        osremove(file)
+    except:
+        pass
+    help = telegraph.create_page(title="MediaInfo", content=reply)["path"]
+    await editMessage(f"https://te.legra.ph/{help}", message.from_user.id, sent)
