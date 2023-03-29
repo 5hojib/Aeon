@@ -10,7 +10,7 @@ from bot.helper.telegram_helper.message_utils import editMessage, sendMessage
 from bot.helper.ext_utils.telegraph_helper import telegraph
 
 
-@bot.on_message(filters.command(BotCommands.MediaInfoCommand) & (CustomFilters.authorized_chat | CustomFilters.authorized_user))
+@bot.on_message(filters.command(BotCommands.MediaInfoCommand) & (CustomFilters.authorized_user))
 async def mediainfo(c: Client, message: Message):
     user_id = message.from_user.id
     if message.chat.type != ChatType.PRIVATE and user_id != OWNER_ID and not is_sudo(user_id):
