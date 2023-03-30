@@ -180,10 +180,10 @@ async def _mirror_leech(client, message, isZip=False, extract=False, isQbit=Fals
 
     if not is_url(link) and not is_magnet(link) and not await aiopath.exists(link) and not is_rclone_path(link) and file_ is None:
         help_msg = '''
-<code>/{cmd}</code> link n:newname pswd:xx(zip/unzip)
+<code>/{cmd}</code> link n: newname pswd: xx(zip/unzip)
 
 <b>By replying to link/file:</b>
-<code>/{cmd}</code> n:newname pswd:xx(zip/unzip)
+<code>/{cmd}</code> n: newname pswd: xx(zip/unzip)
 
 <b>Multi links within same upload directory only by replying to first link/file:</b>
 <code>/{cmd}</code> 10(number of links/files) m:folder_name
@@ -195,7 +195,7 @@ drive_id must be folder id and index must be url else it will not accept
 This options  should be always before n: or pswd:
 
 <b>Direct link authorization:</b>
-<code>/{cmd}</code> link n:newname pswd:xx(zip/unzip)
+<code>/{cmd}</code> link n: newname pswd: xx(zip/unzip)
 <b>username</b>
 <b>password</b>
 
@@ -242,7 +242,7 @@ Check here all <a href='https://rclone.org/flags/'>RcloneFlags</a>.
 3. Options (<b>d, s, m: and multi</b>) should be added randomly before the link and before any other option.
 4. Commands that start with <b>qb</b> are ONLY for torrents.
 5. (n:) option doesn't work with torrents.
-'''.format_map({'cmd': BotCommands.MirrorCommand[0]})
+'''.format_map({'cmd': message.command[0]})
         await sendMessage(message, help_msg)
         await delete_links(message)
         return
