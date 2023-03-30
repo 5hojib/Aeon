@@ -794,6 +794,7 @@ async def update_private_file(client, message, pre_message):
         elif file_name == 'config.env':
             load_dotenv('config.env', override=True)
             load_config()
+        await message.delete()
     await update_buttons(pre_message)
     if DATABASE_URL and file_name != 'config.env':
         await DbManger().update_private_file(file_name)
