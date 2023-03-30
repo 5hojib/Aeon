@@ -3,6 +3,7 @@ from uvloop import install
 
 install()
 from asyncio import Lock
+from collections import OrderedDict
 from faulthandler import enable as faulthandler_enable
 from logging import INFO, FileHandler, StreamHandler, basicConfig
 from logging import error as log_error
@@ -315,14 +316,6 @@ if len(BASE_URL) == 0:
     log_warning('BASE_URL not provided!')
     BASE_URL = ''
 
-UPSTREAM_REPO = environ.get('UPSTREAM_REPO', '')
-if len(UPSTREAM_REPO) == 0:
-    UPSTREAM_REPO = ''
-
-UPSTREAM_BRANCH = environ.get('UPSTREAM_BRANCH', '')
-if len(UPSTREAM_BRANCH) == 0:
-    UPSTREAM_BRANCH = 'master'
-
 STORAGE_THRESHOLD = environ.get('STORAGE_THRESHOLD', '')
 STORAGE_THRESHOLD = '' if len(STORAGE_THRESHOLD) == 0 else float(STORAGE_THRESHOLD)
 
@@ -417,8 +410,6 @@ config_dict = {
     "TELEGRAM_API": TELEGRAM_API,
     "TELEGRAM_HASH": TELEGRAM_HASH,
     "TORRENT_TIMEOUT": TORRENT_TIMEOUT,
-    "UPSTREAM_REPO": UPSTREAM_REPO,
-    "UPSTREAM_BRANCH": UPSTREAM_BRANCH,
     "UPTOBOX_TOKEN": UPTOBOX_TOKEN,
     "USER_SESSION_STRING": USER_SESSION_STRING,
     "USE_SERVICE_ACCOUNTS": USE_SERVICE_ACCOUNTS,
@@ -445,6 +436,8 @@ config_dict = {
     "DM_MODE": DM_MODE,
     "DELETE_LINKS": DELETE_LINKS,
 }
+
+config_dict = OrderedDict(sorted(config_dict.items()))
 
 if GDRIVE_ID:
     list_drives['Main'] = {"drive_id": GDRIVE_ID, "index_link": INDEX_URL}
