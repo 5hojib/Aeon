@@ -158,7 +158,7 @@ async def _ytdl(client, message, isZip=False, isLeech=False, sameDir={}):
     if not is_url(link) or reply_to and not reply_to.text:
         help_msg = """
 <b>Send link along with command line:</b>
-<code>/{cmd}</code> s link n:newname pswd:xx(zip) opt: x:y|x1:y1
+<code>/{cmd}</code> s link n: newname pswd: xx(zip) opt: x:y|x1:y1
 
 <b>By replying to link:</b>
 <code>/{cmd}</code> n: newname pswd: xx(zip) opt: x:y|x1:y1
@@ -202,7 +202,7 @@ Check here all <a href='https://rclone.org/flags/'>RcloneFlags</a>.
 4. You can always add video quality from yt-dlp api options.
 
 Check all yt-dlp api options from this <a href='https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/YoutubeDL.py#L184'>FILE</a>.
-        """.format_map({'cmd': BotCommands.YtdlCommand[0], 'fmg': '{"ffmpeg": ["-threads", "4"]}'})
+        """.format_map({'cmd': message.command[0], 'fmg': '{"ffmpeg": ["-threads", "4"]}'})
         await sendMessage(message, help_msg)
         await delete_links(message)
         return
