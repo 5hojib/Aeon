@@ -15,4 +15,4 @@ def sleep(update, context):
     else:
         sendMessage('Ping have been stopped, your bot will sleep in less than 30 min.', context.bot, update.message)
 
-bot.add_handler(MessageHandler('sleep',  filters=CustomFilters.owner_filter & CustomFilters.sudo_user))
+bot.add_handler(MessageHandler('sleep',  CustomFilters.sudo))
