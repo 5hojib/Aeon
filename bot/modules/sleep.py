@@ -1,5 +1,5 @@
 from pyrogram.handlers import MessageHandler
-from bot import BASE_URL, alive
+from bot import BASE_URL, alive, bot
 from bot.helper.telegram_helper.message_utils import sendMessage
 from bot.helper.telegram_helper.filters import CustomFilters
 
