@@ -13,7 +13,7 @@ class SplitStatus:
         self.startTime = self.__listener.extra_details['startTime']
         self.mode = self.__listener.extra_details['mode']
         self.source = self.__listener.extra_details['source']
-        self.engine = "ffmpeg/split"
+        self.engine = "ffmpeg"
 
     def gid(self):
         return self.__gid
