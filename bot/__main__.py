@@ -204,6 +204,7 @@ async def main():
                     except Exception as e:
                         LOGGER.error(e)
 
+    
     if await aiopath.isfile(".restartmsg"):
         with open(".restartmsg") as f:
             chat_id, msg_id = map(int, f)
