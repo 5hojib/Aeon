@@ -14,7 +14,7 @@ class QueueStatus:
         self.startTime = self.__listener.extra_details['startTime']
         self.mode = self.__listener.extra_details['mode']
         self.source = self.__listener.extra_details['source']
-        self.engine = "Queue System v1.1"
+        self.engine = "Queue System"
 
     def gid(self):
         return self.__gid
