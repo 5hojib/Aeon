@@ -16,7 +16,8 @@ from bot.helper.ext_utils.fs_utils import (check_storage_threshold,
 from bot.helper.mirror_utils.status_utils.mega_download_status import MegaDownloadStatus
 from bot.helper.mirror_utils.status_utils.queue_status import QueueStatus
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
-from bot.helper.telegram_helper.message_utils import (sendMessage,delete_links,
+from bot.helper.telegram_helper.message_utils import (delete_links,
+                                                      sendMessage,
                                                       sendStatusMessage)
 
 
@@ -66,7 +67,7 @@ class MegaAppListener(MegaListener):
         if str(error).lower() != "no error":
             self.error = error.copy()
             LOGGER.error(f'Mega onRequestFinishError: {self.error}')
-            async_to_sync(self.event_setter)
+            self.event_setter()
             return
         request_type = request.getType()
         if request_type == MegaRequest.TYPE_LOGIN:
@@ -78,7 +79,7 @@ class MegaAppListener(MegaListener):
             self.node = api.getRootNode()
             LOGGER.info(f"Node Name: {self.node.getName()}")
         if request_type not in self._NO_EVENT_ON or self.node and "cloud drive" not in self.node.getName().lower():
-            async_to_sync(self.event_setter)
+            self.event_setter()
 
     def onRequestTemporaryError(self, api, request, error: MegaError):
         LOGGER.error(f'Mega Request error in {error}')
@@ -86,12 +87,12 @@ class MegaAppListener(MegaListener):
             self.is_cancelled = True
             async_to_sync(self.listener.onDownloadError, f"RequestTempError: {error.toString()}")
         self.error = error.toString()
-        async_to_sync(self.event_setter)
+        self.event_setter()
 
     def onTransferUpdate(self, api: MegaApi, transfer: MegaTransfer):
         if self.is_cancelled:
             api.cancelTransfer(transfer, None)
-            async_to_sync(self.event_setter)
+            self.event_setter()
             return
         self.__speed = transfer.getSpeed()
         self.__bytes_transferred = transfer.getTransferredBytes()
@@ -99,10 +100,10 @@ class MegaAppListener(MegaListener):
     def onTransferFinish(self, api: MegaApi, transfer: MegaTransfer, error):
         try:
             if self.is_cancelled:
-                async_to_sync(self.event_setter)
+                self.event_setter()
             elif transfer.isFinished() and (transfer.isFolderTransfer() or transfer.getFileName() == self.name):
                 async_to_sync(self.listener.onDownloadComplete)
-                async_to_sync(self.event_setter)
+                self.event_setter()
         except Exception as e:
             LOGGER.error(e)
 
@@ -112,7 +113,7 @@ class MegaAppListener(MegaListener):
         errStr = error.toString()
         LOGGER.error(f'Mega download error in file {transfer} {filen}: {error}')
         if state in [1, 4]:
-            # Sometimes MEGA (offical client) can't stream a node either and raises a temp failed error.
+            # Sometimes MEGA (official client) can't stream a node either and raises a temp failed error.
             # Don't break the transfer queue if transfer's in queued (1) or retrying (4) state [causes seg fault]
             return
 
@@ -120,9 +121,9 @@ class MegaAppListener(MegaListener):
         if not self.is_cancelled:
             self.is_cancelled = True
             async_to_sync(self.listener.onDownloadError, f"TransferTempError: {errStr} ({filen})")
-            async_to_sync(self.event_setter)
+            self.event_setter()
 
-    async def event_setter(self):
+    def event_setter(self):
         self.continue_event.set()
 
     async def cancel_download(self):
