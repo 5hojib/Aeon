@@ -43,7 +43,7 @@ async def countNode(client, message):
         gd = GoogleDriveHelper()
         result = await sync_to_async(gd.count, link)
         await deleteMessage(msg)
-        cc = f'\n\n<b>#cc</b>: {tag} | <b>Elapsed</b>: {get_readable_time(time() - startTime)}'
+        cc = f'\n\n<b>• Counted by</b>: {tag}\n<b>• Elapsed</b>: {get_readable_time(time() - startTime)}'
         await sendMessage(message, result + cc)
     else:
         msg = 'Send Gdrive link along with command or by replying to the link by command'
