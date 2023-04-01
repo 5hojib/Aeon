@@ -336,7 +336,7 @@ class MirrorLeechListener:
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
             await DbManger().rm_complete_task(self.message.link)
         if self.isLeech:
-            msg = f'<b>Name: {escape(name)}</b>\n'
+            msg = f'<b><i>{escape(name)}</i></b>\n'
             msg += f'\n<b>• Size</b>: {get_readable_file_size(size)}'
             msg += f'\n<b>• Total Files</b>: {folders}'
             msg += f"\n<b>• Elapsed</b>: {get_readable_time(time() - self.extra_details['startTime'])}"
@@ -384,7 +384,7 @@ class MirrorLeechListener:
                 await start_from_queued()
                 return
         else:
-            msg = f'<b>Name: {escape(name)}</b>\n'
+            msg = f'<b><i>{escape(name)}</i></b>\n'
             msg += f'\n<b>• Size</b>: {get_readable_file_size(size)}'
             msg += f'\n<b>• Type</b>: {typ}'
             if typ == "Folder":
