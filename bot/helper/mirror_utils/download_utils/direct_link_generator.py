@@ -69,8 +69,6 @@ def direct_link_generator(link: str):
         return shrdsk(link)
     elif 'letsupload.io' in domain:
         return letsupload(link)
-    elif 'zippyshare.com' in domain:
-        return zippyshare(link)
     elif any(x in domain for x in ['wetransfer.com', 'we.tl']):
         return wetransfer(link)
     elif any(x in domain for x in anonfilesBaseSites):
@@ -618,57 +616,3 @@ def linkbox(url):
     name = quote(itemInfo["name"])
     raw = itemInfo['url'].split("/", 3)[-1]
     return f'https://wdl.nuplink.net/{raw}&filename={name}'
-
-def zippyshare(url):
-    cget = create_scraper().request
-    try:
-        url = cget('GET', url).url
-        resp = cget('GET', url)
-    except Exception as e:
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
-    if not resp.ok:
-        raise DirectDownloadLinkException('ERROR: Something went wrong!!, Try in your browser')
-    if findall(r'>File does not exist on this server<', resp.text):
-        raise DirectDownloadLinkException('ERROR: File does not exist on server!!, Try in your browser')
-    pages = etree.HTML(resp.text).xpath("//script[contains(text(),'dlbutton')][3]/text()")
-    if not pages:
-        raise DirectDownloadLinkException('ERROR: Page not found!!')
-    js_script = pages[0]
-    uri1 = None
-    uri2 = None
-    method = ''
-    if omg:= findall(r"\.omg.=.(.*?);", js_script):
-        omg = omg[0]
-        method = f'omg = {omg}'
-        mtk = (eval(omg) * (int(omg.split("%")[0])%3)) + 18
-        uri1 = findall(r'"/(d/\S+)/"', js_script)
-        uri2 = findall(r'\/d.*?\+"/(\S+)";', js_script)
-    elif var_a := findall(r"var.a.=.(\d+)", js_script):
-        var_a = var_a[0]
-        method = f'var_a = {var_a}'
-        mtk = int(pow(int(var_a),3) + 3)
-        uri1 = findall(r"\.href.=.\"/(.*?)/\"", js_script)
-        uri2 = findall(r"\+\"/(.*?)\"", js_script)
-    elif var_ab := findall(r"var.[ab].=.(\d+)", js_script):
-        a = var_ab[0]
-        b = var_ab[1]
-        method = f'a = {a}, b = {b}'
-        mtk = eval(f"{floor(int(a)/3) + int(a) % int(b)}")
-        uri1 = findall(r"\.href.=.\"/(.*?)/\"", js_script)
-        uri2 = findall(r"\)\+\"/(.*?)\"", js_script)
-    elif unknown:= findall(r"\+\((.*?).\+", js_script):
-        method = f'unknown = {unknown[0]}'
-        mtk = eval(f"{unknown[0]}+ 11")
-        uri1 = findall(r"\.href.=.\"/(.*?)/\"", js_script)
-        uri2 = findall(r"\)\+\"/(.*?)\"", js_script)
-    elif unknown1:= findall(r"\+.\((.*?)\).\+", js_script):
-        method = f'unknown1 = {unknown1[0]}'
-        mtk = eval(unknown1[0])
-        uri1 = findall(r"\.href.=.\"/(.*?)/\"", js_script)
-        uri2 = findall(r"\+.\"/(.*?)\"", js_script)
-    else:
-        raise DirectDownloadLinkException("ERROR: Direct link not found")
-    if not any([uri1, uri2]):
-        raise DirectDownloadLinkException(f"ERROR: uri1 or uri2 not found with method {method}")
-    domain = urlparse(url).hostname
-    return f"https://{domain}/{uri1[0]}/{mtk}/{uri2[0]}"

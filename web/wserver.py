@@ -22,7 +22,7 @@ aria2 = ariaAPI(ariaClient(host="http://localhost", port=6800, secret=""))
 
 LOGGER = getLogger(__name__)
 
-rawowners = "<h1 style='text-align: center'>Modified by<a href='https://github.com/5hojib'>5hojib</a></h1>"
+rawowners = "<h1 style='text-align: center'>Modified by <a href='https://github.com/5hojib'>5hojib</a></h1>"
 
 pin_entry = '''
     <section>
