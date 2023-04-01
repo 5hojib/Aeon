@@ -117,9 +117,9 @@ def bt_selection_buttons(id_, isCanCncl=True):
 def get_progress_bar_string(pct):
     pct = float(pct.split('%')[0])
     p = min(max(pct, 0), 100)
-    cFull = int(p // 10)
-    p_str = '■' * cFull
-    p_str += '□' * (10 - cFull)
+    cFull = int(p // 6)
+    p_str = '●' * cFull
+    p_str += '○' * (16 - cFull)
     return f"{p_str}"
 
 def get_readable_message():

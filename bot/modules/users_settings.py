@@ -84,7 +84,7 @@ async def get_user_settings(from_user):
         buttons.ibutton("Reset Setting", f"userset {user_id} reset_all")
 
     buttons.ibutton("Close", f"userset {user_id} close")
-    text = f"<u>Settings for {name}</u>\n\n"\
+    text = f"<b><i>Settings for {name}</i></b>\n\n"\
         f"Leech Type is <b>{ltype}</b>\n"\
         f"Custom Thumbnail <b>{thumbmsg}</b>\n"\
         f"Rclone Config <b>{rccmsg}</b>\n"\
@@ -264,13 +264,13 @@ Check all available qualities options <a href="https://github.com/yt-dlp/yt-dlp#
         rmsg = f'''
 Send Leech Prefix. Timeout: 60 sec
 Examples:
-1. <code>{escape('<b>@JMDKH_Team</b>')}</code> 
+1. <code>{escape('<b>@JuniorXcientist</b>')}</code> 
 This will give output of:
 <b>@JMDKH_Team</b>  <code>50MB.bin</code>.
 
-2. <code>{escape('<code>@JMDKH_Team</code>')}</code> 
+2. <code>{escape('<code>@JuniorXcientist</code>')}</code> 
 This will give output of:
-<code>@JMDKH_Team</code> <code>50MB.bin</code>.
+<code>@JuniorXcientist</code> <code>50MB.bin</code>.
 
 Check all available formatting options <a href="https://core.telegram.org/bots/api#formatting-options">HERE</a>.
         '''

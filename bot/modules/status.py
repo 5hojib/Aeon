@@ -26,7 +26,7 @@ async def mirror_status(client, message):
     if count == 0:
         currentTime = get_readable_time(time() - botStartTime)
         free = get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)
-        msg = 'No Active Downloads !'
+        msg = 'No Active Downloads !\n'
         msg += f"\n<b>• Bot Uptime</b>: {get_readable_time(time() - botStartTime)}"
         msg += f"\n<b>• Free Disk</b>: {get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}"
         msg += f"\n<b>• CPU</b>: {cpu_percent()}% | <b>RAM</b>: {virtual_memory().percent}%"

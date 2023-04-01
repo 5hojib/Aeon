@@ -39,8 +39,8 @@ if UPSTREAM_REPO:
         srun(["rm", "-rf", ".git"])
 
     update = srun([f"git init -q \
-                     && git config --global user.email jmdkh007@gmail.com \
-                     && git config --global user.name jmdkh \
+                     && git config --global user.email yesiamshojib@gmail.com \
+                     && git config --global user.name 5hojib \
                      && git add . \
                      && git commit -sm update -q \
                      && git remote add origin {UPSTREAM_REPO} \
@@ -48,6 +48,5 @@ if UPSTREAM_REPO:
                      && git reset --hard origin/{UPSTREAM_BRANCH} -q"], shell=True)
 
     if update.returncode == 0:
-        log_info('Successfully updated with latest commit from UPSTREAM_REPO')
     else:
         log_error('Something went wrong while updating, check UPSTREAM_REPO if valid or not!')
