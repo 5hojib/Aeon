@@ -115,7 +115,7 @@ class TgUploader:
 
     async def __prepare_file(self, file_, dirpath):
         if self.__lprefix:
-            cap_mono = f"{self.__lprefix} <code>{file_}</code>"
+            cap_mono = f"{self.__lprefix} <b></i>{file_}</i></b>"
             self.__lprefix = re_sub('<.*?>', '', self.__lprefix)
             if self.__listener.seed and not self.__listener.newDir and not dirpath.endswith("splited_files_mltb"):
                 dirpath = f'{dirpath}/copied_mltb'
@@ -127,7 +127,7 @@ class TgUploader:
                 await aiorename(self.__up_path, new_path)
                 self.__up_path = new_path
         else:
-            cap_mono = f"<code>{file_}</code>"
+            cap_mono = f"<b><i>{file_}</i></b>"
         if len(file_) > 60:
             if is_archive(file_):
                 name = get_base_name(file_)
