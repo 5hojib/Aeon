@@ -971,7 +971,7 @@ async def edit_bot_settings(client, query):
         await event_handler(client, query, pfunc, rfunc)
     elif data[1] == 'editvar' and STATE == 'view':
         value = config_dict[data[2]]
-        if value and data[2] in ['DATABASE_URL', 'TELEGRAM_API', 'TELEGRAM_HASH',
+        if value and data[2] in ['DATABASE_URL', 'TELEGRAM_API', 'TELEGRAM_HASH', 'UPSTREAM_REPO',
                                  'USER_SESSION_STRING', 'MEGA_API_KEY', 'MEGA_PASSWORD',
                                  'UPTOBOX_TOKEN'] and not await CustomFilters.owner(client, query):
             value = 'Only owner can see this!'
@@ -1036,6 +1036,17 @@ async def edit_bot_settings(client, query):
         if START != int(data[3]):
             globals()['START'] = int(data[3])
             await update_buttons(message, data[2])
+    elif data[1] == 'push':
+        await query.answer()
+        filename = data[2].rsplit('.zip', 1)[0]
+        if await aiopath.exists(filename):
+            await (await create_subprocess_shell(f"git add -f {filename} \
+                                                   && git commit -sm botsettings -q \
+                                                   && git push origin {config_dict['UPSTREAM_BRANCH']} -qf")).wait()
+        else:
+            await (await create_subprocess_shell(f"git rm -r --cached {filename} \
+                                                   && git commit -sm botsettings -q \
+                                                   && git push origin {config_dict['UPSTREAM_BRANCH']} -qf")).wait()
         await message.reply_to_message.delete()
         await message.delete()
 
