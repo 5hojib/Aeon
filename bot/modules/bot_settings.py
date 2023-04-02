@@ -703,7 +703,7 @@ async def edit_qbit(client, message, pre_message, key):
     await update_buttons(pre_message, 'qbit')
     await message.delete()
     if DATABASE_URL:
-        await DbManger().update_qbittorrent(key, value)
+    await DbManger().update_qbittorrent(key, value)
 
 async def update_private_file(client, message, pre_message):
     handler_dict[message.chat.id] = False
@@ -734,7 +734,7 @@ async def update_private_file(client, message, pre_message):
         elif file_name == ['shorteners.txt', 'shorteners']:
             SHORTENERES.clear()
             SHORTENER_APIS.clear()
-        await message.delete()
+            await message.delete()
     elif doc := message.document:
         file_name = doc.file_name
         await message.download(file_name=f'{getcwd()}/{file_name}')
@@ -808,7 +808,7 @@ async def update_private_file(client, message, pre_message):
         elif file_name == 'config.env':
             load_dotenv('config.env', override=True)
             await load_config()
-        await message.delete()
+            await message.delete()
     if file_name == 'rclone.conf':
         await rclone_serve_booter()
     await update_buttons(pre_message)
