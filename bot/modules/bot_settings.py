@@ -1036,8 +1036,8 @@ async def edit_bot_settings(client, query):
         if START != int(data[3]):
             globals()['START'] = int(data[3])
             await update_buttons(message, data[2])
-    await message.reply_to_message.delete()
-    await message.delete()
+        await message.reply_to_message.delete()
+        await message.delete()
 
 async def bot_settings(client, message):
     msg, button = await get_buttons()
