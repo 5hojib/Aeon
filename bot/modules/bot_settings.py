@@ -703,7 +703,7 @@ async def edit_qbit(client, message, pre_message, key):
     await update_buttons(pre_message, 'qbit')
     await message.delete()
     if DATABASE_URL:
-    await DbManger().update_qbittorrent(key, value)
+        await DbManger().update_qbittorrent(key, value)
 
 async def update_private_file(client, message, pre_message):
     handler_dict[message.chat.id] = False
