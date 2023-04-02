@@ -86,8 +86,6 @@ def direct_link_generator(link: str):
             return filepress(link)
         else:
             return sharer_scraper(link)
-    elif 'zippyshare.com' in domain:
-        raise DirectDownloadLinkException('ERROR: R.I.P Zippyshare')
     else:
         raise DirectDownloadLinkException(f'No Direct link function found for {link}')
 

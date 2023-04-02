@@ -11,7 +11,7 @@ class SplitStatus:
         self.__listener = listener
         self.message = listener.message
         self.extra_details = self.__listener.extra_details
-        self.engine = "ffmpeg/split"
+        self.engine = "ffmpeg"
 
     def gid(self):
         return self.__gid

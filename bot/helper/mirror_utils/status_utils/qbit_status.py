@@ -13,7 +13,7 @@ def get_download(client, tag):
     except Exception as e:
         LOGGER.error(f'{e}: Qbittorrent, while getting torrent info. Tag: {tag}')
 
-engine_ = f"qBittorrent {get_client().app.version}"
+engine_ = f"qBittorrent"
 
 class QbittorrentStatus:
 
