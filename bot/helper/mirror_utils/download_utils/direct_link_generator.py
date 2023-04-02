@@ -1,4 +1,3 @@
-import requests
 from base64 import standard_b64encode
 from http.cookiejar import MozillaCookieJar
 from json import loads
@@ -23,6 +22,7 @@ fmed_list = ['fembed.net', 'fembed.com', 'femax20.com', 'fcdn.stream', 'feurl.co
 anonfilesBaseSites = ['anonfiles.com', 'hotfile.io', 'bayfiles.com', 'megaupload.nz', 'letsupload.cc',
                       'filechan.org', 'myfile.is', 'vshare.is', 'rapidshare.nu', 'lolabits.se',
                       'openload.cc', 'share-online.is', 'upvid.cc']
+
 
 def direct_link_generator(link: str):
     """ direct links generator """
@@ -86,6 +86,8 @@ def direct_link_generator(link: str):
             return filepress(link)
         else:
             return sharer_scraper(link)
+    elif 'zippyshare.com' in domain:
+        raise DirectDownloadLinkException('ERROR: R.I.P Zippyshare')
     else:
         raise DirectDownloadLinkException(f'No Direct link function found for {link}')
 
@@ -285,7 +287,7 @@ def antfiles(url: str) -> str:
     if not link:
         raise DirectDownloadLinkException("ERROR: Download link not found")
     return link
-    
+
 def streamtape(url: str) -> str:
     """ Streamtape direct link generator
     Based on https://github.com/zevtyardt/lk21
@@ -297,7 +299,7 @@ def streamtape(url: str) -> str:
     if not link:
         raise DirectDownloadLinkException("ERROR: Download link not found")
     return link
-    
+
 def racaty(url: str) -> str:
     """ Racaty direct link generator
     By https://github.com/junedkh """
@@ -468,7 +470,7 @@ def filepress(url):
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
     if 'data' not in res:
         raise DirectDownloadLinkException(f'ERROR: {res["statusText"]}')
-    return f'https://drive.google.com/open?id={res["data"]}'
+    return f'https://drive.google.com/uc?id={res["data"]}&export=download'
 
 def gdtot(url):
     cget = create_scraper().request

@@ -1,4 +1,4 @@
-from bot.helper.ext_utils.bot_utils import get_readable_file_size, MirrorStatus
+from bot.helper.ext_utils.bot_utils import MirrorStatus, get_readable_file_size
 
 
 class RcloneStatus:
@@ -6,9 +6,7 @@ class RcloneStatus:
         self.__obj = obj
         self.__status = status
         self.message = message
-        self.startTime = extra_details['startTime']
-        self.mode = extra_details['mode']
-        self.source = extra_details['source']
+        self.extra_details = extra_details
         self.engine = "rclone"
 
     def gid(self):

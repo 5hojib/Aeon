@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
+from collections import OrderedDict
+
 from uvloop import install
 
 install()
 from asyncio import Lock
-from collections import OrderedDict
 from faulthandler import enable as faulthandler_enable
 from logging import INFO, FileHandler, StreamHandler, basicConfig
 from logging import error as log_error
@@ -45,6 +46,7 @@ load_dotenv('config.env', override=True)
 
 Interval = []
 QbInterval = []
+QbTorrents = {}
 list_drives = {}
 SHORTENERES = []
 SHORTENER_APIS = []
@@ -61,6 +63,7 @@ non_queued_up = set()
 download_dict_lock = Lock()
 status_reply_dict_lock = Lock()
 queue_dict_lock = Lock()
+qb_listener_lock = Lock()
 status_reply_dict = {}
 download_dict = {}
 rss_dict = {}
@@ -171,7 +174,7 @@ USER_SESSION_STRING = environ.get('USER_SESSION_STRING', '')
 if len(USER_SESSION_STRING) != 0:
     log_info("Creating client from USER_SESSION_STRING")
     user = tgClient('user', TELEGRAM_API, TELEGRAM_HASH, session_string=USER_SESSION_STRING,
-                    parse_mode=enums.ParseMode.HTML, no_updates=True).start()
+                    parse_mode=enums.ParseMode.HTML, no_updates=True, max_concurrent_transmissions=1000).start()
     if user.me.is_bot:
         log_warning("You added bot string for USER_SESSION_STRING this is not allowed! Exiting now")
         user.stop()
@@ -241,14 +244,8 @@ SEARCH_LIMIT = 0 if len(SEARCH_LIMIT) == 0 else int(SEARCH_LIMIT)
 DUMP_CHAT = environ.get('DUMP_CHAT', '')
 DUMP_CHAT = '' if len(DUMP_CHAT) == 0 else int(DUMP_CHAT)
 
-LOG_CHAT = environ.get('LOG_CHAT', '')
-LOG_CHAT = '' if len(LOG_CHAT) == 0 else int(LOG_CHAT)
-
 STATUS_LIMIT = environ.get('STATUS_LIMIT', '')
 STATUS_LIMIT = 8 if len(STATUS_LIMIT) == 0 else int(STATUS_LIMIT)
-
-USER_MAX_TASKS = environ.get('USER_MAX_TASKS', '')
-USER_MAX_TASKS = '' if len(USER_MAX_TASKS) == 0 else int(USER_MAX_TASKS)
 
 CMD_SUFFIX = environ.get('CMD_SUFFIX', '')
 
@@ -297,16 +294,34 @@ EQUAL_SPLITS = EQUAL_SPLITS.lower() == 'true'
 MEDIA_GROUP = environ.get('MEDIA_GROUP', '')
 MEDIA_GROUP = MEDIA_GROUP.lower() == 'true'
 
-SERVER_PORT = environ.get('SERVER_PORT', '')
-if len(SERVER_PORT) == 0:
-    SERVER_PORT = 80
-else:
-    SERVER_PORT = int(SERVER_PORT)
+BASE_URL_PORT = environ.get('BASE_URL_PORT', '')
+BASE_URL_PORT = 80 if len(BASE_URL_PORT) == 0 else int(BASE_URL_PORT)
 
 BASE_URL = environ.get('BASE_URL', '').rstrip("/")
 if len(BASE_URL) == 0:
     log_warning('BASE_URL not provided!')
     BASE_URL = ''
+
+RCLONE_SERVE_URL = environ.get('RCLONE_SERVE_URL', '')
+if len(RCLONE_SERVE_URL) == 0:
+    RCLONE_SERVE_URL = ''
+
+RCLONE_SERVE_PORT = environ.get('RCLONE_SERVE_PORT', '')
+RCLONE_SERVE_PORT = 8080 if len(RCLONE_SERVE_PORT) == 0 else int(RCLONE_SERVE_PORT)
+
+RCLONE_SERVE_USER = environ.get('RCLONE_SERVE_USER', '')
+if len(RCLONE_SERVE_USER) == 0:
+    RCLONE_SERVE_USER = ''
+
+RCLONE_SERVE_PASS = environ.get('RCLONE_SERVE_PASS', '')
+if len(RCLONE_SERVE_PASS) == 0:
+    RCLONE_SERVE_PASS = ''
+
+LOG_CHAT = environ.get('LOG_CHAT', '')
+LOG_CHAT = '' if len(LOG_CHAT) == 0 else int(LOG_CHAT)
+
+USER_MAX_TASKS = environ.get('USER_MAX_TASKS', '')
+USER_MAX_TASKS = '' if len(USER_MAX_TASKS) == 0 else int(USER_MAX_TASKS)
 
 STORAGE_THRESHOLD = environ.get('STORAGE_THRESHOLD', '')
 STORAGE_THRESHOLD = '' if len(STORAGE_THRESHOLD) == 0 else float(STORAGE_THRESHOLD)
@@ -365,6 +380,7 @@ config_dict = {
     "AUTHORIZED_CHATS": AUTHORIZED_CHATS,
     "AUTO_DELETE_MESSAGE_DURATION": AUTO_DELETE_MESSAGE_DURATION,
     "BASE_URL": BASE_URL,
+    "BASE_URL_PORT": BASE_URL_PORT,
     "BOT_TOKEN": BOT_TOKEN,
     "CMD_SUFFIX": CMD_SUFFIX,
     "DATABASE_URL": DATABASE_URL,
@@ -389,12 +405,15 @@ config_dict = {
     "QUEUE_UPLOAD": QUEUE_UPLOAD,
     "RCLONE_FLAGS": RCLONE_FLAGS,
     "RCLONE_PATH": RCLONE_PATH,
+    "RCLONE_SERVE_URL": RCLONE_SERVE_URL,
+    "RCLONE_SERVE_PORT": RCLONE_SERVE_PORT,
+    "RCLONE_SERVE_USER": RCLONE_SERVE_USER,
+    "RCLONE_SERVE_PASS": RCLONE_SERVE_PASS,
     "RSS_CHAT_ID": RSS_CHAT_ID,
     "RSS_DELAY": RSS_DELAY,
     "SEARCH_API_LINK": SEARCH_API_LINK,
     "SEARCH_LIMIT": SEARCH_LIMIT,
     "SEARCH_PLUGINS": SEARCH_PLUGINS,
-    "SERVER_PORT": SERVER_PORT,
     "STATUS_LIMIT": STATUS_LIMIT,
     "STATUS_UPDATE_INTERVAL": STATUS_UPDATE_INTERVAL,
     "STOP_DUPLICATE": STOP_DUPLICATE,
@@ -486,7 +505,6 @@ if ospath.exists('categories.txt'):
                 tempdict['index_link'] = ''
             categories[name] = tempdict
 
-
 PORT = environ.get('PORT')
 Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{PORT}", shell=True)
 alive = Popen(["python3", "alive.py"])
@@ -558,7 +576,8 @@ else:
     qb_client.app_set_preferences(qb_opt)
 
 log_info("Creating client from BOT_TOKEN")
-bot = tgClient('bot', TELEGRAM_API, TELEGRAM_HASH, bot_token=BOT_TOKEN, parse_mode=enums.ParseMode.HTML).start()
+bot = tgClient('bot', TELEGRAM_API, TELEGRAM_HASH, bot_token=BOT_TOKEN,
+               parse_mode=enums.ParseMode.HTML, max_concurrent_transmissions=1000).start()
 bot_loop = bot.loop
 bot_name = bot.me.username
 scheduler = AsyncIOScheduler(timezone=str(get_localzone()), event_loop=bot_loop)

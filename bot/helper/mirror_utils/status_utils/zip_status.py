@@ -16,9 +16,7 @@ class ZipStatus:
         self.__listener = listener
         self.__start_time = time()
         self.message = self.__listener.message
-        self.startTime = self.__listener.extra_details['startTime']
-        self.mode = self.__listener.extra_details['mode']
-        self.source = self.__listener.extra_details['source']
+        self.extra_details = self.__listener.extra_details
         self.engine = "7z"
 
     def gid(self):
@@ -71,4 +69,6 @@ class ZipStatus:
         LOGGER.info(f'Cancelling Archive: {self.__name}')
         if self.__listener.suproc:
             self.__listener.suproc.kill()
+        else:
+            self.__listener.suproc = 'cancelled'
         await self.__listener.onUploadError('archiving stopped by user!')

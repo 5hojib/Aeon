@@ -21,11 +21,9 @@ from tenacity import (RetryError, retry, retry_if_exception_type,
 
 from bot import (GLOBAL_EXTENSION_FILTER, IS_PREMIUM_USER, bot, config_dict,
                  user, user_data)
-from bot.helper.ext_utils.bot_utils import (get_readable_file_size,
-                                            sync_to_async)
-from bot.helper.ext_utils.fs_utils import (clean_unwanted, get_base_name,
-                                           get_document_type, get_media_info,
-                                           is_archive, take_ss)
+from bot.helper.ext_utils.bot_utils import sync_to_async
+from bot.helper.ext_utils.leech_utils import (get_document_type, get_media_info , take_ss)
+from bot.helper.ext_utils.fs_utils import (clean_unwanted, get_base_name, is_archive)
 from bot.helper.telegram_helper.button_build import ButtonMaker
 
 LOGGER = getLogger(__name__)

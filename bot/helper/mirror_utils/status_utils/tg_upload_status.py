@@ -5,7 +5,7 @@ from bot.helper.ext_utils.bot_utils import (MirrorStatus,
                                             get_readable_file_size,
                                             get_readable_time)
 
-engine_ = f"Pyrogram"
+engine_ = f"pyrogram v{get_distribution('pyrogram').version}"
 
 class TgUploadStatus:
     def __init__(self, obj, size, gid, message, extra_details):
@@ -13,9 +13,7 @@ class TgUploadStatus:
         self.__size = size
         self.__gid = gid
         self.message = message
-        self.startTime = extra_details['startTime']
-        self.mode = extra_details['mode']
-        self.source = extra_details['source']
+        self.extra_details = extra_details
         self.engine = engine_
 
     def processed_bytes(self):

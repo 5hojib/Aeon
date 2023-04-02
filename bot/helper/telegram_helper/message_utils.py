@@ -27,7 +27,6 @@ async def sendMessage(message, text, buttons=None):
         LOGGER.error(f"{e.NAME}: {e.MESSAGE}")
     except Exception as e:
         LOGGER.error(str(e))
-        return str(e)
 
 async def editMessage(message, text, buttons=None):
     try:
@@ -71,7 +70,6 @@ async def sendRss(text):
         LOGGER.error(f"{e.NAME}: {e.MESSAGE}")
     except Exception as e:
         LOGGER.error(str(e))
-        return str(e)
 
 async def deleteMessage(message):
     try:

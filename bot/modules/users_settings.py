@@ -6,6 +6,7 @@ from io import BytesIO
 from math import ceil
 from os import getcwd
 from os import path as ospath
+from re import sub as re_sub
 from time import time
 
 from aiofiles.os import mkdir
@@ -84,7 +85,7 @@ async def get_user_settings(from_user):
         buttons.ibutton("Reset Setting", f"userset {user_id} reset_all")
 
     buttons.ibutton("Close", f"userset {user_id} close")
-    text = f"<b><i>Settings for {name}</i></b>\n\n"\
+    text = f"<u>Settings for {name}</u>\n\n"\
         f"Leech Type is <b>{ltype}</b>\n"\
         f"Custom Thumbnail <b>{thumbmsg}</b>\n"\
         f"Rclone Config <b>{rccmsg}</b>\n"\
@@ -117,7 +118,7 @@ async def set_perfix(client, message, pre_event):
     user_id = message.from_user.id
     handler_dict[user_id] = False
     value = message.text
-    if len(value.encode()) < 30:
+    if len(re_sub('<.*?>', '', value)) < 15:
         update_user_ldata(user_id, 'lprefix', value)
         await message.delete()
         if DATABASE_URL:
@@ -138,7 +139,7 @@ async def set_thumb(client, message, pre_event):
     await message.delete()
     await update_user_settings(pre_event)
     if DATABASE_URL:
-        await DbManger().update_user_doc(user_id, des_dir)
+        await DbManger().update_user_doc(user_id, 'thumb', des_dir)
 
 async def add_rclone(client, message, pre_event):
     user_id = message.from_user.id
@@ -152,7 +153,7 @@ async def add_rclone(client, message, pre_event):
     await message.delete()
     await update_user_settings(pre_event)
     if DATABASE_URL:
-        await DbManger().update_user_doc(user_id, des_dir)
+        await DbManger().update_user_doc(user_id, 'rclone', des_dir)
 
 async def leech_split_size(client, message, pre_event):
     user_id = message.from_user.id
@@ -215,7 +216,7 @@ async def edit_user_settings(client, query):
             update_user_ldata(user_id, 'thumb', '')
             await update_user_settings(query)
             if DATABASE_URL:
-                await DbManger().update_user_doc(user_id)
+                await DbManger().update_user_doc(user_id, 'thumb')
         else:
             await query.answer("Old Settings", show_alert=True)
             await update_user_settings(query)
@@ -264,13 +265,13 @@ Check all available qualities options <a href="https://github.com/yt-dlp/yt-dlp#
         rmsg = f'''
 Send Leech Prefix. Timeout: 60 sec
 Examples:
-1. <code>{escape('<b>@JuniorXcientist</b>')}</code> 
+1. <code>{escape('<b>@JMDKH_Team</b>')}</code> 
 This will give output of:
 <b>@JMDKH_Team</b>  <code>50MB.bin</code>.
 
-2. <code>{escape('<code>@JuniorXcientist</code>')}</code> 
+2. <code>{escape('<code>@JMDKH_Team</code>')}</code> 
 This will give output of:
-<code>@JuniorXcientist</code> <code>50MB.bin</code>.
+<code>@JMDKH_Team</code> <code>50MB.bin</code>.
 
 Check all available formatting options <a href="https://core.telegram.org/bots/api#formatting-options">HERE</a>.
         '''
@@ -343,7 +344,7 @@ Check all available formatting options <a href="https://core.telegram.org/bots/a
             update_user_ldata(user_id, 'rclone', '')
             await update_user_settings(query)
             if DATABASE_URL:
-                await DbManger().update_user_doc(user_id)
+                await DbManger().update_user_doc(user_id, 'rclone')
         else:
             await query.answer("Old Settings", show_alert=True)
             await update_user_settings(query)
@@ -407,9 +408,9 @@ async def send_users_settings(client, message):
     elif userid in user_data:
         msg = f'<b>{userid}</b>:'
         if data := user_data[userid]:
-            buttons.ibutton("Close", f"userset {message.from_user.id} x")
             buttons = ButtonMaker()
             buttons.ibutton("Delete Data", f"userset {message.from_user.id} user_del {userid}")
+            buttons.ibutton("Close", f"userset {message.from_user.id} x")
             button = buttons.build_menu(1)
             for key, value in data.items():
                 msg += f'\n<b>{key}</b>: <code>{escape(str(value))}</code>'

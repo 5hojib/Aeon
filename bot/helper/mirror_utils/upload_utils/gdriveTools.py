@@ -64,7 +64,7 @@ class GoogleDriveHelper:
         self.processed_bytes = 0
         self.transferred_size = 0
         self.__service_account_index = 0
-        self.__service = None
+        self.__service = self.__authorize()
 
     def speed(self):
         """
@@ -153,7 +153,6 @@ class GoogleDriveHelper:
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(3),
            retry=retry_if_exception_type(Exception))
     def getFolderData(self, file_id):
-        self.__service = self.__authorize()
         try:
             meta = self.__service.files().get(fileId=file_id, supportsAllDrives=True).execute()
             if meta.get('mimeType', '') == self.__G_DRIVE_DIR_MIME_TYPE:
@@ -186,7 +185,6 @@ class GoogleDriveHelper:
             self.__total_time += self.__update_interval
 
     def deletefile(self, link: str):
-        self.__service = self.__authorize()
         try:
             file_id = self.getIdFromUrl(link)
         except (KeyError, IndexError):
@@ -212,7 +210,6 @@ class GoogleDriveHelper:
             return msg
 
     def upload(self, file_name, gdrive_id):
-        self.__service = self.__authorize()
         self.__is_uploading = True
         item_path = f"{self.__path}/{file_name}"
         LOGGER.info(f"Uploading: {item_path}")
@@ -372,8 +369,6 @@ class GoogleDriveHelper:
         return
 
     def clone(self, link, gdrive_id):
-        if self.__service is None:
-            self.__service = self.__authorize()
         self.__is_cloning = True
         self.__start_time = time()
         self.__total_files = 0
@@ -538,8 +533,6 @@ class GoogleDriveHelper:
             return {'files': []}
 
     def drive_list(self, fileName, stopDup=False, noMulti=False, isRecursive=True, itemType=""):
-        if self.__service is None:
-            self.__service = self.__authorize()
         msg = ""
         fileName = self.__escapes(str(fileName))
         contents_count = 0
@@ -566,7 +559,10 @@ class GoogleDriveHelper:
             for file in response.get('files', []):
                 mime_type = file.get('mimeType')
                 if mime_type == "application/vnd.google-apps.folder":
-                    msg += f"<code>{file.get('name')}<br>(folder)</code><br>"
+                    if SHORTENERES:
+                        msg += f"📁 .<code>{file.get('name').replace(' ', '-').replace('.', ',')}<br>(folder)</code><br>"
+                    else:
+                        msg += f"📁 <code>{file.get('name')}<br>(folder)</code><br>"
                     if not config_dict['DISABLE_DRIVE_LINK']:
                         furl = short_url(f"https://drive.google.com/drive/folders/{file.get('id')}")
                         msg += f"<b><a href={furl}>Drive Link</a></b>"
@@ -576,14 +572,21 @@ class GoogleDriveHelper:
                         else:
                             url_path = rquote(f'{file.get("name")}', safe='')
                         url = short_url(f'{index_url}/{url_path}/')
-                        msg += f' <b>| <a href={url}>Index Link</a></b>'
+                        msg += f' 📁 <b>| <a href={url}>Index Link</a></b>'
                 elif mime_type == 'application/vnd.google-apps.shortcut':
                     if not config_dict['DISABLE_DRIVE_LINK']:
                         furl = short_url(f"https://drive.google.com/drive/folders/{file.get('id')}")
-                        msg += f"⁍<a href={furl}>{file.get('name')}" \
-                               f"</a> (shortcut)"
+                        if SHORTENERES:
+                            msg += f"⁍<a href={furl}>{file.get('name').replace(' ', '-').replace('.', ',')}" \
+                                    f"</a> (shortcut)"
+                        else:
+                            msg += f"⁍<a href={furl}>{file.get('name')}" \
+                                   f"</a> (shortcut)"
                 else:
-                    msg += f"<code>{file.get('name')}<br>({get_readable_file_size(int(file.get('size', 0)))})</code><br>"
+                    if SHORTENERES:
+                        msg += f"📄 <code>{file.get('name').replace(' ', '-').replace('.', ',')}<br>({get_readable_file_size(int(file.get('size', 0)))})</code><br>"
+                    else:
+                        msg += f"📄 <code>{file.get('name')}<br>({get_readable_file_size(int(file.get('size', 0)))})</code><br>"
                     if not config_dict['DISABLE_DRIVE_LINK']:
                         furl = short_url(f"https://drive.google.com/uc?id={file.get('id')}&export=download")
                         msg += f"<b><a href={furl}>Drive Link</a></b>"
@@ -593,11 +596,11 @@ class GoogleDriveHelper:
                         else:
                             url_path = rquote(f'{file.get("name")}')
                         url = short_url(f'{index_url}/{url_path}')
-                        msg += f' <b>| <a href={url}>Index Link</a></b>'
+                        msg += f' <b>| 🚀 <a href={url}>Index Link</a></b>'
                         if config_dict['VIEW_LINK']:
                             urlv = f'{index_url}/{url_path}?a=view'
                             urlv = short_url(urlv)
-                            msg += f' <b>| <a href={urlv}>View Link</a></b>'
+                            msg += f' <b>| 💻 <a href={urlv}>View Link</a></b>'
                 msg += '<br><br>'
                 contents_count += 1
                 if len(msg.encode('utf-8')) > 39000:
@@ -619,13 +622,11 @@ class GoogleDriveHelper:
 
         msg = f"<b>Found {contents_count} result for <i>{fileName}</i></b>"
         buttons = ButtonMaker()
-        buttons.ubutton("VIEW", f"https://telegra.ph/{path[0]}", 'header')
+        buttons.ubutton("🔎 VIEW", f"https://telegra.ph/{path[0]}", 'header')
         buttons = extra_btns(buttons)
         return msg, buttons.build_menu(2)
 
     def count(self, link):
-        if self.__service is None:
-            self.__service = self.__authorize()
         try:
             file_id = self.getIdFromUrl(link)
         except (KeyError, IndexError):
@@ -639,19 +640,19 @@ class GoogleDriveHelper:
             mime_type = meta.get('mimeType')
             if mime_type == self.__G_DRIVE_DIR_MIME_TYPE:
                 self.__gDrive_directory(meta)
-                msg += f'<b>Name</b>: <b>{name}</b>\n'
-                msg += f'\n<b>• Size</b>: {get_readable_file_size(self.__total_bytes)}'
-                msg += f'\n<b>• Type</b>: Folder'
-                msg += f'\n<b>• SubFolders</b>: {self.__total_folders}'
+                msg += f'<b>Name</b>: <code>{name}</code>'
+                msg += f'\n\n<b>Size</b>: {get_readable_file_size(self.__total_bytes)}'
+                msg += '\n\n<b>Type</b>: Folder'
+                msg += f' |<b>SubFolders</b>: {self.__total_folders}'
             else:
-                msg += f'<b>Name</b>: <b>{name}</b>\n'
+                msg += f'<b>Name</b>: <code>{name}</code>'
                 if mime_type is None:
                     mime_type = 'File'
                 self.__total_files += 1
                 self.__gDrive_file(meta)
-                msg += f'\n<b>• Size</b>: {get_readable_file_size(self.__total_bytes)}'
-                msg += f'\n<b>• Type</b>: {mime_type}'
-            msg += f'\n<b>• Files</b>: {self.__total_files}'
+                msg += f'\n<b>Size</b>: {get_readable_file_size(self.__total_bytes)}'
+                msg += f'\n\n<b>Type</b>: {mime_type}'
+            msg += f' |<b>Files</b>: {self.__total_files}'
         except Exception as err:
             if isinstance(err, RetryError):
                 LOGGER.info(f"Total Attempts: {err.last_attempt.attempt_number}")
@@ -689,7 +690,6 @@ class GoogleDriveHelper:
                 self.__gDrive_file(filee)
 
     def helper(self, link):
-        self.__service = self.__authorize()
         try:
             file_id = self.getIdFromUrl(link)
         except (KeyError, IndexError):
@@ -724,8 +724,6 @@ class GoogleDriveHelper:
         return "", size, name, files
 
     def download(self, link):
-        if self.__service is None:
-            self.__service = self.__authorize()
         self.__is_downloading = True
         file_id = self.getIdFromUrl(link)
         self.__updater = setInterval(self.__update_interval, self.__progress)

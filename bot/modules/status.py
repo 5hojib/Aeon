@@ -9,7 +9,7 @@ from bot import (DOWNLOAD_DIR, Interval, bot, botStartTime, config_dict,
                  download_dict, download_dict_lock, status_reply_dict_lock)
 from bot.helper.ext_utils.bot_utils import (get_readable_file_size,
                                             get_readable_time, new_task,
-                                            setInterval, turn)
+                                            setInterval, turn_page)
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import (auto_delete_message,
@@ -26,10 +26,9 @@ async def mirror_status(client, message):
     if count == 0:
         currentTime = get_readable_time(time() - botStartTime)
         free = get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)
-        msg = 'No Active Downloads !\n'
-        msg += f"\n<b>• Bot Uptime</b>: {get_readable_time(time() - botStartTime)}"
-        msg += f"\n<b>• Free Disk</b>: {get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}"
-        msg += f"\n<b>• CPU</b>: {cpu_percent()}% | <b>RAM</b>: {virtual_memory().percent}%"
+        msg = 'No Active Downloads !\n___________________________'
+        msg += f"\n<b>CPU</b>: {cpu_percent()}% | <b>FREE</b>: {free}" \
+                   f"\n<b>RAM</b>: {virtual_memory().percent}% | <b>UPTIME</b>: {currentTime}"
         reply_message = await sendMessage(message, msg)
         await auto_delete_message(message, reply_message)
     else:
@@ -49,10 +48,8 @@ async def status_pages(client, query):
     data = query.data.split()
     if data[1] == "ref":
         await update_all_messages(True)
-        return
-    done = await turn(data)
-    if not done:
-        await deleteMessage(query.message)
+    else:
+        await turn_page(data)
 
 
 bot.add_handler(MessageHandler(mirror_status, filters=command(BotCommands.StatusCommand) & CustomFilters.authorized))

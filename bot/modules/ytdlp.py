@@ -12,7 +12,7 @@ from bot.helper.ext_utils.bot_utils import (get_readable_file_size,
                                             is_gdrive_link, is_rclone_path,
                                             is_url, new_task, sync_to_async)
 from bot.helper.jmdkh_utils import none_admin_utils
-from bot.helper.listener import MirrorLeechListener
+from bot.helper.listeners.tasks_listener import MirrorLeechListener
 from bot.helper.mirror_utils.download_utils.yt_dlp_download_helper import YoutubeDLHelper
 from bot.helper.mirror_utils.rclone_utils.list import RcloneList
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
@@ -28,6 +28,7 @@ from bot.helper.telegram_helper.message_utils import (anno_checker,
                                                       sendMessage)
 
 listener_dict = {}
+
 
 async def _mdisk(link, name):
     key = link.split('/')[-1]
@@ -165,7 +166,7 @@ async def _ytdl(client, message, isZip=False, isLeech=False, sameDir={}):
 
 <b>Quality Buttons:</b>
 Incase default quality added but you need to select quality for specific link or links with multi links feature.
-<code>/cmd</code> s link
+<code>/{cmd}</code> s link
 This option should be always before n:, pswd: and opt:
 
 <b>Options Example:</b> opt: playliststart:^10|matchtitle:S13|writesubtitles:true|live_from_start:true|postprocessor_args:{fmg}|wait_for_video:(5, 100)
@@ -187,8 +188,8 @@ You can add tuple and dict also. Use double quotes inside dict.
 You can directly add the upload path. up: remote:dir/subdir
 If DEFAULT_UPLOAD is `rc` then you can pass up: `gd` to upload using gdrive tools to GDRIVE_ID.
 If DEFAULT_UPLOAD is `gd` then you can pass up: `rc` to upload to RCLONE_PATH.
-If you want to add path manually from your config add <code>mrcc:</code> before the path without space
-<code>/{cmd}</code> link up: <code>mrcc:</code>main:/dump
+If you want to add path manually from your config (uploaded from usetting) add <code>mrcc:</code> before the path without space
+<code>/{cmd}</code> link up: <code>mrcc:</code>main:dump
 
 <b>Rclone Flags</b>:
 <code>/{cmd}</code> link up: path|rcl rcf: --buffer-size:8M|--drive-starred-only|key|key:value
@@ -230,14 +231,14 @@ Check all yt-dlp api options from this <a href='https://github.com/yt-dlp/yt-dlp
         dmMessage = None
     logMessage = await sendLogMessage(message, link, tag)
 
-    if up == 'rcl':
+    if (up == 'rcl' or config_dict['RCLONE_PATH'] == 'rcl' and config_dict['DEFAULT_UPLOAD'] == 'rc') and not isLeech:
         up = await RcloneList(client, message).get_rclone_path('rcu')
         if not is_rclone_path(up):
             await sendMessage(message, up)
             return
 
     listener = MirrorLeechListener(message, isZip, isLeech=isLeech, pswd=pswd,
-                                   tag=tag, sameDir=sameDir, rcFlags=rcf, upload=up,
+                                   tag=tag, sameDir=sameDir, rcFlags=rcf, upPath=up,
                                    raw_url=raw_url, drive_id=drive_id,
                                    index_link=index_link, dmMessage=dmMessage, logMessage=logMessage)
     if 'mdisk.me' in link:

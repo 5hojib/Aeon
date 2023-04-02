@@ -10,11 +10,9 @@ class QueueStatus:
         self.__gid = gid
         self.__listener = listener
         self.__status = status
-        self.message = listener.message
-        self.startTime = self.__listener.extra_details['startTime']
-        self.mode = self.__listener.extra_details['mode']
-        self.source = self.__listener.extra_details['source']
-        self.engine = "Queue System"
+        self.message = self.__listener.message
+        self.extra_details = self.__listener.extra_details
+        self.engine = "Queue System v2.0"
 
     def gid(self):
         return self.__gid

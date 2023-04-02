@@ -29,8 +29,8 @@ async def initiate_search_tools():
         globals()['PLUGINS'] = []
         src_plugins = eval(SEARCH_PLUGINS)
         if qb_plugins:
-            for plugin in qb_plugins:
-                await sync_to_async(qbclient.search_uninstall_plugin, names=plugin['name'])
+            names = [plugin['name'] for plugin in qb_plugins]
+            await sync_to_async(qbclient.search_uninstall_plugin, names=names)
         await sync_to_async(qbclient.search_install_plugin, src_plugins)
     elif qb_plugins:
         for plugin in qb_plugins:
@@ -100,16 +100,16 @@ async def __search(key, site, message, method):
             status = result_status[0].status
             if status != 'Running':
                 break
-        dict_search_results = await sync_to_async(client.search_results, search_id=search_id)
+        dict_search_results = await sync_to_async(client.search_results, search_id=search_id, limit=TELEGRAPH_LIMIT)
         search_results = dict_search_results.results
         total_results = dict_search_results.total
         if total_results == 0:
             await editMessage(message, f"No result found for <i>{key}</i>\nTorrent Site:- <i>{site.capitalize()}</i>")
             return
-        await sync_to_async(client.search_delete, search_id=search_id)
-        await sync_to_async(client.auth_log_out)
         msg = f"<b>Found {min(total_results, TELEGRAPH_LIMIT)}</b>"
         msg += f" <b>result(s) for <i>{key}</i>\nTorrent Site:- <i>{site.capitalize()}</i></b>"
+        await sync_to_async(client.search_delete, search_id=search_id)
+        await sync_to_async(client.auth_log_out)
     link = await __getResult(search_results, key, message, method)
     buttons = ButtonMaker()
     buttons.ubutton("🔎 VIEW", link)

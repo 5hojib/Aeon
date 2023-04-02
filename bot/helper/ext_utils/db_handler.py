@@ -18,7 +18,6 @@ class DbManger:
         self.__conn = None
         self.__connect()
 
-
     def __connect(self):
         try:
             self.__conn = AsyncIOMotorClient(DATABASE_URL)
@@ -127,10 +126,9 @@ class DbManger:
         await self.__db.users[bot_id].replace_one({'_id': user_id}, data, upsert=True)
         self.__conn.close
 
-    async def update_user_doc(self, user_id, path=''):
+    async def update_user_doc(self, user_id, key, path=''):
         if self.__err:
             return
-        key = 'rclone' if path.endswith('.conf') else 'thumb'
         if path:
             async with aiopen(path, 'rb+') as doc:
                 doc_bin = await doc.read()

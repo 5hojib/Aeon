@@ -16,7 +16,7 @@ from bot.helper.ext_utils.bot_utils import (get_content_type, is_gdrive_link,
                                             is_url, new_task, sync_to_async)
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.jmdkh_utils import none_admin_utils
-from bot.helper.listener import MirrorLeechListener
+from bot.helper.listeners.tasks_listener import MirrorLeechListener
 from bot.helper.mirror_utils.download_utils.aria2_download import add_aria2c_download
 from bot.helper.mirror_utils.download_utils.clonner import start_clone
 from bot.helper.mirror_utils.download_utils.direct_link_generator import direct_link_generator
@@ -25,7 +25,7 @@ from bot.helper.mirror_utils.download_utils.mega_downloader import add_mega_down
 from bot.helper.mirror_utils.download_utils.qbit_downloader import add_qb_torrent
 from bot.helper.mirror_utils.download_utils.telegram_downloader import TelegramDownloadHelper
 from bot.helper.mirror_utils.rclone_utils.list import RcloneList
-from bot.helper.mirror_utils.rclone_utils.rclone_transfer import RcloneTransferHelper
+from bot.helper.mirror_utils.rclone_utils.transfer import RcloneTransferHelper
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
@@ -148,6 +148,8 @@ async def _mirror_leech(client, message, isZip=False, extract=False, isQbit=Fals
             await message.unpin()
         except:
             pass
+    elif sender_chat:= message.sender_chat:
+        tag = sender_chat.title
     elif username := message.from_user.username:
         tag = f"@{username}"
     else:
@@ -185,10 +187,6 @@ async def _mirror_leech(client, message, isZip=False, extract=False, isQbit=Fals
 <b>By replying to link/file:</b>
 <code>/{cmd}</code> n: newname pswd: xx(zip/unzip)
 
-<b>Multi links within same upload directory only by replying to first link/file:</b>
-<code>/{cmd}</code> 10(number of links/files) m:folder_name
-Number and m:folder_name should be always before n: or pswd:
-
 <b>Upload Custom Drive</b>
 <code>/{cmd}</code> <b>id:</b><code>drive_folder_link</code> or <code>drive_id</code> <b>index:</b><code>https://anything.in/0:</code> link or by replying to file/link
 drive_id must be folder id and index must be url else it will not accept
@@ -223,13 +221,13 @@ Users can add their own rclone from user settings
 If you want to add path manually from your config add <code>mrcc:</code> before the path without space
 <code>/{cmd}</code> <code>mrcc:</code>main:/dump/ubuntu.iso
 
-<b>Rclone Upload</b>:
-<code>/{cmd}</code> link up: <code>rcl</code> (To select config, remote and path)
+<b>Upload</b>:
+<code>/{cmd}</code> link up: <code>rcl</code> (To select rclone config, remote and path)
 You can directly add the upload path. up: remote:dir/subdir
 If DEFAULT_UPLOAD is `rc` then you can pass up: `gd` to upload using gdrive tools to GDRIVE_ID.
 If DEFAULT_UPLOAD is `gd` then you can pass up: `rc` to upload to RCLONE_PATH.
-If you want to add path manually from your config add <code>mrcc:</code> before the path without space
-<code>/{cmd}</code> link up: <code>mrcc:</code>main:/dump
+If you want to add path manually from your config (uploaded from usetting) add <code>mrcc:</code> before the path without space
+<code>/{cmd}</code> link up: <code>mrcc:</code>main:dump
 
 <b>Rclone Flags</b>:
 <code>/{cmd}</code> link|path|rcl up: path|rcl rcf: --buffer-size:8M|--drive-starred-only|key|key:value
@@ -295,7 +293,7 @@ Check here all <a href='https://rclone.org/flags/'>RcloneFlags</a>.
         if not is_rclone_path(link):
             await sendMessage(message, link)
             return
-    if up == 'rcl' and not isLeech:
+    if (up == 'rcl' or config_dict['RCLONE_PATH'] == 'rcl' and config_dict['DEFAULT_UPLOAD'] == 'rc') and not isLeech:
         up = await RcloneList(client, message).get_rclone_path('rcu')
         if not is_rclone_path(up):
             await sendMessage(message, up)

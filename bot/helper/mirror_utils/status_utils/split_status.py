@@ -10,10 +10,8 @@ class SplitStatus:
         self.__size = size
         self.__listener = listener
         self.message = listener.message
-        self.startTime = self.__listener.extra_details['startTime']
-        self.mode = self.__listener.extra_details['mode']
-        self.source = self.__listener.extra_details['source']
-        self.engine = "ffmpeg"
+        self.extra_details = self.__listener.extra_details
+        self.engine = "ffmpeg/split"
 
     def gid(self):
         return self.__gid
@@ -46,4 +44,6 @@ class SplitStatus:
         LOGGER.info(f'Cancelling Split: {self.__name}')
         if self.__listener.suproc:
             self.__listener.suproc.kill()
+        else:
+            self.__listener.suproc = 'cancelled'
         await self.__listener.onUploadError('splitting stopped by user!')

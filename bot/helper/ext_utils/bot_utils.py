@@ -23,9 +23,11 @@ MAGNET_REGEX = r'magnet:\?xt=urn:(btih|btmh):[a-zA-Z0-9]*\s*'
 
 URL_REGEX = r'^(?!\/)(rtmps?:\/\/|mms:\/\/|rtsp:\/\/|https?:\/\/|ftp:\/\/)?([^\/:]+:[^\/@]+@)?(www\.)?(?=[^\/:\s]+\.[^\/:\s]+)([^\/:\s]+\.[^\/:\s]+)(:\d+)?(\/[^#\s]*[\s\S]*)?(\?[^#\s]*)?(#.*)?$'
 
-COUNT = 0
+SIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+
+STATUS_START = 0
+PAGES = 1
 PAGE_NO = 1
-PAGES = 0
 
 
 class MirrorStatus:
@@ -41,46 +43,33 @@ class MirrorStatus:
     STATUS_CHECKING = "CheckUp"
     STATUS_SEEDING = "Seeding"
 
-SIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
-
 
 class setInterval:
     def __init__(self, interval, action):
         self.interval = interval
         self.action = action
-        self.stopEvent = False
-        bot_loop.create_task(self.__setInterval())
+        self.task = bot_loop.create_task(self.__set_interval())
 
-    async def __setInterval(self):
-        nextTime = time() + self.interval
-        while not self.stopEvent:
-            await sleep(nextTime - time())
-            if self.stopEvent:
-                break
+    async def __set_interval(self):
+        while True:
+            await sleep(self.interval)
             await self.action()
-            nextTime = time() + self.interval
 
     def cancel(self):
-        self.stopEvent = True
+        self.task.cancel()
 
 def get_readable_file_size(size_in_bytes):
     if size_in_bytes is None:
         return '0B'
     index = 0
-    while size_in_bytes >= 1024:
+    while size_in_bytes >= 1024 and index < len(SIZE_UNITS) - 1:
         size_in_bytes /= 1024
         index += 1
-    try:
-        return f'{round(size_in_bytes, 2)}{SIZE_UNITS[index]}'
-    except IndexError:
-        return 'File too large'
+    return f'{size_in_bytes:.2f}{SIZE_UNITS[index]}' if index > 0 else f'{size_in_bytes}B'
 
 async def getDownloadByGid(gid):
     async with download_dict_lock:
-        for dl in list(download_dict.values()):
-            if dl.gid() == gid:
-                return dl
-    return None
+        return next((dl for dl in download_dict.values() if dl.gid() == gid), None)
 
 async def getAllDownload(req_status, user_id=None):
     dls = []
@@ -95,13 +84,7 @@ async def getAllDownload(req_status, user_id=None):
 
 def bt_selection_buttons(id_, isCanCncl=True):
     gid = id_[:12] if len(id_) > 20 else id_
-    pincode = ""
-    for n in id_:
-        if n.isdigit():
-            pincode += str(n)
-        if len(pincode) == 4:
-            break
-
+    pincode = ''.join([n for n in id_ if n.isdigit()][:4])
     buttons = ButtonMaker()
     BASE_URL = config_dict['BASE_URL']
     if config_dict['WEB_PINCODE']:
@@ -197,49 +180,36 @@ def extra_btns(buttons):
             buttons.ubutton(btn_name, btn_url)
     return buttons
 
-async def turn(data):
+async def turn_page(data):
     STATUS_LIMIT = config_dict['STATUS_LIMIT']
-    try:
-        global COUNT, PAGE_NO
-        async with download_dict_lock:
-            if data[1] == "nex":
-                if PAGE_NO == PAGES:
-                    COUNT = 0
-                    PAGE_NO = 1
-                else:
-                    COUNT += STATUS_LIMIT
-                    PAGE_NO += 1
-            elif data[1] == "pre":
-                if PAGE_NO == 1:
-                    COUNT = STATUS_LIMIT * (PAGES - 1)
-                    PAGE_NO = PAGES
-                else:
-                    COUNT -= STATUS_LIMIT
-                    PAGE_NO -= 1
-        return True
-    except:
-        return False
+    global STATUS_START, PAGE_NO
+    async with download_dict_lock:
+        if data[1] == "nex":
+            if PAGE_NO == PAGES:
+                STATUS_START = 0
+                PAGE_NO = 1
+            else:
+                STATUS_START += STATUS_LIMIT
+                PAGE_NO += 1
+        elif data[1] == "pre":
+            if PAGE_NO == 1:
+                STATUS_START = STATUS_LIMIT * (PAGES - 1)
+                PAGE_NO = PAGES
+            else:
+                STATUS_START -= STATUS_LIMIT
+                PAGE_NO -= 1
 
 async def check_user_tasks(user_id, maxtask):
     if tasks:= await getAllDownload(MirrorStatus.STATUS_DOWNLOADING, user_id):
         return len(tasks) >= maxtask
 
 def get_readable_time(seconds):
+    periods = [(' Days ', 86400), (' Hours', 3600), (' Min ', 60), (' Sec', 1)]
     result = ''
-    (days, remainder) = divmod(seconds, 86400)
-    days = int(days)
-    if days != 0:
-        result += f'{days} Days '
-    (hours, remainder) = divmod(remainder, 3600)
-    hours = int(hours)
-    if hours != 0:
-        result += f'{hours} Hours '
-    (minutes, seconds) = divmod(remainder, 60)
-    minutes = int(minutes)
-    if minutes != 0:
-        result += f'{minutes} Min '
-    seconds = int(seconds)
-    result += f'{seconds} Sec'
+    for period_name, period_seconds in periods:
+        if seconds >= period_seconds:
+            period_value, seconds = divmod(seconds, period_seconds)
+            result += f'{int(period_value)}{period_name}'
     return result
 
 def is_magnet(url):
@@ -267,13 +237,7 @@ def is_rclone_path(path):
     return bool(re_match(r'^(mrcc:)?(?!magnet:)(?![- ])[a-zA-Z0-9_\. -]+(?<! ):(?!.*\/\/).*$|^rcl$', path))
 
 def get_mega_link_type(url):
-    if "folder" in url:
-        return "folder"
-    elif "file" in url:
-        return "file"
-    elif "/#F!" in url:
-        return "folder"
-    return "file"
+    return "folder" if "folder" in url or "/#F!" in url else "file"
 
 def get_content_type(link):
     try:
@@ -291,10 +255,8 @@ def update_user_ldata(id_, key, value):
     if not key and not value:
         user_data[id_] = {}
         return
-    if id_ in user_data:
-        user_data[id_][key] = value
-    else:
-        user_data[id_] = {key: value}
+    user_data.setdefault(id_, {})
+    user_data[id_][key] = value
 
 async def cmd_exec(cmd, shell=False):
     if shell:

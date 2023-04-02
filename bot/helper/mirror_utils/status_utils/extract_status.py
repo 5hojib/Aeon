@@ -12,12 +12,9 @@ class ExtractStatus:
         self.__size = size
         self.__gid = gid
         self.__listener = listener
-        self.__uid = self.__listener.uid
         self.__start_time = time()
         self.message = self.__listener.message
-        self.startTime = self.__listener.extra_details['startTime']
-        self.mode = self.__listener.extra_details['mode']
-        self.source = self.__listener.extra_details['source']
+        self.extra_details = self.__listener.extra_details
         self.engine = '7z'
 
     def gid(self):
@@ -70,4 +67,6 @@ class ExtractStatus:
         LOGGER.info(f'Cancelling Extract: {self.__name}')
         if self.__listener.suproc:
             self.__listener.suproc.kill()
+        else:
+            self.__listener.suproc = 'cancelled'
         await self.__listener.onUploadError('extracting stopped by user!')

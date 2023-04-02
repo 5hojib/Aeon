@@ -5,7 +5,7 @@ from bot.helper.ext_utils.bot_utils import (MirrorStatus,
                                             get_readable_file_size,
                                             get_readable_time)
 
-engine_ = f"Google Api"
+engine_ = f"Google Api v{get_distribution('google-api-python-client').version}"
 
 class UploadStatus:
     def __init__(self, obj, size, gid, message, extra_details):
@@ -13,9 +13,7 @@ class UploadStatus:
         self.__size = size
         self.__gid = gid
         self.message = message
-        self.startTime = extra_details['startTime']
-        self.mode = extra_details['mode']
-        self.source = extra_details['source']
+        self.extra_details = extra_details
         self.engine = engine_
 
     def processed_bytes(self):

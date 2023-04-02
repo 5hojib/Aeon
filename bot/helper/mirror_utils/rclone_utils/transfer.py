@@ -1,7 +1,8 @@
-from asyncio import create_subprocess_exec
+from asyncio import Event, create_subprocess_exec
 from asyncio.subprocess import PIPE
 from configparser import ConfigParser
 from json import loads
+from logging import getLogger
 from random import SystemRandom
 from re import findall as re_findall
 from string import ascii_letters, digits
@@ -9,7 +10,7 @@ from string import ascii_letters, digits
 from aiofiles import open as aiopen
 from aiofiles.os import path as aiopath
 
-from bot import (GLOBAL_EXTENSION_FILTER, LOGGER, config_dict, download_dict,
+from bot import (GLOBAL_EXTENSION_FILTER, config_dict, download_dict,
                  download_dict_lock, non_queued_dl, non_queued_up,
                  queue_dict_lock, queued_dl)
 from bot.helper.ext_utils.bot_utils import cmd_exec, new_task, sync_to_async
@@ -22,6 +23,8 @@ from bot.helper.telegram_helper.message_utils import (sendMessage,
                                                       sendStatusMessage,
                                                       update_all_messages)
 
+LOGGER = getLogger(__name__)
+
 
 class RcloneTransferHelper:
     def __init__(self, listener, name='', size=0, gid=''):
@@ -32,7 +35,6 @@ class RcloneTransferHelper:
         self.__percentage = '0%'
         self.__speed = '0 B/s'
         self.__is_cancelled = False
-        self.__is_upload = False
         self.__is_download = False
         self.name = name
         self.size = size
@@ -63,23 +65,34 @@ class RcloneTransferHelper:
             if data := re_findall(r'Transferred:\s+([\d.]+\s*\w+)\s+/\s+([\d.]+\s*\w+),\s+([\d.]+%)\s*,\s+([\d.]+\s*\w+/s),\s+ETA\s+([\dwdhms]+)', data):
                 self.__transferred_size, _, self.__percentage, self.__speed, self.__eta = data[0]
   
-    async def add_download(self, rc_path, config_path, path, name, from_queue=False):
+    async def add_download(self, rc_path, config_path, path, name):
         self.__is_download = True
-        if not from_queue: 
+        cmd = ['rclone', 'lsjson', '--fast-list', '--stat', '--no-mimetype',
+               '--no-modtime', '--config', config_path, rc_path]
+        res, err, code = await cmd_exec(cmd)
+        if self.__is_cancelled:
+            return
+        if code not in [0, -9]:
+            await sendMessage(f'Error: While getting rclone stat. Path: {rc_path}. Stderr: {err[:4000]}')
+            return
+        result = loads(res)
+        if result['IsDir']:
             if not name:
                 name = await self.__getItemName(rc_path.strip('/'))
             path += name
+        else:
+            name = await self.__getItemName(rc_path.strip('/'))
         self.name = name
         cmd = ['rclone', 'size', '--fast-list', '--json', '--config', config_path, rc_path]
         res, err, code = await cmd_exec(cmd)
         if self.__is_cancelled:
             return
         if code not in [0, -9]:
-            await self.__listener.onDownloadError(f'while getting rclone size. Path: {rc_path}. Stderr: {err[:4090]}')
+            await sendMessage(f'Error: While getting rclone size. Path: {rc_path}. Stderr: {err[:4000]}')
             return
         rdict = loads(res)
         self.size = rdict['bytes']
-        if config_dict['STOP_DUPLICATE'] and not self.__listener.isLeech:
+        if config_dict['STOP_DUPLICATE'] and not self.__listener.isLeech and self.__listener.upPath == 'gd':
             LOGGER.info('Checking File/Folder if already in Drive')
             if self.__listener.isZip:
                 rname = f"{name}.zip"
@@ -99,6 +112,7 @@ class RcloneTransferHelper:
         self.gid = ''.join(SystemRandom().choices(ascii_letters + digits, k=12))
         all_limit = config_dict['QUEUE_ALL']
         dl_limit = config_dict['QUEUE_DOWNLOAD']
+        from_queue = False
         if all_limit or dl_limit:
             added_to_queue = False
             async with queue_dict_lock:
@@ -106,14 +120,19 @@ class RcloneTransferHelper:
                 up = len(non_queued_up)
                 if (all_limit and dl + up >= all_limit and (not dl_limit or dl >= dl_limit)) or (dl_limit and dl >= dl_limit):
                     added_to_queue = True
-                    queued_dl[self.__listener.uid] = ['rcd', rc_path, config_path, path, name, self.__listener]
+                    event = Event()
+                    queued_dl[self.__listener.uid] = event
             if added_to_queue:
                 LOGGER.info(f"Added to Queue/Download: {name}")
                 async with download_dict_lock:
                     download_dict[self.__listener.uid] = QueueStatus(name, self.size, self.gid, self.__listener, 'Dl')
                 await self.__listener.onDownloadStart()
                 await sendStatusMessage(self.__listener.message)
-                return
+                await event.wait()
+                async with download_dict_lock:
+                    if self.__listener.uid not in download_dict:
+                        return
+                from_queue = True
         async with download_dict_lock:
             download_dict[self.__listener.uid] = RcloneStatus(self, self.__listener.message, 'dl', self.__listener.extra_details)
         async with queue_dict_lock:
@@ -139,14 +158,13 @@ class RcloneTransferHelper:
         elif return_code != -9:
             error = (await self.__proc.stderr.read()).decode().strip()
             LOGGER.error(error)
-            await self.__listener.onDownloadError(error[:4090])
+            await self.__listener.onDownloadError(error[:4000])
 
     async def upload(self, path):
-        self.__is_upload = True
         async with download_dict_lock:
-            download_dict[self.__listener.uid] = RcloneStatus(self, self.__listener.message, 'up', self.__listener.extra_details)
+            download_dict[self.__listener.uid] = RcloneStatus(self, self.__listener.message, 'up')
         await update_all_messages()
-        rc_path = (self.__listener.upload or config_dict['RCLONE_PATH']).strip('/')
+        rc_path = self.__listener.upPath.strip('/')
         if rc_path == 'rc':
             rc_path = config_dict['RCLONE_PATH']
         if rc_path.startswith('mrcc:'):
@@ -156,20 +174,19 @@ class RcloneTransferHelper:
             config_path = 'rclone.conf'
         if await aiopath.isdir(path):
             mime_type = 'Folder'
-            rc_path += f"/{self.name}"
+            rc_path += f"/{self.name}" if rc_path.split(':', 1)[1] else self.name
         else:
             mime_type = 'File'
         remote = rc_path.split(':')[0]
         remote_type = await self.__get_remote_type(config_path, remote)
         cmd = await self.__getUpdatedCommand(config_path, path, rc_path)
         if remote_type == 'drive' and not config_dict['RCLONE_FLAGS'] and not self.__listener.rcFlags:
-            cmd.extend(('--drive-chunk-size', '32M', '--drive-upload-cutoff', '32M'))
+            cmd.extend(('--drive-chunk-size', '64M', '--drive-upload-cutoff', '32M'))
         self.__proc = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
         self.__progress()
-        await self.__proc.wait()
+        return_code = await self.__proc.wait()
         if self.__is_cancelled:
             return
-        return_code = self.__proc.returncode
         if return_code == -9:
             pass
         elif return_code == 0:
@@ -180,7 +197,17 @@ class RcloneTransferHelper:
                 folders = 0
                 files = 1
             if remote_type == 'drive':
-                epath = rc_path.rsplit('/', 1)[0] if mime_type == 'Folder' else f'{rc_path}/{self.name}'
+                if mime_type == 'Folder':
+                    remote, epath = rc_path.split(':', 1)
+                    epath = epath.strip('/').rsplit('/', 1)
+                    epath = f'{remote}:{epath[0]}' if len(epath) > 1 else f'{remote}:'
+                    destination = rc_path
+                elif rc_path.split(':', 1)[1]:
+                    epath = f"{rc_path}/{self.name}"
+                    destination = epath
+                else:
+                    epath = f"{rc_path}{self.name}"
+                    destination = epath
                 cmd = ['rclone', 'lsjson', '--fast-list', '--no-mimetype', '--no-modtime', '--config', config_path, epath]
                 res, err, code = await cmd_exec(cmd)
                 if self.__is_cancelled:
@@ -194,9 +221,14 @@ class RcloneTransferHelper:
                     link = f'https://drive.google.com/drive/folders/{fid}' if mime_type == 'Folder' else f'https://drive.google.com/uc?id={fid}&export=download'
                 elif code != -9:
                     LOGGER.error(f'while getting drive link. Path: {rc_path}. Stderr: {err}')
-                    link = 'https://drive.google.com/file/d/err/view'
+                    link = ''
             else:
-                epath = rc_path if mime_type == 'Folder' else f'{rc_path}/{self.name}'
+                if mime_type == 'Folder':
+                    epath = rc_path 
+                elif rc_path.split(':', 1)[1]:
+                    epath = f"{rc_path}/{self.name}"
+                else:
+                    epath = f"{rc_path}{self.name}"
                 cmd = ['rclone', 'link', '--config', config_path, epath]
                 res, err, code = await cmd_exec(cmd)
                 if self.__is_cancelled:
@@ -204,31 +236,28 @@ class RcloneTransferHelper:
                 if code == 0:
                     link = res
                 elif code != -9:
-                    LOGGER.error(f'while getting link. Path: {rc_path}. Stderr: {err}')
-                    link = f'Path: {rc_path if mime_type == "Folder" else f"{rc_path/self.name}"}'
-            LOGGER.info(f'Upload Done. Path: {rc_path}. Name: {self.name}')
-            await self.__listener.onUploadComplete(link, self.size, files, folders, mime_type, self.name, True)
+                    LOGGER.error(f'while getting link. Path: {epath} | Stderr: {err}')
+                    link = ''
+                destination = epath
+            LOGGER.info(f'Upload Done. Path: {epath}')
+            await self.__listener.onUploadComplete(link, self.size, files, folders, mime_type, self.name, destination)
         else:
             error = (await self.__proc.stderr.read()).decode().strip()
             LOGGER.error(error)
-            await self.__listener.onUploadError(error[:4090])
+            await self.__listener.onUploadError(error[:4000])
 
     @staticmethod
     async def __getItemName(path):
-        pre_name = path.rsplit('/', 1)
-        if '' in pre_name:
-            pre_name.remove('')
-        if len(pre_name) > 1:
-            name = pre_name[1]
-        elif pre_name := path.split(':', 1):
-            if '' in pre_name:
-                pre_name.remove('')
-            name = pre_name[1] if len(pre_name) > 1 else pre_name[0]
-        return name
+        remote, ipath = path.split(':', 1)
+        if not ipath:
+            return remote
+        pre_name = ipath.rsplit('/', 1)
+        return pre_name[1] if len(pre_name) > 1 else pre_name[0]
 
-    async def __getUpdatedCommand(self, config_path, fpath, tpath):
+    async def __getUpdatedCommand(self, config_path, source, destination):
         ext = '*.{' + ','.join(GLOBAL_EXTENSION_FILTER) + '}'
-        cmd = ['rclone', 'copy', '--config', config_path, '-P', fpath, tpath, '--exclude', ext, '--ignore-case']
+        cmd = ['rclone', 'copy', '--fast-list', '--config', config_path, '-P', source, destination,
+               '--exclude', ext, '--ignore-case']
         if rcf := self.__listener.rcFlags or config_dict['RCLONE_FLAGS']:
             rcflags = rcf.split('|')
             for flag in rcflags:
@@ -250,7 +279,10 @@ class RcloneTransferHelper:
     async def cancel_download(self):
         self.__is_cancelled = True
         if self.__proc is not None:
-            self.__proc.kill()
+            try:
+                self.__proc.kill()
+            except:
+                pass
         if self.__is_download:
             LOGGER.info(f"Cancelling Download: {self.name}")
             await self.__listener.onDownloadError('Download stopped by user!')

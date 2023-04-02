@@ -3,7 +3,6 @@ from bot import CMD_SUFFIX
 
 class _BotCommands:
     def __init__(self):
-        self.MediaInfoCommand = f'mediainfo{CMD_SUFFIX}'
         self.StartCommand = f'start{CMD_SUFFIX}'
         self.MirrorCommand = [f'mirror{CMD_SUFFIX}', f'm{CMD_SUFFIX}']
         self.UnzipMirrorCommand = [f'unzipmirror{CMD_SUFFIX}', f'uzm{CMD_SUFFIX}']

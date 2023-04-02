@@ -6,7 +6,7 @@ from bot.helper.ext_utils.bot_utils import (MirrorStatus, async_to_sync,
                                             get_readable_time)
 from bot.helper.ext_utils.fs_utils import get_path_size
 
-engine_ = f"yt-dlp"
+engine_ = f"yt-dlp v{get_distribution('yt-dlp').version}"
 
 class YtDlpDownloadStatus:
     def __init__(self, obj, listener, gid):
@@ -14,9 +14,7 @@ class YtDlpDownloadStatus:
         self.__gid = gid
         self.__listener = listener
         self.message = self.__listener.message
-        self.startTime = self.__listener.extra_details['startTime']
-        self.mode = self.__listener.extra_details['mode']
-        self.source = self.__listener.extra_details['source']
+        self.extra_details = self.__listener.extra_details
         self.engine = engine_
 
     def gid(self):
