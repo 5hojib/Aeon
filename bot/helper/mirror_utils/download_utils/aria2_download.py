@@ -226,7 +226,7 @@ def add_aria2c_download(link: str, path, listener, filename, auth, ratio, seed_t
     args = {'dir': path, 'max-upload-limit': '1K', 'netrc-path': '/usr/src/app/.netrc'}
     a2c_opt = {**aria2_options}
     [a2c_opt.pop(k) for k in aria2c_global if k in aria2_options]
-    args.update(a2c_opt)
+    args |= a2c_opt
     if filename:
         args['out'] = filename
     if auth:
@@ -244,9 +244,7 @@ def add_aria2c_download(link: str, path, listener, filename, auth, ratio, seed_t
         if error:
             LOGGER.info(f"Download Error: {links}")
             return sendMessage(links, listener.bot, listener.message)
-        dls = []
-        for link in links:
-            dls.append(aria2.add_uris([link], args))
+        dls = [aria2.add_uris([link], args) for link in links]
         LOGGER.info(dls)
         download = dls[0]
     else:

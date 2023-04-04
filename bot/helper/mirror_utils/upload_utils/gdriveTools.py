@@ -173,8 +173,7 @@ class GoogleDriveHelper:
         try:
             file_id = self.__getIdFromUrl(link)
         except (KeyError, IndexError):
-            msg = "Google Drive ID could not be found in the provided link"
-            return msg
+            return "Google Drive ID could not be found in the provided link"
         msg = ''
         try:
             self.__service.files().delete(fileId=file_id, supportsAllDrives=True).execute()
@@ -280,7 +279,9 @@ class GoogleDriveHelper:
         file_id = file.get("id")
         if not config_dict['IS_TEAM_DRIVE']:
             self.__set_permission(file_id)
-        LOGGER.info("Created G-Drive Folder:\nName: {}\nID: {} ".format(file.get("name"), file_id))
+        LOGGER.info(
+            f'Created G-Drive Folder:\nName: {file.get("name")}\nID: {file_id} '
+        )
         return file_id
 
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(10),
@@ -307,8 +308,7 @@ class GoogleDriveHelper:
                 self.__set_permission(response['id'])
 
             drive_file = self.__service.files().get(fileId=response['id'], supportsAllDrives=True).execute()
-            download_url = self.__G_DRIVE_BASE_DOWNLOAD_URL.format(drive_file.get('id'))
-            return download_url
+            return self.__G_DRIVE_BASE_DOWNLOAD_URL.format(drive_file.get('id'))
         media_body = MediaFileUpload(file_path,
                                      mimetype=mime_type,
                                      resumable=True,
@@ -354,8 +354,7 @@ class GoogleDriveHelper:
             self.__set_permission(response['id'])
         # Define file instance and get url for download
         drive_file = self.__service.files().get(fileId=response['id'], supportsAllDrives=True).execute()
-        download_url = self.__G_DRIVE_BASE_DOWNLOAD_URL.format(drive_file.get('id'))
-        return download_url
+        return self.__G_DRIVE_BASE_DOWNLOAD_URL.format(drive_file.get('id'))
 
 
     def clone(self, link, u_index, c_index):
@@ -366,8 +365,7 @@ class GoogleDriveHelper:
         try:
             file_id = self.__getIdFromUrl(link)
         except (KeyError, IndexError):
-            msg = "Google Drive ID could not be found in the provided link"
-            return msg
+            return "Google Drive ID could not be found in the provided link"
         msg = ""
         LOGGER.info(f"File ID: {file_id}")
         GDRIVEID, INDEXURL = getGDriveUploadUtils(self.user_id, u_index, c_index)
@@ -423,7 +421,7 @@ class GoogleDriveHelper:
             if config_dict['BUTTON_SIX_NAME'] != '' and config_dict['BUTTON_SIX_URL'] != '':
                 buttons.buildbutton(f"{config_dict['BUTTON_SIX_NAME']}", f"{config_dict['BUTTON_SIX_URL']}")
             if config_dict['SOURCE_LINK']:
-                buttons.buildbutton(f"Source Link", link)
+                buttons.buildbutton("Source Link", link)
         except Exception as err:
             if isinstance(err, RetryError):
                 LOGGER.info(f"Total Attempts: {err.last_attempt.attempt_number}")

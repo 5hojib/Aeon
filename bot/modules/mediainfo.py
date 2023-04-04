@@ -20,14 +20,10 @@ def mediainfo(update, context):
     help_msg = "\n<b>By replying to message (including media):</b>"
     help_msg += f"\n<code>/{BotCommands.MediaInfoCommand}" + " {message}" + "</code>"
     if not mediamessage: return sendMessage(help_msg, context.bot, update.message)
-    file = None
     media_array = [mediamessage.document, mediamessage.video, mediamessage.audio, mediamessage.document, \
         mediamessage.video, mediamessage.photo, mediamessage.audio, mediamessage.voice, \
         mediamessage.animation, mediamessage.video_note, mediamessage.sticker]
-    for i in media_array:
-        if i is not None:
-            file = i
-            break
+    file = next((i for i in media_array if i is not None), None)
     if not file: return sendMessage(help_msg, context.bot, update.message)
     sent = sendMessage('Running mediainfo. Downloading your file.', context.bot, update.message)
     try:

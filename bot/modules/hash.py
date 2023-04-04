@@ -14,19 +14,21 @@ def HumanBytes(size):
     while size > power:
         size /= power
         n += 1
-    return str(round(size, 2)) + " " + Dic_powerN[n] + "iB"
+    return f"{str(round(size, 2))} {Dic_powerN[n]}iB"
 
 
 def TimeFormatter(milliseconds: int) -> str:
-    seconds, milliseconds = divmod(int(milliseconds), 1000)
+    seconds, milliseconds = divmod(milliseconds, 1000)
     minutes, seconds = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
     days, hours = divmod(hours, 24)
-    tmp = ((str(days) + "d, ") if days else "") + \
-        ((str(hours) + "h, ") if hours else "") + \
-        ((str(minutes) + "m, ") if minutes else "") + \
-        ((str(seconds) + "s, ") if seconds else "") + \
-        ((str(milliseconds) + "ms, ") if milliseconds else "")
+    tmp = (
+        (f"{str(days)}d, " if days else "")
+        + (f"{str(hours)}h, " if hours else "")
+        + (f"{str(minutes)}m, " if minutes else "")
+        + (f"{str(seconds)}s, " if seconds else "")
+        + (f"{str(milliseconds)}ms, " if milliseconds else "")
+    )
     return tmp[:-2]
 
 
@@ -36,14 +38,10 @@ def hash(update, context):
     help_msg = "<b>Reply to message including file:</b>"
     help_msg += f"\n<code>/{BotCommands.HashCommand}" + " {message}" + "</code>"
     if not mediamessage: return sendMessage(help_msg, context.bot, update.message)
-    file = None
     media_array = [mediamessage.document, mediamessage.video, mediamessage.audio, mediamessage.document, \
         mediamessage.video, mediamessage.photo, mediamessage.audio, mediamessage.voice, \
         mediamessage.animation, mediamessage.video_note, mediamessage.sticker]
-    for i in media_array:
-        if i is not None:
-            file = i
-            break
+    file = next((i for i in media_array if i is not None), None)
     if not file: return sendMessage(help_msg, context.bot, update.message)
     VtPath = os.path.join("Hasher", str(message.from_user.id))
     if not os.path.exists("Hasher"): os.makedirs("Hasher")
@@ -79,14 +77,15 @@ def hash(update, context):
         try: os.remove(file)
         except: pass
         return editMessage("Hashing error. Check Logs.", sent)
-    # hash text
-    finishedText = "🍆 File: <code>{}</code>\n".format(filename)
-    finishedText += "🍓 MD5: <code>{}</code>\n".format(md5.hexdigest())
-    finishedText += "🍌 SHA1: <code>{}</code>\n".format(sha1.hexdigest())
-    finishedText += "🍒 SHA224: <code>{}</code>\n".format(sha224.hexdigest())
-    finishedText += "🍑 SHA256: <code>{}</code>\n".format(sha256.hexdigest())
-    finishedText += "🥭 SHA512: <code>{}</code>\n".format(sha512.hexdigest())
-    finishedText += "🍎 SHA384: <code>{}</code>\n".format(sha384.hexdigest())
+    finishedText = (
+        f"🍆 File: <code>{filename}</code>\n"
+        + f"🍓 MD5: <code>{md5.hexdigest()}</code>\n"
+    )
+    finishedText += f"🍌 SHA1: <code>{sha1.hexdigest()}</code>\n"
+    finishedText += f"🍒 SHA224: <code>{sha224.hexdigest()}</code>\n"
+    finishedText += f"🍑 SHA256: <code>{sha256.hexdigest()}</code>\n"
+    finishedText += f"🥭 SHA512: <code>{sha512.hexdigest()}</code>\n"
+    finishedText += f"🍎 SHA384: <code>{sha384.hexdigest()}</code>\n"
     timeTaken = f"🥚 Hash Time: <code>{TimeFormatter((time.time() - hashStartTime) * 1000)}</code>"
     editMessage(f"{timeTaken}\n{finishedText}", sent)
     try: os.remove(file)

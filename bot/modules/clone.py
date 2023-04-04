@@ -32,7 +32,7 @@ def _clone(message, bot):
             tag = message.from_user.mention_html(message.from_user.first_name)
         if forcesub(bot, message, tag):
             return
-            
+
     if get_bot_pm(user_id) and message.chat.type != 'private':
         try:
             msg1 = f'Added your Requested link to Download\n'
@@ -64,8 +64,7 @@ def _clone(message, bot):
                 return sendMessage(f"<b>BOT TOTAL TASK LIMIT : {TOTAL_TASKS_LIMIT}\nTASKS PROCESSING : {total_task}\n#total limit exceed </b>", bot ,message)
             if USER_TASKS_LIMIT == get_user_task(user_id):
                 return sendMessage(f"<b>BOT USER TASK LIMIT : {USER_TASKS_LIMIT} \nYOUR TASK : {get_user_task(user_id)}\n#user limit exceed</b>", bot ,message)
-        time_gap = timegap_check(message)
-        if time_gap:
+        if time_gap := timegap_check(message):
             return
         TIME_GAP_STORE[message.from_user.id] = time()
 
@@ -78,7 +77,7 @@ def _clone(message, bot):
     u_index = None
     shwbtns = True
     msg_id = message.message_id
-    CATUSR = getUserTDs(user_id)[0] 
+    CATUSR = getUserTDs(user_id)[0]
     if len(CATUSR) >= 1: u_index = 0
 
     if len(mesg.split(maxsplit=1)) > 1:

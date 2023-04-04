@@ -84,16 +84,16 @@ class TgUploader:
 
         dumpid = user_data[user_id_].get('userlog') if user_id_ in user_data and user_data[user_id_].get('userlog') else ''
         LEECH_X = int(dumpid) if len(dumpid) != 0 else user_data.get('is_log_leech', [''])[0]
-        
+
         BOT_PM_X = get_bot_pm(user_id_)
-        
+
         notMedia = False
         thumb = self.__thumb
         self.__is_corrupted = False
         try:
             is_video, is_audio = get_media_streams(up_path)
-            if not self.__as_doc:
-                if is_video:
+            if is_video:
+                if not self.__as_doc:
                     duration = get_media_info(up_path)[0]
                     if thumb is None:
                         thumb = take_ss(up_path, duration)
@@ -114,8 +114,11 @@ class TgUploader:
                         up_path = new_path
                     if 'is_leech_log' in user_data and user_data.get('is_leech_log'):
                         for leechchat in self.__leech_log:
-                            if ospath.getsize(up_path) > tgBotMaxFileSize: usingclient = premium_session
-                            else: usingclient = self.__app
+                            usingclient = (
+                                premium_session
+                                if ospath.getsize(up_path) > tgBotMaxFileSize
+                                else self.__app
+                            )
                             self.__sent_msg = usingclient.send_video(chat_id=int(leechchat),video=up_path,
                                                                   caption=cap_mono,
                                                                   duration=duration,
@@ -154,7 +157,8 @@ class TgUploader:
                                 app.copy_message(chat_id=self.__user_id, from_chat_id=self.__sent_msg.chat.id, message_id=self.__sent_msg.id)
                             except Exception as err:
                                 LOGGER.error(f"Failed To Send Vedio in PM:\n{err}")
-                elif is_audio:
+            elif is_audio:
+                if not self.__as_doc:
                     duration , artist, title = get_media_info(up_path)
                     if 'is_leech_log' in user_data and user_data.get('is_leech_log'):
                         for leechchat in self.__leech_log:
@@ -196,7 +200,8 @@ class TgUploader:
                             except Exception as err:
                                 LOGGER.error(f"Failed To Send Audio in PM:\n{err}")
 
-                elif file_.upper().endswith(IMAGE_SUFFIXES):
+            elif file_.upper().endswith(IMAGE_SUFFIXES):
+                if not self.__as_doc:
                     if 'is_leech_log' in user_data and user_data.get('is_leech_log'):
                         for leechchat in self.__leech_log:
                             if ospath.getsize(up_path) > tgBotMaxFileSize: usingclient = premium_session
@@ -229,8 +234,8 @@ class TgUploader:
                                 app.copy_message(chat_id=self.__user_id, from_chat_id=self.__sent_msg.chat.id, message_id=self.__sent_msg.id)
                             except Exception as err:
                                 LOGGER.error(f"Failed To Send Image in PM:\n{err}")
-                else:
-                    notMedia = True
+            elif not self.__as_doc:
+                notMedia = True
             if self.__as_doc or notMedia:
                 if is_video and thumb is None:
                     thumb = take_ss(up_path, None)
@@ -286,7 +291,7 @@ class TgUploader:
         if self.__thumb is None and thumb is not None and ospath.lexists(thumb):
             osremove(thumb)
         if not self.__is_cancelled and \
-                   (not self.__listener.seed or self.__listener.newDir or dirpath.endswith("splited_files_mltb")):
+                       (not self.__listener.seed or self.__listener.newDir or dirpath.endswith("splited_files_mltb")):
             try:
                 osremove(up_path)
             except:
@@ -303,8 +308,7 @@ class TgUploader:
 
     def __user_settings(self):
         user_id = self.__listener.message.from_user.id
-        user_dict = user_data.get(user_id, False)
-        if user_dict:
+        if user_dict := user_data.get(user_id, False):
             self.__as_doc = user_dict.get('as_doc', config_dict['AS_DOCUMENT'])
         if not ospath.lexists(self.__thumb):
             self.__thumb = None

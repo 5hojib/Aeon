@@ -170,16 +170,16 @@ def RecaptchaV3(ANCHOR_URL):
         'content-type': 'application/x-www-form-urlencoded'
     })
     matches = re_findall('([api2|enterprise]+)\/anchor\?(.*)', ANCHOR_URL)[0]
-    url_base += matches[0]+'/'
+    url_base += f'{matches[0]}/'
     params = matches[1]
-    res = client.get(url_base+'anchor', params=params)
+    res = client.get(f'{url_base}anchor', params=params)
     token = re_findall(r'"recaptcha-token" value="(.*?)"', res.text)[0]
     params = dict(pair.split('=') for pair in params.split('&'))
     post_data = post_data.format(params["v"], token, params["k"], params["co"])
-    res = client.post(url_base+'reload',
-                      params=f'k={params["k"]}', data=post_data)
-    answer = re_findall(r'"rresp","(.*?)"', res.text)[0]
-    return answer
+    res = client.post(
+        f'{url_base}reload', params=f'k={params["k"]}', data=post_data
+    )
+    return re_findall(r'"rresp","(.*?)"', res.text)[0]
 
 
 def ouo(url: str) -> str:
@@ -245,8 +245,7 @@ def zippy_share(url: str) -> str:
                         raise DirectDownloadLinkException("ERROR: Unable to get direct link")
 
 
-    dl_url = f"{base_url}/{uri1}/{int(mtk)}/{uri2}"
-    return dl_url  
+    return f"{base_url}/{uri1}/{int(mtk)}/{uri2}"  
   
 
 
@@ -303,8 +302,7 @@ def uptobox(url: str) -> str:
             dl_url = link
         except:
             file_id = re_findall(r'\bhttps?://.*uptobox\.com/(\w+)', url)[0]
-            file_link = 'https://uptobox.com/api/link?token=%s&file_code=%s' % (
-                UPTOBOX_TOKEN, file_id)
+            file_link = f'https://uptobox.com/api/link?token={UPTOBOX_TOKEN}&file_code={file_id}'
             req = rget(file_link)
             result = req.json()
             if result['message'].lower() == 'success':
@@ -480,9 +478,9 @@ def racaty(url: str) -> str:
     ids = soup.find("input", {"name": "id"})["value"]
     rpost = scraper.post(url, data={"op": op, "id": ids})
     rsoup = BeautifulSoup(rpost.text, "lxml")
-    dl_url = rsoup.find("a", {"id": "uniqueExpirylink"})[
-        "href"].replace(" ", "%20")
-    return dl_url
+    return rsoup.find("a", {"id": "uniqueExpirylink"})["href"].replace(
+        " ", "%20"
+    )
 
 
 def fichier(link: str) -> str:
@@ -523,14 +521,14 @@ def fichier(link: str) -> str:
     elif len(soup.find_all("div", {"class": "ct_warn"})) == 3:
         str_2 = soup.find_all("div", {"class": "ct_warn"})[-1]
         if "you must wait" in str(str_2).lower():
-            numbers = [int(word)
-                       for word in str(str_2).split() if word.isdigit()]
-            if not numbers:
-                raise DirectDownloadLinkException(
-                    "ERROR: 1fichier is on a limit. Please wait a few minutes/hour.")
-            else:
+            if numbers := [
+                int(word) for word in str(str_2).split() if word.isdigit()
+            ]:
                 raise DirectDownloadLinkException(
                     f"ERROR: 1fichier is on a limit. Please wait {numbers[0]} minute.")
+            else:
+                raise DirectDownloadLinkException(
+                    "ERROR: 1fichier is on a limit. Please wait a few minutes/hour.")
         elif "protect access" in str(str_2).lower():
             raise DirectDownloadLinkException(
                 f"ERROR: This link requires a password!\n\n<b>This link requires a password!</b>\n- Insert sign <b>::</b> after the link and write the password after the sign.\n\n<b>Example:</b>\n<code>/{BotCommands.MirrorCommand} https://1fichier.com/?smmtd8twfpm66awbqz04::love you</code>\n\n* No spaces between the signs <b>::</b>\n* For the password, you can use a space!")
@@ -542,14 +540,14 @@ def fichier(link: str) -> str:
         str_1 = soup.find_all("div", {"class": "ct_warn"})[-2]
         str_3 = soup.find_all("div", {"class": "ct_warn"})[-1]
         if "you must wait" in str(str_1).lower():
-            numbers = [int(word)
-                       for word in str(str_1).split() if word.isdigit()]
-            if not numbers:
-                raise DirectDownloadLinkException(
-                    "ERROR: 1fichier is on a limit. Please wait a few minutes/hour.")
-            else:
+            if numbers := [
+                int(word) for word in str(str_1).split() if word.isdigit()
+            ]:
                 raise DirectDownloadLinkException(
                     f"ERROR: 1fichier is on a limit. Please wait {numbers[0]} minute.")
+            else:
+                raise DirectDownloadLinkException(
+                    "ERROR: 1fichier is on a limit. Please wait a few minutes/hour.")
         elif "bad password" in str(str_3).lower():
             raise DirectDownloadLinkException(
                 "ERROR: The password you entered is wrong!")
@@ -646,25 +644,19 @@ def gdtot(url):
     return unified(final_url)
 
 def parse_info(res):
-    info_parsed = {}
     info_chunks = re_findall(">(.*?)<\/td>", res.text)
-    for i in range(0, len(info_chunks), 2):
-        info_parsed[info_chunks[i]] = info_chunks[i + 1]
-    return info_parsed
+    return {
+        info_chunks[i]: info_chunks[i + 1]
+        for i in range(0, len(info_chunks), 2)
+    }
 
 def udrive(url: str) -> str:
     siteName = urlparse(url).netloc.split('.', 1)[0]
-    if 'katdrive' or 'hubdrive' in url:
-        client = requests.Session()
-    else:
-        client = cloudscraper.create_scraper(delay=10, browser='chrome')
-
-    if "hubdrive" in url:
-        if "hubdrive.in" in url:
-            url = url.replace(".in", ".pro")
-    if "kolop" in url:
-        if "kolop.icu" in url:
-            url = url.replace(".icu", ".cyou")
+    client = requests.Session()
+    if "hubdrive" in url and "hubdrive.in" in url:
+        url = url.replace(".in", ".pro")
+    if "kolop" in url and "kolop.icu" in url:
+        url = url.replace(".icu", ".cyou")
 
     client.cookies.update({"crypt": cryptDict[siteName]})
 
@@ -690,24 +682,16 @@ def udrive(url: str) -> str:
 
     if 'drivefire' in url:
         decoded_id = res.rsplit('/', 1)[-1]
-        flink = f"https://drive.google.com/file/d/{decoded_id}"
-        return flink
-    elif 'drivehub' in url:
+        return f"https://drive.google.com/file/d/{decoded_id}"
+    elif 'drivehub' in url or 'drivebuzz' in url:
         gd_id = res.rsplit("=", 1)[-1]
-        flink = f"https://drive.google.com/open?id={gd_id}"
-        return flink
-    elif 'drivebuzz' in url:
-        gd_id = res.rsplit("=", 1)[-1]
-        flink = f"https://drive.google.com/open?id={gd_id}"
-        return flink
+        return f"https://drive.google.com/open?id={gd_id}"
     else:
         gd_id = re_findall('gd=(.*)', res, DOTALL)[0]
 
     info_parsed["gdrive_url"] = f"https://drive.google.com/open?id={gd_id}"
     info_parsed["src_url"] = url
-    flink = info_parsed['gdrive_url']
-
-    return flink
+    return info_parsed['gdrive_url']
 
 
 def sharer_pw_dl(url: str) -> str:
@@ -721,7 +705,7 @@ def sharer_pw_dl(url: str) -> str:
     data = {'_token': token, 'nl': 1}
     headers = {'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
                'x-requested-with': 'XMLHttpRequest'}
-    response = client.post(url+'/dl', headers=headers, data=data).json()
+    response = client.post(f'{url}/dl', headers=headers, data=data).json()
 
     if response.get("status") == 0:
         drive_link = response
@@ -731,9 +715,8 @@ def sharer_pw_dl(url: str) -> str:
         if response["message"] == "OK":
             raise DirectDownloadLinkException(
                 "Something went wrong. Could not generate GDrive URL for your Sharer Link")
-        else:
-            finalMsg = BeautifulSoup(response["message"], "lxml").text
-            raise DirectDownloadLinkException(finalMsg)
+        finalMsg = BeautifulSoup(response["message"], "lxml").text
+        raise DirectDownloadLinkException(finalMsg)
 
 
 def shareDrive(url, directLogin=True):
@@ -782,19 +765,13 @@ def shareDrive(url, directLogin=True):
         f'https://{urlparse(url).netloc}/post', headers=headers, data=data, cookies=cookies)
     toJson = resp.json()
 
+    if toJson['message'] in successMsgs:
+        return toJson['redirect']
     if directLogin == True:
-        if toJson['message'] in successMsgs:
-            driveUrl = toJson['redirect']
-            return driveUrl
-        else:
-            shareDrive(url, directLogin=False)
+        shareDrive(url, directLogin=False)
     else:
-        if toJson['message'] in successMsgs:
-            driveUrl = toJson['redirect']
-            return driveUrl
-        else:
-            raise DirectDownloadLinkException(
-                "ERROR! File Not Found or User rate exceeded !!")
+        raise DirectDownloadLinkException(
+            "ERROR! File Not Found or User rate exceeded !!")
 
 
 

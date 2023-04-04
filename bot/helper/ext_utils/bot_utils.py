@@ -130,11 +130,9 @@ def get_user_task(user_id):
 def get_bot_pm(user_id):
     if config_dict['FORCE_BOT_PM']:
         return True
-    else:
-        if not (user_id in user_data and user_data[user_id].get('ubot_pm')):
-            update_user_ldata(user_id, 'ubot_pm', config_dict['BOT_PM'])
-        botpm = user_data[user_id].get('ubot_pm')
-        return botpm
+    if user_id not in user_data or not user_data[user_id].get('ubot_pm'):
+        update_user_ldata(user_id, 'ubot_pm', config_dict['BOT_PM'])
+    return user_data[user_id].get('ubot_pm')
 
 def getGDriveUploadUtils(user_id, u_index, c_index):
     GDRIVEID = config_dict['GDRIVE_ID']
@@ -163,11 +161,9 @@ def getUserTDs(user_id, force=False):
 
 def handleIndex(index, dic):
     """Handle IndexError for any List (Runs Index Loop) +ve & -ve Supported"""
-    while True:
-        if abs(index) >= len(dic):
-            if index < 0: index = len(dic) - abs(index)
-            elif index > 0: index = index - len(dic)
-        else: break
+    while abs(index) >= len(dic):
+        if index < 0: index = len(dic) - abs(index)
+        elif index > 0: index = index - len(dic)
     return index
 
   
@@ -196,15 +192,17 @@ def progress_bar(percentage):
     return "".join(comp if i <= percentage // 10 else ncomp for i in range(1, 11))
 
 def timeformatter(milliseconds: int) -> str:
-    seconds, milliseconds = divmod(int(milliseconds), 1000)
+    seconds, milliseconds = divmod(milliseconds, 1000)
     minutes, seconds = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
     days, hours = divmod(hours, 24)
-    tmp = ((str(days) + " days, ") if days else "") + \
-        ((str(hours) + " hours, ") if hours else "") + \
-        ((str(minutes) + " min, ") if minutes else "") + \
-        ((str(seconds) + " sec, ") if seconds else "") + \
-        ((str(milliseconds) + " millisec, ") if milliseconds else "")
+    tmp = (
+        (f"{str(days)} days, " if days else "")
+        + (f"{str(hours)} hours, " if hours else "")
+        + (f"{str(minutes)} min, " if minutes else "")
+        + (f"{str(seconds)} sec, " if seconds else "")
+        + (f"{str(milliseconds)} millisec, " if milliseconds else "")
+    )
     return tmp[:-2]
 
 def get_progress_bar_string(status):
@@ -403,16 +401,15 @@ def is_gdtot_link(url: str):
 def is_udrive_link(url: str):
     if 'drivehub.ws' in url:
         return 'drivehub.ws' in url
-    else:
-        url = re_match(r'https?://(hubdrive|katdrive|kolop|drivefire)\.\S+', url)
-        return bool(url)
+    url = re_match(r'https?://(hubdrive|katdrive|kolop|drivefire)\.\S+', url)
+    return bool(url)
 
 def is_unified_link(url: str):
     url1 = re_match(r'https?://(anidrive|driveroot|driveflix|indidrive|drivehub)\.in/\S+', url)
     url = re_match(r'https?://(appdrive|driveapp|driveace|gdflix|drivelinks|drivebit|drivesharer|drivepro|driveseed|driveleech)\.\S+', url)
-    if bool(url1) == True:
+    if bool(url1):
         return bool(url1)
-    elif bool(url) == True:
+    elif bool(url):
         return bool(url)
     else:
         return False
@@ -503,7 +500,7 @@ def change_filename(file_, user_id_, dirpath=None, up_path=None, all_edit=True, 
             elif len(args) == 1:
                 __newFileName = __newFileName.replace(args[0], '')
         file_ = __newFileName + ospath.splitext(file_)[1]
-        LOGGER.info("Remname : "+file_)
+        LOGGER.info(f"Remname : {file_}")
     if PREFIX:
         PREFIX = PREFIX.replace('\s', ' ')
         if not file_.startswith(PREFIX):
@@ -516,10 +513,7 @@ def change_filename(file_, user_id_, dirpath=None, up_path=None, all_edit=True, 
         _extOutName = '.'.join(fileDict[:-1]).replace('.', ' ').replace('-', ' ')
         _newExtFileName = f"{_extOutName}{SUFFIX}.{fileDict[-1]}"
         if len(_extOutName) > (64 - (sufLen + _extIn)):
-            _newExtFileName = (
-                _extOutName[: 64 - (sufLen + _extIn)]
-                + f"{SUFFIX}.{fileDict[-1]}"
-            )
+            _newExtFileName = f"{_extOutName[:64 - (sufLen + _extIn)]}{SUFFIX}.{fileDict[-1]}"
         file_ = _newExtFileName
     elif SUFFIX:
         SUFFIX = SUFFIX.replace('\s', ' ')
@@ -530,8 +524,8 @@ def change_filename(file_, user_id_, dirpath=None, up_path=None, all_edit=True, 
         osrename(up_path, new_path)
         up_path = new_path
 
+    cfont = FSTYLE or config_dict['CAPTION_FONT']
     cap_mono = ""
-    cfont = config_dict['CAPTION_FONT'] if not FSTYLE else FSTYLE
     if CAPTION and all_edit:
         CAPTION = CAPTION.replace('\|', '%%').replace('\s', ' ')
         slit = CAPTION.split("|")
@@ -561,25 +555,20 @@ def update_user_ldata(id_, key, value):
         user_data[id_] = {key: value}
 
 def is_sudo(user_id):
-    if user_id in user_data:
-        return user_data[user_id].get('is_sudo')
-    return False
+    return user_data[user_id].get('is_sudo') if user_id in user_data else False
 
 def getdailytasks(user_id, increase_task=False, upleech=0, upmirror=0, check_mirror=False, check_leech=False):
     task, lsize, msize = 0, 0, 0
     if user_id in user_data and user_data[user_id].get('dly_tasks'):
         userdate = user_data[user_id]['dly_tasks'][0]
-        nowdate = datetime.today()
+        nowdate = datetime.now()
         if userdate.year <= nowdate.year and userdate.month <= nowdate.month and userdate.day < nowdate.day:
             if increase_task: task = 1
             elif upleech != 0: lsize += upleech #bytes
             elif upmirror != 0: msize += upmirror #bytes
-            update_user_ldata(user_id, 'dly_tasks', [datetime.today(), task, lsize, msize])
+            update_user_ldata(user_id, 'dly_tasks', [datetime.now(), task, lsize, msize])
             if DATABASE_URL:
                 DbManger().update_user_data(user_id)
-            if check_leech: return lsize
-            elif check_mirror: return msize
-            return task
         else:
             task = user_data[user_id]['dly_tasks'][1]
             lsize = user_data[user_id]['dly_tasks'][2]
@@ -588,35 +577,32 @@ def getdailytasks(user_id, increase_task=False, upleech=0, upmirror=0, check_mir
             elif upleech != 0: lsize += upleech
             elif upmirror != 0: msize += upmirror
             if increase_task or upleech or upmirror:
-                update_user_ldata(user_id, 'dly_tasks', [datetime.today(), task, lsize, msize])
+                update_user_ldata(user_id, 'dly_tasks', [datetime.now(), task, lsize, msize])
                 if DATABASE_URL:
                     DbManger().update_user_data(user_id)
-            if check_leech: return lsize
-            elif check_mirror: return msize
-            return task
     else:
         if increase_task: task += 1
         elif upleech != 0: lsize += upleech
         elif upmirror != 0: msize += upmirror
-        update_user_ldata(user_id, 'dly_tasks', [datetime.today(), task, lsize, msize])
+        update_user_ldata(user_id, 'dly_tasks', [datetime.now(), task, lsize, msize])
         if DATABASE_URL:
             DbManger().update_user_data(user_id)
-        if check_leech: return lsize
-        elif check_mirror: return msize
-        return task
+
+    if check_leech: return lsize
+    elif check_mirror: return msize
+    return task
 
 def is_paid(user_id):
-    if config_dict['PAID_SERVICE'] is True:
-        if user_id in user_data and user_data[user_id].get('is_paid'):
-            ex_date = user_data[user_id].get('expiry_date')
-            if ex_date:
-                odate = datetime.strptime(ex_date, '%d-%m-%Y')
-                ndate = datetime.today()
-                if odate.year <= ndate.year and odate.month <= ndate.month and odate.day < ndate.day:
-                    return False
-            return True
-        else: return False
-    else: return False
+    if config_dict['PAID_SERVICE'] is not True:
+        return False
+    if user_id not in user_data or not user_data[user_id].get('is_paid'):
+        return False
+    if ex_date := user_data[user_id].get('expiry_date'):
+        odate = datetime.strptime(ex_date, '%d-%m-%Y')
+        ndate = datetime.now()
+        if odate.year <= ndate.year and odate.month <= ndate.month and odate.day < ndate.day:
+            return False
+    return True
 
 ONE, TWO, THREE = range(3)
 def pop_up_stats(update, context):
@@ -666,7 +652,6 @@ Uploads: {num_upload} | SEEDING: {num_seeding}
 ZIP: {num_zip}
 UNZIP: {num_unzip}
 """
-    return stats
 dispatcher.add_handler(
-    CallbackQueryHandler(pop_up_stats, pattern="^" + str(THREE) + "$")
+    CallbackQueryHandler(pop_up_stats, pattern=f"^{str(THREE)}$")
 )

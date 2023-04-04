@@ -109,10 +109,7 @@ class DbManger:
     def update_userval(self, user_id, data, value=None):
         if self.__err:
             return
-        if value is not None:
-            dbval = value
-        else:
-            dbval = False
+        dbval = value if value is not None else False
         self.__db.users.update_one({'_id': user_id}, {'$set': {data: dbval}}, upsert=True)
         self.__conn.close()
 

@@ -138,7 +138,7 @@ Type /{BotCommands.HelpCommand} to get a list of available commands
         else:
             sendMessage(start_string, context.bot, update.message, reply_markup)
     else:
-        text = f"Not Authorized user, deploy your own mirror bot"
+        text = "Not Authorized user, deploy your own mirror bot"
         if config_dict['PICS']:
             sendPhoto(text, context.bot, update.message, rchoice(config_dict['PICS']), reply_markup)
         else:
@@ -371,7 +371,7 @@ def main():
             if config_dict['PIXABAY_SEARCH']: PIXABAY_ENDPOINT += f"&q={q(config_dict['PIXABAY_SEARCH'])}"
             resp = rget(PIXABAY_ENDPOINT)
             jdata = resp.json()
-            for x in range(0, 200):
+            for x in range(200):
                 largeImageURL = jdata['hits'][x]['largeImageURL']
                 config_dict['PICS'].append(largeImageURL)
         except Exception as err:
@@ -440,7 +440,7 @@ def main():
             LOGGER.info(e)
         osremove(".restartmsg")
 
-     
+
 
     start_handler = CommandHandler(BotCommands.StartCommand, start)
     log_handler = CommandHandler(BotCommands.LogCommand, log,
