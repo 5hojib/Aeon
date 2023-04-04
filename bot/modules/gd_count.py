@@ -17,9 +17,9 @@ async def countNode(client, message):
     args = message.text.split()
     link = ''
     if not message.from_user:
-            message.from_user = await anno_checker(message)
-        if not message.from_user:
-            return
+        message.from_user = await anno_checker(message)
+    if not message.from_user:
+        return
     if len(args) > 1:
         link = args[1]
         if username := message.from_user.username:
