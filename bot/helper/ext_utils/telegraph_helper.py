@@ -70,7 +70,7 @@ class TelegraphHelper:
                     nxt_page += 1
             await self.edit_page(
                 path = path[prev_page],
-                title = 'Jmdkh-mltb Torrent Search',
+                title = 'Torrent Search',
                 content=content
             )
         return
@@ -83,5 +83,5 @@ class TelegraphHelper:
             LOGGER.error(f'Failed Revoking telegraph access token due to : {e}')
 
 
-telegraph = TelegraphHelper('Jmdkh-mltb', 'https://github.com/junedkh/jmdkh-mltb')
+telegraph = TelegraphHelper('Luna-Portal', 'https://github.com/5hojib/Luna-Portal')
 bot_loop.run_until_complete(telegraph.create_account())
