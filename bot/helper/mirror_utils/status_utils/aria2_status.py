@@ -12,7 +12,7 @@ def get_download(gid):
     except Exception as e:
         LOGGER.error(f'{e}: Aria2c, Error while getting torrent info')
 
-engine_ = f"Aria2c"
+engine_ = "Aria2c"
 
 class Aria2Status:
 
