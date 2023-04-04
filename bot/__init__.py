@@ -212,25 +212,7 @@ if len(LEECH_FILENAME_PREFIX) == 0:
 
 SEARCH_PLUGINS = environ.get('SEARCH_PLUGINS', '')
 if len(SEARCH_PLUGINS) == 0:
-    SEARCH_PLUGINS = '["https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/rarbg.py",
-                       "https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/piratebay.py",
-                       "https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/legittorrents.py",
-                       "https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/limetorrents.py",
-                       "https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/torrentscsv.py",
-                       "https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/torlock.py",
-                       "https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/eztv.py",
-                       "https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/torrentproject.py",
-                       "https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/solidtorrents.py",
-                       "https://raw.githubusercontent.com/MaurizioRicci/qBittorrent_search_engines/master/kickass_torrent.py",
-                       "https://raw.githubusercontent.com/MaurizioRicci/qBittorrent_search_engines/master/yts_am.py",
-                       "https://raw.githubusercontent.com/MadeOfMagicAndWires/qBit-plugins/master/engines/linuxtracker.py",
-                       "https://raw.githubusercontent.com/MadeOfMagicAndWires/qBit-plugins/master/engines/nyaasi.py",
-                       "https://raw.githubusercontent.com/LightDestory/qBittorrent-Search-Plugins/master/src/engines/ettv.py",
-                       "https://raw.githubusercontent.com/LightDestory/qBittorrent-Search-Plugins/master/src/engines/glotorrents.py",
-                       "https://raw.githubusercontent.com/LightDestory/qBittorrent-Search-Plugins/master/src/engines/thepiratebay.py",
-                       "https://raw.githubusercontent.com/nindogo/qbtSearchScripts/master/magnetdl.py",
-                       "https://raw.githubusercontent.com/msagca/qbittorrent_plugins/main/uniondht.py",
-                       "https://raw.githubusercontent.com/khensolomon/leyts/master/yts.py"]'
+    SEARCH_PLUGINS = ''
 
 MAX_SPLIT_SIZE = 4194304000 if IS_PREMIUM_USER else 2097152000
 
