@@ -24,51 +24,40 @@ Instructions for Heroku
 <summary>Bot commands</summary>
 
 ```
-mirror - Mirror
-zipmirror - Mirror and upload as zip
-unzipmirror - Mirror and extract files
-qbmirror - Mirror torrent using qBittorrent
-qbzipmirror - Mirror torrent and upload as zip using qb
-qbunzipmirror - Mirror torrent and extract files using qb
-leech - Leech
-zipleech - Leech and upload as zip
-unzipleech - Leech and extract files
-qbleech - Leech torrent using qBittorrent
-qbzipleech - Leech torrent and upload as zip using qb
-qbunzipleech - Leech torrent and extract using qb
+mirror - or /m Mirror
+zipmirror - or /zm Mirror and upload as zip
+unzipmirror - or /uzm Mirror and extract files
+qbmirror - or /qm Mirror torrent using qBittorrent
+qbzipmirror - or /qzm Mirror torrent using qb and upload as zip
+qbunzipmirror - or /quzm Mirror torrent using qb and extract files
+leech - or /l Leech
+zipleech - or /zl Leech and upload as zip
+unzipleech - or /uzl Leech and extract files
+qbleech - or /ql Leech torrent using qBittorrent
+qbzipleech - or /qzl Leech torrent using qb and upload as zip
+qbunzipleech - or /quzl Leech torrent using qb and extract
 clone - Copy file/folder to Drive
-count - Count file/folder of Drive
-ytdl - Mirror yt-dlp supported link
-ytdlzip - Mirror yt-dlp supported link as zip
-ytdlleech - Leech through yt-dlp supported link
-ytdlzipleech - Leech yt-dlp support link as zip
-usetting - Users settings
-bsetting - Bot Settings
+count - Count file/folder from Drive
+ytdl - or /y Mirror yt-dlp supported link
+ytdlzip - or /yz Mirror yt-dlp supported link as zip
+ytdlleech - or /yl Leech through yt-dlp supported link
+ytdlzipleech - or /yzl Leech yt-dlp support link as zip
+usetting - User settings
+bsetting - Bot settings
 status - Get Mirror Status message
-rsslist - List all subscribed rss feed info
-rssget - Get specific No. of links from specific rss feed
-rsssub - Subscribe new rss feed
-rssunsub - Unsubscribe rss feed by title
-rssset - Rss Settings
+btsel - Select files from torrent
+rss - Rss menu
 list - Search files in Drive
 search - Search for torrents with API
 cancel - Cancel a task
 cancelall - Cancel all tasks
 del - Delete file/folder from Drive
 log - Get the Bot Log
-imdb - search Movie/Tv show
-anime - search Anime
-speedtest - Get server speedtest
-mediainfo - Get information of media files
-hash - Get Hash of telegram files
-wayback - Internet archive 
 shell - Run commands in Shell
 restart - Restart the Bot
 stats - Bot Usage Stats
-usage - Heroku app usage
 ping - Ping the Bot
 help - All cmds with description
-sleep - Sleep the bot
 ```
 </details>
 
@@ -79,16 +68,15 @@ sleep - Sleep the bot
 
 
 ### Modified from
-* [MLTB](https://github.com/anasty17/mirror-leech-telegram-bot)
-* [WZML](https://github.com/weebzone/WZML) 
 * [JMDKH](https://github.com/junedkh/jmdkh-mltb)
-* [SN-MLTB](https://github.com/SN-ABDULLAH-AL-NOMAN/SN-MLTB)
+* [MLTB](https://github.com/anasty17/mirror-leech-telegram-bot)
+* [WZML](https://github.com/weebzone/WZML)
+
 
 ### Thanks To
-* [Anas](https://github.com/anasty17) 
-* [Juned KH](https://github.com/junedkh) 
-* [Karan Adhikary](https://github.com/weebzone) 
-* [Al-Noman](https://github.com/SN-ABDULLAH-AL-NOMAN) 
+* [Juned KH](https://github.com/junedkh)
+* [Anas](https://github.com/anasty17)
+* [Karan Adhikary](https://github.com/weebzone)
 * ChatGPT
 
 You can't donate me!

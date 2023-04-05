@@ -566,7 +566,7 @@ class GoogleDriveHelper:
                         else:
                             url_path = rquote(f'{file.get("name")}', safe='')
                         url = short_url(f'{index_url}/{url_path}/')
-                        msg += f' 📁 <b>| <a href={url}>Index Link</a></b>'
+                        msg += f' <b>| <a href={url}>Index Link</a></b>'
                 elif mime_type == 'application/vnd.google-apps.shortcut':
                     if not config_dict['DISABLE_DRIVE_LINK']:
                         furl = short_url(f"https://drive.google.com/drive/folders/{file.get('id')}")

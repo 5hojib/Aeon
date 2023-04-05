@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-from asyncio import (create_subprocess_exec, create_subprocess_shell,
-                     run_coroutine_threadsafe, sleep)
+from asyncio import (create_subprocess_exec, create_subprocess_shell, run_coroutine_threadsafe, sleep)
 from asyncio.subprocess import PIPE
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial, wraps
@@ -14,8 +13,7 @@ from psutil import cpu_percent, disk_usage, virtual_memory
 from pyrogram.types import BotCommand
 from requests import head as rhead
 
-from bot import (DOWNLOAD_DIR, bot_loop, botStartTime, config_dict,
-                 download_dict, download_dict_lock, extra_buttons, user_data)
+from bot import (DOWNLOAD_DIR, bot_loop, botStartTime, config_dict, download_dict, download_dict_lock, extra_buttons, user_data)
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 
@@ -200,7 +198,7 @@ async def check_user_tasks(user_id, maxtask):
         return len(tasks) >= maxtask
 
 def get_readable_time(seconds):
-    periods = [(' Days ', 86400), (' Hours', 3600), (' Min ', 60), (' Sec', 1)]
+    periods = [(' Days ', 86400), (' Hours ', 3600), (' Min ', 60), (' Sec', 1)]
     result = ''
     for period_name, period_seconds in periods:
         if seconds >= period_seconds:

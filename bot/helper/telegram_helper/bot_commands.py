@@ -3,7 +3,7 @@ from bot import CMD_SUFFIX
 
 class _BotCommands:
     def __init__(self):
-        self.StartCommand = f'start{CMD_SUFFIX}'
+        self.StartCommand = 'start'
         self.MirrorCommand = [f'mirror{CMD_SUFFIX}', f'm{CMD_SUFFIX}']
         self.UnzipMirrorCommand = [f'unzipmirror{CMD_SUFFIX}', f'uzm{CMD_SUFFIX}']
         self.ZipMirrorCommand = [f'zipmirror{CMD_SUFFIX}', f'zm{CMD_SUFFIX}']
@@ -27,7 +27,7 @@ class _BotCommands:
         self.CancelAllCommand = [f'cancelall{CMD_SUFFIX}', 'cancelallbot']
         self.ListCommand = f'list{CMD_SUFFIX}'
         self.SearchCommand = f'search{CMD_SUFFIX}'
-        self.StatusCommand = [f'status{CMD_SUFFIX}', f's{CMD_SUFFIX}', 'sall']
+        self.StatusCommand = [f'status{CMD_SUFFIX}', f's{CMD_SUFFIX}', 'statusall']
         self.UsersCommand = f'users{CMD_SUFFIX}'
         self.AuthorizeCommand = f'authorize{CMD_SUFFIX}'
         self.UnAuthorizeCommand = f'unauthorize{CMD_SUFFIX}'
@@ -35,7 +35,7 @@ class _BotCommands:
         self.RmSudoCommand = f'rmsudo{CMD_SUFFIX}'
         self.PingCommand = ['ping','p']
         self.RestartCommand = [f'restart{CMD_SUFFIX}', 'restartall']
-        self.StatsCommand = f'stats{CMD_SUFFIX}'
+        self.StatsCommand = [f'stats{CMD_SUFFIX}', 'statsall']
         self.HelpCommand = f'help{CMD_SUFFIX}'
         self.LogCommand = f'log{CMD_SUFFIX}'
         self.ShellCommand = f'shell{CMD_SUFFIX}'
