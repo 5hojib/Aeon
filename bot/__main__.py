@@ -35,7 +35,7 @@ from .modules import (anonymous, authorize, bot_settings, cancel_mirror,
 
 start_aria2_listener()
 
-version = "1.0.1 Initial"
+version = "1.0.2"
 async def stats(client, message):
     total, used, free, disk = disk_usage('/')
     swap = swap_memory()

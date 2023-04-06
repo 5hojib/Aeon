@@ -622,7 +622,7 @@ async def edit_variable(client, message, pre_message, key):
     elif key == 'REQUEST_LIMITS':
         value = max(int(value), 5)
     elif key == 'FONT':
-        value = value.lower() if value.lower() in ['b'] else 'code'
+        value = value.lower() if value.lower() in ['b', 'code', 'u'] else 'code'
     elif key == 'LEECH_SPLIT_SIZE':
         value = min(int(value), MAX_SPLIT_SIZE)
     elif key == 'BASE_URL_PORT':
