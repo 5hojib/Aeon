@@ -78,7 +78,7 @@ bot_id = BOT_TOKEN.split(':', 1)[0]
 
 FONT = environ.get('FONT', '')
 if len(FONT) == 0:
-    FONT = 'code'
+    FONT = ''
 
 DATABASE_URL = environ.get('DATABASE_URL', '')
 if len(DATABASE_URL) == 0:

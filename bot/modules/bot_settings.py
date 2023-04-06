@@ -69,7 +69,7 @@ async def load_config():
 
     FONT = environ.get('FONT', '')
     if len(FONT) == 0:
-        FONT = 'code'
+        FONT = ''
     
     DOWNLOAD_DIR = environ.get('DOWNLOAD_DIR', '')
     if len(DOWNLOAD_DIR) == 0:
@@ -621,6 +621,8 @@ async def edit_variable(client, message, pre_message, key):
         value = value.lower() if value.lower() in ['leech', 'mirror', 'all'] else ''
     elif key == 'REQUEST_LIMITS':
         value = max(int(value), 5)
+    elif key == 'FONT':
+        value = value.lower() if value.lower() in ['b'] else 'code'
     elif key == 'LEECH_SPLIT_SIZE':
         value = min(int(value), MAX_SPLIT_SIZE)
     elif key == 'BASE_URL_PORT':
