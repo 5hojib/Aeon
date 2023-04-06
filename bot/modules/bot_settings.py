@@ -67,6 +67,10 @@ async def load_config():
     if len(DATABASE_URL) == 0:
         DATABASE_URL = ''
 
+    FONT = environ.get('FONT', '')
+    if len(FONT) == 0:
+        FONT = 'code'
+    
     DOWNLOAD_DIR = environ.get('DOWNLOAD_DIR', '')
     if len(DOWNLOAD_DIR) == 0:
         DOWNLOAD_DIR = '/usr/src/app/downloads/'
@@ -428,6 +432,7 @@ async def load_config():
     "DUMP_CHAT": DUMP_CHAT,
     "EQUAL_SPLITS": EQUAL_SPLITS,
     "EXTENSION_FILTER": EXTENSION_FILTER,
+    "FONT": FONT,
     "GDRIVE_ID": GDRIVE_ID,
     "INCOMPLETE_TASK_NOTIFIER": INCOMPLETE_TASK_NOTIFIER,
     "INDEX_URL": INDEX_URL,

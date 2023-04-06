@@ -28,7 +28,7 @@ from bot.helper.telegram_helper.button_build import ButtonMaker
 
 LOGGER = getLogger(__name__)
 getLogger("pyrogram").setLevel(ERROR)
-
+FONT = config_dict['FONT']
 
 class TgUploader:
 
@@ -113,7 +113,7 @@ class TgUploader:
 
     async def __prepare_file(self, file_, dirpath):
         if self.__lprefix:
-            cap_mono = f"{self.__lprefix} <b></i>{file_}</i></b>"
+            cap_mono = f"{self.__lprefix} <{FONT}></i>{file_}</i></{FONT}>"
             self.__lprefix = re_sub('<.*?>', '', self.__lprefix)
             if self.__listener.seed and not self.__listener.newDir and not dirpath.endswith("splited_files_mltb"):
                 dirpath = f'{dirpath}/copied_mltb'
@@ -125,7 +125,7 @@ class TgUploader:
                 await aiorename(self.__up_path, new_path)
                 self.__up_path = new_path
         else:
-            cap_mono = f"<b><i>{file_}</i></b>"
+            cap_mono = f"<{FONT}><i>{file_}</i></{FONT}>"
         if len(file_) > 60:
             if is_archive(file_):
                 name = get_base_name(file_)
