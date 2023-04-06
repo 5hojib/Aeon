@@ -68,9 +68,8 @@ async def load_config():
         DATABASE_URL = ''
 
     FONT = environ.get('FONT', '')
-    if len(FONT) == 0:
-        FONT = ''
-    
+    FONT = FONT.lower() if FONT.lower() in ['b', 'code', 'u'] else ''
+
     DOWNLOAD_DIR = environ.get('DOWNLOAD_DIR', '')
     if len(DOWNLOAD_DIR) == 0:
         DOWNLOAD_DIR = '/usr/src/app/downloads/'
@@ -622,7 +621,7 @@ async def edit_variable(client, message, pre_message, key):
     elif key == 'REQUEST_LIMITS':
         value = max(int(value), 5)
     elif key == 'FONT':
-        value = value.lower() if value.lower() in ['b', 'code', 'u'] else 'code'
+        value = value.lower() if value.lower() in ['b', 'code', 'u'] else ''
     elif key == 'LEECH_SPLIT_SIZE':
         value = min(int(value), MAX_SPLIT_SIZE)
     elif key == 'BASE_URL_PORT':
