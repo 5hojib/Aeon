@@ -41,7 +41,7 @@ default_values = {'AUTO_DELETE_MESSAGE_DURATION': 30,
                   'LEECH_SPLIT_SIZE': MAX_SPLIT_SIZE,
                   'RSS_DELAY': 900,
                   'STATUS_UPDATE_INTERVAL': 10,
-                  'SEARCH_LIMIT': 0}
+                  'SEARCH_LIMIT': 0, 'FONT': 'code'}
 
 
 async def load_config():
@@ -68,7 +68,10 @@ async def load_config():
         DATABASE_URL = ''
 
     FONT = environ.get('FONT', '')
-    FONT = FONT.lower() if FONT.lower() in ['b', 'code', 'u'] else ''
+    if len(FONT) == 0:
+        FONT = 'code'
+    else:
+        FONT = FONT
 
     DOWNLOAD_DIR = environ.get('DOWNLOAD_DIR', '')
     if len(DOWNLOAD_DIR) == 0:
@@ -620,8 +623,6 @@ async def edit_variable(client, message, pre_message, key):
         value = value.lower() if value.lower() in ['leech', 'mirror', 'all'] else ''
     elif key == 'REQUEST_LIMITS':
         value = max(int(value), 5)
-    elif key == 'FONT':
-        value = value.lower() if value.lower() in ['b', 'code', 'u'] else ''
     elif key == 'LEECH_SPLIT_SIZE':
         value = min(int(value), MAX_SPLIT_SIZE)
     elif key == 'BASE_URL_PORT':
