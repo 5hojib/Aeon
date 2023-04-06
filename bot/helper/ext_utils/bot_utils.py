@@ -92,12 +92,18 @@ def bt_selection_buttons(id_, isCanCncl=True):
     buttons.ibutton("Done Selecting", f"btsel done {gid} {id_}")
     return buttons.build_menu(2)
 
+PROGRESS_MAX_SIZE = 100 // 8
+PROGRESS_INCOMPLETE = ['◔', '◔', '◑', '◑', '◑', '◕', '◕']
+
 def get_progress_bar_string(pct):
     pct = float(pct.strip('%'))
     p = min(max(pct, 0), 100)
-    cFull = int(p // 6)
+    cFull = int(p // 8)
+    cIncomplete = int(p % 8)
     p_str = '●' * cFull
-    p_str += '○' * (16 - cFull)
+    if cIncomplete > 0:
+        p_str += PROGRESS_INCOMPLETE[cIncomplete-1]
+    p_str += '○' * (PROGRESS_MAX_SIZE - cFull - 1)
     return f"{p_str}"
 
 def get_readable_message():
@@ -113,7 +119,7 @@ def get_readable_message():
         msg += f"<b><i>{escape(f'{download.name()}')}</i></b>\n\n"
         msg += f"<b>┌ {download.status()} with {download.engine}</b>"
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
-            msg += f"\n<b>├ {get_progress_bar_string(download.progress())}</b> {download.progress()}"
+            msg += f"\n<b>├ <a href='https://github.com/5hojib/hk-upstream'>{get_progress_bar_string(download.progress())}</a></b> {download.progress()}"
             msg += f"\n<b>├ Processed</b>: {download.processed_bytes()} of {download.size()}"
             msg += f"\n<b>├ Speed</b>: {download.speed()}"
             msg += f"\n<b>├ Estimated</b>: {download.eta()}"
