@@ -36,7 +36,7 @@ async def stats(client, message):
     osUptime = get_readable_time(time() - boot_time())
     cpuUsage = cpu_percent(interval=0.5)
     if await aiopath.exists('.git'):
-        changelog = await cmd_exec("git log --pretty=format:%s -1")
+        changelog = await cmd_exec("git log -1 --pretty=format:'%s'")
         changelog = changelog[0]
         last_commit = await cmd_exec("git log -1 --date=short --pretty=format:'%cd <b>From</b> %cr'", True)
         last_commit = last_commit[0]
@@ -53,7 +53,7 @@ async def stats(client, message):
             f'<b>• Updated:</b> {commit_date}\n'\
             f'<b>• Commited On: </b>{commit_time}\n'\
             f'<b>• From: </b>{commit_from}\n'\
-            f'<b>• Changes: </b>\n'\
+            f'<b>• Changes: </b>{changelog}\n'\
             f'\n'\
             f'<b><u>BOT INFO</u></b>\n\n'\
             f'<b>• Uptime:</b> {currentTime}\n'\
