@@ -95,11 +95,11 @@ def bt_selection_buttons(id_, isCanCncl=True):
 def get_progress_bar_string(pct):
     pct = float(pct.strip('%'))
     p = min(max(pct, 0), 100)
-    s = '○◔◔◑◑◕◕●'
     cFull = int(p / 6.25)
     cIncomplete = int(round((p / 6.25 - cFull) * 7))
     p_str = '●' * cFull
     if cIncomplete > 0:
+        s = '○◔◔◑◑◕◕●'
         incomplete_char = s[cIncomplete - 1]
         p_str += incomplete_char
     p_str += '○' * (16 - len(p_str))

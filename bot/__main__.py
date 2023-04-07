@@ -8,30 +8,20 @@ from time import time
 from aiofiles import open as aiopen
 from aiofiles.os import path as aiopath
 from aiofiles.os import remove as aioremove
-from psutil import (boot_time, cpu_count, cpu_percent, disk_usage,
-                    net_io_counters, swap_memory, virtual_memory)
+from psutil import boot_time, cpu_count, cpu_percent, disk_usage, net_io_counters, swap_memory, virtual_memory
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 
-from bot import (DATABASE_URL, INCOMPLETE_TASK_NOTIFIER, LOGGER,
-                 STOP_DUPLICATE_TASKS, Interval, QbInterval, bot, botStartTime,
-                 config_dict, scheduler)
-from bot.helper.listeners.aria2_listener import start_aria2_listener
+from bot import DATABASE_URL, INCOMPLETE_TASK_NOTIFIER, LOGGER, STOP_DUPLICATE_TASKS, Interval, QbInterval, bot, botStartTime, config_dict, scheduler
 
-from .helper.ext_utils.bot_utils import (cmd_exec, get_readable_file_size,
-                                         get_readable_time, set_commands,
-                                         sync_to_async)
+from bot.helper.listeners.aria2_listener import start_aria2_listener
+from .helper.ext_utils.bot_utils import cmd_exec, get_readable_file_size, get_readable_time, set_commands, sync_to_async
 from .helper.ext_utils.db_handler import DbManger
 from .helper.ext_utils.fs_utils import clean_all, exit_clean_up, start_cleanup
 from .helper.telegram_helper.bot_commands import BotCommands
 from .helper.telegram_helper.filters import CustomFilters
-from .helper.telegram_helper.message_utils import (editMessage, sendFile,
-                                                   sendMessage)
-from .modules import (anonymous, authorize, bot_settings, cancel_mirror,
-                      category_select, eval, gd_count, gd_delete, gd_list,
-                      leech_del, mirror_leech, rmdb, rss, save_message, shell,
-                      status, torrent_search, torrent_select, users_settings,
-                      ytdlp)
+from .helper.telegram_helper.message_utils import editMessage, sendFile, sendMessage
+from .modules import anonymous, authorize, bot_settings, cancel_mirror, category_select, eval, gd_count, gd_delete, gd_list, leech_del, mirror_leech, rmdb, rss, save_message, shell, status, torrent_search, torrent_select, users_settings, ytdlp
 
 start_aria2_listener()
 
@@ -46,6 +36,8 @@ async def stats(client, message):
     osUptime = get_readable_time(time() - boot_time())
     cpuUsage = cpu_percent(interval=0.5)
     if await aiopath.exists('.git'):
+        changelog = await cmd_exec("git log -1 --pretty=format:%s")
+        changelog = changelog[0]
         last_commit = await cmd_exec("git log -1 --date=short --pretty=format:'%cd <b>From</b> %cr'", True)
         last_commit = last_commit[0]
         commit_from = await cmd_exec("git log -1 --date=short --pretty=format:'%cr'", True)
@@ -61,6 +53,7 @@ async def stats(client, message):
             f'<b>• Updated:</b> {commit_date}\n'\
             f'<b>• Commited On: </b>{commit_time}\n'\
             f'<b>• From: </b>{commit_from}\n'\
+            f'<b>• Changes: </b>{changelog}\n'\
             f'\n'\
             f'<b><u>BOT INFO</u></b>\n\n'\
             f'<b>• Uptime:</b> {currentTime}\n'\

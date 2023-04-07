@@ -13,23 +13,15 @@ from dotenv import load_dotenv
 from pyrogram.filters import command, create, regex
 from pyrogram.handlers import CallbackQueryHandler, MessageHandler
 
-from bot import (DATABASE_URL, GLOBAL_EXTENSION_FILTER, IS_PREMIUM_USER,
-                 LOGGER, MAX_SPLIT_SIZE, SHORTENER_APIS, SHORTENERES, Interval,
-                 aria2, aria2_options, aria2c_global, bot, categories,
-                 config_dict, download_dict, extra_buttons, get_client,
-                 list_drives, qbit_options, status_reply_dict_lock, user_data)
-from bot.helper.ext_utils.bot_utils import (get_readable_file_size, new_thread,
-                                            set_commands, setInterval,
-                                            sync_to_async)
+from bot import DATABASE_URL, GLOBAL_EXTENSION_FILTER, IS_PREMIUM_USER, LOGGER, MAX_SPLIT_SIZE, SHORTENER_APIS, SHORTENERES, Interval, aria2, aria2_options, aria2c_global, bot, categories, config_dict, download_dict, extra_buttons, get_client, list_drives, qbit_options, status_reply_dict_lock, user_data
+from bot.helper.ext_utils.bot_utils import get_readable_file_size, new_thread, set_commands, setInterval, sync_to_async
 from bot.helper.ext_utils.db_handler import DbManger
 from bot.helper.ext_utils.queued_starter import start_from_queued
 from bot.helper.mirror_utils.rclone_utils.serve import rclone_serve_booter
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import (editMessage, sendFile,
-                                                      sendMessage,
-                                                      update_all_messages)
+from bot.helper.telegram_helper.message_utils import editMessage, sendFile, sendMessage, update_all_messages
 from bot.modules.rss import addJob
 from bot.modules.torrent_search import initiate_search_tools
 
@@ -69,7 +61,7 @@ async def load_config():
 
     FONT = environ.get('FONT', '')
     if len(FONT) == 0:
-        FONT = 'code'
+        FONT = config_dict['FONT']
     else:
         FONT = FONT
 

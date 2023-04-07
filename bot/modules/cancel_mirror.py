@@ -5,13 +5,11 @@ from pyrogram.filters import command, regex
 from pyrogram.handlers import CallbackQueryHandler, MessageHandler
 
 from bot import bot, bot_loop, download_dict, download_dict_lock
-from bot.helper.ext_utils.bot_utils import (MirrorStatus, getAllDownload,
-                                            getDownloadByGid, new_task)
+from bot.helper.ext_utils.bot_utils import MirrorStatus, getAllDownload, getDownloadByGid, new_task
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import (anno_checker,
-                                                      editMessage, sendMessage)
+from bot.helper.telegram_helper.message_utils import anno_checker, editMessage, sendMessage
 
 
 async def cancel_mirror(client, message):
@@ -25,7 +23,7 @@ async def cancel_mirror(client, message):
         gid = msg[1]
         dl = await getDownloadByGid(gid)
         if not dl:
-            await sendMessage(message, f"GID: <code>{gid}</code> Not Found.")
+            await sendMessage(message, f"GID: <i>{gid}</i> Not Found.")
             return
     elif reply_to_id := message.reply_to_message_id:
         async with download_dict_lock:
@@ -54,9 +52,9 @@ async def cancel_all(status, info, listOfTasks):
     tag = info[3]
     success = 0
     failed = 0
-    _msg = f"<b>User id</b>: {user_id}\n" if user_id else "<b>Everyone</b>\n"
-    _msg += f"<b>Status</b>: {status}\n"
-    _msg += f"<b>Total</b>: {len(listOfTasks)}\n"
+    _msg = f"<b>• User id</b>: {user_id}\n" if user_id else "<b>• Everyone</b>\n"
+    _msg += f"<b>• Status</b>: {status}\n"
+    _msg += f"<b>• Total</b>: {len(listOfTasks)}\n"
     for dl in listOfTasks:
         try:
             obj = dl.download()
@@ -65,9 +63,9 @@ async def cancel_all(status, info, listOfTasks):
             await sleep(1)
         except:
             failed += 1
-        new_msg = f"<b>Success</b>: {success}\n"
-        new_msg += f"<b>Failed</b>: {failed}\n"
-        new_msg += f"<b>#cancel_all</b> : {tag}"
+        new_msg = f"<b>• Success</b>: {success}\n"
+        new_msg += f"<b>• Failed</b>: {failed}\n"
+        new_msg += f"<b>• Cancelled by</b>: {tag}"
         await editMessage(msg, _msg+new_msg)
 
 @new_task

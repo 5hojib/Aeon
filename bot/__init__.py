@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from collections import OrderedDict
-
 from uvloop import install
 
 install()
@@ -135,6 +134,9 @@ if len(TELEGRAM_HASH) == 0:
 GDRIVE_ID = environ.get('GDRIVE_ID', '')
 if len(GDRIVE_ID) == 0:
     GDRIVE_ID = ''
+
+ENABLE_RATE_LIMIT = environ.get('ENABLE_RATE_LIMIT', '')
+    ENABLE_RATE_LIMIT = ENABLE_RATE_LIMIT.lower() == 'true'
 
 RCLONE_PATH = environ.get('RCLONE_PATH', '')
 if len(RCLONE_PATH) == 0:
@@ -394,6 +396,7 @@ config_dict = {
     "DOWNLOAD_DIR": DOWNLOAD_DIR,
     "DUMP_CHAT": DUMP_CHAT,
     "EQUAL_SPLITS": EQUAL_SPLITS,
+    "ENABLE_RATE_LIMIT": ENABLE_RATE_LIMIT,
     "EXTENSION_FILTER": EXTENSION_FILTER,
     "FONT": FONT,
     "GDRIVE_ID": GDRIVE_ID,
