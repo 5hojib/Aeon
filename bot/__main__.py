@@ -36,8 +36,7 @@ async def stats(client, message):
     osUptime = get_readable_time(time() - boot_time())
     cpuUsage = cpu_percent(interval=0.5)
     if await aiopath.exists('.git'):
-        changelog = await cmd_exec("git log -1 --pretty=format:'%s'")
-        changelog = changelog[0]
+        changelog = 'Nothing'
         last_commit = await cmd_exec("git log -1 --date=short --pretty=format:'%cd <b>From</b> %cr'", True)
         last_commit = last_commit[0]
         commit_from = await cmd_exec("git log -1 --date=short --pretty=format:'%cr'", True)
