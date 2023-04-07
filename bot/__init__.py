@@ -135,9 +135,6 @@ GDRIVE_ID = environ.get('GDRIVE_ID', '')
 if len(GDRIVE_ID) == 0:
     GDRIVE_ID = ''
 
-ENABLE_RATE_LIMIT = environ.get('ENABLE_RATE_LIMIT', '')
-    ENABLE_RATE_LIMIT = ENABLE_RATE_LIMIT.lower() == 'true'
-
 RCLONE_PATH = environ.get('RCLONE_PATH', '')
 if len(RCLONE_PATH) == 0:
     RCLONE_PATH = ''
@@ -396,7 +393,6 @@ config_dict = {
     "DOWNLOAD_DIR": DOWNLOAD_DIR,
     "DUMP_CHAT": DUMP_CHAT,
     "EQUAL_SPLITS": EQUAL_SPLITS,
-    "ENABLE_RATE_LIMIT": ENABLE_RATE_LIMIT,
     "EXTENSION_FILTER": EXTENSION_FILTER,
     "FONT": FONT,
     "GDRIVE_ID": GDRIVE_ID,
