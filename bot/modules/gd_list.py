@@ -21,9 +21,11 @@ async def list_buttons(user_id, isRecursive=True):
     buttons.ibutton("Folders", f"list_types {user_id} folders {isRecursive}")
     buttons.ibutton("Files", f"list_types {user_id} files {isRecursive}")
     buttons.ibutton("Both", f"list_types {user_id} both {isRecursive}")
-    buttons.ibutton(f"Recursive: {isRecursive}", f"list_types {user_id} rec {isRecursive}")
+    buttons.ibutton(f"Recursive: {isRecursive}",
+                    f"list_types {user_id} rec {isRecursive}")
     buttons.ibutton("Cancel", f"list_types {user_id} cancel")
     return buttons.build_menu(2)
+
 
 async def _list_drive(key, message, item_type, isRecursive):
     LOGGER.info(f"listing: {key}")
@@ -37,6 +39,7 @@ async def _list_drive(key, message, item_type, isRecursive):
     else:
         msg = f'No result found for <i>{key}</i>\n\n<b>Type</b>: {item_type} | <b>Recursive list</b>: {isRecursive}\n<b>Elapsed</b>: {Elapsed}'
         await editMessage(message, msg)
+
 
 @new_task
 async def select_type(client, query):
@@ -60,6 +63,7 @@ async def select_type(client, query):
     await editMessage(message, f"<b>Searching for <i>{key}</i></b>")
     await _list_drive(key, message, item_type, isRecursive)
 
+
 async def drive_list(client, message):
     if len(message.text.split()) == 1:
         return await sendMessage(message, 'Send a search key along with command')
@@ -73,5 +77,7 @@ async def drive_list(client, message):
     buttons = await list_buttons(user_id)
     await sendMessage(message, 'Choose list options:', buttons)
 
-bot.add_handler(MessageHandler(drive_list, filters=command(BotCommands.ListCommand) & CustomFilters.authorized))
-bot.add_handler(CallbackQueryHandler(select_type, filters=regex("^list_types")))
+bot.add_handler(MessageHandler(drive_list, filters=command(
+    BotCommands.ListCommand) & CustomFilters.authorized))
+bot.add_handler(CallbackQueryHandler(
+    select_type, filters=regex("^list_types")))

@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
-from asyncio import (create_subprocess_exec, create_subprocess_shell, run_coroutine_threadsafe, sleep)
-from asyncio.subprocess import PIPE
-from concurrent.futures import ThreadPoolExecutor
-from functools import partial, wraps
-from html import escape
-from math import ceil
 from re import match as re_match
 from time import time
-from urllib.request import urlopen
-
-from psutil import cpu_percent, disk_usage, virtual_memory
-from pyrogram.types import BotCommand
+from html import escape
+from psutil import virtual_memory, cpu_percent, disk_usage
 from requests import head as rhead
+from urllib.request import urlopen
+from asyncio import create_subprocess_exec, create_subprocess_shell, run_coroutine_threadsafe, sleep
+from asyncio.subprocess import PIPE
+from pyrogram.types import BotCommand
+from functools import partial, wraps
+from concurrent.futures import ThreadPoolExecutor
 
-from bot import (DOWNLOAD_DIR, bot_loop, botStartTime, config_dict, download_dict, download_dict_lock, extra_buttons, user_data)
+from bot import download_dict, download_dict_lock, botStartTime, user_data, config_dict, bot_loop, extra_buttons
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 
@@ -168,7 +166,7 @@ def get_readable_message():
         buttons.ibutton("Next", "status nex")
         button = buttons.build_menu(3)
     msg += f"<b>• Bot Uptime</b>: {get_readable_time(time() - botStartTime)}"
-    msg += f"\n<b>• Free Disk</b>: {get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}"
+    msg += f"\n<b>• Free Disk</b>: {get_readable_file_size(disk_usage(config_dict['DOWNLOAD_DIR']).free)}"
     msg += f"\n<b>• Total downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
     msg += f"\n<b>• Total uploading speed</b>: {get_readable_file_size(up_speed)}/s"
     return msg, button

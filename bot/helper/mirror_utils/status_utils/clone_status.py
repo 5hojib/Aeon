@@ -7,14 +7,14 @@ from bot.helper.ext_utils.bot_utils import (MirrorStatus,
 
 engine_ = "Google Api"
 
+
 class CloneStatus:
-    def __init__(self, obj, size, listener, gid):
+    def __init__(self, obj, size, message, gid, extra_details):
         self.__obj = obj
         self.__size = size
         self.__gid = gid
-        self.__listener = listener
-        self.message = self.__listener.message
-        self.extra_details = self.__listener.extra_details
+        self.message = message
+        self.extra_details = extra_details
         self.engine = engine_
 
     def processed_bytes(self):
@@ -46,7 +46,8 @@ class CloneStatus:
 
     def eta(self):
         try:
-            seconds = (self.__size - self.__obj.transferred_size) / self.__obj.cspeed()
+            seconds = (self.__size - self.__obj.transferred_size) / \
+                self.__obj.cspeed()
             return f'{get_readable_time(seconds)}'
         except:
             return '-'

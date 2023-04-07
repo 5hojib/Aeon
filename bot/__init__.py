@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
-from collections import OrderedDict
-
-from uvloop import install
-
-install()
 from asyncio import Lock
+from collections import OrderedDict
 from faulthandler import enable as faulthandler_enable
 from logging import INFO, FileHandler, StreamHandler, basicConfig
 from logging import error as log_error
@@ -29,16 +25,17 @@ from pyrogram import Client as tgClient
 from pyrogram import enums
 from qbittorrentapi import Client as qbClient
 from tzlocal import get_localzone
+from uvloop import install
 
 faulthandler_enable()
-
+install()
 setdefaulttimeout(600)
 
 botStartTime = time()
 
-basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    handlers=[FileHandler('log.txt'), StreamHandler()],
-                    level=INFO)
+basicConfig(format='%(asctime)s - %(name)s %(levelname)s : %(message)s [%(module)s:%(lineno)d]',
+            handlers=[FileHandler('log.txt'), StreamHandler()],
+            level=INFO)
 
 LOGGER = getLogger(__name__)
 
@@ -89,7 +86,8 @@ if len(DATABASE_URL) == 0:
 if DATABASE_URL:
     conn = MongoClient(DATABASE_URL)
     db = conn.mltb
-    if config_dict := db.settings.config.find_one({'_id': bot_id}):  #return config dict (all env vars)
+    # return config dict (all env vars)
+    if config_dict := db.settings.config.find_one({'_id': bot_id}):
         del config_dict['_id']
         for key, value in config_dict.items():
             environ[key] = str(value)
@@ -182,7 +180,8 @@ if len(USER_SESSION_STRING) != 0:
     user = tgClient('user', TELEGRAM_API, TELEGRAM_HASH, session_string=USER_SESSION_STRING,
                     parse_mode=enums.ParseMode.HTML, no_updates=True, max_concurrent_transmissions=1000).start()
     if user.me.is_bot:
-        log_warning("You added bot string for USER_SESSION_STRING this is not allowed! Exiting now")
+        log_warning(
+            "You added bot string for USER_SESSION_STRING this is not allowed! Exiting now")
         user.stop()
         exit(1)
     else:
@@ -313,7 +312,8 @@ if len(RCLONE_SERVE_URL) == 0:
     RCLONE_SERVE_URL = ''
 
 RCLONE_SERVE_PORT = environ.get('RCLONE_SERVE_PORT', '')
-RCLONE_SERVE_PORT = 8080 if len(RCLONE_SERVE_PORT) == 0 else int(RCLONE_SERVE_PORT)
+RCLONE_SERVE_PORT = 8080 if len(
+    RCLONE_SERVE_PORT) == 0 else int(RCLONE_SERVE_PORT)
 
 RCLONE_SERVE_USER = environ.get('RCLONE_SERVE_USER', '')
 if len(RCLONE_SERVE_USER) == 0:
@@ -330,7 +330,8 @@ USER_MAX_TASKS = environ.get('USER_MAX_TASKS', '')
 USER_MAX_TASKS = '' if len(USER_MAX_TASKS) == 0 else int(USER_MAX_TASKS)
 
 STORAGE_THRESHOLD = environ.get('STORAGE_THRESHOLD', '')
-STORAGE_THRESHOLD = '' if len(STORAGE_THRESHOLD) == 0 else float(STORAGE_THRESHOLD)
+STORAGE_THRESHOLD = '' if len(
+    STORAGE_THRESHOLD) == 0 else float(STORAGE_THRESHOLD)
 
 TORRENT_LIMIT = environ.get('TORRENT_LIMIT', '')
 TORRENT_LIMIT = '' if len(TORRENT_LIMIT) == 0 else float(TORRENT_LIMIT)
@@ -369,10 +370,12 @@ SET_COMMANDS = environ.get('SET_COMMANDS', '')
 SET_COMMANDS = SET_COMMANDS.lower() == 'true'
 
 REQUEST_LIMITS = environ.get('REQUEST_LIMITS', '')
-REQUEST_LIMITS = '' if len(REQUEST_LIMITS) == 0 else max(int(REQUEST_LIMITS), 5)
+REQUEST_LIMITS = '' if len(
+    REQUEST_LIMITS) == 0 else max(int(REQUEST_LIMITS), 5)
 
 DM_MODE = environ.get('DM_MODE', '')
-DM_MODE = DM_MODE.lower() if DM_MODE.lower() in ['leech', 'mirror', 'all'] else ''
+DM_MODE = DM_MODE.lower() if DM_MODE.lower() in [
+    'leech', 'mirror', 'all'] else ''
 
 DELETE_LINKS = environ.get('DELETE_LINKS', '')
 DELETE_LINKS = DELETE_LINKS.lower() == 'true'
@@ -518,7 +521,7 @@ alive = Popen(["python3", "alive.py"])
 srun(["qbittorrent-nox", "-d", f"--profile={getcwd()}"])
 if not ospath.exists('.netrc'):
     with open('.netrc', 'w'):
-       pass
+        pass
 srun(["chmod", "600", ".netrc"])
 srun(["cp", ".netrc", "/root/.netrc"])
 srun(["chmod", "+x", "aria.sh"])
@@ -535,8 +538,10 @@ sleep(0.5)
 
 aria2 = ariaAPI(ariaClient(host="http://localhost", port=6800, secret=""))
 
+
 def get_client():
     return qbClient(host="localhost", port=8090, VERIFY_WEBUI_CERTIFICATE=False, REQUESTS_ARGS={'timeout': (30, 60)})
+
 
 def aria2c_init():
     try:
@@ -554,6 +559,7 @@ def aria2c_init():
     except Exception as e:
         log_error(f"Aria2c initializing error: {e}")
 
+
 Thread(target=aria2c_init).start()
 sleep(1.5)
 
@@ -563,9 +569,9 @@ aria2c_global = ['bt-max-open-files', 'download-result', 'keep-unfinished-downlo
 
 if not aria2_options:
     aria2_options = aria2.client.get_global_option()
-    del aria2_options['dir']
 else:
-    a2c_glo = {op: aria2_options[op] for op in aria2c_global if op in aria2_options}
+    a2c_glo = {op: aria2_options[op]
+               for op in aria2c_global if op in aria2_options}
     aria2.set_global_options(a2c_glo)
 
 qb_client = get_client()
@@ -587,4 +593,5 @@ bot = tgClient('bot', TELEGRAM_API, TELEGRAM_HASH, bot_token=BOT_TOKEN,
                parse_mode=enums.ParseMode.HTML, max_concurrent_transmissions=1000).start()
 bot_loop = bot.loop
 bot_name = bot.me.username
-scheduler = AsyncIOScheduler(timezone=str(get_localzone()), event_loop=bot_loop)
+scheduler = AsyncIOScheduler(timezone=str(
+    get_localzone()), event_loop=bot_loop)

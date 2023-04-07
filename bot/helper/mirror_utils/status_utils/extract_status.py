@@ -2,7 +2,9 @@
 from time import time
 
 from bot import LOGGER
-from bot.helper.ext_utils.bot_utils import get_readable_file_size, MirrorStatus, get_readable_time, async_to_sync
+from bot.helper.ext_utils.bot_utils import (MirrorStatus, async_to_sync,
+                                            get_readable_file_size,
+                                            get_readable_time)
 from bot.helper.ext_utils.fs_utils import get_path_size
 
 
@@ -53,7 +55,7 @@ class ExtractStatus:
 
     def processed_bytes(self):
         return get_readable_file_size(self.processed_raw())
-    
+
     def processed_raw(self):
         if self.__listener.newDir:
             return async_to_sync(get_path_size, self.__listener.newDir)
@@ -65,7 +67,7 @@ class ExtractStatus:
 
     async def cancel_download(self):
         LOGGER.info(f'Cancelling Extract: {self.__name}')
-        if self.__listener.suproc:
+        if self.__listener.suproc is not None:
             self.__listener.suproc.kill()
         else:
             self.__listener.suproc = 'cancelled'

@@ -5,7 +5,7 @@ from functools import partial
 from io import BytesIO
 from os import environ, getcwd
 from time import time
-
+from aiofiles import open as aiopen
 from aiofiles.os import path as aiopath
 from aiofiles.os import remove, rename
 from aioshutil import rmtree as aiormtree
@@ -16,7 +16,7 @@ from pyrogram.handlers import CallbackQueryHandler, MessageHandler
 from bot import DATABASE_URL, GLOBAL_EXTENSION_FILTER, IS_PREMIUM_USER, LOGGER, MAX_SPLIT_SIZE, SHORTENER_APIS, SHORTENERES, Interval, aria2, aria2_options, aria2c_global, bot, categories, config_dict, download_dict, extra_buttons, get_client, list_drives, qbit_options, status_reply_dict_lock, user_data
 from bot.helper.ext_utils.bot_utils import get_readable_file_size, new_thread, set_commands, setInterval, sync_to_async
 from bot.helper.ext_utils.db_handler import DbManger
-from bot.helper.ext_utils.queued_starter import start_from_queued
+from bot.helper.ext_utils.task_manager import start_from_queued
 from bot.helper.mirror_utils.rclone_utils.serve import rclone_serve_booter
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
@@ -350,8 +350,8 @@ async def load_config():
         categories['Root'] = {"drive_id": GDRIVE_ID, "index_link": INDEX_URL}
 
     if await aiopath.exists('list_drives.txt'):
-        with open('list_drives.txt', 'r+') as f:
-            lines = f.readlines()
+        async with aiopen('list_drives.txt', 'r+') as f:
+            lines = await f.readlines()
             for line in lines:
                 temp = line.strip().split()
                 name = temp[0].replace("_", " ")
@@ -366,8 +366,8 @@ async def load_config():
                 list_drives[name] = tempdict
 
     if await aiopath.exists('categories.txt'):
-        with open('categories.txt', 'r+') as f:
-            lines = f.readlines()
+        async with aiopen('categories.txt', 'r+') as f:
+            lines = await f.readlines()
             for line in lines:
                 temp = line.strip().split()
                 name = temp[0].replace("_", " ")
@@ -383,8 +383,8 @@ async def load_config():
 
     extra_buttons.clear()
     if await aiopath.exists('buttons.txt'):
-        with open('buttons.txt', 'r+') as f:
-            lines = f.readlines()
+        async with aiopen('buttons.txt', 'r+') as f:
+            lines = await f.readlines()
             for line in lines:
                 temp = line.strip().split()
                 if len(extra_buttons.keys()) == 4:
@@ -395,8 +395,8 @@ async def load_config():
     SHORTENERES.clear()
     SHORTENER_APIS.clear()
     if await aiopath.exists('shorteners.txt'):
-        with open('shorteners.txt', 'r+') as f:
-            lines = f.readlines()
+        async with aiopen('shorteners.txt', 'r+') as f:
+            lines = await f.readlines()
             for line in lines:
                 temp = line.strip().split()
                 if len(temp) == 2:
@@ -634,7 +634,7 @@ async def edit_variable(client, message, pre_message, key):
         list_drives['Main'] = {"drive_id": value, "index_link": config_dict['INDEX_URL']}
         categories['Root'] = {"drive_id": value, "index_link": config_dict['INDEX_URL']}
     elif key == 'INDEX_URL':
-        if GDRIVE_ID:=config_dict['GDRIVE_ID']:
+        if GDRIVE_ID := config_dict['GDRIVE_ID']:
             list_drives['Main'] = {"drive_id": GDRIVE_ID, "index_link": value}
             categories['Root'] = {"drive_id": GDRIVE_ID, "index_link": value}
     elif key not in ['SEARCH_LIMIT', 'STATUS_LIMIT'] and key.endswith(('_THRESHOLD', '_LIMIT')):
@@ -713,6 +713,7 @@ async def update_private_file(client, message, pre_message):
         if fn == 'accounts':
             if await aiopath.exists('accounts'):
                 await aiormtree('accounts')
+                await aiormtree('rclone_sa')
             config_dict['USE_SERVICE_ACCOUNTS'] = False
             if DATABASE_URL:
                 await DbManger().update_config({'USE_SERVICE_ACCOUNTS': False})
@@ -740,6 +741,7 @@ async def update_private_file(client, message, pre_message):
         if file_name == 'accounts.zip':
             if await aiopath.exists('accounts'):
                 await aiormtree('accounts')
+                await aiormtree('rclone_sa')
             await (await create_subprocess_exec("7z", "x", "-o.", "-aoa", "accounts.zip", "accounts/*.json")).wait()
             await (await create_subprocess_exec("chmod", "-R", "777", "accounts")).wait()
         elif file_name == 'list_drives.txt':
@@ -823,7 +825,6 @@ async def event_handler(client, query, pfunc, rfunc, document=False):
         user = event.from_user or event.sender_chat
         return bool(user.id == query.from_user.id and event.chat.id == chat_id and (event.text or event.document and document))
     handler = client.add_handler(MessageHandler(pfunc, filters=create(event_filter)), group=-1)
-    start_time = time()
     while handler_dict[chat_id]:
         await sleep(0.5)
         if time() - start_time > 60:
@@ -895,9 +896,9 @@ async def edit_bot_settings(client, query):
             if 'Root' in categories:
                 del categories['Root']
         elif data[2] == 'INDEX_URL':
-            if (GDRIVE_ID:= config_dict['GDRIVE_ID']) and 'Main' in list_drives:
+            if (GDRIVE_ID := config_dict['GDRIVE_ID']) and 'Main' in list_drives:
                 list_drives['Main'] = {"drive_id": GDRIVE_ID, "index_link": ''}
-            if (GDRIVE_ID:= config_dict['GDRIVE_ID']) and 'Root' in categories:
+            if (GDRIVE_ID := config_dict['GDRIVE_ID']) and 'Root' in categories:
                 categories['Root'] = {"drive_id": GDRIVE_ID, "index_link": ''}
         elif data[2] == 'INCOMPLETE_TASK_NOTIFIER' and DATABASE_URL:
             await DbManger().trunc_table('tasks')
