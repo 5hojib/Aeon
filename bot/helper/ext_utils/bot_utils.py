@@ -102,7 +102,7 @@ def get_progress_bar_string(pct):
     if cIncomplete > 0:
         incomplete_char = s[cIncomplete - 1]
         p_str += incomplete_char
-    p_str += '○' * (16 - cFull - 1)
+    p_str += '○' * (16 - len(p_str))
     return f"{p_str}"
 
 def get_readable_message():
