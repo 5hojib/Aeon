@@ -75,9 +75,7 @@ bot_id = BOT_TOKEN.split(':', 1)[0]
 
 FONT = environ.get('FONT', '')
 if len(FONT) == 0:
-    FONT = 'code'
-else:
-    FONT = FONT
+    FONT = ''
 
 DATABASE_URL = environ.get('DATABASE_URL', '')
 if len(DATABASE_URL) == 0:
@@ -529,7 +527,7 @@ srun("./aria.sh", shell=True)
 if ospath.exists('accounts.zip'):
     if ospath.exists('accounts'):
         srun(["rm", "-rf", "accounts"])
-    srun(["7z", "x", "-o.", "-aoa", "accounts.zip", "accounts/*.json"])
+    srun(["7z", "x", "-o.", "-bd", "-aoa", "accounts.zip", "accounts/*.json"])
     srun(["chmod", "-R", "777", "accounts"])
     osremove('accounts.zip')
 if not ospath.exists('accounts'):

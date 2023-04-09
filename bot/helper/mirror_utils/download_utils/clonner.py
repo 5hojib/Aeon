@@ -35,6 +35,6 @@ async def start_clone(link, listener):
         gd.name = name
         gid = ''.join(SystemRandom().choices(ascii_letters + digits, k=12))
         async with download_dict_lock:
-            download_dict[listener.uid] = CloneStatus(gd, size, listener, gid)
+            download_dict[listener.uid] = CloneStatus(gd, size, listener.message, gid, listener.extra_details)
         await sendStatusMessage(listener.message)
         await sync_to_async(gd.clone, link, drive_id)
