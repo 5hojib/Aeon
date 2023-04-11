@@ -104,7 +104,7 @@ def get_progress_bar_string(pct):
     return f"{p_str}"
 
 def get_readable_message():
-    msg = ""
+    msg = "<b>Powered by Luna</b>\n\n"
     button = None
     STATUS_LIMIT = config_dict['STATUS_LIMIT']
     tasks = len(download_dict)
@@ -116,7 +116,7 @@ def get_readable_message():
         msg += f"<b><i>{escape(f'{download.name()}')}</i></b>\n\n"
         msg += f"<b>┌ {download.status()} with {download.engine}</b>"
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
-            msg += f"\n<b>├ <a href='https://github.com/5hojib/Luna-Portal'>{get_progress_bar_string(download.progress())}</a></b> {download.progress()}"
+            msg += f"\n<b>├ <a href='https://github.com/5hojib/Luna'>{get_progress_bar_string(download.progress())}</a></b> {download.progress()}"
             msg += f"\n<b>├ Processed</b>: {download.processed_bytes()} of {download.size()}"
             msg += f"\n<b>├ Speed</b>: {download.speed()}"
             msg += f"\n<b>├ Estimated</b>: {download.eta()}"
@@ -135,7 +135,7 @@ def get_readable_message():
             msg += f"\n<b>├ Size</b>: {download.size()}"
         msg += f"\n<b>├ Source</b>: {download.extra_details['source']}"
         msg += f"\n<b>├ Elapsed</b>: {get_readable_time(time() - download.extra_details['startTime'])}"
-        msg += f"\n<b>└ Stop</b>: <code>/{BotCommands.CancelMirror} {download.gid()}</code>\n\n"
+        msg += f"\n<b>└ </b><code>/{BotCommands.CancelMirror} {download.gid()}</code>\n\n"
     if len(msg) == 0:
         return None, None
     dl_speed = 0
@@ -162,13 +162,14 @@ def get_readable_message():
     if tasks > STATUS_LIMIT:
         buttons = ButtonMaker()
         buttons.ibutton("Prev", "status pre")
-        buttons.ibutton(f"{PAGE_NO}/{PAGES} ({tasks})", "status ref")
+        buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
         buttons.ibutton("Next", "status nex")
         button = buttons.build_menu(3)
-    msg += f"<b>• Bot Uptime</b>: {get_readable_time(time() - botStartTime)}"
-    msg += f"\n<b>• Free Disk</b>: {get_readable_file_size(disk_usage(config_dict['DOWNLOAD_DIR']).free)}"
-    msg += f"\n<b>• Total downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
+    msg += f"<b>• Tasks</b>: {tasks}"
+    msg += f"<b>• Bot uptime</b>: {get_readable_time(time() - botStartTime)}"
+    msg += f"\n<b>• Free disk space</b>: {get_readable_file_size(disk_usage(config_dict['DOWNLOAD_DIR']).free)}"
     msg += f"\n<b>• Total uploading speed</b>: {get_readable_file_size(up_speed)}/s"
+    msg += f"\n<b>• Total downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
     return msg, button
 
 def extra_btns(buttons):
