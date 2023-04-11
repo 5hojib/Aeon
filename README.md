@@ -1,3 +1,3 @@
-# Hi, if you girl, I love you 🥰
+## Hi, if are a you girl, I love you 🥰
 
-## Go to jmdkh-deploy branch, for instructions and deploy!
+Go to jmdkh-deploy branch, for instructions and deploy!
