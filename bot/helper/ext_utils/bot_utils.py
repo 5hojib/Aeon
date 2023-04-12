@@ -110,8 +110,8 @@ def get_readable_message():
     tasks = len(download_dict)
     globals()['PAGES'] = (tasks + STATUS_LIMIT - 1) // STATUS_LIMIT
     if PAGE_NO > PAGES and PAGES != 0:
-        globals()['STATUS_START'] -= STATUS_LIMIT
-        globals()['PAGE_NO'] -= 1
+        globals()['STATUS_START'] = STATUS_LIMIT * (PAGES - 1)
+        globals()['PAGE_NO'] = PAGES
     for download in list(download_dict.values())[STATUS_START:STATUS_LIMIT+STATUS_START]:
         msg += f"<b><i>{escape(f'{download.name()}')}</i></b>\n\n"
         msg += f"<b>┌ {download.status()} with {download.engine}</b>"
