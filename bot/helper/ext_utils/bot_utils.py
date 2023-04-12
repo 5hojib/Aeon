@@ -166,7 +166,7 @@ def get_readable_message():
         buttons.ibutton("Next", "status nex")
         button = buttons.build_menu(3)
     msg += f"<b>• Tasks</b>: {tasks}"
-    msg += f"<b>• Bot uptime</b>: {get_readable_time(time() - botStartTime)}"
+    msg += f"\n<b>• Bot uptime</b>: {get_readable_time(time() - botStartTime)}"
     msg += f"\n<b>• Free disk space</b>: {get_readable_file_size(disk_usage(config_dict['DOWNLOAD_DIR']).free)}"
     msg += f"\n<b>• Total uploading speed</b>: {get_readable_file_size(up_speed)}/s"
     msg += f"\n<b>• Total downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
