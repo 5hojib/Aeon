@@ -94,10 +94,10 @@ def get_progress_bar_string(pct):
     pct = float(pct.strip('%'))
     p = min(max(pct, 0), 100)
     cFull = int(p / 10)
-    cIncomplete = int(round((p / 10 - cFull) * 5))
+    cIncomplete = int(round((p / 10 - cFull) * 4))
     p_str = '●' * cFull
     if cIncomplete > 0:
-        s = '○◔◑◕●'
+        s = '◔◑◕●'
         incomplete_char = s[cIncomplete - 1]
         p_str += incomplete_char
     p_str += '○' * (10 - len(p_str))
