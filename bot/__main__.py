@@ -25,7 +25,7 @@ from .modules import anonymous, authorize, bot_settings, cancel_mirror, category
 
 start_aria2_listener()
 
-version = "1.0.2"
+version = "1.0.3"
 async def stats(client, message):
     total, used, free, disk = disk_usage('/')
     swap = swap_memory()
@@ -36,7 +36,6 @@ async def stats(client, message):
     osUptime = get_readable_time(time() - boot_time())
     cpuUsage = cpu_percent(interval=0.5)
     if await aiopath.exists('.git'):
-        changelog = 'Sync with jmdkh'
         last_commit = await cmd_exec("git log -1 --date=short --pretty=format:'%cd <b>From</b> %cr'", True)
         last_commit = last_commit[0]
         commit_from = await cmd_exec("git log -1 --date=short --pretty=format:'%cr'", True)
@@ -52,7 +51,6 @@ async def stats(client, message):
             f'<b>• Updated:</b> {commit_date}\n'\
             f'<b>• Commited On: </b>{commit_time}\n'\
             f'<b>• From: </b>{commit_from}\n'\
-            f'<b>• Changes: </b>{changelog}\n'\
             f'\n'\
             f'<b><u>BOT INFO</u></b>\n\n'\
             f'<b>• Uptime:</b> {currentTime}\n'\
@@ -68,10 +66,10 @@ async def stats(client, message):
 
 async def start(client, message):
     if config_dict['DM_MODE']:
-        start_string = 'Bot Started.\n' \
+        start_string = f'<b>Welcome, To Era of Luna!</b>\n\n' \
                     'Now I will send your files or links here.\n'
     else:
-        start_string = 'Welcome To One Of A Modified Anasty Mirror Bot\n' \
+        start_string = f'<b>Welcome, To Era of Luna!</b>\n\n' \
                     'This bot can Mirror all your links To Google Drive!\n'
               
     await sendMessage(message, start_string)

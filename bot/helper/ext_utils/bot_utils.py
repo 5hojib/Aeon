@@ -93,14 +93,14 @@ def bt_selection_buttons(id_, isCanCncl=True):
 def get_progress_bar_string(pct):
     pct = float(pct.strip('%'))
     p = min(max(pct, 0), 100)
-    cFull = int(p / 6.25)
-    cIncomplete = int(round((p / 6.25 - cFull) * 7))
+    cFull = int(p / 10)
+    cIncomplete = int(round((p / 10 - cFull) * 4))
     p_str = '●' * cFull
     if cIncomplete > 0:
-        s = '○◔◔◑◑◕◕●'
+        s = '◔◑◕●'
         incomplete_char = s[cIncomplete - 1]
         p_str += incomplete_char
-    p_str += '○' * (16 - len(p_str))
+    p_str += '○' * (10 - len(p_str))
     return f"{p_str}"
 
 def get_readable_message():
@@ -113,13 +113,12 @@ def get_readable_message():
         globals()['STATUS_START'] = STATUS_LIMIT * (PAGES - 1)
         globals()['PAGE_NO'] = PAGES
     for download in list(download_dict.values())[STATUS_START:STATUS_LIMIT+STATUS_START]:
-        msg += f"<b><i>{escape(f'{download.name()}')}</i></b>\n\n"
+        msg += f"<i>{escape(f'{download.name()}')}</i>\n\n"
         msg += f"<b>┌ {download.status()} with {download.engine}</b>"
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
             msg += f"\n<b>├ <a href='https://github.com/5hojib/Luna'>{get_progress_bar_string(download.progress())}</a></b> {download.progress()}"
-            msg += f"\n<b>├ Processed</b>: {download.processed_bytes()} of {download.size()}"
+            msg += f"\n<b>├ </b>{download.processed_bytes()} of {download.size()}"
             msg += f"\n<b>├ Speed</b>: {download.speed()}"
-            msg += f"\n<b>├ Estimated</b>: {download.eta()}"
             if hasattr(download, 'seeders_num'):
                 try:
                     msg += f"\n<b>├ Seeders</b>: {download.seeders_num()} | <b>Leechers</b>: {download.leechers_num()}"
@@ -166,10 +165,9 @@ def get_readable_message():
         buttons.ibutton("Next", "status nex")
         button = buttons.build_menu(3)
     msg += f"<b>• Tasks</b>: {tasks}"
-    msg += f"\n<b>• Bot uptime</b>: {get_readable_time(time() - botStartTime)}"
     msg += f"\n<b>• Free disk space</b>: {get_readable_file_size(disk_usage(config_dict['DOWNLOAD_DIR']).free)}"
-    msg += f"\n<b>• Total uploading speed</b>: {get_readable_file_size(up_speed)}/s"
-    msg += f"\n<b>• Total downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
+    msg += f"\n<b>• Uploading speed</b>: {get_readable_file_size(up_speed)}/s"
+    msg += f"\n<b>• Downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
     return msg, button
 
 def extra_btns(buttons):
