@@ -88,14 +88,14 @@ async def get_user_settings(from_user):
 
     buttons.ibutton("Close", f"userset {user_id} close")
     text = f"<u>Settings for {name}</u>\n\n"\
-        f"Leech Type is <b>{ltype}</b>\n"\
-        f"Custom Thumbnail <b>{thumbmsg}</b>\n"\
-        f"Rclone Config <b>{rccmsg}</b>\n"\
-        f"Leech Split Size is <b>{split_size}</b>\n"\
-        f"Equal Splits is <b>{equal_splits}</b>\n"\
-        f"Media Group is <b>{media_group}</b>\n"\
-        f"YT-DLP Quality is <code>{escape(ytq)}</code>\n"\
-        f"Leech Prefix is <code>{escape(lprefix)}</code>"
+        f"<b>Leech Type</b>: {ltype}\n"\
+        f"<b>Custom Thumbnail</b>: {thumbmsg}\n"\
+        f"<b>Rclone Config</b>: {rccmsg}\n"\
+        f"<b>Leech Split Size</b>: {split_size}\n"\
+        f"<b>Equal Splits</b>: {equal_splits}\n"\
+        f"<b>Media Group</b>: {media_group}</b>\n"\
+        f"<b>YT-DLP Quality</b>: {escape(ytq)}\n"\
+        f"<b>Leech Prefix</b>: {escape(lprefix)}"
     return text, buttons.build_menu(1)
 
 
