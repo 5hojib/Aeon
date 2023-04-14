@@ -15,7 +15,7 @@ def get_download(client, tag):
             f'{e}: Qbittorrent, while getting torrent info. Tag: {tag}')
 
 
-engine_ = "qBittorrent"
+engine_ = f"qBittorrent {get_client().app.version}"
 
 
 class QbittorrentStatus:
@@ -113,7 +113,6 @@ class QbittorrentStatus:
             await self.__listener.onDownloadError('Download stopped by user!')
             await sync_to_async(self.__client.torrents_delete, torrent_hashes=self.__info.hash, delete_files=True)
             await sync_to_async(self.__client.torrents_delete_tags, tags=self.__info.tags)
-            await sync_to_async(self.__client.auth_log_out)
             async with qb_listener_lock:
                 if self.__info.tags in QbTorrents:
                     del QbTorrents[self.__info.tags]

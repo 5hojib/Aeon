@@ -21,7 +21,7 @@ from .helper.ext_utils.fs_utils import clean_all, exit_clean_up, start_cleanup
 from .helper.telegram_helper.bot_commands import BotCommands
 from .helper.telegram_helper.filters import CustomFilters
 from .helper.telegram_helper.message_utils import editMessage, sendFile, sendMessage
-from .modules import anonymous, authorize, bot_settings, cancel_mirror, category_select, eval, gd_count, gd_delete, gd_list, leech_del, mirror_leech, rmdb, rss, save_message, shell, status, torrent_search, torrent_select, users_settings, ytdlp
+from .modules import anonymous, authorize, bot_settings, cancel_mirror, category_select, clone, eval, gd_count, gd_delete, gd_list, leech_del, mirror_leech, rmdb, rss, save_message, shell, status, torrent_search, torrent_select, users_settings, ytdlp
 
 start_aria2_listener()
 
