@@ -36,13 +36,13 @@ async def countNode(client, message):
             await sendMessage(message, name)
             return
         await deleteMessage(msg)
-        msg = f'<b>Name: </b><code>{name}</code>'
-        msg += f'\n\n<b>Size: </b>{get_readable_file_size(size)}'
-        msg += f'\n\n<b>Type: </b>{mime_type}'
+        msg = f'<b><i>{name}</i></b>'
+        msg += f'\n\n<b>• Size: </b>{get_readable_file_size(size)}'
+        msg += f'\n<b>• Type: </b>{mime_type}'
         if mime_type == 'Folder':
-            msg += f'\n<b>SubFolders: </b>{folders}'
-            msg += f'\n<b>Files: </b>{files}'
-        msg += f'\n\n<b>cc: </b>{tag}'
+            msg += f'\n<b>• SubFolders: </b>{folders}'
+            msg += f'\n<b>• Files: </b>{files}'
+        msg += f'\n\n<b>• Counted by: </b>{tag}'
     else:
         msg = 'Send Gdrive link along with command or by replying to the link by command'
 
