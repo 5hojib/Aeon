@@ -8,6 +8,19 @@ MIRROR_HELP_MESSAGE = """
 <a href='https://telegra.ph/Mirror-Leech-YtDl-04-08'>Click here</a>
 """
 
+CLONE_HELP_MESSAGE = """Send Gdrive|Gdot|Filepress|Filebee|Appdrive|Gdflix link or rclone path along with command or by replying to the link/rc_path by command
+<b>Multi links only by replying to first gdlink or rclone_path:</b>
+<code>/{cmd}</code> 10(number of links/pathies)
+<b>Gdrive:</b>
+<code>/{cmd}</code> gdrivelink
+<b>Upload Custom Drive</b>
+<code>/{cmd}</code> <b>id:</b> <code>drive_folder_link</code> or <code>drive_id</code> <b>index:</b> <code>https://anything.in/0:</code> link or by replying to link
+drive_id must be folder id and index must be url else it will not accept
+<b>Rclone:</b>
+<code>/{cmd}</code> rcl or rclone_path up: rcl or rclone_path rcf: flagkey:flagvalue|flagkey|flagkey:flagvalue
+Notes:
+if up: not specified then rclone destination will be the RCLONE_PATH from config.env
+"""
 
 RSS_HELP_MESSAGE = """
 Use this format to add feed url:
