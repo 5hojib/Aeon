@@ -11,19 +11,11 @@ from aiofiles.os import path as aiopath
 from aiofiles.os import remove as aioremove
 from aioshutil import move
 
-from bot import (DATABASE_URL, DOWNLOAD_DIR, LOGGER, MAX_SPLIT_SIZE,
-                 SHORTENERES, Interval, aria2, config_dict, download_dict,
-                 download_dict_lock, non_queued_dl, non_queued_up,
-                 queue_dict_lock, queued_dl, queued_up, status_reply_dict_lock,
-                 user_data)
-from bot.helper.ext_utils.bot_utils import (extra_btns, get_readable_file_size,
-                                            get_readable_time, sync_to_async)
+from bot import DATABASE_URL, DOWNLOAD_DIR, LOGGER, MAX_SPLIT_SIZE, SHORTENERES, Interval, aria2, config_dict, download_dict, download_dict_lock, non_queued_dl, non_queued_up, queue_dict_lock, queued_dl, queued_up, status_reply_dict_lock, user_data
+from bot.helper.ext_utils.bot_utils import extra_btns, get_readable_file_size, get_readable_time, sync_to_async
 from bot.helper.ext_utils.db_handler import DbManger
 from bot.helper.ext_utils.exceptions import NotSupportedExtractionArchive
-from bot.helper.ext_utils.fs_utils import (clean_download, clean_target,
-                                           get_base_name, get_path_size,
-                                           is_archive, is_archive_split,
-                                           is_first_archive_split)
+from bot.helper.ext_utils.fs_utils import clean_download, clean_target, get_base_name, get_path_size, is_archive, is_archive_split, is_first_archive_split
 from bot.helper.ext_utils.leech_utils import split_file
 from bot.helper.ext_utils.shortener import short_url
 from bot.helper.ext_utils.task_manager import start_from_queued
@@ -38,10 +30,7 @@ from bot.helper.mirror_utils.status_utils.zip_status import ZipStatus
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.mirror_utils.upload_utils.pyrogramEngine import TgUploader
 from bot.helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.telegram_helper.message_utils import (delete_all_messages,
-                                                      delete_links,
-                                                      sendMessage,
-                                                      update_all_messages)
+from bot.helper.telegram_helper.message_utils import delete_all_messages, delete_links, sendMessage, update_all_messages
 
 
 class MirrorLeechListener:
@@ -366,7 +355,6 @@ class MirrorLeechListener:
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
             await DbManger().rm_complete_task(self.message.link)
         LOGGER.info(f'Done Uploading {name}')
-        usr_name = self.message.from_user.first_name.replace('>', '').replace('<', '')
         if self.isLeech:
             msg = f'<b><i>{escape(name)}</i></b>\n'
             msg += f'\n<b>• Size</b>: {get_readable_file_size(size)}'
@@ -374,7 +362,7 @@ class MirrorLeechListener:
             msg += f"\n<b>• Elapsed</b>: {get_readable_time(time() - self.extra_details['startTime'])}"
             if mime_type != 0:
                 msg += f'\n<b>• Corrupted Files</b>: {mime_type}'
-            msg += f'\n<b>• Leeched by</b>: {usr_name}\n\n'
+            msg += f'\n<b>• Leeched by</b>: {self.tag}\n\n'
             if not files:
                 await sendMessage(self.message, msg)
                 if self.logMessage:
@@ -418,7 +406,7 @@ class MirrorLeechListener:
             if mime_type == "Folder":
                 msg += f'\n<b>• SubFolders</b>: {folders}'
                 msg += f'\n<b>• Files</b>: {files}'
-            msg += f'\n<b>• Uploaded by</b>: {usr_name}'
+            msg += f'\n<b>• Uploaded by</b>: {self.tag}'
             msg += f'\n<b>• Elapsed</b>: {get_readable_time(time() - self.extra_details["startTime"])}'
             if link or rclonePath and config_dict['RCLONE_SERVE_URL']:
                 if drive_id and config_dict['GDRIVE_ID'] != drive_id:

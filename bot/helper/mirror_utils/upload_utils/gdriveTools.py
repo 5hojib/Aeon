@@ -16,13 +16,10 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
-from tenacity import (RetryError, retry, retry_if_exception_type,
-                      stop_after_attempt, wait_exponential)
+from tenacity import RetryError, retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from bot import GLOBAL_EXTENSION_FILTER, SHORTENERES, config_dict, list_drives
-from bot.helper.ext_utils.bot_utils import (async_to_sync,
-                                            get_readable_file_size,
-                                            setInterval)
+from bot.helper.ext_utils.bot_utils import async_to_sync, get_readable_file_size, setInterval
 from bot.helper.ext_utils.fs_utils import get_mime_type
 from bot.helper.ext_utils.shortener import short_url
 

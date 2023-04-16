@@ -2,7 +2,6 @@
 from asyncio import sleep
 from random import SystemRandom
 from string import ascii_letters
-
 from telegraph.aio import Telegraph
 from telegraph.exceptions import RetryAfterError
 
