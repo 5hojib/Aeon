@@ -4,15 +4,11 @@ from time import time
 from aiofiles.os import path as aiopath
 from aiofiles.os import remove as aioremove
 
-from bot import (LOGGER, config_dict, download_dict, download_dict_lock,
-                 get_client)
+from bot import LOGGER, config_dict, download_dict, download_dict_lock, get_client
 from bot.helper.ext_utils.bot_utils import bt_selection_buttons, sync_to_async
 from bot.helper.listeners.qbit_listener import onDownloadStart
 from bot.helper.mirror_utils.status_utils.qbit_status import QbittorrentStatus
-from bot.helper.telegram_helper.message_utils import (delete_links,
-                                                      deleteMessage,
-                                                      sendMessage,
-                                                      sendStatusMessage)
+from bot.helper.telegram_helper.message_utils import delete_links, deleteMessage, sendMessage, sendStatusMessage
 
 """
 Only v1 torrents

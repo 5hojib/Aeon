@@ -23,7 +23,6 @@ anonfilesBaseSites = ['anonfiles.com', 'hotfile.io', 'bayfiles.com', 'megaupload
 
 
 def direct_link_generator(link: str):
-    """ direct links generator """
     domain = urlparse(link).hostname
     if not domain:
         raise DirectDownloadLinkException("ERROR: Invalid URL")
@@ -91,8 +90,6 @@ def direct_link_generator(link: str):
 
 
 def yandex_disk(url: str) -> str:
-    """ Yandex.Disk direct link generator
-    Based on https://github.com/wldhx/yadisk-direct """
     try:
         link = findall(r'\b(https?://(yadi.sk|disk.yandex.com)\S+)', url)[0][0]
     except IndexError:
@@ -107,8 +104,6 @@ def yandex_disk(url: str) -> str:
 
 
 def uptobox(url: str) -> str:
-    """ Uptobox direct link generator
-    based on https://github.com/jovanzers/WinTenCermin and https://github.com/sinoobie/noobie-mirror """
     try:
         link = findall(r'\bhttps?://.*uptobox\.com\S+', url)[0]
     except IndexError:
@@ -118,7 +113,7 @@ def uptobox(url: str) -> str:
     cget = create_scraper().request
     try:
         file_id = findall(r'\bhttps?://.*uptobox\.com/(\w+)', url)[0]
-        if UPTOBOX_TOKEN := config_dict['UPTOBOX_TOKEN']:
+        if UPTOBOX_TOKEN := config_dict.get('UPTOBOX_TOKEN'):
             file_link = f'https://uptobox.com/api/link?token={UPTOBOX_TOKEN}&file_code={file_id}'
         else:
             file_link = f'https://uptobox.com/api/link?file_code={file_id}'
@@ -158,7 +153,6 @@ def mediafire(url: str) -> str:
 
 
 def osdn(url: str) -> str:
-    """ OSDN direct link generator """
     osdn_link = 'https://osdn.net'
     try:
         link = findall(r'\bhttps?://.*osdn\.net\S+', url)[0]
@@ -181,7 +175,6 @@ def osdn(url: str) -> str:
 
 
 def github(url: str) -> str:
-    """ GitHub direct links generator """
     try:
         findall(r'\bhttps?://.*github\.com.*releases\S+', url)[0]
     except IndexError:
@@ -195,9 +188,6 @@ def github(url: str) -> str:
 
 
 def hxfile(url: str) -> str:
-    """ Hxfile direct link generator
-    Based on https://github.com/zevtyardt/lk21
-    """
     try:
         return Bypass().bypass_filesIm(url)
     except Exception as e:
@@ -228,9 +218,6 @@ def anonfilesBased(url: str) -> str:
 
 
 def fembed(link: str) -> str:
-    """ Fembed direct link generator
-    Based on https://github.com/zevtyardt/lk21
-    """
     try:
         dl_url = Bypass().bypass_fembed(link)
         count = len(dl_url)
@@ -241,9 +228,6 @@ def fembed(link: str) -> str:
 
 
 def sbembed(link: str) -> str:
-    """ Sbembed direct link generator
-    Based on https://github.com/zevtyardt/lk21
-    """
     try:
         dl_url = Bypass().bypass_sbembed(link)
         count = len(dl_url)
@@ -285,7 +269,6 @@ def onedrive(link: str) -> str:
 
 
 def pixeldrain(url: str) -> str:
-    """ Based on https://github.com/yash-dk/TorToolkit-Telegram """
     url = url.strip("/ ")
     file_id = url.split("/")[-1]
     if url.split("/")[-2] == "l":
@@ -307,9 +290,6 @@ def pixeldrain(url: str) -> str:
 
 
 def antfiles(url: str) -> str:
-    """ Antfiles direct link generator
-    Based on https://github.com/zevtyardt/lk21
-    """
     try:
         link = Bypass().bypass_antfiles(url)
     except Exception as e:
@@ -320,9 +300,6 @@ def antfiles(url: str) -> str:
 
 
 def streamtape(url: str) -> str:
-    """ Streamtape direct link generator
-    Based on https://github.com/zevtyardt/lk21
-    """
     try:
         link = Bypass().bypass_streamtape(url)
     except Exception as e:
@@ -333,8 +310,6 @@ def streamtape(url: str) -> str:
 
 
 def racaty(url: str) -> str:
-    """ Racaty direct link generator
-    By https://github.com/junedkh """
     cget = create_scraper().request
     try:
         url = cget('GET', url).url
@@ -352,9 +327,6 @@ def racaty(url: str) -> str:
 
 
 def fichier(link: str) -> str:
-    """ 1Fichier direct link generator
-    Based on https://github.com/Maujar
-    """
     regex = r"^([http:\/\/|https:\/\/]+)?.*1fichier\.com\/\?.+"
     gan = match(regex, link)
     if not gan:
@@ -421,9 +393,6 @@ def fichier(link: str) -> str:
 
 
 def solidfiles(url: str) -> str:
-    """ Solidfiles direct link generator
-    Based on https://github.com/Xonshiz/SolidFiles-Downloader
-    By https://github.com/Jusidama18 """
     cget = create_scraper().request
     try:
         headers = {
@@ -438,9 +407,6 @@ def solidfiles(url: str) -> str:
 
 
 def krakenfiles(page_link: str) -> str:
-    """ krakenfiles direct link generator
-    Based on https://github.com/tha23rd/py-kraken
-    By https://github.com/junedkh """
     cget = create_scraper().request
     try:
         page_resp = cget('get', page_link)
@@ -477,8 +443,6 @@ def krakenfiles(page_link: str) -> str:
 
 
 def uploadee(url: str) -> str:
-    """ uploadee direct link generator
-    By https://github.com/iron-heart-x"""
     cget = create_scraper().request
     try:
         soup = BeautifulSoup(cget('get', url).content, 'lxml')
