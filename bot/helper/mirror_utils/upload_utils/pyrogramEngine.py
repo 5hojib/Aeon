@@ -77,7 +77,7 @@ class TgUploader:
             else:
                 msg = f'<b><a href="{self.__listener.message.link}">Source</a></b>' if self.__listener.isSuperGroup else self.__listener.message.text
                 msg += f'\n\n<b>#cc</b>: {self.__listener.tag} (<code>{self.__listener.message.from_user.id}</code>)'
-                self.__sent_msg = await bot.send_message(DUMP_CHAT, msg, disable_web_page_preview=True)
+                self.__sent_msg = await bot.send_message(DUMP_CHAT, disable_web_page_preview=True)
             if self.__listener.dmMessage:
                 self.__sent_DMmsg = self.__listener.dmMessage
             if IS_PREMIUM_USER:
@@ -268,7 +268,7 @@ class TgUploader:
         if config_dict['DUMP_CHAT']:
             msg = f'<b><a href="{self.__listener.message.link}">Source</a></b>' if self.__listener.isSuperGroup else self.__listener.message.text
             msg = f'{msg}\n\n<b>#LeechCompleted</b>: {self.__listener.tag} #id{self.__listener.message.from_user.id}'
-            await self.__sent_msg.reply(text=msg, quote=True, disable_web_page_preview=True)
+            await self.__sent_msg.reply(quote=True, disable_web_page_preview=True)
         LOGGER.info(f"Leech Completed: {self.name}")
         await self.__listener.onUploadComplete(None, size, self.__msgs_dict, self.__total_files, self.__corrupted, self.name)
 

@@ -176,12 +176,12 @@ async def sendLogMessage(message, link, tag):
                 if isSuperGroup:
                     caption += f'<b><a href="{message.link}">Source</a></b> | '
                 caption += f'<b>#cc</b>: {tag} (<code>{message.from_user.id}</code>)'
-                return await reply_to.copy(log_chat, caption=caption)
+                return await reply_to.copy(log_chat)
         msg = ''
         if isSuperGroup:
             msg += f'<b><a href="{message.link}">Source</a></b>: '
         msg += f'<code>{link}</code>\n\n<b>#cc</b>: {tag} (<code>{message.from_user.id}</code>)'
-        return await message._client.send_message(log_chat, msg, disable_web_page_preview=True)
+        return await message._client.send_message(log_chat, disable_web_page_preview=True)
     except FloodWait as r:
         LOGGER.warning(str(r))
         await sleep(r.value * 1.2)
