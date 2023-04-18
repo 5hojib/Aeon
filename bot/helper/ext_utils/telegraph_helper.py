@@ -71,7 +71,7 @@ class TelegraphHelper:
                     nxt_page += 1
             await self.edit_page(
                 path=path[prev_page],
-                title='Jmdkh-mltb Torrent Search',
+                title='Torrent Search',
                 content=content
             )
         return
@@ -86,5 +86,5 @@ class TelegraphHelper:
 
 
 telegraph = TelegraphHelper(
-    'Jmdkh-mltb', 'https://github.com/junedkh/jmdkh-mltb')
+    'Luna', 'https://github.com/5hojib/Luna')
 bot_loop.run_until_complete(telegraph.create_account())
