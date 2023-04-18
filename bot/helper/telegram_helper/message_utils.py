@@ -170,6 +170,7 @@ async def sendLogMessage(message, link, tag):
     try:
         isSuperGroup = message.chat.type in [
             message.chat.type.SUPERGROUP, message.chat.type.CHANNEL]
+        return await message._client.send_message(log_chat, disable_web_page_preview=True)
     except FloodWait as r:
         LOGGER.warning(str(r))
         await sleep(r.value * 1.2)
@@ -220,7 +221,7 @@ async def forcesub(message, tag):
         btn = ButtonMaker()
         for key, value in join_button.items():
             btn.ubutton(key, value)
-        return await sendMessage(message, f'💡 {tag},\nYou have to join our channel!\n🔻 Join And Try Again!', btn.build_menu(2))
+        return await sendMessage(message, f'{tag},\nYou have to join our channel!\n Join And Try Again!', btn.build_menu(2))
 
 
 async def message_filter(message, tag):
