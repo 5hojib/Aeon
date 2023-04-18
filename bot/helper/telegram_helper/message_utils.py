@@ -170,10 +170,6 @@ async def sendLogMessage(message, link, tag):
     try:
         isSuperGroup = message.chat.type in [
             message.chat.type.SUPERGROUP, message.chat.type.CHANNEL]
-        if reply_to := message.reply_to_message:
-            if not reply_to.text:
-                return await reply_to.copy(log_chat)
-        return await message._client.send_message(log_chat, disable_web_page_preview=True)
     except FloodWait as r:
         LOGGER.warning(str(r))
         await sleep(r.value * 1.2)
