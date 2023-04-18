@@ -174,8 +174,8 @@ async def sendLogMessage(message, link, tag):
             if not reply_to.text:
                 caption = ''
                 if isSuperGroup:
-                    caption += f'<b><a href="{message.link}">Source</a></b> | '
-                caption += f'<b>• Task by</b>: {tag} (<code>{message.from_user.id}</code>)'
+                    caption += f'<b><a href="{message.link}">Source</a></b>'
+                caption += f'<b>\n\n• Task by</b>: {tag} (<code>{message.from_user.id}</code>)'
                 return await reply_to.copy(log_chat, caption=caption)
         msg = ''
         if isSuperGroup:
