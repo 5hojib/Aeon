@@ -16,6 +16,7 @@ from bot.helper.telegram_helper.message_utils import deleteMessage, sendMessage,
 
 @new_thread
 async def __onDownloadStarted(api, gid):
+    gid = gid[:8]
     download = await sync_to_async(api.get_download, gid)
     if download.is_metadata:
         LOGGER.info(f'onDownloadStarted: {gid} METADATA')
