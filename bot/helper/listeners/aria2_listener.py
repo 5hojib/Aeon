@@ -101,6 +101,7 @@ async def __onDownloadStarted(api, gid):
 
 @new_thread
 async def __onDownloadComplete(api, gid):
+    gid = gid[:8]
     try:
         download = await sync_to_async(api.get_download, gid)
     except:
@@ -133,6 +134,7 @@ async def __onDownloadComplete(api, gid):
 
 @new_thread
 async def __onBtDownloadComplete(api, gid):
+    gid = gid[:8]
     seed_start_time = time()
     await sleep(1)
     download = await sync_to_async(api.get_download, gid)
@@ -184,6 +186,7 @@ async def __onBtDownloadComplete(api, gid):
 
 @new_thread
 async def __onDownloadStopped(api, gid):
+    gid = gid[:8]
     await sleep(6)
     if dl := await getDownloadByGid(gid):
         listener = dl.listener()
@@ -192,6 +195,7 @@ async def __onDownloadStopped(api, gid):
 
 @new_thread
 async def __onDownloadError(api, gid):
+    gid = gid[:8]
     LOGGER.info(f"onDownloadError: {gid}")
     error = "None"
     try:
