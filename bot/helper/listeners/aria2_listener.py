@@ -107,7 +107,7 @@ async def __onDownloadComplete(api, gid):
     except:
         return
     if download.followed_by_ids:
-        new_gid = download.followed_by_ids[0]
+        new_gid = download.followed_by_ids[0][:8]
         LOGGER.info(f'Gid changed from {gid} to {new_gid}')
         if dl := await getDownloadByGid(new_gid):
             listener = dl.listener()
