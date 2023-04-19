@@ -22,7 +22,7 @@ async def __remove_torrent(client, hash_, tag):
 async def __onDownloadError(err, tor, button=None):
     LOGGER.info(f"Cancelling Download: {tor.name}")
     ext_hash = tor.hash
-    download = await getDownloadByGid(ext_hash[:12])
+    download = await getDownloadByGid(ext_hash[:8])
     if not hasattr(download, 'client'):
         return
     listener = download.listener()
@@ -37,7 +37,7 @@ async def __onDownloadError(err, tor, button=None):
 async def __onSeedFinish(tor):
     ext_hash = tor.hash
     LOGGER.info(f"Cancelling Seed: {tor.name}")
-    download = await getDownloadByGid(ext_hash[:12])
+    download = await getDownloadByGid(ext_hash[:8])
     if not hasattr(download, 'client'):
         return
     listener = download.listener()
@@ -49,7 +49,7 @@ async def __onSeedFinish(tor):
 
 @new_task
 async def __stop_duplicate(tor):
-    download = await getDownloadByGid(tor.hash[:12])
+    download = await getDownloadByGid(tor.hash[:8])
     if not hasattr(download, 'listener'):
         return
     listener = download.listener()
@@ -61,7 +61,7 @@ async def __stop_duplicate(tor):
 
 @new_task
 async def __size_checked(tor):
-    download = await getDownloadByGid(tor.hash[:12])
+    download = await getDownloadByGid(tor.hash[:8])
     if hasattr(download, 'listener'):
         listener = download.listener()
         size = tor.size
@@ -74,7 +74,7 @@ async def __onDownloadComplete(tor):
     ext_hash = tor.hash
     tag = tor.tags
     await sleep(2)
-    download = await getDownloadByGid(ext_hash[:12])
+    download = await getDownloadByGid(ext_hash[:8])
     if not hasattr(download, 'client'):
         return
     listener = download.listener()
