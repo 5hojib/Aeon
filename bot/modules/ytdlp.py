@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from asyncio import sleep
 from re import split as re_split
 
@@ -189,6 +188,7 @@ async def _ytdl(client, message, isZip=False, isLeech=False, sameDir={}):
             return await sendMessage(message, 'DM_MODE and User Session need DUMP_CHAT')
         dmMessage = await sendDmMessage(message, dmMode, isLeech)
         if dmMessage == 'BotNotStarted':
+            await delete_links(message)
             return
     else:
         dmMessage = None

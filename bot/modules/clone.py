@@ -24,8 +24,6 @@ from bot.helper.mirror_utils.status_utils.rclone_status import RcloneStatus
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import anno_checker, delete_links, deleteMessage, editMessage, isAdmin, open_category_btns, sendDmMessage, sendLogMessage, sendMessage, sendStatusMessage
-
 
 async def rcloneNode(client, message, rcf, listener):
     if link == 'rcl':
@@ -270,6 +268,7 @@ async def clone(client, message):
     if (dmMode := config_dict['DM_MODE']) and message.chat.type == message.chat.type.SUPERGROUP:
         dmMessage = await sendDmMessage(message, dmMode, False)
         if dmMessage == 'BotNotStarted':
+            await delete_links(message)
             return
     else:
         dmMessage = None

@@ -191,6 +191,7 @@ async def _mirror_leech(client, message, isZip=False, extract=False, isQbit=Fals
             return await sendMessage(message, 'DM_MODE and User Session need DUMP_CHAT')
         dmMessage = await sendDmMessage(message, dmMode, isLeech)
         if dmMessage == 'BotNotStarted':
+            await delete_links(message)
             return
     else:
         dmMessage = None
