@@ -2,12 +2,10 @@
 from aiofiles.os import path as aiopath
 from aiofiles.os import remove as aioremove
 
-from bot import (LOGGER, aria2, aria2_options, aria2c_global, config_dict,
-                 download_dict, download_dict_lock)
+from bot import LOGGER, aria2, aria2_options, aria2c_global, config_dict, download_dict, download_dict_lock
 from bot.helper.ext_utils.bot_utils import bt_selection_buttons, sync_to_async
 from bot.helper.mirror_utils.status_utils.aria2_status import Aria2Status
-from bot.helper.telegram_helper.message_utils import (delete_links, sendMessage,
-                                                      sendStatusMessage)
+from bot.helper.telegram_helper.message_utils import delete_links, sendMessage, sendStatusMessage
 
 
 async def add_aria2c_download(link, path, listener, filename, auth, ratio, seed_time):

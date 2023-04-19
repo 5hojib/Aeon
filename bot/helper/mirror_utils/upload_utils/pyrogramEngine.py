@@ -16,16 +16,12 @@ from natsort import natsorted
 from PIL import Image
 from pyrogram.errors import FloodWait, RPCError
 from pyrogram.types import InputMediaDocument, InputMediaVideo
-from tenacity import (RetryError, retry, retry_if_exception_type,
-                      stop_after_attempt, wait_exponential)
+from tenacity import RetryError, retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from bot import (GLOBAL_EXTENSION_FILTER, IS_PREMIUM_USER, bot, config_dict,
-                 user, user_data)
+from bot import GLOBAL_EXTENSION_FILTER, IS_PREMIUM_USER, bot, config_dict, user, user_data
 from bot.helper.ext_utils.bot_utils import sync_to_async
-from bot.helper.ext_utils.fs_utils import (clean_unwanted, get_base_name,
-                                           is_archive)
-from bot.helper.ext_utils.leech_utils import (get_document_type,
-                                              get_media_info, take_ss)
+from bot.helper.ext_utils.fs_utils import clean_unwanted, get_base_name, is_archive
+from bot.helper.ext_utils.leech_utils import get_document_type, get_media_info, take_ss
 from bot.helper.telegram_helper.button_build import ButtonMaker
 
 LOGGER = getLogger(__name__)
@@ -80,8 +76,8 @@ class TgUploader:
                 self.__sent_msg = await self.__listener.logMessage.copy(DUMP_CHAT)
             else:
                 msg = f'<b><a href="{self.__listener.message.link}">Source</a></b>' if self.__listener.isSuperGroup else self.__listener.message.text
-                msg += f'\n\n<b>#cc</b>: {self.__listener.tag} (<code>{self.__listener.message.from_user.id}</code>)'
-                self.__sent_msg = await self.__listener.message._client.send_message(DUMP_CHAT, msg, disable_web_page_preview=True)
+                msg += f'\n\n<b>• Task by</b>: {self.__listener.tag} (<code>{self.__listener.message.from_user.id}</code>)'
+                self.__sent_msg = await bot.send_message(DUMP_CHAT, msg, disable_web_page_preview=True)
             if self.__listener.dmMessage:
                 self.__sent_DMmsg = self.__listener.dmMessage
             if IS_PREMIUM_USER:
@@ -108,7 +104,9 @@ class TgUploader:
             self.__sent_msg = self.__listener.dmMessage
         else:
             self.__sent_msg = self.__listener.message
-
+        if self.__sent_msg is None:
+            await self.__listener.onUploadError('Cannot find the message to reply')
+            return
         if ((self.__listener.isSuperGroup or config_dict['DUMP_CHAT']) and not IS_PREMIUM_USER and not self.__sent_msg.chat.has_protected_content):
             btn = ButtonMaker()
             btn.ibutton('Save This File', 'save', 'footer')

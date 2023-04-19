@@ -25,7 +25,6 @@ from .modules import anonymous, authorize, bot_settings, cancel_mirror, category
 
 start_aria2_listener()
 
-version = "1.0.3"
 async def stats(client, message):
     total, used, free, disk = disk_usage('/')
     swap = swap_memory()
@@ -47,7 +46,6 @@ async def stats(client, message):
     else:
         last_commit = 'No UPSTREAM_REPO'
     stats = f'<b><u>REPOSITORY INFO</u></b>\n\n' \
-            f'<b>• Repository Version:</b> {version}\n'\
             f'<b>• Updated:</b> {commit_date}\n'\
             f'<b>• Commited On: </b>{commit_time}\n'\
             f'<b>• From: </b>{commit_from}\n'\
@@ -66,11 +64,9 @@ async def stats(client, message):
 
 async def start(client, message):
     if config_dict['DM_MODE']:
-        start_string = f'<b>Welcome, To Era of Luna!</b>\n\n' \
-                    'Now I will send your files or links here.\n'
+        start_string = f'<b>Welcome, To Era of Luna!</b>\n\nNow I will send your files or links here.\n'
     else:
-        start_string = f'<b>Welcome, To Era of Luna!</b>\n\n' \
-                    'This bot can Mirror all your links To Google Drive!\n'
+        start_string = f'<b>Welcome, To Era of Luna!</b>\n\nThis bot can Mirror all your links To Google Drive!\n'
               
     await sendMessage(message, start_string)
 

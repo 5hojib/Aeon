@@ -3,15 +3,11 @@ from asyncio import sleep
 from datetime import datetime, timedelta, timezone
 from time import time
 
-from pyrogram.errors import (FloodWait, PeerIdInvalid, RPCError, UserIsBlocked,
-                             UserNotParticipant)
+from pyrogram.errors import FloodWait, PeerIdInvalid, RPCError, UserIsBlocked, UserNotParticipant
 from pyrogram.types import ChatPermissions
 
-from bot import (LOGGER, Interval, bot, btn_listener, categories, config_dict,
-                 download_dict_lock, status_reply_dict, status_reply_dict_lock,
-                 user)
-from bot.helper.ext_utils.bot_utils import (get_readable_message, setInterval,
-                                            sync_to_async)
+from bot import LOGGER, Interval, bot, btn_listener, categories, config_dict, download_dict_lock, status_reply_dict, status_reply_dict_lock, user
+from bot.helper.ext_utils.bot_utils import get_readable_message, setInterval, sync_to_async
 from bot.helper.telegram_helper.button_build import ButtonMaker
 
 
@@ -178,13 +174,13 @@ async def sendLogMessage(message, link, tag):
             if not reply_to.text:
                 caption = ''
                 if isSuperGroup:
-                    caption += f'<b><a href="{message.link}">Source</a></b> | '
-                caption += f'<b>#cc</b>: {tag} (<code>{message.from_user.id}</code>)'
+                    caption += f'<b><a href="{message.link}">Source</a></b>'
+                caption += f'<b>\n\n• Task by</b>: {tag} (<code>{message.from_user.id}</code>)'
                 return await reply_to.copy(log_chat, caption=caption)
         msg = ''
         if isSuperGroup:
             msg += f'<b><a href="{message.link}">Source</a></b>: '
-        msg += f'<code>{link}</code>\n\n<b>#cc</b>: {tag} (<code>{message.from_user.id}</code>)'
+        msg += f'<code>{link}</code>\n\n<b>• Task by</b>: {tag} (<code>{message.from_user.id}</code>)'
         return await message._client.send_message(log_chat, msg, disable_web_page_preview=True)
     except FloodWait as r:
         LOGGER.warning(str(r))
@@ -236,7 +232,7 @@ async def forcesub(message, tag):
         btn = ButtonMaker()
         for key, value in join_button.items():
             btn.ubutton(key, value)
-        return await sendMessage(message, f'💡 {tag},\nYou have to join our channel!\n🔻 Join And Try Again!', btn.build_menu(2))
+        return await sendMessage(message, f'{tag},\nYou have to join our channel!\n Join And Try Again!', btn.build_menu(2))
 
 
 async def message_filter(message, tag):
