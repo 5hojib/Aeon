@@ -16,7 +16,6 @@ from bot.helper.telegram_helper.message_utils import deleteMessage, sendMessage,
 
 @new_thread
 async def __onDownloadStarted(api, gid):
-    gid = gid[:8]
     download = await sync_to_async(api.get_download, gid)
     if download.is_metadata:
         LOGGER.info(f'onDownloadStarted: {gid} METADATA')
@@ -101,13 +100,12 @@ async def __onDownloadStarted(api, gid):
 
 @new_thread
 async def __onDownloadComplete(api, gid):
-    gid = gid[:8]
     try:
         download = await sync_to_async(api.get_download, gid)
     except:
         return
     if download.followed_by_ids:
-        new_gid = download.followed_by_ids[0][:8]
+        new_gid = download.followed_by_ids[0]
         LOGGER.info(f'Gid changed from {gid} to {new_gid}')
         if dl := await getDownloadByGid(new_gid):
             listener = dl.listener()
@@ -134,7 +132,6 @@ async def __onDownloadComplete(api, gid):
 
 @new_thread
 async def __onBtDownloadComplete(api, gid):
-    gid = gid[:8]
     seed_start_time = time()
     await sleep(1)
     download = await sync_to_async(api.get_download, gid)
@@ -186,7 +183,6 @@ async def __onBtDownloadComplete(api, gid):
 
 @new_thread
 async def __onDownloadStopped(api, gid):
-    gid = gid[:8]
     await sleep(6)
     if dl := await getDownloadByGid(gid):
         listener = dl.listener()
@@ -195,7 +191,6 @@ async def __onDownloadStopped(api, gid):
 
 @new_thread
 async def __onDownloadError(api, gid):
-    gid = gid[:8]
     LOGGER.info(f"onDownloadError: {gid}")
     error = "None"
     try:
