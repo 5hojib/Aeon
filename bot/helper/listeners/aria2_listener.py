@@ -13,6 +13,7 @@ from bot.helper.mirror_utils.status_utils.aria2_status import Aria2Status
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.message_utils import deleteMessage, sendMessage, update_all_messages
 
+gid = ''.join(SystemRandom().choices(ascii_letters + digits, k=8))
 
 @new_thread
 async def __onDownloadStarted(api, gid):

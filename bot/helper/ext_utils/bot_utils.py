@@ -63,7 +63,7 @@ def get_readable_file_size(size_in_bytes):
 
 async def getDownloadByGid(gid):
     async with download_dict_lock:
-        return next((dl for dl in download_dict.values() if dl.gid()[0:8] == gid), None)
+        return next((dl for dl in download_dict.values() if dl.gid() == gid), None)
 
 async def getAllDownload(req_status, user_id=None):
     dls = []
