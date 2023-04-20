@@ -9,12 +9,16 @@ from aiofiles.os import path as aiopath
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 
-from bot import LOGGER, bot, categories, config_dict, download_dict, download_dict_lock
-from bot.helper.ext_utils.bot_utils import cmd_exec, get_telegraph_list, is_gdrive_link, is_rclone_path, is_share_link, new_task, sync_to_async
+from bot import (LOGGER, bot, categories, config_dict, download_dict,
+                 download_dict_lock)
+from bot.helper.ext_utils.bot_utils import (cmd_exec, get_telegraph_list,
+                                            is_gdrive_link, is_rclone_path,
+                                            is_share_link, new_task,
+                                            sync_to_async)
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.help_messages import CLONE_HELP_MESSAGE
 from bot.helper.ext_utils.task_manager import limit_checker
-from bot.helper.luna_utils import none_admin_utils, stop_duplicate_tasks
+from bot.helper.jmdkh_utils import none_admin_utils, stop_duplicate_tasks
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
 from bot.helper.mirror_utils.download_utils.direct_link_generator import direct_link_generator
 from bot.helper.mirror_utils.rclone_utils.list import RcloneList
@@ -24,7 +28,15 @@ from bot.helper.mirror_utils.status_utils.rclone_status import RcloneStatus
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import anno_checker, delete_links, deleteMessage, editMessage, isAdmin, open_category_btns, sendDmMessage, sendLogMessage, sendMessage, sendStatusMessage
+from bot.helper.telegram_helper.message_utils import (anno_checker,
+                                                      delete_links,
+                                                      deleteMessage,
+                                                      editMessage, isAdmin,
+                                                      open_category_btns,
+                                                      sendDmMessage,
+                                                      sendLogMessage,
+                                                      sendMessage,
+                                                      sendStatusMessage)
 
 
 async def rcloneNode(client, message, rcf, listener):
@@ -184,24 +196,39 @@ async def gdcloneNode(message, link, listener):
 
 @new_task
 async def clone(client, message):
-    text = message.text
-    args = text.split(maxsplit=1)
+    mesg = message.text.split('\n')
+    message_args = mesg[0].split(maxsplit=1)
     link = ''
+    select = False
     multi = 0
     raw_url = None
-    if len(args) > 1:
-        link = args[1].strip()
-        if not link.startswith(('up:', 'rcf:', 'id:', 'index:')):
-            link = re_split(r' up: | rcf: | id: | index: ', link)[0].strip()
-        if link.isdigit():
-            multi = int(link)
-            link = ''
-        elif sender_chat := message.sender_chat:
-            tag = sender_chat.title
-        elif username := message.from_user.username:
-            tag = f"@{username}"
-        else:
-            tag = message.from_user.mention
+    if len(message_args) > 1:
+        index = 1
+        args = mesg[0].split(maxsplit=2)
+        args.pop(0)
+        for x in args:
+            x = x.strip()
+            if x == 's':
+                select = True
+                index += 1
+            elif x.isdigit():
+                multi = int(x)
+                mi = index
+            else:
+                break
+        if multi == 0:
+            message_args = mesg[0].split(maxsplit=index)
+            if len(message_args) > index:
+                x = message_args[index].strip()
+                if not x.startswith(('up:', 'rcf:', 'id:', 'index:')):
+                    link = re_split(r' up: | rcf: | id: | index: ', x)[0].strip()
+
+    if sender_chat := message.sender_chat:
+        tag = sender_chat.title
+    elif username := message.from_user.username:
+        tag = f"@{username}"
+    else:
+        tag = message.from_user.mention
     if reply_to := message.reply_to_message:
         if len(link) == 0:
             link = reply_to.text.split('\n', 1)[0].strip()
@@ -213,21 +240,21 @@ async def clone(client, message):
             else:
                 tag = reply_to.from_user.mention
 
-    rcf = text.split(' rcf: ', 1)
+    rcf = mesg[0].split(' rcf: ', 1)
     rcf = re_split(' up: | id: | index: ', rcf[1])[
         0].strip() if len(rcf) > 1 else None
 
-    dst_path = text.split(' up: ', 1)
+    dst_path = mesg[0].split(' up: ', 1)
     dst_path = re_split(' rcf: | id: | index: ', dst_path[1])[
         0].strip() if len(dst_path) > 1 else None
 
-    drive_id = text.split(' id: ', 1)
+    drive_id = mesg[0].split(' id: ', 1)
     drive_id = re_split(' rcf: | up: | index: ', drive_id[1])[
         0].strip() if len(drive_id) > 1 else None
     if drive_id and is_gdrive_link(drive_id):
         drive_id = GoogleDriveHelper.getIdFromUrl(drive_id)
 
-    index_link = text.split(' index: ', 1)
+    index_link = mesg[0].split(' index: ', 1)
     index_link = re_split(' rcf: | up: | id: ', index_link[1])[
         0].strip() if len(index_link) > 1 else None
     if index_link and not index_link.startswith(('http://', 'https://')):
@@ -241,8 +268,9 @@ async def clone(client, message):
             return
         await sleep(4)
         nextmsg = await client.get_messages(chat_id=message.chat.id, message_ids=message.reply_to_message_id + 1)
-        args[1] = f"{multi - 1}"
-        nextmsg = await sendMessage(nextmsg, " ".join(args))
+        msg = message.text.split(maxsplit=mi+1)
+        msg[mi] = f"{multi - 1}"
+        nextmsg = await sendMessage(nextmsg, " ".join(msg))
         nextmsg = await client.get_messages(chat_id=message.chat.id, message_ids=nextmsg.id)
         if message.sender_chat:
             nextmsg.sender_chat = message.sender_chat
@@ -287,7 +315,7 @@ async def clone(client, message):
             await sendMessage(message, 'Destinantion not specified!')
             await delete_links(message)
             return
-        listener = MirrorLeechListener(message, tag=tag, isClone=True, drive_id=drive_id,
+        listener = MirrorLeechListener(message, tag=tag, select=select, isClone=True, drive_id=drive_id,
                                        index_link=index_link, dmMessage=dmMessage, logMessage=logMessage, raw_url=raw_url)
         await rcloneNode(client, message, link, listener)
     else:
@@ -301,7 +329,7 @@ async def clone(client, message):
             await sendMessage(message, 'GDRIVE_ID not Provided!')
             await delete_links(message)
             return
-        listener = MirrorLeechListener(message, tag=tag, isClone=True, drive_id=drive_id,
+        listener = MirrorLeechListener(message, tag=tag, select=select, isClone=True, drive_id=drive_id,
                                        index_link=index_link, dmMessage=dmMessage, logMessage=logMessage, raw_url=raw_url)
         await gdcloneNode(message, link, listener)
 

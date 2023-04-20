@@ -77,7 +77,7 @@ async def getAllDownload(req_status, user_id=None):
     return dls
 
 def bt_selection_buttons(id_, isCanCncl=True):
-    gid = id_[:12] if len(id_) > 20 else id_
+    gid = id_[:8
     pincode = ''.join([n for n in id_ if n.isdigit()][:4])
     buttons = ButtonMaker()
     BASE_URL = config_dict['BASE_URL']
