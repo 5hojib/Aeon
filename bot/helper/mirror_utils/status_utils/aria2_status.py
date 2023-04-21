@@ -51,12 +51,11 @@ class Aria2Status:
         return self.__download.total_length_string()
 
     def eta(self):
-        try:
-            seconds = (self.__size - self.__obj.processed_bytes) / \
-                self.__obj.speed
-            return f'{get_readable_time(seconds)}'
-        except:
-            return '-'
+        time_str = self.__download.eta_string()
+        hours, minutes, seconds = time_str.split('h')[0], time_str.split('m')[0].split('h')[1], time_str.split('s')[0].split('m')[1]
+        total_seconds = int(hours) * 3600 + int(minutes) * 60 + int(seconds)
+        return get_readable_time(total_seconds)
+   
     
     def status(self):
         self.__update()
