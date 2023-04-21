@@ -174,7 +174,7 @@ def get_readable_message():
         buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
         buttons.ibutton("Next", "status nex")
         button = buttons.build_menu(3)
-    msg += f"<b>• Tasks</b>: {tasks}"
+    msg += f"<b>• Tasks running</b>: {tasks}"
     msg += f"\n<b>• Free disk space</b>: {get_readable_file_size(disk_usage(config_dict['DOWNLOAD_DIR']).free)}"
     msg += f"\n<b>• Uploading speed</b>: {get_readable_file_size(up_speed)}/s"
     msg += f"\n<b>• Downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
@@ -210,13 +210,17 @@ async def check_user_tasks(user_id, maxtask):
         return len(tasks) >= maxtask
 
 def get_readable_time(seconds):
-    periods = [(' Days ', 86400), (' Hours ', 3600), (' Min ', 60), (' Sec', 1)]
+    periods = [('Year', 31536000), ('Month', 2592000), ('Week', 604800), ('Day', 86400), ('Hour', 3600), ('Minute', 60), ('Second', 1)]
     result = ''
     for period_name, period_seconds in periods:
         if seconds >= period_seconds:
             period_value, seconds = divmod(seconds, period_seconds)
-            result += f'{int(period_value)}{period_name}'
-    return result
+            plural_suffix = 's' if period_value > 1 else ''
+            result += f'{int(period_value)} {period_name}{plural_suffix} '
+            if len(result.split()) == 2:
+                break
+    return result.strip()
+
 
 def is_magnet(url):
     magnet = re_match(MAGNET_REGEX, url)
