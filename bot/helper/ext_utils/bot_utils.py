@@ -30,7 +30,7 @@ class MirrorStatus:
     STATUS_CLONING = "Cloning"
     STATUS_QUEUEDL = "DL waiting"
     STATUS_QUEUEUP = "UL waiting"
-    STATUS_PAUSED = "Pause"
+    STATUS_PAUSED = "Paused"
     STATUS_ARCHIVING = "Archiving"
     STATUS_EXTRACTING = "Extracting"
     STATUS_SPLITTING = "Splitting"
@@ -129,6 +129,7 @@ def get_readable_message():
             msg += f"\n<b>├ <a href='https://github.com/5hojib/Luna'>{get_progress_bar_string(download.progress())}</a></b> {download.progress()}"
             msg += f"\n<b>├ </b>{download.processed_bytes()} of {download.size()}"
             msg += f"\n<b>├ Speed</b>: {download.speed()}"
+            msg += f'\n<b>├ estimated</b>: {download.eta()}'
             if hasattr(download, 'seeders_num'):
                 try:
                     msg += f"\n<b>├ Seeders</b>: {download.seeders_num()} | <b>Leechers</b>: {download.leechers_num()}"
@@ -142,8 +143,8 @@ def get_readable_message():
             msg += f"\n<b>├ Time</b>: {download.seeding_time()}"
         else:
             msg += f"\n<b>├ Size</b>: {download.size()}"
-        msg += f"\n<b>├ Source</b>: {download.extra_details['source']}"
         msg += f"\n<b>├ Elapsed</b>: {get_readable_time(time() - download.extra_details['startTime'])}"
+        msg += f"\n<b>├ Source</b>: {download.extra_details['source']}"
         msg += f"\n<b>└ </b><code>/{BotCommands.CancelMirror} {download.gid()}</code>\n\n"
     if len(msg) == 0:
         return None, None
@@ -210,14 +211,14 @@ async def check_user_tasks(user_id, maxtask):
         return len(tasks) >= maxtask
 
 def get_readable_time(seconds):
-    periods = [('Year', 31536000), ('Month', 2592000), ('Week', 604800), ('Day', 86400), ('Hour', 3600), ('Minute', 60), ('Second', 1)]
+    periods = [('year', 31536000), ('month', 2592000), ('week', 604800), ('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
     result = ''
     for period_name, period_seconds in periods:
         if seconds >= period_seconds:
             period_value, seconds = divmod(seconds, period_seconds)
             plural_suffix = 's' if period_value > 1 else ''
             result += f'{int(period_value)} {period_name}{plural_suffix} '
-            if len(result.split()) == 4:
+            if len(result.split()) == 2:
                 break
     return result.strip()
 
