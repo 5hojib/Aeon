@@ -51,8 +51,13 @@ class Aria2Status:
         return self.__download.total_length_string()
 
     def eta(self):
-        return self.__download.eta_string()
-
+        try:
+            seconds = (self.__size - self.__obj.processed_bytes) / \
+                self.__obj.speed
+            return f'{get_readable_time(seconds)}'
+        except:
+            return '-'
+    
     def status(self):
         self.__update()
         if self.__download.is_waiting:
