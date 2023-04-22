@@ -14,7 +14,7 @@ class SplitStatus:
         self.engine = "ffmpeg"
 
     def gid(self):
-        return self.__gid[:8]
+        return self.__gid
 
     def progress(self):
         return '0'

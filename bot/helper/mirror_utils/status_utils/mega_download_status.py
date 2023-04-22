@@ -50,7 +50,7 @@ class MegaDownloadStatus:
         return f'{get_readable_file_size(self.__obj.speed)}/s'
 
     def gid(self):
-        return self.__gid[:8]
+        return self.__gid
 
     def download(self):
         return self.__obj

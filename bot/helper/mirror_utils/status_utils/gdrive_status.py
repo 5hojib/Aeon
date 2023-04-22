@@ -36,7 +36,7 @@ class GdriveStatus:
         return self.__obj.name
 
     def gid(self) -> str:
-        return self.__gid[:8]
+        return self.__gid
 
     def progress_raw(self):
         try:

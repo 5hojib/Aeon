@@ -99,7 +99,7 @@ async def __onDownloadStarted(api, gid):
 
 
 @new_thread
-async def __onDownloadComplete(api, gid[:8]):
+async def __onDownloadComplete(api, gid):
     try:
         download = await sync_to_async(api.get_download, gid)
     except:

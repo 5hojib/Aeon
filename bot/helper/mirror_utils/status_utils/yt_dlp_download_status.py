@@ -19,7 +19,7 @@ class YtDlpDownloadStatus:
         self.engine = engine_
 
     def gid(self):
-        return self.__gid[:8]
+        return self.__gid
 
     def processed_bytes(self):
         return get_readable_file_size(self.processed_raw())
