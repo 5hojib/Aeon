@@ -105,7 +105,7 @@ async def __onDownloadComplete(api, gid):
     except:
         return
     if download.followed_by_ids:
-        new_gid = download.followed_by_ids[0]
+        new_gid = download.followed_by_ids[0][:8]
         LOGGER.info(f'Gid changed from {gid} to {new_gid}')
         if dl := await getDownloadByGid(new_gid):
             listener = dl.listener()
@@ -115,7 +115,7 @@ async def __onDownloadComplete(api, gid):
                 msg = "Your download paused. Choose files then press Done Selecting button to start downloading."
                 await sendMessage(listener.message, msg, SBUTTONS)
     elif download.is_torrent:
-        if dl := await getDownloadByGid(gid):
+        if dl := await getDownloadByGid(gid[:8]):
             if hasattr(dl, 'listener') and dl.seeding:
                 LOGGER.info(
                     f"Cancelling Seed: {download.name} onDownloadComplete")
@@ -124,7 +124,7 @@ async def __onDownloadComplete(api, gid):
                 await sync_to_async(api.remove, [download], force=True, files=True)
     else:
         LOGGER.info(f"onDownloadComplete: {download.name} - Gid: {gid}")
-        if dl := await getDownloadByGid(gid):
+        if dl := await getDownloadByGid(gid[:8]):
             listener = dl.listener()
             await listener.onDownloadComplete()
             await sync_to_async(api.remove, [download], force=True, files=True)
@@ -136,7 +136,7 @@ async def __onBtDownloadComplete(api, gid):
     await sleep(1)
     download = await sync_to_async(api.get_download, gid)
     LOGGER.info(f"onBtDownloadComplete: {download.name} - Gid: {gid}")
-    if dl := await getDownloadByGid(gid):
+    if dl := await getDownloadByGid(gid[:8]):
         listener = dl.listener()
         if listener.select:
             res = download.files
@@ -163,7 +163,7 @@ async def __onBtDownloadComplete(api, gid):
         download = download.live
         if listener.seed:
             if download.is_complete:
-                if dl := await getDownloadByGid(gid):
+                if dl := await getDownloadByGid(gid[:8]):
                     LOGGER.info(f"Cancelling Seed: {download.name}")
                     await listener.onUploadError(f"Seeding stopped with Ratio: {dl.ratio()} and Time: {dl.seeding_time()}")
                     await sync_to_async(api.remove, [download], force=True, files=True)
@@ -184,7 +184,7 @@ async def __onBtDownloadComplete(api, gid):
 @new_thread
 async def __onDownloadStopped(api, gid):
     await sleep(6)
-    if dl := await getDownloadByGid(gid):
+    if dl := await getDownloadByGid(gid[:8]):
         listener = dl.listener()
         await listener.onDownloadError('Dead torrent!')
 
@@ -199,7 +199,7 @@ async def __onDownloadError(api, gid):
         LOGGER.info(f"Download Error: {error}")
     except:
         pass
-    if dl := await getDownloadByGid(gid):
+    if dl := await getDownloadByGid(gid[:8]):
         listener = dl.listener()
         await listener.onDownloadError(error)
 
