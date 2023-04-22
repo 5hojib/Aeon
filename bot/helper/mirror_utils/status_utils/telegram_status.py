@@ -51,7 +51,7 @@ class TelegramStatus:
             return '-'
 
     def gid(self) -> str:
-        return self.__gid
+        return self.__gid[:8]
 
     def download(self):
         return self.__obj

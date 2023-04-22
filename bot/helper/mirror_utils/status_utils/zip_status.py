@@ -20,7 +20,7 @@ class ZipStatus:
         self.engine = "7z"
 
     def gid(self):
-        return self.__gid
+        return self.__gid[:8]
 
     def speed_raw(self):
         return self.processed_raw() / (time() - self.__start_time)

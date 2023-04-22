@@ -11,7 +11,7 @@ class RcloneStatus:
         self.engine = "rclone"
 
     def gid(self):
-        return self.__gid
+        return self.__gid[:8]
 
     def progress(self):
         return self.__obj.percentage

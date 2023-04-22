@@ -15,7 +15,7 @@ class QueueStatus:
         self.engine = "Queue System"
 
     def gid(self):
-        return self.__gid
+        return self.__gid[:8]
 
     def name(self):
         return self.__name
