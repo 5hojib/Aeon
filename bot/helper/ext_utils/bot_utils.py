@@ -129,7 +129,7 @@ def get_readable_message():
             msg += f"\n<b>├ <a href='https://github.com/5hojib/Luna'>{get_progress_bar_string(download.progress())}</a></b> {download.progress()}"
             msg += f"\n<b>├ </b>{download.processed_bytes()} of {download.size()}"
             msg += f"\n<b>├ Speed</b>: {download.speed()}"
-            msg += f'\n<b>├ Estimated</b>: {get_readable_time(download.eta())}'
+            msg += f'\n<b>├ Estimated</b>: {download.eta()}'
             if hasattr(download, 'seeders_num'):
                 try:
                     msg += f"\n<b>├ Seeders</b>: {download.seeders_num()} | <b>Leechers</b>: {download.leechers_num()}"
