@@ -43,7 +43,7 @@ default_values = {'AUTO_DELETE_MESSAGE_DURATION': 30,
                   'RSS_DELAY': 900,
                   'STATUS_UPDATE_INTERVAL': 10,
                   'SEARCH_LIMIT': 0,
-                  'UPSTREAM_BRANCH': 'Luna'}
+                  'UPSTREAM_BRANCH': 'jmdkh'}
 
 
 async def load_config():
@@ -286,7 +286,7 @@ async def load_config():
 
     UPSTREAM_BRANCH = environ.get('UPSTREAM_BRANCH', '')
     if len(UPSTREAM_BRANCH) == 0:
-        UPSTREAM_BRANCH = 'Luna'
+        UPSTREAM_BRANCH = 'jmdkh'
 
     LOG_CHAT = environ.get('LOG_CHAT', '')
     LOG_CHAT = '' if len(LOG_CHAT) == 0 else int(LOG_CHAT)

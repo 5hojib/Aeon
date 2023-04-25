@@ -1,7 +1,7 @@
 services:
   # A Docker web service
   - type: web
-    name: LunaPortal
+    name: Luna
     env: docker
     region: Singapore
     plan: free
@@ -21,3 +21,5 @@ services:
       - key: TELEGRAM_HASH
         # value: TELEGRAM_HASH
         sync: false
+      - key: PORT
+        value: 80
