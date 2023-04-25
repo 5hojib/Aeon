@@ -1,0 +1,25 @@
+services:
+  # A Docker web service
+  - type: web
+    name: Luna
+    env: docker
+    region: Singapore
+    plan: free
+    envVars:
+      - key: BOT_TOKEN
+        # value: BOT_TOKEN
+        sync: false
+      - key: DATABASE_URL
+        # value: DATABASE_URL
+        sync: false
+      - key: OWNER_ID
+        # value: OWNER_ID
+        sync: false
+      - key: TELEGRAM_API
+        # value: TELEGRAM_API
+        sync: false
+      - key: TELEGRAM_HASH
+        # value: TELEGRAM_HASH
+        sync: false
+      - key: PORT
+        value: 80

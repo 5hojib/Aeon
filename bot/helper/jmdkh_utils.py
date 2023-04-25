@@ -55,7 +55,7 @@ async def none_admin_utils(message, tag, isLeech):
         return notSub
     if (maxtask := config_dict['USER_MAX_TASKS']) and await check_user_tasks(message.from_user.id, maxtask):
         await delete_links(message)
-        return await sendMessage(message, f"Your tasks limit exceeded for {maxtask} tasks")
+        return await sendMessage(message, f"Your tasks limit exceeded for {maxtask} tasks!")
     if isLeech and config_dict['DISABLE_LEECH']:
         await delete_links(message)
-        return await sendMessage(message, 'Locked!')
+        return await sendMessage(message, 'Leech disabled by admin!')
