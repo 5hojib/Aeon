@@ -39,7 +39,7 @@ from bot.helper.telegram_helper.message_utils import (anno_checker,
                                                       sendStatusMessage)
 
 
-async def rcloneNode(client, message, rcf, listener):
+async def rcloneNode(client, message, link, dst_path, rcf, listener):
     if link == 'rcl':
         link = await RcloneList(client, message).get_rclone_path('rcd')
         if not is_rclone_path(link):
