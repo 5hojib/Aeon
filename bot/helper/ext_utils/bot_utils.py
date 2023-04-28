@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-from asyncio import create_subprocess_exec, create_subprocess_shell, run_coroutine_threadsafe, sleep
+from asyncio import (create_subprocess_exec, create_subprocess_shell,
+                     run_coroutine_threadsafe, sleep)
 from asyncio.subprocess import PIPE
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial, wraps
@@ -7,11 +8,13 @@ from html import escape
 from re import match as re_match
 from time import time
 from urllib.request import urlopen
+from uuid import uuid4
 from psutil import cpu_percent, disk_usage, virtual_memory
 from pyrogram.types import BotCommand
 from requests import head as rhead
-
-from bot import bot_loop, botStartTime, config_dict, download_dict, download_dict_lock, extra_buttons, user_data
+from bot import (bot_loop, bot_name, botStartTime, config_dict, download_dict,
+                 download_dict_lock, extra_buttons, user_data)
+from bot.helper.ext_utils.shortener import short_url
 from bot.helper.ext_utils.telegraph_helper import telegraph
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
@@ -181,12 +184,6 @@ def get_readable_message():
     msg += f"\n<b>• Downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
     return msg, button
 
-def extra_btns(buttons):
-    if extra_buttons:
-        for btn_name, btn_url in extra_buttons.items():
-            buttons.ubutton(btn_name, btn_url)
-    return buttons
-
 async def turn_page(data):
     STATUS_LIMIT = config_dict['STATUS_LIMIT']
     global STATUS_START, PAGE_NO
@@ -205,10 +202,6 @@ async def turn_page(data):
             else:
                 STATUS_START -= STATUS_LIMIT
                 PAGE_NO -= 1
-
-async def check_user_tasks(user_id, maxtask):
-    if tasks:= await getAllDownload(MirrorStatus.STATUS_DOWNLOADING, user_id):
-        return len(tasks) >= maxtask
 
 def get_readable_time(seconds):
     periods = [('year', 31536000), ('month', 2592000), ('week', 604800), ('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
@@ -246,6 +239,36 @@ def is_mega_link(url):
 
 def is_rclone_path(path):
     return bool(re_match(r'^(mrcc:)?(?!magnet:)(?![- ])[a-zA-Z0-9_\. -]+(?<! ):(?!.*\/\/).*$|^rcl$', path))
+
+def extra_btns(buttons):
+    if extra_buttons:
+        for btn_name, btn_url in extra_buttons.items():
+            buttons.ubutton(btn_name, btn_url)
+    return buttons
+
+
+async def check_user_tasks(user_id, maxtask):
+    if tasks := await getAllDownload(MirrorStatus.STATUS_DOWNLOADING, user_id):
+        return len(tasks) >= maxtask
+
+
+def checking_access(user_id, button=None):
+    user_data.setdefault(user_id, {})
+    data = user_data[user_id]
+    expire = data.get('time')
+    isExpired = (expire is None or expire is not None and (time() - expire) > config_dict['TOKEN_TIMEOUT'])
+    if isExpired:
+        token = data['token'] if expire is None and 'token' in data else str(uuid4())
+        if expire is not None:
+            del data['time']
+        data['token'] = token
+        user_data[user_id].update(data)
+        if button is None:
+            button = ButtonMaker()
+        button.ubutton('Get access', short_url(f'https://t.me/{bot_name}?start={token}'))
+        return 'Token is expired.', button
+    return None, button
+
 
 def get_mega_link_type(url):
     return "folder" if "folder" in url or "/#F!" in url else "file"
