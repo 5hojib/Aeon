@@ -44,9 +44,8 @@ load_dotenv('config.env', override=True)
 Interval = []
 QbInterval = []
 QbTorrents = {}
-list_drives = {}
-SHORTENERES = []
-SHORTENER_APIS = []
+list_drives_dict = {}
+shorteneres_list = []
 extra_buttons = {}
 GLOBAL_EXTENSION_FILTER = ['.aria2']
 user_data = {}
@@ -54,7 +53,7 @@ aria2_options = {}
 qbit_options = {}
 queued_dl = {}
 queued_up = {}
-categories = {}
+categories_dict = {}
 non_queued_dl = set()
 non_queued_up = set()
 download_dict_lock = Lock()
@@ -64,7 +63,7 @@ qb_listener_lock = Lock()
 status_reply_dict = {}
 download_dict = {}
 rss_dict = {}
-btn_listener = {}
+cached_dict = {}
 
 BOT_TOKEN = environ.get('BOT_TOKEN', '')
 if len(BOT_TOKEN) == 0:
@@ -469,8 +468,8 @@ config_dict = {
 config_dict = OrderedDict(sorted(config_dict.items()))
 
 if GDRIVE_ID:
-    list_drives['Main'] = {"drive_id": GDRIVE_ID, "index_link": INDEX_URL}
-    categories['Root'] = {"drive_id": GDRIVE_ID, "index_link": INDEX_URL}
+    list_drives_dict['Main'] = {"drive_id": GDRIVE_ID, "index_link": INDEX_URL}
+    categories_dict['Root'] = {"drive_id": GDRIVE_ID, "index_link": INDEX_URL}
 
 if ospath.exists('list_drives.txt'):
     with open('list_drives.txt', 'r+') as f:
@@ -486,7 +485,7 @@ if ospath.exists('list_drives.txt'):
                 tempdict['index_link'] = temp[2]
             else:
                 tempdict['index_link'] = ''
-            list_drives[name] = tempdict
+            list_drives_dict[name] = tempdict
 
 if ospath.exists('buttons.txt'):
     with open('buttons.txt', 'r+') as f:
@@ -504,8 +503,7 @@ if ospath.exists('shorteners.txt'):
         for line in lines:
             temp = line.strip().split()
             if len(temp) == 2:
-                SHORTENERES.append(temp[0])
-                SHORTENER_APIS.append(temp[1])
+                shorteneres_list.append({'domain': temp[0],'api_key': temp[1]})
 
 if ospath.exists('categories.txt'):
     with open('categories.txt', 'r+') as f:
@@ -521,7 +519,7 @@ if ospath.exists('categories.txt'):
                 tempdict['index_link'] = temp[2]
             else:
                 tempdict['index_link'] = ''
-            categories[name] = tempdict
+            categories_dict[name] = tempdict
 
 Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{BASE_URL_PORT}", shell=True)
 alive = Popen(["python3", "alive.py"])

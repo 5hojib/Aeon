@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 from mega import MegaApi
 
-from bot.helper.ext_utils.bot_utils import MirrorStatus, get_readable_file_size, get_readable_time
+from bot.helper.ext_utils.bot_utils import (MirrorStatus,
+                                            get_readable_file_size,
+                                            get_readable_time)
 
 engine_ = "MegaSDK"
 
@@ -39,7 +41,7 @@ class MegaDownloadStatus:
         try:
             seconds = (self.__size - self.__obj.downloaded_bytes) / \
                 self.__obj.speed
-            return f'{get_readable_time(seconds)}'
+            return get_readable_time(seconds)
         except ZeroDivisionError:
             return '-'
 

@@ -13,7 +13,7 @@ from psutil import boot_time, cpu_count, cpu_percent, disk_usage, net_io_counter
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 
-from bot import DATABASE_URL, INCOMPLETE_TASK_NOTIFIER, LOGGER, STOP_DUPLICATE_TASKS, Interval, QbInterval, bot, user_data, botStartTime, config_dict, scheduler
+from bot import DATABASE_URL, INCOMPLETE_TASK_NOTIFIER, LOGGER, STOP_DUPLICATE_TASKS, Interval, QbInterval, bot, user_data, botStartTime, config_dict, scheduler, alive
 
 from bot.helper.listeners.aria2_listener import start_aria2_listener
 from .helper.ext_utils.bot_utils import cmd_exec, get_readable_file_size, get_readable_time, set_commands, sync_to_async

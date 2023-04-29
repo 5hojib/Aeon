@@ -8,8 +8,11 @@ from aiofiles.os import path as aiopath
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 
-from bot import IS_PREMIUM_USER, LOGGER, bot, categories, config_dict
-from bot.helper.ext_utils.bot_utils import get_content_type, is_gdrive_link, is_magnet, is_mega_link, is_rclone_path, is_url, new_task, sync_to_async
+from bot import IS_PREMIUM_USER, LOGGER, bot, categories_dict, config_dict
+from bot.helper.ext_utils.bot_utils import (get_content_type, is_gdrive_link,
+                                            is_magnet, is_mega_link,
+                                            is_rclone_path, is_url, new_task,
+                                            sync_to_async)
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.help_messages import MIRROR_HELP_MESSAGE
 from bot.helper.jmdkh_utils import none_admin_utils, stop_duplicate_tasks
@@ -25,7 +28,14 @@ from bot.helper.mirror_utils.rclone_utils.list import RcloneList
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import anno_checker, delete_links, editMessage, isAdmin, open_category_btns, sendDmMessage, sendLogMessage, sendMessage
+from bot.helper.telegram_helper.message_utils import (anno_checker,
+                                                      delete_links,
+                                                      editMessage, isAdmin,
+                                                      isBot_canDm,
+                                                      open_category_btns,
+                                                      request_limiter,
+                                                      sendLogMessage,
+                                                      sendMessage)
 
 
 @new_task
@@ -80,7 +90,8 @@ async def _mirror_leech(client, message, isZip=False, extract=False, isQbit=Fals
             if len(message_args) > index:
                 x = message_args[index].strip()
                 if not x.startswith(('n:', 'pswd:', 'up:', 'rcf:', 'id:', 'index:')):
-                    link = re_split(r' pswd: | n: | up: | rcf: | id: | index: ', x)[0].strip()
+                    link = re_split(r' pswd: | n: | up: | rcf: | id: | index: ', x)[
+                        0].strip()
 
         if len(folder_name) > 0:
             seed = False
@@ -181,23 +192,36 @@ async def _mirror_leech(client, message, isZip=False, extract=False, isQbit=Fals
     if not message.from_user:
         await delete_links(message)
         return
+    error_msg = []
+    error_button = None
     if not await isAdmin(message):
+        if await request_limiter(message):
+            await delete_links(message)
+            return
         raw_url = await stop_duplicate_tasks(message, link, file_)
         if raw_url == 'duplicate_tasks':
             await delete_links(message)
             return
-        if await none_admin_utils(message, tag, isLeech):
-            return
+        none_admin_msg, error_button = await none_admin_utils(message, isLeech)
+        if none_admin_msg:
+            error_msg.extend(none_admin_msg)
     if (dmMode := config_dict['DM_MODE']) and message.chat.type == message.chat.type.SUPERGROUP:
-        if isLeech and IS_PREMIUM_USER and not config_dict['DUMP_CHAT']:
-            await delete_links(message)
-            return await sendMessage(message, 'DM_MODE and User Session need DUMP_CHAT')
-        dmMessage = await sendDmMessage(message, dmMode, isLeech)
-        if dmMessage == 'BotNotStarted':
-            await delete_links(message)
-            return
+        if isLeech and IS_PREMIUM_USER and not config_dict['DUMP_CHAT_ID']:
+            error_msg.append('DM_MODE and User Session need DUMP_CHAT_ID')
+        dmMessage, error_button = await isBot_canDm(message, dmMode, isLeech, error_button)
+        if dmMessage is not None and dmMessage != 'BotStarted':
+            error_msg.append(dmMessage)
     else:
         dmMessage = None
+    if error_msg:
+        final_msg = f'Hey, <b>{tag}</b>,\n'
+        for __i, __msg in enumerate(error_msg, 1):
+            final_msg += f'\n<b>{__i}</b>: {__msg}\n'
+        if error_button is not None:
+            error_button = error_button.build_menu(2)
+        await delete_links(message)
+        await sendMessage(message, final_msg, error_button)
+        return
     logMessage = await sendLogMessage(message, link, tag)
 
     if link:
@@ -227,7 +251,7 @@ async def _mirror_leech(client, message, isZip=False, extract=False, isQbit=Fals
             up = config_dict['RCLONE_PATH']
         if up is None and config_dict['DEFAULT_UPLOAD'] == 'gd':
             up = 'gd'
-            if not drive_id and len(categories) > 1:
+            if not drive_id and len(categories_dict) > 1:
                 drive_id, index_link = await open_category_btns(message)
             if drive_id and not await sync_to_async(GoogleDriveHelper().getFolderData, drive_id):
                 return await sendMessage(message, "Google Drive id validation failed!!")
