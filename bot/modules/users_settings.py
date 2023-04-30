@@ -93,7 +93,7 @@ async def get_user_settings(from_user):
            f"<b>Leech Split Size</b>: {split_size}\n"\
            f"<b>Equal Splits</b>: {equal_splits}\n"\
            f"<b>Media Group</b>: {media_group}</b>\n"\
-           f"<b>YT-DLP Quality</b>: {escape(ytq)}\n"\
+           f"<b>YT-DLP Quality</b>: {escape(ytopt)}\n"\
            f"<b>Leech Prefix</b>: {escape(lprefix)}"
     return text, buttons.build_menu(1)
 
