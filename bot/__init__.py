@@ -385,7 +385,7 @@ TOKEN_TIMEOUT = environ.get('TOKEN_TIMEOUT', '')
 if TOKEN_TIMEOUT.isdigit():
     TOKEN_TIMEOUT = int(TOKEN_TIMEOUT)
 else:
-    TOKEN_TIMEOUT = 21600
+    TOKEN_TIMEOUT = ''
 
 FSUB_IDS = environ.get('FSUB_IDS', '')
 if len(FSUB_IDS) == 0:

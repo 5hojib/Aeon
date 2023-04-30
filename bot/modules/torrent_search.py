@@ -225,10 +225,11 @@ async def torrentSearch(client, message):
     if not await isAdmin(message, user_id):
         if await request_limiter(message):
             return
-        msg, buttons = checking_access(user_id, buttons)
-        if msg is not None:
-            await sendMessage(message, msg, buttons.build_menu(1))
-            return
+        if message.chat.type != message.chat.type.PRIVATE:
+            msg, buttons = checking_access(user_id, buttons)
+            if msg is not None:
+                await sendMessage(message, msg, buttons.build_menu(1))
+                return
     key = message.text.split()
     SEARCH_PLUGINS = config_dict['SEARCH_PLUGINS']
     if SITES is None and not SEARCH_PLUGINS:

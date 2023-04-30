@@ -296,7 +296,7 @@ async def check_user_tasks(user_id, maxtask):
 
 
 def checking_access(user_id, button=None):
-    if not config_dict['TOKEN_TIMEOUT'] or config_dict['TOKEN_TIMEOUT'] == 0:
+    if not config_dict['TOKEN_TIMEOUT']:
         return None, button
     user_data.setdefault(user_id, {})
     data = user_data[user_id]

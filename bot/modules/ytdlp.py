@@ -254,8 +254,6 @@ async def _mdisk(link, name):
 @new_task
 async def _ytdl(client, message, isZip=False, isLeech=False, sameDir={}):
     mssg = message.text
-    user_id = message.from_user.id
-    msg_id = message.id
     qual = ''
     select = False
     multi = 0
@@ -307,6 +305,8 @@ async def _ytdl(client, message, isZip=False, isLeech=False, sameDir={}):
         if len(folder_name) > 0:
             sameDir.add(nextmsg.id)
         nextmsg.from_user = message.from_user
+        if message.sender_chat:
+            nextmsg.sender_chat = message.sender_chat
         await sleep(4)
         _ytdl(client, nextmsg, isZip, isLeech, sameDir)
 
@@ -368,7 +368,6 @@ async def _ytdl(client, message, isZip=False, isLeech=False, sameDir={}):
 
     if not is_url(link):
         await sendMessage(message, YT_HELP_MESSAGE.format_map({'cmd': message.command[0], 'fmg': '{"ffmpeg": ["-threads", "4"]}'}))
-
         await delete_links(message)
         return
     if not message.from_user:

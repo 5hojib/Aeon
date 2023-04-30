@@ -82,10 +82,11 @@ async def drive_list(client, message):
     if not await isAdmin(message, user_id):
         if await request_limiter(message):
             return
-        msg, btn = checking_access(user_id)
-        if msg is not None:
-            await sendMessage(message, msg, btn.build_menu(1))
-            return
+        if message.chat.type != message.chat.type.PRIVATE:
+            msg, btn = checking_access(user_id)
+            if msg is not None:
+                await sendMessage(message, msg, btn.build_menu(1))
+                return
     buttons = await list_buttons(user_id)
     await sendMessage(message, 'Choose list options:', buttons)
 

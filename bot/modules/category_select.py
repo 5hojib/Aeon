@@ -3,9 +3,9 @@ from pyrogram.handlers import CallbackQueryHandler, MessageHandler
 
 from bot import (bot, cached_dict, categories_dict, download_dict,
                  download_dict_lock)
-from bot.helper.ext_utils.bot_utils import (MirrorStatus, checking_access,
-                                            getDownloadByGid, is_gdrive_link,
-                                            is_url, new_task, sync_to_async)
+from bot.helper.ext_utils.bot_utils import (MirrorStatus, getDownloadByGid,
+                                            is_gdrive_link, is_url, new_task,
+                                            sync_to_async)
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
@@ -22,13 +22,8 @@ async def change_category(client, message):
     if not message.from_user:
         return
     user_id = message.from_user.id
-    if not await isAdmin(message, user_id):
-        if await request_limiter(message):
-            return
-        msg, btn = checking_access(user_id)
-        if msg is not None:
-            await sendMessage(message, msg, btn.build_menu(1))
-            return
+    if not await isAdmin(message, user_id) and await request_limiter(message):
+        return
     mesg = message.text.split('\n')
     message_args = mesg[0].split(maxsplit=1)
     index = 1

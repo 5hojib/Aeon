@@ -44,7 +44,6 @@ default_values = {'AUTO_DELETE_MESSAGE_DURATION': 30,
                   'RSS_DELAY': 900,
                   'STATUS_UPDATE_INTERVAL': 10,
                   'SEARCH_LIMIT': 0,
-                  'TOKEN_TIMEOUT': 3600,
                   'UPSTREAM_BRANCH': 'jmdkh'}
 
 
@@ -362,7 +361,7 @@ async def load_config():
     if TOKEN_TIMEOUT.isdigit():
         TOKEN_TIMEOUT = int(TOKEN_TIMEOUT)
     else:
-        TOKEN_TIMEOUT = 3600
+        TOKEN_TIMEOUT = ''
 
     list_drives_dict.clear()
     categories_dict.clear()
