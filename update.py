@@ -40,7 +40,7 @@ if len(UPSTREAM_REPO) == 0:
 
 UPSTREAM_BRANCH = environ.get('UPSTREAM_BRANCH', '')
 if len(UPSTREAM_BRANCH) == 0:
-    UPSTREAM_BRANCH = 'Luna'
+    UPSTREAM_BRANCH = 'jmdkh'
 
 if UPSTREAM_REPO:
     if ospath.exists('.git'):
