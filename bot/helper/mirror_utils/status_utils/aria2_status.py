@@ -16,10 +16,11 @@ engine_ = "Aria2c"
 
 class Aria2Status:
 
-    def __init__(self, gid, listener, seeding=False):
+    def __init__(self, gid, listener, seeding=False, queued=False):
         self.__gid = gid
         self.__download = get_download(gid)
         self.__listener = listener
+        self.queued = queued
         self.start_time = 0
         self.seeding = seeding
         self.message = listener.message
@@ -52,10 +53,10 @@ class Aria2Status:
 
     def eta(self):
         return get_readable_time(int(self.__download.eta.total_seconds()))
-     
+
     def status(self):
         self.__update()
-        if self.__download.is_waiting:
+        if self.__download.is_waiting or self.queued:
             if self.seeding:
                 return MirrorStatus.STATUS_QUEUEUP
             else:
@@ -84,7 +85,7 @@ class Aria2Status:
         return f"{round(self.__download.upload_length / self.__download.completed_length, 3)}"
 
     def seeding_time(self):
-        return f"{get_readable_time(time() - self.start_time)}"
+        return get_readable_time(time() - self.start_time)
 
     def download(self):
         return self
@@ -97,6 +98,7 @@ class Aria2Status:
         return self.__gid
 
     async def cancel_download(self):
+        self.__update()
         await sync_to_async(self.__update)
         if self.__download.seeder and self.seeding:
             LOGGER.info(f"Cancelling Seed: {self.name()}")
@@ -108,6 +110,11 @@ class Aria2Status:
             downloads.append(self.__download)
             await sync_to_async(aria2.remove, downloads, force=True, files=True)
         else:
-            LOGGER.info(f"Cancelling Download: {self.name()}")
-            await self.__listener.onDownloadError('Download stopped by user!')
+            if self.queued:
+                LOGGER.info(f'Cancelling QueueDl: {self.name()}')
+                msg = 'task have been removed from queue/download'
+            else:
+                LOGGER.info(f"Cancelling Download: {self.name()}")
+                msg = 'Download stopped by user!'
+            await self.__listener.onDownloadError(msg)
             await sync_to_async(aria2.remove, [self.__download], force=True, files=True)

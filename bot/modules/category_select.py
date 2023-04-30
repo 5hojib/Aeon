@@ -1,7 +1,7 @@
 from pyrogram.filters import command, regex
 from pyrogram.handlers import CallbackQueryHandler, MessageHandler
 
-from bot import (bot, btn_listener, categories, download_dict,
+from bot import (bot, cached_dict, categories_dict, download_dict,
                  download_dict_lock)
 from bot.helper.ext_utils.bot_utils import (MirrorStatus, getDownloadByGid,
                                             is_gdrive_link, is_url, new_task,
@@ -10,8 +10,9 @@ from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import (anno_checker,
-                                                      editMessage,
+                                                      editMessage, isAdmin,
                                                       open_category_btns,
+                                                      request_limiter,
                                                       sendMessage)
 
 
@@ -21,6 +22,8 @@ async def change_category(client, message):
     if not message.from_user:
         return
     user_id = message.from_user.id
+    if not await isAdmin(message, user_id) and await request_limiter(message):
+        return
     mesg = message.text.split('\n')
     message_args = mesg[0].split(maxsplit=1)
     index = 1
@@ -77,7 +80,7 @@ drive_id must be folder id and index must be url else it will not accept
         return
     listener = dl.listener() if dl and hasattr(dl, 'listener') else None
     if listener and not listener.isLeech:
-        if not index_link and not drive_id and categories:
+        if not index_link and not drive_id and categories_dict:
             drive_id, index_link = await open_category_btns(message)
         if not index_link and not drive_id:
             return await sendMessage(message, "Time out")
@@ -102,13 +105,13 @@ async def confirm_category(client, query):
     user_id = query.from_user.id
     data = query.data.split(maxsplit=3)
     msg_id = int(data[2])
-    if msg_id not in btn_listener:
+    if msg_id not in cached_dict:
         return await editMessage(query.message, '<b>Old Task</b>')
     if user_id != int(data[1]) and not await CustomFilters.sudo(client, query):
         return await query.answer(text="This task is not for you!", show_alert=True)
     await query.answer()
-    btn_listener[msg_id][0] = categories[data[3]].get('drive_id')
-    btn_listener[msg_id][1] = categories[data[3]].get('index_link')
+    cached_dict[msg_id][0] = categories_dict[data[3]].get('drive_id')
+    cached_dict[msg_id][1] = categories_dict[data[3]].get('index_link')
         
 
 bot.add_handler(MessageHandler(change_category, filters=command(BotCommands.CategorySelect) & CustomFilters.authorized))

@@ -1,26 +1,120 @@
 #!/usr/bin/env python3
 
 YT_HELP_MESSAGE = """
-<a href='https://telegra.ph/Mirror-Leech-YtDl-04-08'>Click here</a>
+<b>Send link along with command line:</b>
+<code>/{cmd}</code> s link n: newname pswd: xx(zip) opt: x:y|x1:y1
+
+<b>By replying to link:</b>
+<code>/{cmd}</code> n: newname pswd: xx(zip) opt: x:y|x1:y1
+
+<b>Upload Custom Drive</b>
+<code>/{cmd}</code> link or by replying to file/link <b>id:</b> <code>drive_folder_link</code> or <code>drive_id</code> <b>index:</b> <code>https://anything.in/0:</code>
+drive_id must be folder id and index must be url else it will not accept
+This options should be always after n: or pswd:
+
+<b>Quality Buttons:</b>
+Incase default quality added but you need to select quality for specific link or links with multi links feature.
+<code>/{cmd}</code> s link
+This option should be always before n:, pswd: and opt:
+
+<b>Options Example:</b> opt: playliststart:^10|matchtitle:S13|writesubtitles:true|live_from_start:true|postprocessor_args:{fmg}|wait_for_video:(5, 100)
+
+<b>Multi links only by replying to first link:</b>
+<code>/{cmd}</code> 10(number of links)
+Number should be always before n:, pswd: and opt:
+
+<b>Multi links within same upload directory only by replying to first link:</b>
+<code>/{cmd}</code> 10(number of links) m:folder_name
+Number and m:folder_name should be always before n:, pswd: and opt:
+
+<b>Options Note:</b> Add `^` before integer, some values must be integer and some string.
+Like playlist_items:10 works with string, so no need to add `^` before the number but playlistend works only with integer so you must add `^` before the number like example above.
+You can add tuple and dict also. Use double quotes inside dict.
+
+<b>Rclone Upload</b>:
+<code>/{cmd}</code> link up: <code>rcl</code> (To select config, remote and path)
+You can directly add the upload path. up: remote:dir/subdir
+If DEFAULT_UPLOAD is `rc` then you can pass up: `gd` to upload using gdrive tools to GDRIVE_ID.
+If DEFAULT_UPLOAD is `gd` then you can pass up: `rc` to upload to RCLONE_PATH.
+If you want to add path manually from your config (uploaded from usetting) add <code>mrcc:</code> before the path without space
+<code>/{cmd}</code> link up: <code>mrcc:</code>main:dump
+
+<b>Rclone Flags</b>:
+<code>/{cmd}</code> link up: path|rcl rcf: --buffer-size:8M|--drive-starred-only|key|key:value
+This will override all other flags except --exclude
+Check here all <a href='https://rclone.org/flags/'>RcloneFlags</a>.
+
+<b>NOTES:</b>
+1. When use cmd by reply don't add any option in link msg! Always add them after cmd msg!
+2. Options (<b>s, m: and multi</b>) should be added randomly before link and before any other option.
+3. Options (<b>n:, pswd: and opt:</b>) should be added randomly after the link if link along with the cmd or after cmd if by reply.
+4. You can always add video quality from yt-dlp api options.
+5. Don't add file extension while rename using `n:`
+
+Check all yt-dlp api options from this <a href='https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/YoutubeDL.py#L184'>FILE</a>.
 """
 
 MIRROR_HELP_MESSAGE = """
-<a href='https://telegra.ph/Mirror-Leech-YtDl-04-08'>Click here</a>
+<code>/{cmd}</code> link n: newname pswd: xx(zip/unzip)
+
+<b>By replying to link/file:</b>
+<code>/{cmd}</code> n: newname pswd: xx(zip/unzip)
+
+<b>Upload Custom Drive</b>
+<code>/{cmd}</code> link or by replying to file/link <b>id:</b> <code>drive_folder_link</code> or <code>drive_id</code> <b>index:</b> <code>https://anything.in/0:</code>
+drive_id must be folder id and index must be url else it will not accept
+This options should be always after n: or pswd:
+
+<b>Direct link authorization:</b>
+<code>/{cmd}</code> link n: newname pswd: xx(zip/unzip)
+<b>username</b>
+<b>password</b>
+
+<b>Bittorrent selection:</b>
+<code>/{cmd}</code> <b>s</b> link or by replying to file/link
+This option should be always before n: or pswd:
+
+<b>Bittorrent seed</b>:
+<code>/{cmd}</code> <b>d</b> link or by replying to file/link
+To specify ratio and seed time add d:ratio:time. Ex: d:0.7:10 (ratio and time) or d:0.7 (only ratio) or d::10 (only time) where time in minutes.
+Those options should be always before n: or pswd:
+
+<b>Multi links only by replying to first link/file:</b>
+<code>/{cmd}</code> 10(number of links/files)
+Number should be always before n: or pswd:
+
+<b>Multi links within same upload directory only by replying to first link/file:</b>
+<code>/{cmd}</code> 10(number of links/files) m:folder_name
+Number and m:folder_name (folder_name without space) should be always before n: or pswd:
+
+<b>Rclone Download</b>:
+Treat rclone paths exactly like links
+<code>/{cmd}</code> main:dump/ubuntu.iso or <code>rcl</code> (To select config, remote and path)
+Users can add their own rclone from user settings
+If you want to add path manually from your config add <code>mrcc:</code> before the path without space
+<code>/{cmd}</code> <code>mrcc:</code>main:/dump/ubuntu.iso
+
+<b>Upload</b>:
+<code>/{cmd}</code> link up: <code>rcl</code> (To select rclone config, remote and path)
+You can directly add the upload path. up: remote:dir/subdir
+If DEFAULT_UPLOAD is `rc` then you can pass up: `gd` to upload using gdrive tools to GDRIVE_ID.
+If DEFAULT_UPLOAD is `gd` then you can pass up: `rc` to upload to RCLONE_PATH.
+If you want to add path manually from your config (uploaded from usetting) add <code>mrcc:</code> before the path without space
+<code>/{cmd}</code> link up: <code>mrcc:</code>main:dump
+
+<b>Rclone Flags</b>:
+<code>/{cmd}</code> link|path|rcl up: path|rcl rcf: --buffer-size:8M|--drive-starred-only|key|key:value
+This will override all other flags except --exclude
+Check here all <a href='https://rclone.org/flags/'>RcloneFlags</a>.
+
+<b>NOTES:</b>
+1. When use cmd by reply don't add any option in link msg! Always add them after cmd msg!
+2. Options (<b>n: and pswd:</b>) should be added randomly after the link if link along with the cmd and after any other option
+3. Options (<b>d, s, m: and multi</b>) should be added randomly before the link and before any other option.
+4. Commands that start with <b>qb</b> are ONLY for torrents.
+5. (n:) option doesn't work with torrents.
 """
 
-CLONE_HELP_MESSAGE = """Send Gdrive|Gdot|Filepress|Filebee|Appdrive|Gdflix link or rclone path along with command or by replying to the link/rc_path by command
-<b>Multi links only by replying to first gdlink or rclone_path:</b>
-<code>/{cmd}</code> 10(number of links/pathies)
-<b>Gdrive:</b>
-<code>/{cmd}</code> gdrivelink
-<b>Upload Custom Drive</b>
-<code>/{cmd}</code> <b>id:</b> <code>drive_folder_link</code> or <code>drive_id</code> <b>index:</b> <code>https://anything.in/0:</code> link or by replying to link
-drive_id must be folder id and index must be url else it will not accept
-<b>Rclone:</b>
-<code>/{cmd}</code> rcl or rclone_path up: rcl or rclone_path rcf: flagkey:flagvalue|flagkey|flagkey:flagvalue
-Notes:
-if up: not specified then rclone destination will be the RCLONE_PATH from config.env
-"""
 
 RSS_HELP_MESSAGE = """
 Use this format to add feed url:
@@ -44,4 +138,20 @@ Filter Notes:
 3. You can add `or` and `|` as much as you want."
 4. Take look on title if it has static special character after or before the qualities or extensions or whatever and use them in filter to avoid wrong match.
 Timeout: 60 sec.
+"""
+
+CLONE_HELP_MESSAGE = """Send Gdrive|Gdot|Filepress|Filebee|Appdrive|Gdflix link or rclone path along with command or by replying to the link/rc_path by command
+<b>Multi links only by replying to first gdlink or rclone_path:</b>
+<code>/{cmd}</code> 10(number of links/pathies)
+<b>Gdrive:</b>
+<code>/{cmd}</code> gdrivelink
+
+<b>Upload Custom Drive</b>
+<code>/{cmd}</code> link or by replying to link <b>id:</b> <code>drive_folder_link</code> or <code>drive_id</code> <b>index:</b> <code>https://anything.in/0:</code>
+drive_id must be folder id and index must be url else it will not accept
+
+<b>Rclone:</b>
+<code>/{cmd}</code> rcl or rclone_path up: rcl or rclone_path rcf: flagkey:flagvalue|flagkey|flagkey:flagvalue
+Notes:
+if up: not specified then rclone destination will be the RCLONE_PATH from config.env
 """

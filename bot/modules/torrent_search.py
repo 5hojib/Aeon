@@ -7,12 +7,17 @@ from pyrogram.filters import command, regex
 from pyrogram.handlers import CallbackQueryHandler, MessageHandler
 
 from bot import LOGGER, bot, config_dict, get_client
-from bot.helper.ext_utils.bot_utils import get_readable_file_size, new_task, sync_to_async
+from bot.helper.ext_utils.bot_utils import (checking_access,
+                                            get_readable_file_size, new_task,
+                                            sync_to_async)
 from bot.helper.ext_utils.telegraph_helper import telegraph
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import anno_checker, editMessage, isAdmin, request_limiter, sendMessage
+from bot.helper.telegram_helper.message_utils import (anno_checker,
+                                                      editMessage, isAdmin,
+                                                      request_limiter,
+                                                      sendMessage)
 
 PLUGINS = []
 SITES = None
@@ -178,7 +183,7 @@ async def __getResult(search_results, key, message, method):
         telegraph_content.append(msg)
 
     await editMessage(message, f"<b>Creating</b> {len(telegraph_content)} <b>Telegraph pages.</b>")
-    path = [(await telegraph.create_page(title='Torrent Search',
+    path = [(await telegraph.create_page(title='Jmdkh-mltb Torrent Search',
                                          content=content))["path"] for content in telegraph_content]
     if len(path) > 1:
         await editMessage(message, f"<b>Editing</b> {len(telegraph_content)} <b>Telegraph pages.</b>")
@@ -216,9 +221,15 @@ async def torrentSearch(client, message):
     if not message.from_user:
         return
     user_id = message.from_user.id
-    if not await isAdmin(message, user_id) and await request_limiter(message):
-        return
     buttons = ButtonMaker()
+    if not await isAdmin(message, user_id):
+        if await request_limiter(message):
+            return
+        if message.chat.type != message.chat.type.PRIVATE:
+            msg, buttons = checking_access(user_id, buttons)
+            if msg is not None:
+                await sendMessage(message, msg, buttons.build_menu(1))
+                return
     key = message.text.split()
     SEARCH_PLUGINS = config_dict['SEARCH_PLUGINS']
     if SITES is None and not SEARCH_PLUGINS:
