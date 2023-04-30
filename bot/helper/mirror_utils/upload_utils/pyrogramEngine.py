@@ -21,7 +21,8 @@ from tenacity import (RetryError, retry, retry_if_exception_type,
 
 from bot import (GLOBAL_EXTENSION_FILTER, IS_PREMIUM_USER, bot, config_dict,
                  user, user_data)
-from bot.helper.ext_utils.bot_utils import sync_to_async
+from bot.helper.ext_utils.bot_utils import (get_readable_file_size,
+                                            sync_to_async)
 from bot.helper.ext_utils.fs_utils import (clean_unwanted, get_base_name,
                                            is_archive)
 from bot.helper.ext_utils.leech_utils import (get_document_type,
@@ -60,8 +61,7 @@ class TgUploader:
         if self.__is_cancelled:
             if IS_PREMIUM_USER:
                 user.stop_transmission()
-            else:
-                bot.stop_transmission()
+            bot.stop_transmission()
         chunk_size = current - self.__last_uploaded
         self.__last_uploaded = current
         self.__processed_bytes += chunk_size
@@ -240,6 +240,7 @@ class TgUploader:
                                         await self.__send_media_group(subkey, key, msgs)
                     self.__last_msg_in_group = False
                     self.__last_uploaded = 0
+                    await self.__switching_client(f_size)
                     await self.__upload_file(cap_mono, file_)
                     if self.__is_cancelled:
                         return
@@ -281,6 +282,16 @@ class TgUploader:
         LOGGER.info(f"Leech Completed: {self.name}")
         await self.__listener.onUploadComplete(None, size, self.__msgs_dict, self.__total_files, self.__corrupted, self.name)
 
+    async def __switching_client(self, f_size):
+        if f_size > 2097152000 and IS_PREMIUM_USER and self.__sent_msg._client.me.is_bot:
+            LOGGER.info(
+                f'Trying to upload file greater than {get_readable_file_size(f_size)} fetching message for user client')
+            self.__sent_msg = await user.get_messages(chat_id=self.__sent_msg.chat.id, message_ids=self.__sent_msg.id)
+        if f_size < 2097152000 and not self.__sent_msg._client.me.is_bot:
+            LOGGER.info(
+                f'Trying to upload file less than {get_readable_file_size(f_size)} fetching message for bot client')
+            self.__sent_msg = await bot.get_messages(chat_id=self.__sent_msg.chat.id, message_ids=self.__sent_msg.id)
+
     async def __send_dm(self):
         try:
             self.__sent_DMmsg = await self.__sent_DMmsg._client.copy_message(
@@ -291,9 +302,11 @@ class TgUploader:
             )
         except Exception as err:
             if isinstance(err, RPCError):
-                LOGGER.error(f"Error while sending dm {err.NAME}: {err.MESSAGE}")
+                LOGGER.error(
+                    f"Error while sending dm {err.NAME}: {err.MESSAGE}")
             else:
-                LOGGER.error(f"Error while sending dm {err.__class__.__name__}")
+                LOGGER.error(
+                    f"Error while sending dm {err.__class__.__name__}")
             self.__sent_DMmsg = None
 
     @retry(wait=wait_exponential(multiplier=2, min=4, max=8), stop=stop_after_attempt(3),
@@ -403,9 +416,7 @@ class TgUploader:
                         self.__last_msg_in_group = True
                 elif self.__sent_DMmsg:
                     await self.__send_dm()
-
-            if not self.__is_cancelled and self.__sent_DMmsg and not self.__media_group:
-                await sleep(0.5)
+            elif self.__sent_DMmsg:
                 await self.__send_dm()
             if self.__thumb is None and thumb is not None and await aiopath.exists(thumb):
                 await aioremove(thumb)
