@@ -42,18 +42,18 @@ async def stats(client, message):
     stats = f'<b><u>REPOSITORY INFO</u></b>\n\n' \
             f'<b>• Last commit: </b>{commit_id}\n'\
             f'<b>• Commit date:</b> {commit_date}\n'\
-            f'<b>• Commited On: </b>{commit_time}\n'\
-            f'<b>• From: </b>{commit_from}\n'\
+            f'<b>• Commited on: </b>{commit_time}\n'\
+            f'<b>• From now: </b>{commit_from}\n'\
             f'<b>• Changelog: </b>{commit_name}\n'\
             f'\n'\
             f'<b><u>SYSTEM INFO</u></b>\n\n'\
             f'<b>• Bot uptime:</b> {currentTime}\n'\
             f'<b>• System uptime:</b> {osUptime}\n'\
-            f'<b>• CPU Usage:</b> {cpuUsage}%\n'\
-            f'<b>• RAM Usage:</b> {mem_p}%\n'\
-            f'<b>• Disk Usage:</b> {disk}%\n'\
-            f'<b>• Free Disk Space:</b> {get_readable_file_size(free)}\n'\
-            f'<b>• Total Disk Space:</b> {get_readable_file_size(total)}\n'
+            f'<b>• CPU usage:</b> {cpuUsage}%\n'\
+            f'<b>• RAM usage:</b> {mem_p}%\n'\
+            f'<b>• Disk usage:</b> {disk}%\n'\
+            f'<b>• Free disk space:</b> {get_readable_file_size(free)}\n'\
+            f'<b>• Total disk space:</b> {get_readable_file_size(total)}\n'
     await sendMessage(message, stats)
 
 async def start(client, message):
@@ -68,7 +68,7 @@ async def start(client, message):
         data['token'] = str(uuid4())
         data['time'] = time()
         user_data[userid].update(data)
-        return await sendMessage(message, 'Token refreshed successfully!')
+        return await sendMessage(message, 'Token refreshed successfully!\n\n<b>Valid for:</b> {config_dict["TOKEN_TIMEOUT"]}s') 
     elif config_dict['DM_MODE']:
         start_string = f'<b>Welcome, To Era of Luna!</b>\n\nNow I will send your files or links here.\n'
     else:
