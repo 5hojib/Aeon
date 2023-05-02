@@ -44,7 +44,7 @@ async def stats(client, message):
             f'<b>• Commit date:</b> {commit_date}\n'\
             f'<b>• Commited On: </b>{commit_time}\n'\
             f'<b>• From: </b>{commit_from}\n'\
-            f'<b>• From: </b>{commit_name}\n'\
+            f'<b>• Changelog: </b>{commit_name}\n'\
             f'\n'\
             f'<b><u>SYSTEM INFO</u></b>\n\n'\
             f'<b>• Bot uptime:</b> {currentTime}\n'\
