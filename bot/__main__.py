@@ -34,21 +34,21 @@ async def stats(client, message):
     osUptime = get_readable_time(time() - boot_time())
     cpuUsage = cpu_percent(interval=0.5)
     if await aiopath.exists('.git'):
-        commit_id = (await cmd_exec("git log -1 --pretty=format:'%h %s%n%b'", True))[0]
+        commit_id = (await cmd_exec("git log -1 --pretty=format:'%h'", True))[0]
         commit_from = (await cmd_exec("git log -1 --date=short --pretty=format:'%cr'", True))[0]
         commit_date = (await cmd_exec("git log -1 --date=format:'%d %B %Y' --pretty=format:'%ad'", True))[0]
         commit_time = (await cmd_exec("git log -1 --date=format:'%I:%M:%S %p' --pretty=format:'%ad'", True))[0]
+        commit_name = (await cmd_exec("git log -1 --pretty=format:'%s%n%b'", True))[0]
     stats = f'<b><u>REPOSITORY INFO</u></b>\n\n' \
             f'<b>• Last commit: </b>{commit_id}\n'\
             f'<b>• Commit date:</b> {commit_date}\n'\
             f'<b>• Commited On: </b>{commit_time}\n'\
             f'<b>• From: </b>{commit_from}\n'\
-            f'\n'\
-            f'<b><u>BOT INFO</u></b>\n\n'\
-            f'<b>• Uptime:</b> {currentTime}\n'\
-            f'<b>• System:</b> {osUptime}\n'\
+            f'<b>• From: </b>{commit_name}\n'\
             f'\n'\
             f'<b><u>SYSTEM INFO</u></b>\n\n'\
+            f'<b>• Bot uptime:</b> {currentTime}\n'\
+            f'<b>• System uptime:</b> {osUptime}\n'\
             f'<b>• CPU Usage:</b> {cpuUsage}%\n'\
             f'<b>• RAM Usage:</b> {mem_p}%\n'\
             f'<b>• Disk Usage:</b> {disk}%\n'\
