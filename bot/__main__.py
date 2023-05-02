@@ -28,29 +28,23 @@ start_aria2_listener()
 
 async def stats(client, message):
     total, used, free, disk = disk_usage('/')
-    swap = swap_memory()
     memory = virtual_memory()
-    net_io = net_io_counters()
     currentTime = get_readable_time(time() - botStartTime)
     mem_p = memory.percent
     osUptime = get_readable_time(time() - boot_time())
     cpuUsage = cpu_percent(interval=0.5)
     if await aiopath.exists('.git'):
-        commit_id = await cmd_exec("git log -1 --pretty=format:'%h %s%n%b'", True)
-        commit_id = commit_id[0]
-        commit_from = await cmd_exec("git log -1 --date=short --pretty=format:'%cr'", True)
-        commit_from = commit_from[0]
-        commit_date = await cmd_exec("git log -1 --date=format:'%d %B %Y' --pretty=format:'%ad'", True)
-        commit_date = commit_date[0]
-        commit_time = await cmd_exec("git log -1 --date=format:'%I:%M:%S %p' --pretty=format:'%ad'", True)
-        commit_time = commit_time[0]
+        commit_id = (await cmd_exec("git log -1 --pretty=format:'%h %s%n%b'", True))[0]
+        commit_from = await cmd_exec("git log -1 --date=short --pretty=format:'%cr'", True))[0]
+        commit_date = await cmd_exec("git log -1 --date=format:'%d %B %Y' --pretty=format:'%ad'", True))[0]
+        commit_time = await cmd_exec("git log -1 --date=format:'%I:%M:%S %p' --pretty=format:'%ad'", True))[0]
     else:
         last_commit = 'No UPSTREAM_REPO'
     stats = f'<b><u>REPOSITORY INFO</u></b>\n\n' \
-            f'<b>• Updated:</b> {commit_date}\n'\
+            f'<b>• Last commit: </b>{commit_id}\n'\
+            f'<b>• Commit date:</b> {commit_date}\n'\
             f'<b>• Commited On: </b>{commit_time}\n'\
             f'<b>• From: </b>{commit_from}\n'\
-            f'<b>• Changelog: </b>{commit_id}\n'\
             f'\n'\
             f'<b><u>BOT INFO</u></b>\n\n'\
             f'<b>• Uptime:</b> {currentTime}\n'\
