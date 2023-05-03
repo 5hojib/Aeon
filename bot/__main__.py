@@ -68,7 +68,7 @@ async def start(client, message):
         data['token'] = str(uuid4())
         data['time'] = time()
         user_data[userid].update(data)
-        return await sendMessage(message, 'Token refreshed successfully!\n\n<b>Valid for:</b> {config_dict["TOKEN_TIMEOUT"]}s') 
+        return await sendMessage(message, f'Token refreshed successfully!\n\n<b>Valid for:</b> {config_dict["TOKEN_TIMEOUT"]}s') 
     elif config_dict['DM_MODE']:
         start_string = f'<b>Welcome, To Era of Luna!</b>\n\nNow I will send your files or links here.\n'
     else:
