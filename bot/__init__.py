@@ -359,9 +359,6 @@ ENABLE_MESSAGE_FILTER = ENABLE_MESSAGE_FILTER.lower() == 'true'
 STOP_DUPLICATE_TASKS = environ.get('STOP_DUPLICATE_TASKS', '')
 STOP_DUPLICATE_TASKS = STOP_DUPLICATE_TASKS.lower() == 'true'
 
-DISABLE_DRIVE_LINK = environ.get('DISABLE_DRIVE_LINK', '')
-DISABLE_DRIVE_LINK = DISABLE_DRIVE_LINK.lower() == 'true'
-
 DISABLE_LEECH = environ.get('DISABLE_LEECH', '')
 DISABLE_LEECH = DISABLE_LEECH.lower() == 'true'
 
@@ -456,7 +453,6 @@ config_dict = {
     "LEECH_LIMIT": LEECH_LIMIT,
     "ENABLE_MESSAGE_FILTER": ENABLE_MESSAGE_FILTER,
     "STOP_DUPLICATE_TASKS": STOP_DUPLICATE_TASKS,
-    "DISABLE_DRIVE_LINK": DISABLE_DRIVE_LINK,
     "SET_COMMANDS": SET_COMMANDS,
     "DISABLE_LEECH": DISABLE_LEECH,
     "REQUEST_LIMITS": REQUEST_LIMITS,
@@ -521,7 +517,8 @@ if ospath.exists('categories.txt'):
                 tempdict['index_link'] = ''
             categories_dict[name] = tempdict
 
-Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{BASE_URL_PORT}", shell=True)
+PORT = environ.get('PORT')
+Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{PORT}", shell=True)
 alive = Popen(["python3", "alive.py"])
 srun(["qbittorrent-nox", "-d", f"--profile={getcwd()}"])
 if not ospath.exists('.netrc'):

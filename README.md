@@ -7,11 +7,13 @@
 
 Instructions for Render
 ---------------------
-1. Click on Deploy to Render button.
-2. Fill all variable correctly.
-3. Fill BASE_URL from bsetting.
-3. Fill other variable in sample_config.env and rename to config.env.
-4. Upload token.pickle and other private files from bsetting.
+1. Fork and star this repo.
+2. Go to your forked repo.
+3. Click on Deploy to Render button.
+4. Fill all variable correctly.
+5. Fill BASE_URL from bsetting.
+6. Fill other variable from bsetting or write in sample_config.env and rename to config.env.
+7. Upload token.pickle and other private files from bsetting.
 
 <details>
 <summary>Bot commands</summary>

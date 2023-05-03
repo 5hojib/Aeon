@@ -177,7 +177,7 @@ async def gdcloneNode(message, link, listener):
         drive = GoogleDriveHelper(name, listener=listener)
         if files <= 20:
             msg = await sendMessage(message, f"Cloning: <code>{link}</code>")
-            link, size, mime_type, files, folders, dir_id = await sync_to_async(drive.clone, link, listener.drive_id or config_dict['GDRIVE_ID'])
+            link, size, mime_type, files, folders = await sync_to_async(drive.clone, link, listener.drive_id)
             await deleteMessage(msg)
         else:
             gid = ''.join(SystemRandom().choices(ascii_letters + digits, k=12))
@@ -185,12 +185,12 @@ async def gdcloneNode(message, link, listener):
                 download_dict[message.id] = GdriveStatus(
                     drive, size, message, gid, 'cl', listener.extra_details)
             await sendStatusMessage(message)
-            link, size, mime_type, files, folders, dir_id = await sync_to_async(drive.clone, link, listener.drive_id or config_dict['GDRIVE_ID'])
+            link, size, mime_type, files, folders = await sync_to_async(drive.clone, link, listener.drive_id)
         if not link:
             await delete_links(message)
             return
         LOGGER.info(f'Cloning Done: {name}')
-        await listener.onUploadComplete(link, size, files, folders, mime_type, name, drive_id=dir_id)
+        await listener.onUploadComplete(link, size, files, folders, mime_type, name)
     else:
         await sendMessage(message, CLONE_HELP_MESSAGE.format_map({'cmd': message.command[0]}))
 
@@ -327,11 +327,10 @@ async def clone(client, message):
             await delete_links(message)
             return
         if not config_dict['RCLONE_PATH'] and not dst_path:
-            await sendMessage(message, 'Destinantion not specified!')
+            await sendMessage(message, 'Destination not specified!')
             await delete_links(message)
             return
-        listener = MirrorLeechListener(message, tag=tag, select=select, isClone=True, drive_id=drive_id,
-                                       index_link=index_link, dmMessage=dmMessage, logMessage=logMessage, raw_url=raw_url)
+        listener = MirrorLeechListener(message, tag=tag, select=select, isClone=True, dmMessage=dmMessage, logMessage=logMessage, raw_url=raw_url)
         await rcloneNode(client, message, link, dst_path, rcf, listener)
     else:
         if not drive_id and len(categories_dict) > 1:

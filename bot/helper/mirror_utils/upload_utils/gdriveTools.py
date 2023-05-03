@@ -196,6 +196,8 @@ class GoogleDriveHelper:
         return msg
 
     def upload(self, file_name, size, gdrive_id):
+        if gdrive_id is None:
+            gdrive_id = config_dict['GDRIVE_ID']
         self.__is_uploading = True
         item_path = f"{self.__path}/{file_name}"
         LOGGER.info(f"Uploading: {item_path}")
@@ -203,9 +205,8 @@ class GoogleDriveHelper:
         try:
             if ospath.isfile(item_path):
                 mime_type = get_mime_type(item_path)
-                dir_id = gdrive_id
                 link = self.__upload_file(
-                    item_path, file_name, mime_type, dir_id, is_dir=False)
+                    item_path, file_name, mime_type, gdrive_id, is_dir=False)
                 if self.__is_cancelled:
                     return
                 if link is None:
@@ -241,7 +242,7 @@ class GoogleDriveHelper:
             elif self.__is_errored:
                 return
             async_to_sync(self.__listener.onUploadComplete, link, size, self.__total_files,
-                        self.__total_folders, mime_type, file_name, drive_id=dir_id)
+                          self.__total_folders, mime_type, file_name)
 
     def __upload_dir(self, input_directory, dest_id):
         list_dirs = listdir(input_directory)
@@ -372,6 +373,8 @@ class GoogleDriveHelper:
         return
 
     def clone(self, link, gdrive_id):
+        if gdrive_id is None:
+            gdrive_id = config_dict['GDRIVE_ID']
         self.__is_cloning = True
         self.__start_time = time()
         self.__total_files = 0
@@ -394,19 +397,18 @@ class GoogleDriveHelper:
                 if self.__is_cancelled:
                     LOGGER.info("Deleting cloned data from Drive...")
                     self.deletefile(durl)
-                    return None, None, None, None, None, None
+                    return None, None, None, None, None
                 mime_type = 'Folder'
                 size = self.__processed_bytes
             else:
-                dir_id = gdrive_id
                 file = self.__copyFile(
-                    meta.get('id'), dir_id)
+                    meta.get('id'), gdrive_id)
                 msg += f'<b>Name: </b><code>{file.get("name")}</code>'
                 durl = self.__G_DRIVE_BASE_DOWNLOAD_URL.format(file.get("id"))
                 if mime_type is None:
                     mime_type = 'File'
                 size = int(meta.get('size', 0))
-            return durl, size, mime_type, self.__total_files, self.__total_folders, dir_id
+            return durl, size, mime_type, self.__total_files, self.__total_folders
         except Exception as err:
             if isinstance(err, RetryError):
                 LOGGER.info(
@@ -422,12 +424,12 @@ class GoogleDriveHelper:
                         LOGGER.error(
                             'File not found. Trying with token.pickle...')
                         self.__service = token_service
-                        return self.clone(link)
+                        return self.clone(link, gdrive_id)
                 msg = "File not found."
             else:
                 msg = f"Error.\n{err}"
             async_to_sync(self.__listener.onUploadError, msg)
-            return None, None, None, None, None, None
+            return None, None, None, None, None
 
     def __cloneFolder(self, name, local_path, folder_id, dest_id):
         LOGGER.info(f"Syncing: {local_path}")
@@ -586,7 +588,7 @@ class GoogleDriveHelper:
                 if mime_type == "application/vnd.google-apps.folder":
                     furl = f"https://drive.google.com/drive/folders/{file.get('id')}"
                     msg += f"📁 <code>{file.get('name')}<br>(folder)</code><br>"
-                    msg += f"<b><a href={furl}>Drive Link</a></b>"
+                    msg += f"<b><a href={furl}>Drive Link</a></b> | "
                     if index_url:
                         if isRecur:
                             url_path = "/".join([rquote(n, safe='')
@@ -594,7 +596,7 @@ class GoogleDriveHelper:
                         else:
                             url_path = rquote(f'{file.get("name")}', safe='')
                         url = f'{index_url}/{url_path}/'
-                        msg += f' <b>| <a href="{url}">Index Link</a></b>'
+                        msg += f'<b><a href="{url}">Index Link</a></b>'
                 elif mime_type == 'application/vnd.google-apps.shortcut':
                     furl = f"https://drive.google.com/drive/folders/{file.get('id')}"
                     msg += f"⁍<a href='https://drive.google.com/drive/folders/{file.get('id')}'>{file.get('name')}" \
@@ -602,7 +604,7 @@ class GoogleDriveHelper:
                 else:
                     furl = f"https://drive.google.com/uc?id={file.get('id')}&export=download"
                     msg += f"📄 <code>{file.get('name')}<br>({get_readable_file_size(int(file.get('size', 0)))})</code><br>"
-                    msg += f"<b><a href={furl}>Drive Link</a></b>"
+                    msg += f"<b><a href={furl}>Drive Link</a></b> | "
                     if index_url:
                         if isRecur:
                             url_path = "/".join(rquote(n, safe='')
@@ -610,10 +612,10 @@ class GoogleDriveHelper:
                         else:
                             url_path = rquote(f'{file.get("name")}')
                         url = f'{index_url}/{url_path}'
-                        msg += f' <b>| <a href="{url}">Index Link</a></b>'
+                        msg += f'<b><a href="{url}">Index Link</a></b>'
                         if mime_type.startswith(('image', 'video', 'audio')):
                             urlv = f'{index_url}/{url_path}?a=view'
-                            msg += f' <b>| <a href="{urlv}">View Link</a></b>'
+                            msg += f' | <b><a href="{urlv}">View Link</a></b>'
                 msg += '<br><br>'
                 contents_no += 1
                 if len(msg.encode('utf-8')) > 39000:

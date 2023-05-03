@@ -28,39 +28,32 @@ start_aria2_listener()
 
 async def stats(client, message):
     total, used, free, disk = disk_usage('/')
-    swap = swap_memory()
     memory = virtual_memory()
-    net_io = net_io_counters()
     currentTime = get_readable_time(time() - botStartTime)
     mem_p = memory.percent
     osUptime = get_readable_time(time() - boot_time())
     cpuUsage = cpu_percent(interval=0.5)
     if await aiopath.exists('.git'):
-        last_commit = await cmd_exec("git log -1 --date=short --pretty=format:'%cd <b>From</b> %cr'", True)
-        last_commit = last_commit[0]
-        commit_from = await cmd_exec("git log -1 --date=short --pretty=format:'%cr'", True)
-        commit_from = commit_from[0]
-        commit_date = await cmd_exec("git log -1 --date=format:'%d %B %Y' --pretty=format:'%ad'", True)
-        commit_date = commit_date[0]
-        commit_time = await cmd_exec("git log -1 --date=format:'%I:%M:%S %p' --pretty=format:'%ad'", True)
-        commit_time = commit_time[0]
-    else:
-        last_commit = 'No UPSTREAM_REPO'
+        commit_id = (await cmd_exec("git log -1 --pretty=format:'%h'", True))[0]
+        commit_from = (await cmd_exec("git log -1 --date=short --pretty=format:'%cr'", True))[0]
+        commit_date = (await cmd_exec("git log -1 --date=format:'%d %B %Y' --pretty=format:'%ad'", True))[0]
+        commit_time = (await cmd_exec("git log -1 --date=format:'%I:%M:%S %p' --pretty=format:'%ad'", True))[0]
+        commit_name = (await cmd_exec("git log -1 --pretty=format:'%s%n%b'", True))[0]
     stats = f'<b><u>REPOSITORY INFO</u></b>\n\n' \
-            f'<b>• Updated:</b> {commit_date}\n'\
-            f'<b>• Commited On: </b>{commit_time}\n'\
-            f'<b>• From: </b>{commit_from}\n'\
-            f'\n'\
-            f'<b><u>BOT INFO</u></b>\n\n'\
-            f'<b>• Uptime:</b> {currentTime}\n'\
-            f'<b>• System:</b> {osUptime}\n'\
+            f'<b>• Last commit: </b>{commit_id}\n'\
+            f'<b>• Commit date:</b> {commit_date}\n'\
+            f'<b>• Commited on: </b>{commit_time}\n'\
+            f'<b>• From now: </b>{commit_from}\n'\
+            f'<b>• Changelog: </b>{commit_name}\n'\
             f'\n'\
             f'<b><u>SYSTEM INFO</u></b>\n\n'\
-            f'<b>• CPU Usage:</b> {cpuUsage}%\n'\
-            f'<b>• RAM Usage:</b> {mem_p}%\n'\
-            f'<b>• Disk Usage:</b> {disk}%\n'\
-            f'<b>• Free Disk Space:</b> {get_readable_file_size(free)}\n'\
-            f'<b>• Total Disk Space:</b> {get_readable_file_size(total)}\n'
+            f'<b>• Bot uptime:</b> {currentTime}\n'\
+            f'<b>• System uptime:</b> {osUptime}\n'\
+            f'<b>• CPU usage:</b> {cpuUsage}%\n'\
+            f'<b>• RAM usage:</b> {mem_p}%\n'\
+            f'<b>• Disk usage:</b> {disk}%\n'\
+            f'<b>• Free disk space:</b> {get_readable_file_size(free)}\n'\
+            f'<b>• Total disk space:</b> {get_readable_file_size(total)}\n'
     await sendMessage(message, stats)
 
 async def start(client, message):
@@ -75,7 +68,7 @@ async def start(client, message):
         data['token'] = str(uuid4())
         data['time'] = time()
         user_data[userid].update(data)
-        return await sendMessage(message, 'Token refreshed successfully!')
+        return await sendMessage(message, f'Token refreshed successfully!\n\n<b>Valid for:</b> {config_dict["TOKEN_TIMEOUT"]}s') 
     elif config_dict['DM_MODE']:
         start_string = f'<b>Welcome, To Era of Luna!</b>\n\nNow I will send your files or links here.\n'
     else:
