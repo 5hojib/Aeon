@@ -350,7 +350,7 @@ class MirrorLeechListener:
             async with download_dict_lock:
                 download_dict[self.uid] = upload_status
             await update_all_messages()
-            await sync_to_async(drive.upload, up_name, size, self.drive_id or config_dict['GDRIVE_ID'])
+            await sync_to_async(drive.upload, up_name, size, self.drive_id)
         else:
             size = await get_path_size(path)
             LOGGER.info(f"Upload Name: {up_name}")
@@ -361,7 +361,7 @@ class MirrorLeechListener:
             await update_all_messages()
             await RCTransfer.upload(path, size)
 
-    async def onUploadComplete(self, link, size, files, folders, mime_type, name, rclonePath='', drive_id=None):
+    async def onUploadComplete(self, link, size, files, folders, mime_type, name, rclonePath=''):
         if DATABASE_URL and config_dict['STOP_DUPLICATE_TASKS'] and self.raw_url:
             await DbManger().remove_download(self.raw_url)
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
@@ -416,15 +416,14 @@ class MirrorLeechListener:
             if mime_type == "Folder":
                 msg += f'\n<b>• SubFolders: </b>{folders}'
                 msg += f'\n<b>• Files: </b>{files}'
+                drive_id = GoogleDriveHelper.getIdFromUrl(link)
+                msg += f"\n\n<b>Folder id</b>: <code>{drive_id}</code>"
             msg += f'\n<b>• Uploaded by</b>: {self.tag}'
             msg += f'\n<b>• Elapsed</b>: {get_readable_time(time() - self.extra_details["startTime"])}'
             if link or rclonePath and config_dict['RCLONE_SERVE_URL']:
-                if drive_id and config_dict['GDRIVE_ID'] != drive_id:
-                    msg += f"\n\n<b>Folder id</b>: <code>{drive_id}</code>"
                 buttons = ButtonMaker()
                 if link:
-                    if not config_dict['DISABLE_DRIVE_LINK']:
-                        buttons.ubutton("Drive Link", link)
+                    buttons.ubutton("Drive Link", link)
                 else:
                     msg += f'\n\n<b>Path</b>: <code>{rclonePath}</code>'
                 if rclonePath and (RCLONE_SERVE_URL := config_dict['RCLONE_SERVE_URL']):
@@ -457,8 +456,6 @@ class MirrorLeechListener:
                         buttons.ibutton("Save This Message", 'save', 'footer')
                     await sendMessage(self.message, msg, buttons.build_menu(2))
                 if self.logMessage:
-                    if link and config_dict['DISABLE_DRIVE_LINK']:
-                        buttons.ubutton("Drive Link", link, 'header')
                     await sendMessage(self.logMessage, msg, buttons.build_menu(2))
             else:
                 msg += f'\n\nPath: <code>{rclonePath}</code>'
