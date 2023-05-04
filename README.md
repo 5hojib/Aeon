@@ -1,6 +1,15 @@
-[![hi](https://github-readme-stats.vercel.app/api/pin/?username=5hojib&repo=hk-upstream&theme=react&border_color=61dafb&border_radius=10)](https://github.com/5hojib/hk-upstream)
+[![Repository state](https://github-readme-stats.vercel.app/api/pin/?username=5hojib&repo=hk-upstream&theme=react&border_color=61dafb&border_radius=10)](https://github.com/5hojib/hk-upstream)
 
 [![Support Group](https://img.shields.io/badge/Support%20Group-Join-000000)](https://t.me/Luna073xChat)     [![Render](https://img.shields.io/badge/Deploy%20to%20Render-Deploy-000000)](https://render.com/deploy?repo=)
+
+### Instructions for Render
+1. Fork and star this repository.
+2. Go to your forked repository.
+3. Click on 'Deploy to Render' button.
+4. Fill in all variables correctly and start the deployment.
+5. After deployment, fill in `BASE_URL` using the `bsetting` command from the bot.
+6. Fill in the other variables using the `bsetting` command or by writing them in `sample_config.env` and renaming the file to `config.env`.
+7. Upload `token.pickle` and other private files using the `bsetting` command from the bot.
 
 ### Instructions for Railway
 1. Fork and star this repository.
@@ -16,18 +25,7 @@
 6. After deployment, fill in the other variables using the `bsetting` command from the bot.
 7. Upload `token.pickle` and other private files using the `bsetting` command from the bot.
 
-### Instructions for Render
-1. Fork and star this repository.
-2. Go to your forked repository.
-3. Click on 'Deploy to Render' button.
-4. Fill in all variables correctly and start the deployment.
-5. After deployment, fill in `BASE_URL` using the `bsetting` command from the bot.
-6. Fill in the other variables using the `bsetting` command or by writing them in `sample_config.env` and renaming the file to `config.env`.
-7. Upload `token.pickle` and other private files using the `bsetting` command from the bot.
-
-<details>
-<summary>Bot commands</summary>
-
+### Bot commands
 ```
 mirror - or /m Mirror
 zipmirror - or /zm Mirror and upload as zip
@@ -64,7 +62,6 @@ stats - Bot Usage Stats
 ping - Ping the Bot
 help - All cmds with description
 ```
-</details>
 
 ### Modified from
 * [JMDKH](https://github.com/junedkh/jmdkh-mltb)
