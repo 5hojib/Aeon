@@ -1,14 +1,8 @@
 [![hi](https://github-readme-stats.vercel.app/api/pin/?username=5hojib&repo=hk-upstream&theme=react&border_color=61dafb&border_radius=10)](https://github.com/5hojib/hk-upstream)
 
+[![Support Group](https://img.shields.io/badge/Support%20Group-Join-000000)](https://t.me/Luna073xChat)     [![Render](https://img.shields.io/badge/Deploy%20to%20Render-Deploy-000000)](https://render.com/deploy?repo=)
 
-<a href="https://render.com/deploy?repo="><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" width="120"></a>
-  
-[Support Group](https://t.me/Luna073xChat)
-
-[![Support Group](https://img.shields.io/badge/Support%20Group-Join-9cf?style=for-the-badge&logo=telegram&logoColor=black&style=flat&labelColor=ffffff)](https://t.me/AtrociousBotSupport)     [![Render](https://img.shields.io/badge/Deploy%20to%20Render-Deploy-ffffff)](https://render.com/deploy?repo=)
-
-## Instructions for Railway
-------------------------
+### Instructions for Railway
 1. Fork and star this repository.
 2. Go to your forked repository.
 3. Delete `README.md` and `sample_config.env`.
@@ -22,8 +16,7 @@
 6. After deployment, fill in the other variables using the `bsetting` command from the bot.
 7. Upload `token.pickle` and other private files using the `bsetting` command from the bot.
 
-## Instructions for Render
-------------------------
+### Instructions for Render
 1. Fork and star this repository.
 2. Go to your forked repository.
 3. Click on 'Deploy to Render' button.
