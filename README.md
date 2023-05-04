@@ -1,23 +1,31 @@
-[![hi](https://github-readme-stats.vercel.app/api/pin/?username=5hojib&repo=hk-upstream&theme=react&border_color=61dafb&border_radius=10)](https://github.com/5hojib/hk-upstream)
+[![Repository state](https://github-readme-stats.vercel.app/api/pin/?username=5hojib&repo=hk-upstream&theme=react&border_color=61dafb&border_radius=10)](https://github.com/5hojib/hk-upstream)
 
+[![Support Group](https://img.shields.io/badge/Support%20Group-Join-000000)](https://t.me/Luna073xChat)     [![Render](https://img.shields.io/badge/Deploy%20to%20Render-Deploy-000000)](https://render.com/deploy?repo=)
 
-  <a href="https://render.com/deploy?repo="><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" width="120"></a>
-  
-  [Support Group](https://t.me/Luna073xChat)
+### Instructions for Render
+1. Fork and star this repository.
+2. Go to your forked repository.
+3. Click on 'Deploy to Render' button.
+4. Fill in all variables correctly and start the deployment.
+5. After deployment, fill in `BASE_URL` using the `bsetting` command from the bot.
+6. Fill in the other variables using the `bsetting` command or by writing them in `sample_config.env` and renaming the file to `config.env`.
+7. Upload `token.pickle` and other private files using the `bsetting` command from the bot.
 
-Instructions for Render
----------------------
-1. Fork and star this repo.
-2. Go to your forked repo.
-3. Click on Deploy to Render button.
-4. Fill all variable correctly.
-5. Fill BASE_URL from bsetting.
-6. Fill other variable from bsetting or write in sample_config.env and rename to config.env.
-7. Upload token.pickle and other private files from bsetting.
+### Instructions for Railway
+1. Fork and star this repository.
+2. Go to your forked repository.
+3. Delete `README.md` and `sample_config.env`.
+4. Go to your Railway account and start deploy from GitHub repository.
+5. Select forked repository and fill in these variables:
+* `BOT_TOKEN`
+* `OWNER_ID`
+* `DATABASE_URL`
+* `TELEGRAM_API`
+* `TELEGRAM_HASH` 
+6. After deployment, fill in the other variables using the `bsetting` command from the bot.
+7. Upload `token.pickle` and other private files using the `bsetting` command from the bot.
 
-<details>
-<summary>Bot commands</summary>
-
+### Bot commands
 ```
 mirror - or /m Mirror
 zipmirror - or /zm Mirror and upload as zip
@@ -54,19 +62,11 @@ stats - Bot Usage Stats
 ping - Ping the Bot
 help - All cmds with description
 ```
-</details>
-
-
-  
-
-
-
 
 ### Modified from
 * [JMDKH](https://github.com/junedkh/jmdkh-mltb)
 * [MLTB](https://github.com/anasty17/mirror-leech-telegram-bot)
 * [WZML](https://github.com/weebzone/WZML)
-
 
 ### Thanks To
 * [Juned KH](https://github.com/junedkh)
@@ -74,4 +74,4 @@ help - All cmds with description
 * [Karan Adhikary](https://github.com/weebzone)
 * ChatGPT
 
-You can't donate me!
+You can't donate me! 🤣

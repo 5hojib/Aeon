@@ -57,6 +57,7 @@ async def stats(client, message):
     await sendMessage(message, stats)
 
 async def start(client, message):
+    token_timeout = config_dict['TOKEN_TIMEOUT']
     if len(message.command) > 1:
         userid = message.from_user.id
         input_token = message.command[1]
@@ -64,17 +65,41 @@ async def start(client, message):
             return await sendMessage(message, 'Who are you?')
         data = user_data[userid]
         if 'token' not in data or data['token'] != input_token:
-            return await sendMessage(message, 'This is a token already expired')
+            return await sendMessage(message, 'This token is already expired')
         data['token'] = str(uuid4())
         data['time'] = time()
         user_data[userid].update(data)
-        return await sendMessage(message, f'Token refreshed successfully!\n\n<b>Valid for:</b> {config_dict["TOKEN_TIMEOUT"]}s') 
+        time_str = format_validity_time(token_timeout)
+        return await sendMessage(message, f'Congratulations! Token refreshed successfully!\n\n<b>It will expire after</b> {time_str}') 
     elif config_dict['DM_MODE']:
-        start_string = f'<b>Welcome, To Era of Luna!</b>\n\nNow I will send your files or links here.\n'
+        start_string = f'<b>Welcome to the Era of Luna!</b>\n\nNow I will send your files or links here.\n'
     else:
-        start_string = f'<b>Welcome, To Era of Luna!</b>\n\nThis bot can Mirror all your links To Google Drive!\n'
+        start_string = f'<b>Welcome to the Era of Luna!</b>\n\nThis bot can Mirror all your links To Google Drive!\n'
               
     await sendMessage(message, start_string)
+
+def format_validity_time(validity_time):
+    days = validity_time // (24 * 3600)
+    validity_time = validity_time % (24 * 3600)
+    hours = validity_time // 3600
+    validity_time %= 3600
+    minutes = validity_time // 60
+    validity_time %= 60
+    seconds = validity_time
+    time_str = ''
+    if days > 0:
+        suffix = 's' if days > 1 else ''
+        time_str += f"{days} day{suffix} "
+    if hours > 0:
+        suffix = 's' if hours > 1 else ''
+        time_str += f"{hours} hour{suffix} "
+    if minutes > 0:
+        suffix = 's' if minutes > 1 else ''
+        time_str += f"{minutes} minute{suffix} "
+    suffix = 's' if seconds > 1 else ''
+    time_str += f"{seconds} second{suffix}"
+    return time_str
+
 
 async def restart(client, message):
     restart_message = await sendMessage(message, "Restarting...")
