@@ -65,7 +65,7 @@ async def start(client, message):
             return await sendMessage(message, 'Who are you?')
         data = user_data[userid]
         if 'token' not in data or data['token'] != input_token:
-            return await sendMessage(message, 'This token already expired')
+            return await sendMessage(message, 'This token is already expired')
         data['token'] = str(uuid4())
         data['time'] = time()
         user_data[userid].update(data)

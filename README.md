@@ -5,30 +5,30 @@
   
 [Support Group](https://t.me/Luna073xChat)
 
-Instructions for Railway
+##Instructions for Railway
 ------------------------
-1. Fork and star this repo.
-2. Go to your forked repo.
-3. Delete README.md and sample_config.env.
-4. Go to your railway account and start deploy from GitHub repo.
-5. Select forked repo and fill this variable.
+1. Fork and star this repository.
+2. Go to your forked repository.
+3. Delete `README.md` and `sample_config.env`.
+4. Go to your Railway account and start deploy from GitHub repository.
+5. Select forked repository and fill in these variables:
 * `BOT_TOKEN`
 * `OWNER_ID`
 * `DATABASE_URL`
 * `TELEGRAM_API`
 * `TELEGRAM_HASH` 
-6. After deploy, fill other variable with bsetting command from bot.
-7. Upload token.pickle and other private files with bsetting command from bot.
+6. After deployment, fill in the other variables using the `bsetting` command from the bot.
+7. Upload `token.pickle` and other private files using the `bsetting` command from the bot.
 
-Instructions for Render
+##Instructions for Render
 ------------------------
-1. Fork and star this repo.
-2. Go to your forked repo.
-3. Click on Deploy to Render button.
-4. Fill all variable correctly and start deploy.
-5. After deplot, fill BASE_URL with bsetting command from bot.
-6. Fill other variable with bsetting command or write in sample_config.env and rename to config.env.
-7. Upload token.pickle and other private files with bsetting command from bot.
+1. Fork and star this repository.
+2. Go to your forked repository.
+3. Click on 'Deploy to Render' button.
+4. Fill in all variables correctly and start the deployment.
+5. After deployment, fill in `BASE_URL` using the `bsetting` command from the bot.
+6. Fill in the other variables using the `bsetting` command or by writing them in `sample_config.env` and renaming the file to `config.env`.
+7. Upload `token.pickle` and other private files using the `bsetting` command from the bot.
 
 <details>
 <summary>Bot commands</summary>
@@ -71,17 +71,10 @@ help - All cmds with description
 ```
 </details>
 
-
-  
-
-
-
-
 ### Modified from
 * [JMDKH](https://github.com/junedkh/jmdkh-mltb)
 * [MLTB](https://github.com/anasty17/mirror-leech-telegram-bot)
 * [WZML](https://github.com/weebzone/WZML)
-
 
 ### Thanks To
 * [Juned KH](https://github.com/junedkh)
@@ -89,4 +82,4 @@ help - All cmds with description
 * [Karan Adhikary](https://github.com/weebzone)
 * ChatGPT
 
-You can't donate me!
+You can't donate me! 🤣
