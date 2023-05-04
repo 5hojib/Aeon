@@ -5,7 +5,7 @@
   
 [Support Group](https://t.me/Luna073xChat)
 
-##Instructions for Railway
+## Instructions for Railway
 ------------------------
 1. Fork and star this repository.
 2. Go to your forked repository.
@@ -20,7 +20,7 @@
 6. After deployment, fill in the other variables using the `bsetting` command from the bot.
 7. Upload `token.pickle` and other private files using the `bsetting` command from the bot.
 
-##Instructions for Render
+## Instructions for Render
 ------------------------
 1. Fork and star this repository.
 2. Go to your forked repository.
