@@ -65,16 +65,16 @@ async def start(client, message):
             return await sendMessage(message, 'Who are you?')
         data = user_data[userid]
         if 'token' not in data or data['token'] != input_token:
-            return await sendMessage(message, 'This is a token already expired')
+            return await sendMessage(message, 'This token already expired')
         data['token'] = str(uuid4())
         data['time'] = time()
         user_data[userid].update(data)
         time_str = format_validity_time(token_timeout)
-        return await sendMessage(message, f'Token refreshed successfully!\n\n<b>Valid for:</b> {time_str}') 
+        return await sendMessage(message, f'Congratulations! Token refreshed successfully!\n\n<b>It will expire after</b> {time_str}') 
     elif config_dict['DM_MODE']:
-        start_string = f'<b>Welcome, To Era of Luna!</b>\n\nNow I will send your files or links here.\n'
+        start_string = f'<b>Welcome to the Era of Luna!</b>\n\nNow I will send your files or links here.\n'
     else:
-        start_string = f'<b>Welcome, To Era of Luna!</b>\n\nThis bot can Mirror all your links To Google Drive!\n'
+        start_string = f'<b>Welcome to the Era of Luna!</b>\n\nThis bot can Mirror all your links To Google Drive!\n'
               
     await sendMessage(message, start_string)
 

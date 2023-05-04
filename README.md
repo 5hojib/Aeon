@@ -1,19 +1,34 @@
 [![hi](https://github-readme-stats.vercel.app/api/pin/?username=5hojib&repo=hk-upstream&theme=react&border_color=61dafb&border_radius=10)](https://github.com/5hojib/hk-upstream)
 
 
-  <a href="https://render.com/deploy?repo="><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" width="120"></a>
+<a href="https://render.com/deploy?repo="><img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" width="120"></a>
   
-  [Support Group](https://t.me/Luna073xChat)
+[Support Group](https://t.me/Luna073xChat)
+
+Instructions for Railway
+------------------------
+1. Fork and star this repo.
+2. Go to your forked repo.
+3. Delete README.md and sample_config.env.
+4. Go to your railway account and start deploy from GitHub repo.
+5. Select forked repo and fill this variable.
+* `BOT_TOKEN`
+* `OWNER_ID`
+* `DATABASE_URL`
+* `TELEGRAM_API`
+* `TELEGRAM_HASH` 
+6. After deploy, fill other variable with bsetting command from bot.
+7. Upload token.pickle and other private files with bsetting command from bot.
 
 Instructions for Render
----------------------
+------------------------
 1. Fork and star this repo.
 2. Go to your forked repo.
 3. Click on Deploy to Render button.
-4. Fill all variable correctly.
-5. Fill BASE_URL from bsetting.
-6. Fill other variable from bsetting or write in sample_config.env and rename to config.env.
-7. Upload token.pickle and other private files from bsetting.
+4. Fill all variable correctly and start deploy.
+5. After deplot, fill BASE_URL with bsetting command from bot.
+6. Fill other variable with bsetting command or write in sample_config.env and rename to config.env.
+7. Upload token.pickle and other private files with bsetting command from bot.
 
 <details>
 <summary>Bot commands</summary>
