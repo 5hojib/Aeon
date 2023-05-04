@@ -89,13 +89,13 @@ def format_validity_time(validity_time):
     time_str = ''
     if days > 0:
         suffix = 's' if days > 1 else ''
-        time_str += f"{days} day{suffix}, "
+        time_str += f"{days} day{suffix} "
     if hours > 0:
         suffix = 's' if hours > 1 else ''
-        time_str += f"{hours} hour{suffix}, "
+        time_str += f"{hours} hour{suffix} "
     if minutes > 0:
         suffix = 's' if minutes > 1 else ''
-        time_str += f"{minutes} minute{suffix}, "
+        time_str += f"{minutes} minute{suffix} "
     suffix = 's' if seconds > 1 else ''
     time_str += f"{seconds} second{suffix}"
     return time_str
