@@ -5,6 +5,8 @@
   
 [Support Group](https://t.me/Luna073xChat)
 
+[![Support Group](https://img.shields.io/badge/Support%20Group-Join-9cf?style=for-the-badge&logo=telegram&logoColor=black&style=flat&labelColor=ffffff)](https://t.me/AtrociousBotSupport)     [![Render](https://img.shields.io/badge/Deploy%20to%20Render-Deploy-ffffff)](https://render.com/deploy?repo=)
+
 ## Instructions for Railway
 ------------------------
 1. Fork and star this repository.
