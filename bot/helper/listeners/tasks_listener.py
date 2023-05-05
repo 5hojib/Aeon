@@ -417,7 +417,7 @@ class MirrorLeechListener:
                 msg += f'\n<b>• SubFolders: </b>{folders}'
                 msg += f'\n<b>• Files: </b>{files}'
                 drive_id = GoogleDriveHelper.getIdFromUrl(link)
-                msg += f"\n\n<b>Folder id</b>: <code>{drive_id}</code>"
+                msg += f"\n<b>• Folder id</b>: <code>{drive_id}</code>"
             msg += f'\n<b>• Uploaded by</b>: {self.tag}'
             msg += f'\n<b>• Elapsed</b>: {get_readable_time(time() - self.extra_details["startTime"])}'
             if link or rclonePath and config_dict['RCLONE_SERVE_URL']:
