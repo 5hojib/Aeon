@@ -39,7 +39,7 @@ async def stats(client, message):
         commit_date = (await cmd_exec("git log -1 --date=format:'%d %B %Y' --pretty=format:'%ad'", True))[0]
         commit_time = (await cmd_exec("git log -1 --date=format:'%I:%M:%S %p' --pretty=format:'%ad'", True))[0]
         commit_name = (await cmd_exec("git log -1 --pretty=format:'%s%n%b'", True))[0]
-    stats = f'<b><u>REPOSITORY INFO</u></b>\n\n' \
+    stats = f'<b><u>REPOSITORY INFO⚡</u></b>\n\n' \
             f'<b>• Last commit: </b>{commit_id}\n'\
             f'<b>• Commit date:</b> {commit_date}\n'\
             f'<b>• Commited on: </b>{commit_time}\n'\
@@ -72,9 +72,9 @@ async def start(client, message):
         time_str = format_validity_time(token_timeout)
         return await sendMessage(message, f'Congratulations! Token refreshed successfully!\n\n<b>It will expire after</b> {time_str}') 
     elif config_dict['DM_MODE']:
-        start_string = f'<b>Welcome to the Era of Luna!</b>\n\nNow I will send your files or links here.\n'
+        start_string = f'<b>Welcome to the 𝙎𝙞𝙫𝙖𝙎𝙤𝙛𝙩⚡</b>\n\nNow I will send your files or links here.\n'
     else:
-        start_string = f'<b>Welcome to the Era of Luna!</b>\n\nThis bot can Mirror all your links To Google Drive!\n'
+        start_string = f'<b>Welcome to the 𝙎𝙞𝙫𝙖𝙎𝙤𝙛𝙩⚡</b>\n\nThis bot can Mirror all your links To Google Drive!\n'
               
     await sendMessage(message, start_string)
 
@@ -102,7 +102,7 @@ def format_validity_time(validity_time):
 
 
 async def restart(client, message):
-    restart_message = await sendMessage(message, "Restarting...")
+    restart_message = await sendMessage(message, "Restarting...⚡")
     if scheduler.running:
         scheduler.shutdown(wait=False)
     for interval in [QbInterval, Interval]:
@@ -189,7 +189,7 @@ async def restart_notification():
 
     async def send_incompelete_task_message(cid, msg):
         try:
-            if msg.startswith('Restarted Successfully!'):
+            if msg.startswith('Restarted Successfully⚡'):
                 await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text='Restarted Successfully!')
                 await bot.send_message(chat_id, msg, disable_web_page_preview=True, reply_to_message_id=msg_id)
                 await aioremove(".restartmsg")
@@ -202,7 +202,7 @@ async def restart_notification():
     if DATABASE_URL:
         if INCOMPLETE_TASK_NOTIFIER and (notifier_dict := await DbManger().get_incomplete_tasks()):
             for cid, data in notifier_dict.items():
-                msg = 'Restarted Successfully!' if cid == chat_id else 'Bot Restarted!'
+                msg = 'Restarted Successfully⚡' if cid == chat_id else 'Bot Restarted⚡'
                 for tag, links in data.items():
                     msg += f"\n\n{tag}: "
                     for index, link in enumerate(links, start=1):
@@ -218,7 +218,7 @@ async def restart_notification():
 
     if await aiopath.isfile(".restartmsg"):
         try:
-            await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text='Restarted Successfully!')
+            await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text='Restarted Successfully⚡')
         except:
             pass
         await aioremove(".restartmsg")
