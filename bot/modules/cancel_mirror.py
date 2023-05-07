@@ -45,7 +45,6 @@ async def cancel_mirror(client, message):
 
 cancel_listener = {}
 
-@new_task
 async def cancel_all(status, info, listOfTasks):
     user_id = info[0]
     msg = info[1]
@@ -68,7 +67,6 @@ async def cancel_all(status, info, listOfTasks):
         new_msg += f"<b>• Cancelled by</b>: {tag}"
         await editMessage(msg, _msg+new_msg)
 
-@new_task
 async def cancell_all_buttons(client, message):
     async with download_dict_lock:
         count = len(download_dict)
