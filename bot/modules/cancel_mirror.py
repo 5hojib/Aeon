@@ -121,7 +121,7 @@ async def cancell_all_buttons(client, message):
 
 
 @new_task
-async def cancel_all_update(client, query):
+async def cancel_all_update(_, query):
     data = query.data.split()
     user_id = query.from_user.id
     data = query.data.split()
