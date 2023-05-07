@@ -296,7 +296,7 @@ async def _ytdl(client, message, isZip=False, isLeech=False, sameDir={}):
     async def __run_multi():
         if multi <= 1:
             return
-        await sleep(2)
+        await sleep(1)
         nextmsg = await client.get_messages(chat_id=message.chat.id, message_ids=message.reply_to_message_id + 1)
         ymsg = mssg.split(maxsplit=mi+1)
         ymsg[mi] = f'{multi - 1}'
@@ -307,7 +307,7 @@ async def _ytdl(client, message, isZip=False, isLeech=False, sameDir={}):
         nextmsg.from_user = message.from_user
         if message.sender_chat:
             nextmsg.sender_chat = message.sender_chat
-        await sleep(2)
+        await sleep(1)
         _ytdl(client, nextmsg, isZip, isLeech, sameDir)
 
     path = f'{DOWNLOAD_DIR}{message.id}{folder_name}'
