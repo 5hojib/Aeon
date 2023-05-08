@@ -1,5 +1,3 @@
-import cloudscraper
-
 from http.cookiejar import MozillaCookieJar
 from json import loads
 from os import path
@@ -480,20 +478,22 @@ def terabox(url) -> str:
 
 
 def filepress(url):
-    cget = cloudscraper.create_scraper().request
+    cget = create_scraper().request
     try:
-        raw = urlparse(link)
+        url = cget('GET', url).url
+        raw = urlparse(url)
         json_data = {
-                'id': raw.path.split('/')[-1],
-                'method': 'publicDownlaod',
-                }
+            'id': raw.path.split('/')[-1],
+            'method': 'publicDownlaod',
+        }
         api = f'{raw.scheme}://{raw.hostname}/api/file/downlaod/'
-        res = cget('POST', api, headers={'Referer': f'{raw.scheme}://{raw.netloc}'}, json=json_data).json()
-        if 'data' not in res:
-            raise DirectDownloadLinkException(f'ERROR: {res["statusText"]}')
-        return f'https://drive.google.com/open?id={res["data"]}'
+        res = cget('POST', api, headers={
+                   'Referer': f'{raw.scheme}://{raw.hostname}'}, json=json_data).json()
     except Exception as e:
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+    if 'data' not in res:
+        raise DirectDownloadLinkException(f'ERROR: {res["statusText"]}')
+    return f'https://drive.google.com/uc?id={res["data"]}&export=download'
 
 
 def gdtot(url):
