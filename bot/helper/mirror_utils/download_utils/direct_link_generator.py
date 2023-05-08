@@ -1,3 +1,5 @@
+import cloudscraper
+
 from http.cookiejar import MozillaCookieJar
 from json import loads
 from os import path
@@ -6,7 +8,7 @@ from time import sleep
 from urllib.parse import quote, unquote, urlparse, parse_qs
 from uuid import uuid4
 from bs4 import BeautifulSoup
-from cloudscraper import cloudscraper, create_scraper
+from cloudscraper import create_scraper
 from lk21 import Bypass
 from lxml import etree
 
