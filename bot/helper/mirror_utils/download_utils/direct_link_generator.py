@@ -478,7 +478,7 @@ def terabox(url) -> str:
 
 
 def filepress(url):
-    cget = create_scraper().request
+    cget = cloudscraper.create_scraper().request
     try:
         url = cget('GET', url).url
         raw = urlparse(url)
