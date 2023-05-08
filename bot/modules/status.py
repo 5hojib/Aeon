@@ -12,7 +12,7 @@ from bot.helper.telegram_helper.message_utils import auto_delete_message, delete
 
 
 @new_task
-async def mirror_status(client, message):
+async def mirror_status(_, message):
     async with download_dict_lock:
         count = len(download_dict)
     if count == 0:
@@ -34,7 +34,7 @@ async def mirror_status(client, message):
                 Interval.append(setInterval(config_dict['STATUS_UPDATE_INTERVAL'], update_all_messages))
 
 @new_task
-async def status_pages(client, query):
+async def status_pages(_, query):
     if not await isAdmin(query.message, query.from_user.id) and await request_limiter(query=query):
         return
     await query.answer()
