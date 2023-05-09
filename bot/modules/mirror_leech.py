@@ -9,10 +9,7 @@ from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 
 from bot import IS_PREMIUM_USER, LOGGER, bot, categories_dict, config_dict
-from bot.helper.ext_utils.bot_utils import (get_content_type, is_gdrive_link,
-                                            is_magnet, is_mega_link,
-                                            is_rclone_path, is_url, new_task,
-                                            sync_to_async)
+from bot.helper.ext_utils.bot_utils import get_content_type, is_telegram_link, is_gdrive_link, is_magnet, is_mega_link, is_rclone_path, is_url, new_task, sync_to_async
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.help_messages import MIRROR_HELP_MESSAGE
 from bot.helper.jmdkh_utils import none_admin_utils, stop_duplicate_tasks
@@ -28,14 +25,7 @@ from bot.helper.mirror_utils.rclone_utils.list import RcloneList
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import (anno_checker,
-                                                      delete_links,
-                                                      editMessage, isAdmin,
-                                                      isBot_canDm,
-                                                      open_category_btns,
-                                                      request_limiter,
-                                                      sendLogMessage,
-                                                      sendMessage)
+from bot.helper.telegram_helper.message_utils import anno_checker, delete_links, editMessage, isAdmin, isBot_canDm, open_category_btns, request_limiter, sendLogMessage, sendMessage, get_tg_link_content
 
 
 @new_task
@@ -53,7 +43,10 @@ async def _mirror_leech(client, message, isZip=False, extract=False, isQbit=Fals
     drive_id = None
     index_link = None
     auth = ''
-
+    reply_to = None
+    file_ = None
+    force_user = False
+   
     if len(message_args) > 1:
         index = 1
         args = mesg[0].split(maxsplit=5)
@@ -117,6 +110,8 @@ async def _mirror_leech(client, message, isZip=False, extract=False, isQbit=Fals
         _mirror_leech(client, nextmsg, isZip, extract,
                       isQbit, isLeech, sameDir)
 
+    __run_multi()
+
     path = f'{config_dict["DOWNLOAD_DIR"]}{message.id}{folder_name}'
 
     name = mesg[0].split(' n: ', 1)
@@ -163,8 +158,24 @@ async def _mirror_leech(client, message, isZip=False, extract=False, isQbit=Fals
     else:
         tag = message.from_user.mention
 
-    file_ = None
-    if reply_to := message.reply_to_message:
+    if link and is_telegram_link(link):
+        try:
+            reply_to, force_user = await get_tg_link_content(link)
+        except Exception as e:
+            await sendMessage(message, f'ERROR: {e}')
+            return
+    elif message.reply_to_message:
+        reply_to = message.reply_to_message
+        if reply_to.text is not None:
+            reply_text = reply_to.text.split('\n', 1)[0].strip()
+            if reply_text and is_telegram_link(reply_text):
+                try:
+                    reply_to, force_user = await get_tg_link_content(reply_text)
+                except Exception as e:
+                    await sendMessage(message, f'ERROR: {e}')
+                    return
+      
+    if reply_to:
         file_ = reply_to.document or reply_to.photo or reply_to.video or reply_to.audio or \
             reply_to.voice or reply_to.video_note or reply_to.sticker or reply_to.animation or None
         if sender_chat := reply_to.sender_chat:
@@ -241,10 +252,8 @@ async def _mirror_leech(client, message, isZip=False, extract=False, isQbit=Fals
                 await delete_links(message)
                 if str(e).startswith('ERROR:'):
                     await editMessage(process_msg, str(e))
-                    __run_multi()
                     return
             await process_msg.delete()
-    __run_multi()
 
     if not isLeech:
         if config_dict['DEFAULT_UPLOAD'] == 'rc' and up is None or up == 'rc':
@@ -287,7 +296,7 @@ async def _mirror_leech(client, message, isZip=False, extract=False, isQbit=Fals
                                    drive_id, index_link, dmMessage, logMessage)
 
     if file_ is not None:
-        await TelegramDownloadHelper(listener).add_download(reply_to, f'{path}/', name)
+        await TelegramDownloadHelper(listener).add_download(reply_to, f'{path}/', name, force_user)
     elif is_rclone_path(link):
         if link.startswith('mrcc:'):
             link = link.split('mrcc:', 1)[1]

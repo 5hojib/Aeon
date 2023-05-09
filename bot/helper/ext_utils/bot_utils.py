@@ -231,6 +231,9 @@ def get_readable_time(seconds):
     return result.strip()
 
 
+def is_telegram_link(url):
+    return url.startswith(('https://t.me/', 'tg://openmessage?user_id='))
+
 def is_magnet(url):
     return bool(re_match(MAGNET_REGEX, url))
 
