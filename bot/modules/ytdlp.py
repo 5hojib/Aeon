@@ -32,7 +32,7 @@ from bot.helper.telegram_helper.message_utils import (anno_checker,
                                                       open_category_btns,
                                                       request_limiter,
                                                       sendLogMessage,
-                                                      sendMessage)
+                                                      sendMessage, auto_delete_message)
 
 
 @new_task
@@ -367,7 +367,8 @@ async def _ytdl(client, message, isZip=False, isLeech=False, sameDir={}):
                 tag = reply_to.from_user.mention
 
     if not is_url(link):
-        await sendMessage(message, YT_HELP_MESSAGE.format_map({'cmd': message.command[0], 'fmg': '{"ffmpeg": ["-threads", "4"]}'}))
+        reply_message = await sendMessage(message, YT_HELP_MESSAGE.format_map({'cmd': message.command[0], 'fmg': '{"ffmpeg": ["-threads", "4"]}'}))
+        await auto_delete_message(message, reply_message)
         await delete_links(message)
         return
     if not message.from_user:

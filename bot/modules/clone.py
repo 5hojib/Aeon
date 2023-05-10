@@ -37,7 +37,7 @@ from bot.helper.telegram_helper.message_utils import (anno_checker,
                                                       request_limiter,
                                                       sendLogMessage,
                                                       sendMessage,
-                                                      sendStatusMessage)
+                                                      sendStatusMessage, auto_delete_message)
 
 
 async def rcloneNode(client, message, link, dst_path, rcf, listener):
@@ -192,7 +192,8 @@ async def gdcloneNode(message, link, listener):
         LOGGER.info(f'Cloning Done: {name}')
         await listener.onUploadComplete(link, size, files, folders, mime_type, name)
     else:
-        await sendMessage(message, CLONE_HELP_MESSAGE.format_map({'cmd': message.command[0]}))
+        reply_message = await sendMessage(message, CLONE_HELP_MESSAGE.format_map({'cmd': message.command[0]}))
+        await auto_delete_message(message, reply_message)
 
 
 @new_task
@@ -282,7 +283,8 @@ async def clone(client, message):
     __run_multi()
 
     if not link:
-        await sendMessage(message, CLONE_HELP_MESSAGE.format_map({'cmd': message.command[0]}))
+        reply_message = await sendMessage(message, CLONE_HELP_MESSAGE.format_map({'cmd': message.command[0]}))
+        await auto_delete_message(message, reply_message)
         await delete_links(message)
         return
 

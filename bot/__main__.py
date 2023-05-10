@@ -21,7 +21,7 @@ from .helper.ext_utils.db_handler import DbManger
 from .helper.ext_utils.fs_utils import clean_all, exit_clean_up, start_cleanup
 from .helper.telegram_helper.bot_commands import BotCommands
 from .helper.telegram_helper.filters import CustomFilters
-from .helper.telegram_helper.message_utils import editMessage, sendFile, sendMessage
+from .helper.telegram_helper.message_utils import editMessage, sendFile, sendMessage, auto_delete_message
 from .modules import anonymous, authorize, bot_settings, cancel_mirror, category_select, clone, eval, gd_count, gd_delete, gd_list, leech_del, mirror_leech, rmdb, rss, save_message, shell, status, torrent_search, torrent_select, users_settings, ytdlp
 
 start_aria2_listener()
@@ -38,7 +38,7 @@ async def stats(_, message):
         commit_from = (await cmd_exec("git log -1 --date=short --pretty=format:'%cr'", True))[0]
         commit_date = (await cmd_exec("git log -1 --date=format:'%d %B %Y' --pretty=format:'%ad'", True))[0]
         commit_time = (await cmd_exec("git log -1 --date=format:'%I:%M:%S %p' --pretty=format:'%ad'", True))[0]
-        commit_name = (await cmd_exec("git log -1 --pretty=format:'%s%n%b'", True))[0]
+        commit_name = (await cmd_exec("git log -1 --pretty=format:'%s'", True))[0]
     stats = f'<b><u>REPOSITORY INFO</u></b>\n\n' \
             f'<b>• Last commit: </b>{commit_id}\n'\
             f'<b>• Commit date:</b> {commit_date}\n'\
@@ -177,7 +177,8 @@ NOTE: Try each command without any argument to see more detalis.
 
 
 async def bot_help(_, message):
-    await sendMessage(message, help_string)
+    reply_message = await sendMessage(message, help_string)
+    await auto_delete_message(message, reply_message)
 
 
 async def restart_notification():
