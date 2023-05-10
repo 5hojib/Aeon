@@ -21,7 +21,7 @@ from .helper.ext_utils.db_handler import DbManger
 from .helper.ext_utils.fs_utils import clean_all, exit_clean_up, start_cleanup
 from .helper.telegram_helper.bot_commands import BotCommands
 from .helper.telegram_helper.filters import CustomFilters
-from .helper.telegram_helper.message_utils import editMessage, sendFile, sendMessage
+from .helper.telegram_helper.message_utils import editMessage, sendFile, sendMessage, auto_delete_message
 from .modules import anonymous, authorize, bot_settings, cancel_mirror, category_select, clone, eval, gd_count, gd_delete, gd_list, leech_del, mirror_leech, rmdb, rss, save_message, shell, status, torrent_search, torrent_select, users_settings, ytdlp
 
 start_aria2_listener()
@@ -177,7 +177,8 @@ NOTE: Try each command without any argument to see more detalis.
 
 
 async def bot_help(_, message):
-    await sendMessage(message, help_string)
+    reply_message = await sendMessage(message, help_string)
+    await auto_delete_message(message, reply_message)
 
 
 async def restart_notification():

@@ -181,10 +181,7 @@ async def _mirror_leech(client, message, isZip=False, extract=False, isQbit=Fals
         if sender_chat := reply_to.sender_chat:
             tag = sender_chat.title
         elif (re_user := reply_to.from_user) and not re_user.is_bot:
-            if username := reply_to.from_user.username:
-                tag = f"@{username}"
-            else:
-                tag = reply_to.from_user.mention
+            tag = f"@{username}" if (username := re_user.username) else re_user.mention
         if len(link) == 0 or not is_url(link) and not is_magnet(link):
             if file_ is None:
                 reply_text = reply_to.text.split('\n', 1)[0].strip()
@@ -195,7 +192,8 @@ async def _mirror_leech(client, message, isZip=False, extract=False, isQbit=Fals
                 file_ = None
 
     if not is_url(link) and not is_magnet(link) and not await aiopath.exists(link) and not is_rclone_path(link) and file_ is None:
-        await sendMessage(message, MIRROR_HELP_MESSAGE.format_map({'cmd': message.command[0]}))
+        reply_message = await sendMessage(message, MIRROR_HELP_MESSAGE.format_map({'cmd': message.command[0]}))
+        await auto_delete_message(message, reply_message)
         await delete_links(message)
         return
     if not message.from_user:
@@ -312,8 +310,9 @@ async def _mirror_leech(client, message, isZip=False, extract=False, isQbit=Fals
             gmsg = f"Use /{BotCommands.CloneCommand} to clone Google Drive file/folder\n\n"
             gmsg += f"Use /{BotCommands.ZipMirrorCommand[0]} to make zip of Google Drive folder\n\n"
             gmsg += f"Use /{BotCommands.UnzipMirrorCommand[0]} to extracts Google Drive archive folder/file"
+            reply_message = await sendMessage(message, gmsg)
+            await auto_delete_message(message, reply_message)
             await delete_links(message)
-            await sendMessage(message, gmsg)
         else:
             await add_gd_download(link, path, listener, name)
     elif is_mega_link(link):
