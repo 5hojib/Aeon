@@ -25,8 +25,7 @@ from bot.helper.mirror_utils.rclone_utils.list import RcloneList
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import anno_checker, delete_links, editMessage, isAdmin, isBot_canDm, open_category_btns, request_limiter, sendLogMessage, sendMessage, get_tg_link_content
-
+from bot.helper.telegram_helper.message_utils import anno_checker, delete_links, editMessage, isAdmin, isBot_canDm, open_category_btns, request_limiter, sendLogMessage, sendMessage, get_tg_link_content, auto_delete_message
 
 @new_task
 async def _mirror_leech(client, message, isZip=False, extract=False, isQbit=False, isLeech=False, sameDir={}):

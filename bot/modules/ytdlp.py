@@ -32,7 +32,7 @@ from bot.helper.telegram_helper.message_utils import (anno_checker,
                                                       open_category_btns,
                                                       request_limiter,
                                                       sendLogMessage,
-                                                      sendMessage)
+                                                      sendMessage, auto_delete_message)
 
 
 @new_task

@@ -37,7 +37,7 @@ from bot.helper.telegram_helper.message_utils import (anno_checker,
                                                       request_limiter,
                                                       sendLogMessage,
                                                       sendMessage,
-                                                      sendStatusMessage)
+                                                      sendStatusMessage, auto_delete_message)
 
 
 async def rcloneNode(client, message, link, dst_path, rcf, listener):
