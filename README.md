@@ -66,12 +66,11 @@ help - All cmds with description
 ### Modified from
 * [JMDKH](https://github.com/junedkh/jmdkh-mltb)
 * [MLTB](https://github.com/anasty17/mirror-leech-telegram-bot)
-* [WZML](https://github.com/weebzone/WZML)
 
 ### Thanks To
 * [Juned KH](https://github.com/junedkh)
 * [Anas](https://github.com/anasty17)
-* [Karan Adhikary](https://github.com/weebzone)
-* ChatGPT
+* [Abdullah al noman](https://github.com/SN-Abdullah-Al-Noman)
+* [ChatGPT](https://chat.openai.com/)
 
 You can't donate me! 🤣
