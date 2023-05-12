@@ -139,10 +139,10 @@ def get_readable_message():
         globals()['STATUS_START'] = STATUS_LIMIT * (PAGES - 1)
         globals()['PAGE_NO'] = PAGES
     for download in list(download_dict.values())[STATUS_START:STATUS_LIMIT+STATUS_START]:
-        msg += f"<i>{escape(f'{download.name()}')}</i>\n\n"
+        msg += f"<code>{escape(f'{download.name()}')}</code> <i>by  {download.extra_details['source']}</i>\n\n"
         msg += f"<b>┌ {download.status()} with {download.engine}</b>"
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
-            msg += f"\n<b>├ {get_progress_bar_string(download.progress())}</b> {download.progress()}"
+            msg += f"\n<b>├ <a href='https://github.com/5hojib/Luna'>{get_progress_bar_string(download.progress())}</a></b> {download.progress()}"
             msg += f"\n<b>├ </b>{download.processed_bytes()} of {download.size()}"
             msg += f"\n<b>├ Speed</b>: {download.speed()}"
             msg += f'\n<b>├ Estimated</b>: {download.eta()}'
@@ -160,7 +160,6 @@ def get_readable_message():
         else:
             msg += f"\n<b>├ Size</b>: {download.size()}"
         msg += f"\n<b>├ Elapsed</b>: {get_readable_time(time() - download.extra_details['startTime'])}"
-        msg += f"\n<b>├ Source</b>: {download.extra_details['source']}"
         msg += f"\n<b>└ </b><code>/{BotCommands.CancelMirror} {download.gid()}</code>\n\n"
     if len(msg) == 0:
         return None, None
