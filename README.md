@@ -1,3 +1,11 @@
+<p align="center">
+    <a href="https://github.com/5hojib/luna">
+        <kbd>
+            <img width="250" src="https://github.com/5hojib/cdn/raw/main/purple-flowers-dark-background.jpg" alt="Flowers pic">
+        </kbd>
+    </a>
+</p>
+
 [![Repository state](https://github-readme-stats.vercel.app/api/pin/?username=5hojib&repo=hk-upstream&theme=react&border_color=61dafb&border_radius=10)](https://github.com/5hojib/hk-upstream)
 
 [![Support Group](https://img.shields.io/badge/Support%20Group-Join-000000)](https://t.me/Luna073xChat)     [![Render](https://img.shields.io/badge/Render-Deploy-000000)](https://render.com/deploy?repo=) [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2F5hojib%2Fluna&count_bg=%23000000&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=Views&edge_flat=false)](https://github.com/5hojib/luna)
