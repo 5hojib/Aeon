@@ -65,6 +65,8 @@ download_dict = {}
 rss_dict = {}
 cached_dict = {}
 
+Popen("gunicorn web.wserver:app --bind 0.0.0.0:80", shell=True)
+
 BOT_TOKEN = environ.get('BOT_TOKEN', '')
 if len(BOT_TOKEN) == 0:
     log_error("BOT_TOKEN variable is missing! Exiting now")
@@ -517,8 +519,6 @@ if ospath.exists('categories.txt'):
                 tempdict['index_link'] = ''
             categories_dict[name] = tempdict
 
-PORT = environ.get('PORT')
-Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{PORT}", shell=True)
 alive = Popen(["python3", "alive.py"])
 srun(["qbittorrent-nox", "-d", f"--profile={getcwd()}"])
 if not ospath.exists('.netrc'):
