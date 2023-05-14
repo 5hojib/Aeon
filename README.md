@@ -6,6 +6,18 @@
     </a>
 </p>
 
+now you can start the bot by simply typing `bash start` or `python3 -m TelegramBot`
+
+<kbd>
+<img src="https://github.com/5hojib/cdn/raw/main/purple-flowers-dark-background.jpg" align="left" width="200" alt="Flowers pic">
+</kbd>
+
+The bot will stop working once you logout from the server. You can run the bot 24*7 in the server by using screen or tmux.
+```
+sudo apt install tmux -y
+tmux && bash start
+```
+
 [![Repository state](https://github-readme-stats.vercel.app/api/pin/?username=5hojib&repo=hk-upstream&theme=react&border_color=61dafb&border_radius=10)](https://github.com/5hojib/hk-upstream)
 
 [![Support Group](https://img.shields.io/badge/Support%20Group-Join-000000)](https://t.me/Luna073xChat)     [![Render](https://img.shields.io/badge/Render-Deploy-000000)](https://render.com/deploy?repo=) [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2F5hojib%2Fluna&count_bg=%23000000&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=Views&edge_flat=false)](https://github.com/5hojib/luna)
