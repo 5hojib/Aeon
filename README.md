@@ -13,7 +13,7 @@
 ### Instructions for Render
 1. Fork and star this repository.
 2. Go to your forked repository.
-3. Click on 'Render deploy' button.
+3. Click on `Render deploy` button.
 4. Fill in all variables correctly and start the deployment.
 5. After deployment, fill in `BASE_URL` using the `bsetting` command from the bot.
 6. Fill in the other variables using the `bsetting` command or by writing them in `sample_config.env` and renaming the file to `config.env`.
