@@ -1,5 +1,4 @@
 <img src="https://github.com/5hojib/cdn/raw/main/purple-flowers-dark-background.jpg" align="left" width="200" alt="Flowers pic">
-
 Modified mirror bot repository! Specially modified for Render and Railway deployment. This version also includes bug fixes and daily maintenance, as well as necessary features from MLTB and JMDKH
 
 [![Repository state](https://github-readme-stats.vercel.app/api/pin/?username=5hojib&repo=hk-upstream&theme=react&border_color=61dafb&border_radius=10)](https://github.com/5hojib/hk-upstream)
