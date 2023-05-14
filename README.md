@@ -1,20 +1,6 @@
-<p align="center">
-    <a href="https://github.com/5hojib/luna">
-        <kbd>
-            <img width="250" src="https://github.com/5hojib/cdn/raw/main/purple-flowers-dark-background.jpg" alt="Flowers pic">
-        </kbd>
-    </a>
-</p>
-
-now you can start the bot by simply typing `bash start` or `python3 -m TelegramBot`
-
 <img src="https://github.com/5hojib/cdn/raw/main/purple-flowers-dark-background.jpg" align="left" width="200" alt="Flowers pic">
 
-The bot will stop working once you logout from the server. You can run the bot 24*7 in the server by using screen or tmux.
-```
-sudo apt install tmux -y
-tmux && bash start
-```
+Modified mirror bot repository! Specially modified for Render and Railway deployment. This version also includes bug fixes and daily maintenance, as well as necessary features from MLTB and JMDKH
 
 [![Repository state](https://github-readme-stats.vercel.app/api/pin/?username=5hojib&repo=hk-upstream&theme=react&border_color=61dafb&border_radius=10)](https://github.com/5hojib/hk-upstream)
 
