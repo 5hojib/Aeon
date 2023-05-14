@@ -8,9 +8,7 @@
 
 now you can start the bot by simply typing `bash start` or `python3 -m TelegramBot`
 
-<kbd>
 <img src="https://github.com/5hojib/cdn/raw/main/purple-flowers-dark-background.jpg" align="left" width="200" alt="Flowers pic">
-</kbd>
 
 The bot will stop working once you logout from the server. You can run the bot 24*7 in the server by using screen or tmux.
 ```
