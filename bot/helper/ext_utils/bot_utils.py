@@ -299,7 +299,6 @@ async def check_user_tasks(user_id, maxtask):
 
 def checking_access(user_id, button=None):
     token_timeout = config_dict['TOKEN_TIMEOUT']
-    time_str = format_validity_time(token_timeout)
     if not config_dict['TOKEN_TIMEOUT']:
         return None, button
     user_data.setdefault(user_id, {})
@@ -312,6 +311,7 @@ def checking_access(user_id, button=None):
             del data['time']
         data['token'] = token
         user_data[user_id].update(data)
+        time_str = format_validity_time(token_timeout)
         if button is None:
             button = ButtonMaker()
         button.ubutton('Refresh Token', short_url(f'https://telegram.me/{bot_name}?start={token}'))
