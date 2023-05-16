@@ -16,7 +16,7 @@ from pyrogram.handlers import MessageHandler
 from bot import DATABASE_URL, INCOMPLETE_TASK_NOTIFIER, LOGGER, STOP_DUPLICATE_TASKS, Interval, QbInterval, bot, user_data, botStartTime, config_dict, scheduler, alive
 
 from bot.helper.listeners.aria2_listener import start_aria2_listener
-from .helper.ext_utils.bot_utils import cmd_exec, get_readable_file_size, get_readable_time, set_commands, sync_to_async
+from .helper.ext_utils.bot_utils import cmd_exec, get_readable_file_size, get_readable_time, set_commands, sync_to_async, format_validity_time
 from .helper.ext_utils.db_handler import DbManger
 from .helper.ext_utils.fs_utils import clean_all, exit_clean_up, start_cleanup
 from .helper.telegram_helper.bot_commands import BotCommands
@@ -62,44 +62,21 @@ async def start(_, message):
         userid = message.from_user.id
         input_token = message.command[1]
         if userid not in user_data:
-            return await sendMessage(message, 'Who are you?')
+            return await sendMessage(message, "You do not own this token.")
         data = user_data[userid]
         if 'token' not in data or data['token'] != input_token:
-            return await sendMessage(message, 'This token is already expired')
+            return await sendMessage(message, 'This token has already expired')
         data['token'] = str(uuid4())
         data['time'] = time()
         user_data[userid].update(data)
         time_str = format_validity_time(token_timeout)
-        return await sendMessage(message, f'Congratulations! Token refreshed successfully!\n\n<b>It will expire after</b> {time_str}') 
+        return await sendMessage(message, f'Congratulations on acquiring a new token!\n\n<b>It will expire after</b> {time_str}') 
     elif config_dict['DM_MODE']:
-        start_string = f'<b>Welcome to the Era of Luna!</b>\n\nNow I will send your files or links here.\n'
+        start_string = f'<b>Welcome to the Era of Luna!</b>\n\nYour files or links will be sent to you here.\n'
     else:
-        start_string = f'<b>Welcome to the Era of Luna!</b>\n\nThis bot can Mirror all your links To Google Drive!\n'
+        start_string = f'<b>Welcome to the Era of Luna!</b>\n\nThis bot can upload all your links or Telegram files to Google Drive, Telegram, or Rclone destination!\n'
               
     await sendMessage(message, start_string)
-
-def format_validity_time(validity_time):
-    days = validity_time // (24 * 3600)
-    validity_time = validity_time % (24 * 3600)
-    hours = validity_time // 3600
-    validity_time %= 3600
-    minutes = validity_time // 60
-    validity_time %= 60
-    seconds = validity_time
-    time_str = ''
-    if days > 0:
-        suffix = 's' if days > 1 else ''
-        time_str += f"{days} day{suffix} "
-    if hours > 0:
-        suffix = 's' if hours > 1 else ''
-        time_str += f"{hours} hour{suffix} "
-    if minutes > 0:
-        suffix = 's' if minutes > 1 else ''
-        time_str += f"{minutes} minute{suffix} "
-    suffix = 's' if seconds > 1 else ''
-    time_str += f"{seconds} second{suffix}"
-    return time_str
-
 
 async def restart(_, message):
     restart_message = await sendMessage(message, "Restarting...")

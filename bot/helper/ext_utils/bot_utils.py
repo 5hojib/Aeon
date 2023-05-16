@@ -216,9 +216,8 @@ async def turn_page(data):
                 STATUS_START -= STATUS_LIMIT
                 PAGE_NO -= 1
 
-
 def get_readable_time(seconds):
-    periods = [('year', 31536000), ('month', 2592000), ('week', 604800), ('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
+    periods = [('cosmic year', 31557600000000000), ('galactic year', 225000000000000000), ('aeon', 31536000000000000), ('epoch', 315360000000), ('millennium', 31536000000), ('century', 3153600000), ('decade', 315360000), ('year', 31536000), ('month', 2592000), ('week', 604800), ('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
     result = ''
     for period_name, period_seconds in periods:
         if seconds >= period_seconds:
@@ -228,7 +227,6 @@ def get_readable_time(seconds):
             if len(result.split()) == 2:
                 break
     return result.strip()
-
 
 def is_telegram_link(url):
     return url.startswith(('https://t.me/', 'tg://openmessage?user_id='))
@@ -300,6 +298,8 @@ async def check_user_tasks(user_id, maxtask):
 
 
 def checking_access(user_id, button=None):
+    token_timeout = config_dict['TOKEN_TIMEOUT']
+    time_str = format_validity_time(token_timeout)
     if not config_dict['TOKEN_TIMEOUT']:
         return None, button
     user_data.setdefault(user_id, {})
@@ -315,9 +315,19 @@ def checking_access(user_id, button=None):
         if button is None:
             button = ButtonMaker()
         button.ubutton('Refresh Token', short_url(f'https://telegram.me/{bot_name}?start={token}'))
-        return 'Token is expired, refresh your token and try again.', button
+        return f'Your token has expired, please collect a new token.\n\n<b>It will expire after {time_str}</b>', button
     return None, button
 
+
+def format_validity_time(seconds):
+    periods = [('cosmic year', 31557600000000000), ('galactic year', 225000000000000000), ('aeon', 31536000000000000), ('epoch', 315360000000), ('millennium', 31536000000), ('century', 3153600000), ('decade', 315360000), ('year', 31536000), ('month', 2592000), ('week', 604800), ('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
+    result = ''
+    for period_name, period_seconds in periods:
+        if seconds >= period_seconds:
+            period_value, seconds = divmod(seconds, period_seconds)
+            plural_suffix = 's' if period_value > 1 else ''
+            result += f'{int(period_value)} {period_name}{plural_suffix} '
+    return result
 
 async def cmd_exec(cmd, shell=False):
     if shell:
@@ -328,7 +338,6 @@ async def cmd_exec(cmd, shell=False):
     stdout = stdout.decode().strip()
     stderr = stderr.decode().strip()
     return stdout, stderr, proc.returncode
-
 
 def new_task(func):
     @wraps(func)
@@ -355,54 +364,32 @@ def new_thread(func):
         return future.result() if wait else future
     return wrapper
 
-
 async def set_commands(client):
     if config_dict['SET_COMMANDS']:
         await client.set_bot_commands([
-            BotCommand(
-                f'{BotCommands.MirrorCommand[0]}', f'or /{BotCommands.MirrorCommand[1]} Mirror'),
-            BotCommand(
-                f'{BotCommands.LeechCommand[0]}', f'or /{BotCommands.LeechCommand[1]} Leech'),
-            BotCommand(
-                f'{BotCommands.ZipMirrorCommand[0]}', f'or /{BotCommands.ZipMirrorCommand[1]} Mirror and upload as zip'),
-            BotCommand(
-                f'{BotCommands.ZipLeechCommand[0]}', f'or /{BotCommands.ZipLeechCommand[1]} Leech and upload as zip'),
-            BotCommand(
-                f'{BotCommands.UnzipMirrorCommand[0]}', f'or /{BotCommands.UnzipMirrorCommand[1]} Mirror and extract files'),
-            BotCommand(
-                f'{BotCommands.UnzipLeechCommand[0]}', f'or /{BotCommands.UnzipLeechCommand[1]} Leech and extract files'),
-            BotCommand(
-                f'{BotCommands.QbMirrorCommand[0]}', f'or /{BotCommands.QbMirrorCommand[1]} Mirror torrent using qBittorrent'),
-            BotCommand(
-                f'{BotCommands.QbLeechCommand[0]}', f'or /{BotCommands.QbLeechCommand[1]} Leech torrent using qBittorrent'),
-            BotCommand(
-                f'{BotCommands.QbZipMirrorCommand[0]}', f'or /{BotCommands.QbZipMirrorCommand[1]} Mirror torrent and upload as zip using qb'),
-            BotCommand(
-                f'{BotCommands.QbZipLeechCommand[0]}', f'or /{BotCommands.QbZipLeechCommand[1]} Leech torrent and upload as zip using qb'),
-            BotCommand(
-                f'{BotCommands.QbUnzipMirrorCommand[0]}', f'or /{BotCommands.QbUnzipMirrorCommand[1]} Mirror torrent and extract files using qb'),
-            BotCommand(
-                f'{BotCommands.QbUnzipLeechCommand[0]}', f'or /{BotCommands.QbUnzipLeechCommand[1]} Leech torrent and extract using qb'),
-            BotCommand(
-                f'{BotCommands.YtdlCommand[0]}', f'or /{BotCommands.YtdlCommand[1]} Mirror yt-dlp supported link'),
-            BotCommand(
-                f'{BotCommands.YtdlLeechCommand[0]}', f'or /{BotCommands.YtdlLeechCommand[1]} Leech through yt-dlp supported link'),
-            BotCommand(
-                f'{BotCommands.YtdlZipCommand[0]}', f'or /{BotCommands.YtdlZipCommand[1]} Mirror yt-dlp supported link as zip'),
-            BotCommand(
-                f'{BotCommands.YtdlZipLeechCommand[0]}', f'or /{BotCommands.YtdlZipLeechCommand[1]} Leech yt-dlp support link as zip'),
-            BotCommand(f'{BotCommands.CloneCommand}',
-                       'Copy file/folder to Drive'),
-            BotCommand(
-                f'{BotCommands.StatusCommand[0]}', f'or /{BotCommands.StatusCommand[1]} Get mirror status message'),
-            BotCommand(f'{BotCommands.StatsCommand}', 'Check bot stats'),
-            BotCommand(f'{BotCommands.BtSelectCommand}',
-                       'Select files to download only torrents'),
-            BotCommand(f'{BotCommands.CategorySelect}',
-                       'Select category to upload only mirror'),
+            BotCommand(f'{BotCommands.MirrorCommand[0]}', f'or /{BotCommands.MirrorCommand[1]} Mirror'),
+            BotCommand(f'{BotCommands.LeechCommand[0]}', f'or /{BotCommands.LeechCommand[1]} Leech'),
+            BotCommand(f'{BotCommands.ZipMirrorCommand[0]}', f'or /{BotCommands.ZipMirrorCommand[1]} Mirror and upload as zip'),
+            BotCommand(f'{BotCommands.ZipLeechCommand[0]}', f'or /{BotCommands.ZipLeechCommand[1]} Leech and upload as zip'),
+            BotCommand(f'{BotCommands.UnzipMirrorCommand[0]}', f'or /{BotCommands.UnzipMirrorCommand[1]} Mirror and extract files'),
+            BotCommand(f'{BotCommands.UnzipLeechCommand[0]}', f'or /{BotCommands.UnzipLeechCommand[1]} Leech and extract files'),
+            BotCommand(f'{BotCommands.QbMirrorCommand[0]}', f'or /{BotCommands.QbMirrorCommand[1]} Mirror torrent using qBittorrent'),
+            BotCommand(f'{BotCommands.QbLeechCommand[0]}', f'or /{BotCommands.QbLeechCommand[1]} Leech torrent using qBittorrent'),
+            BotCommand(f'{BotCommands.QbZipMirrorCommand[0]}', f'or /{BotCommands.QbZipMirrorCommand[1]} Mirror torrent and upload as zip using qb'),
+            BotCommand(f'{BotCommands.QbZipLeechCommand[0]}', f'or /{BotCommands.QbZipLeechCommand[1]} Leech torrent and upload as zip using qb'),
+            BotCommand(f'{BotCommands.QbUnzipMirrorCommand[0]}', f'or /{BotCommands.QbUnzipMirrorCommand[1]} Mirror torrent and extract files using qb'),
+            BotCommand(f'{BotCommands.QbUnzipLeechCommand[0]}', f'or /{BotCommands.QbUnzipLeechCommand[1]} Leech torrent and extract using qb'),
+            BotCommand(f'{BotCommands.YtdlCommand[0]}', f'or /{BotCommands.YtdlCommand[1]} Mirror yt-dlp supported link'),
+            BotCommand(f'{BotCommands.YtdlLeechCommand[0]}', f'or /{BotCommands.YtdlLeechCommand[1]} Leech through yt-dlp supported link'),
+            BotCommand(f'{BotCommands.YtdlZipCommand[0]}', f'or /{BotCommands.YtdlZipCommand[1]} Mirror yt-dlp supported link as zip'),
+            BotCommand(f'{BotCommands.YtdlZipLeechCommand[0]}', f'or /{BotCommands.YtdlZipLeechCommand[1]} Leech yt-dlp support link as zip'),
+            BotCommand(f'{BotCommands.CloneCommand}', 'Copy file/folder to Drive'),
+            BotCommand(f'{BotCommands.StatusCommand[0]}', 'or /statusall Get mirror status message'),
+            BotCommand(f'{BotCommands.StatsCommand[0]}', 'or /statsall Check bot stats'),
+            BotCommand(f'{BotCommands.BtSelectCommand}', 'Select files to download only torrents'),
+            BotCommand(f'{BotCommands.CategorySelect}', 'Select category to upload only mirror'),
             BotCommand(f'{BotCommands.CancelMirror}', 'Cancel a Task'),
-            BotCommand(
-                f'{BotCommands.CancelAllCommand[0]}', f'Cancel all tasks which added by you or {BotCommands.CancelAllCommand[1]} to in bots.'),
+            BotCommand(f'{BotCommands.CancelAllCommand[0]}', f'Cancel all tasks which added by you or {BotCommands.CancelAllCommand[1]} to in bots.'),
             BotCommand(f'{BotCommands.ListCommand}', 'Search in Drive'),
             BotCommand(f'{BotCommands.SearchCommand}', 'Search in Torrent'),
             BotCommand(f'{BotCommands.UserSetCommand}', 'Users settings'),
