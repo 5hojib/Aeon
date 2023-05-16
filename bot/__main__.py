@@ -70,7 +70,7 @@ async def start(_, message):
         data['time'] = time()
         user_data[userid].update(data)
         time_str = format_validity_time(token_timeout)
-        return await sendMessage(message, f'Congratulations on acquiring a new token!\n\n<b>It will expire after</b> {time_str}') 
+        return await sendMessage(message, f'Congratulations on acquiring a new token!\n\n<b>It will expire after {time_str}</b>') 
     elif config_dict['DM_MODE']:
         start_string = f'<b>Welcome to the Era of Luna!</b>\n\nYour files or links will be sent to you here.\n'
     else:
