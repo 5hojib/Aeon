@@ -320,6 +320,8 @@ def checking_access(user_id, button=None):
 
 
 def format_validity_time(seconds):
+    if seconds is None:
+        return "Invalid input: seconds cannot be None"
     periods = [('cosmic year', 31557600000000000), ('galactic year', 225000000000000000), ('aeon', 31536000000000000), ('epoch', 315360000000), ('millennium', 31536000000), ('century', 3153600000), ('decade', 315360000), ('year', 31536000), ('month', 2592000), ('week', 604800), ('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
     result = ''
     for period_name, period_seconds in periods:
