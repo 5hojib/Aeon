@@ -70,6 +70,7 @@ async def stats(_, message):
             f'<b>• Disk usage:</b> {disk}%\n'\
             f'<b>• Free disk space:</b> {get_readable_file_size(free)}\n'\
             f'<b>• Total disk space:</b> {get_readable_file_size(total)}\n'
+        await sendMessage(message, stats)
 
 async def start(_, message):
     token_timeout = config_dict['TOKEN_TIMEOUT']
