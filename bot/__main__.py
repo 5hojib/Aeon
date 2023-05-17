@@ -34,13 +34,19 @@ async def stats(_, message):
     osUptime = get_readable_time(time() - boot_time())
     cpuUsage = cpu_percent(interval=0.5)
     if await aiopath.exists('.git'):
+        upstream_repo = config_dict['UPSTREAM_REPO']
+        
+        if len(upstream_repo) == 0:
+            upstream_repo = 'https://github.com/5hojib/luna'
+        
+        commit_link = (await cmd_exec(f"git log -1 --pretty=format:'%h' | xargs printf '{upstream_repo}/commit/%s'", True))[0]
         commit_id = (await cmd_exec("git log -1 --pretty=format:'%h'", True))[0]
         commit_from = (await cmd_exec("git log -1 --date=short --pretty=format:'%cr'", True))[0]
         commit_date = (await cmd_exec("git log -1 --date=format:'%d %B %Y' --pretty=format:'%ad'", True))[0]
         commit_time = (await cmd_exec("git log -1 --date=format:'%I:%M:%S %p' --pretty=format:'%ad'", True))[0]
         commit_name = (await cmd_exec("git log -1 --pretty=format:'%s'", True))[0]
     stats = f'<b><u>REPOSITORY INFO</u></b>\n\n' \
-            f'<b>• Last commit: </b>{commit_id}\n'\
+            f'<b>• Last commit: </b><a href='{commit_link}'>{commit_id}</a>\n'\
             f'<b>• Commit date:</b> {commit_date}\n'\
             f'<b>• Commited on: </b>{commit_time}\n'\
             f'<b>• From now: </b>{commit_from}\n'\
