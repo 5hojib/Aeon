@@ -533,7 +533,7 @@ async def get_buttons(key=None, edit_type=None):
             buttons.ibutton('View', "botset view var")
         buttons.ibutton('Back', "botset back")
         buttons.ibutton('Close', "botset close")
-        for x in range(0, len(config_dict)-1, 10):
+        for x in range(0, len(config_dict), 10):
             buttons.ibutton(
                 f'{int(x/10)}', f"botset start var {x}", position='footer')
         msg = f'Config Variables | Page: {int(START/10)} | State: {STATE}'
@@ -554,7 +554,7 @@ Timeout: 60 sec'''
         buttons.ibutton('Add new key', "botset editaria newkey")
         buttons.ibutton('Back', "botset back")
         buttons.ibutton('Close', "botset close")
-        for x in range(0, len(aria2_options)-1, 10):
+        for x in range(0, len(aria2_options), 10):
             buttons.ibutton(
                 f'{int(x/10)}', f"botset start aria {x}", position='footer')
         msg = f'Aria2c Options | Page: {int(START/10)} | State: {STATE}'
@@ -567,7 +567,7 @@ Timeout: 60 sec'''
             buttons.ibutton('View', "botset view qbit")
         buttons.ibutton('Back', "botset back")
         buttons.ibutton('Close', "botset close")
-        for x in range(0, len(qbit_options)-1, 10):
+        for x in range(0, len(qbit_options), 10):
             buttons.ibutton(
                 f'{int(x/10)}', f"botset start qbit {x}", position='footer')
         msg = f'Qbittorrent Options | Page: {int(START/10)} | State: {STATE}'

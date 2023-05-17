@@ -116,7 +116,7 @@ async def get_telegraph_list(telegraph_content):
     return buttons.build_menu(1)
 
 
-def get_progress_bar_string(pct):
+def progress_bar(pct):
     pct = float(pct.strip('%'))
     p = min(max(pct, 0), 100)
     cFull = int(p / 10)
@@ -127,7 +127,7 @@ def get_progress_bar_string(pct):
         incomplete_char = s[cIncomplete - 1]
         p_str += incomplete_char
     p_str += '○' * (10 - len(p_str))
-    return f"{p_str}"
+    return p_str
 
 def get_readable_message():
     msg = "<b>Powered by Luna</b>\n\n"
@@ -142,7 +142,7 @@ def get_readable_message():
         msg += f"<i>{escape(f'{download.name()}')}\nby {download.extra_details['source']}</i>\n\n"
         msg += f"<b>┌ {download.status()} with {download.engine}</b>"
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
-            msg += f"\n<b>├ <a href='https://github.com/5hojib/Luna'>{get_progress_bar_string(download.progress())}</a></b> {download.progress()}"
+            msg += f"\n<b>├ <a href='https://github.com/5hojib/Luna'>{progress_bar(download.progress())}</a></b> {download.progress()}"
             msg += f"\n<b>├ </b>{download.processed_bytes()} of {download.size()}"
             msg += f"\n<b>├ Speed</b>: {download.speed()}"
             msg += f'\n<b>├ Estimated</b>: {download.eta()}'
