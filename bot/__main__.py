@@ -34,12 +34,7 @@ async def stats(_, message):
     osUptime = get_readable_time(time() - boot_time())
     cpuUsage = cpu_percent(interval=0.5)
     if await aiopath.exists('.git'):
-        upstream_repo = config_dict['UPSTREAM_REPO']
-        
-        if len(upstream_repo) == 0:
-            upstream_repo = 'https://github.com/5hojib/luna'
-        
-        commit_link = (await cmd_exec(f"git log -1 --pretty=format:'%h' | xargs printf '{upstream_repo}/commit/%s'", True))[0]
+        commit_link = (await cmd_exec('remote_url=$(git config --get remote.origin.url) && if echo "$remote_url" | grep -qE "github\.com[:/](.*)/(.*?)(\.git)?$"; then owner_name=$(echo "$remote_url" | sed -nE 's|.*/(.*)/(.*?)(\.git)?$|\1|p') && repo_name=$(echo "$remote_url" | sed -nE 's|.*/(.*)/(.*?)(\.git)?$|\2|p') && last_commit=$(git log -1 --pretty=format:'%h') && commit_link="https://github.com/$owner_name/$repo_name/commit/$last_commit" && echo $commit_link; else echo "Failed to extract repository name and owner name from the remote URL."; fi', True))[0]
         commit_id = (await cmd_exec("git log -1 --pretty=format:'%h'", True))[0]
         commit_from = (await cmd_exec("git log -1 --date=short --pretty=format:'%cr'", True))[0]
         commit_date = (await cmd_exec("git log -1 --date=format:'%d %B %Y' --pretty=format:'%ad'", True))[0]
