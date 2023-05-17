@@ -35,17 +35,17 @@ async def stats(_, message):
     cpuUsage = cpu_percent(interval=0.5)
     if await aiopath.exists('.git'):
         command = '''
-            remote_url=$(git config --get remote.origin.url) &&
-            if echo "$remote_url" | grep -qE "github\.com[:/](.*)/(.*?)(\.git)?$"; then
-                owner_name=$(echo "$remote_url" | sed -nE 's|.*/(.*)/(.*?)(\.git)?$|\1|p') &&
-                repo_name=$(echo "$remote_url" | sed -nE 's|.*/(.*)/(.*?)(\.git)?$|\2|p') &&
-                last_commit=$(git log -1 --pretty=format:'%h') &&
-                commit_link="https://github.com/$owner_name/$repo_name/commit/$last_commit" &&
-                echo $commit_link;
-            else
-                echo "Failed to extract repository name and owner name from the remote URL.";
-            fi
-        '''
+                    remote_url=$(git config --get remote.origin.url) &&
+                    if echo "$remote_url" | grep -qE "github\.com[:/](.*)/(.*?)(\.git)?$"; then
+                        owner_name=$(echo "$remote_url" | awk -F/ '{ print $(NF-1) }') &&
+                        repo_name=$(echo "$remote_url" | awk -F/ '{ print $NF }' | sed 's/\.git$//') &&
+                        last_commit=$(git log -1 --pretty=format:'%h') &&
+                        commit_link="https://github.com/$owner_name/$repo_name/commit/$last_commit" &&
+                        echo $commit_link;
+                    else
+                        echo "Failed to extract repository name and owner name from the remote URL.";
+                    fi
+                '''
         commit_link = (await cmd_exec(command, True))[0]
         commit_id = (await cmd_exec("git log -1 --pretty=format:'%h'", True))[0]
         commit_from = (await cmd_exec("git log -1 --date=short --pretty=format:'%cr'", True))[0]
@@ -56,7 +56,7 @@ async def stats(_, message):
         commit_html_link = f'<a href="{commit_link}">{commit_id}</a>'
         
         stats = f'<b><u>REPOSITORY INFO</u></b>\n\n' \
-            f"<b>• Last commit: </b>{commit_html_link} {commit_link}\n"\
+            f"<b>• Last commit: </b>{commit_html_link}\n"\
             f'<b>• Commit date:</b> {commit_date}\n'\
             f'<b>• Commited on: </b>{commit_time}\n'\
             f'<b>• From now: </b>{commit_from}\n'\
