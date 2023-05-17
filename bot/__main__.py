@@ -56,7 +56,7 @@ async def stats(_, message):
         commit_html_link = f'<a href="{commit_link}">{commit_id}</a>'
         
         stats = f'<b><u>REPOSITORY INFO</u></b>\n\n' \
-            f"<b>• Last commit: </b>{commit_html_link}\n"\
+            f"<b>• Last commit: </b>{commit_html_link} {commit_link}\n"\
             f'<b>• Commit date:</b> {commit_date}\n'\
             f'<b>• Commited on: </b>{commit_time}\n'\
             f'<b>• From now: </b>{commit_from}\n'\
