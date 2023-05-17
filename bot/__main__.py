@@ -46,7 +46,7 @@ async def stats(_, message):
         commit_time = (await cmd_exec("git log -1 --date=format:'%I:%M:%S %p' --pretty=format:'%ad'", True))[0]
         commit_name = (await cmd_exec("git log -1 --pretty=format:'%s'", True))[0]
     stats = f'<b><u>REPOSITORY INFO</u></b>\n\n' \
-            f'<b>• Last commit: </b><a href='{commit_link}'>{commit_id}</a>\n'\
+            f'<b>• Last commit: </b><a href=f'{commit_link}'>{commit_id}</a>\n'\
             f'<b>• Commit date:</b> {commit_date}\n'\
             f'<b>• Commited on: </b>{commit_time}\n'\
             f'<b>• From now: </b>{commit_from}\n'\
