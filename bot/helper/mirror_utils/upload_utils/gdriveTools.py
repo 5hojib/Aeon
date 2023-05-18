@@ -116,10 +116,19 @@ class GoogleDriveHelper:
             regex = r"https:\/\/drive\.google\.com\/(?:drive(.*?)\/folders\/|file(.*?)?\/d\/)([-\w]+)"
             res = re_search(regex, link)
             if res is None:
-                raise IndexError("G-Drive ID not found.")
-            return res.group(3)
-        parsed = urlparse(link)
-        return parse_qs(parsed.query)['id'][0]
+                return link
+            parsed = urlparse(link)
+            return (
+                parse_qs(parsed.query)['id'][0]
+                if 'id' in parse_qs(parsed.query)
+                else res.group(3)
+            )
+        else:
+            parsed = urlparse(link)
+            if 'id' in parse_qs(parsed.query):
+                return parse_qs(parsed.query)['id'][0]
+            else:  
+                return link
 
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(3),
            retry=retry_if_exception_type(Exception))
