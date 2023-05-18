@@ -117,12 +117,12 @@ class GoogleDriveHelper:
             res = re_search(regex, link)
             if res is None:
                 return link
-            else:
-                parsed = urlparse(link)
-                if 'id' in parse_qs(parsed.query):
-                    return parse_qs(parsed.query)['id'][0]
-                else:
-                    return res.group(3)
+            parsed = urlparse(link)
+            return (
+                parse_qs(parsed.query)['id'][0]
+                if 'id' in parse_qs(parsed.query)
+                else res.group(3)
+            )
         else:
             parsed = urlparse(link)
             if 'id' in parse_qs(parsed.query):
