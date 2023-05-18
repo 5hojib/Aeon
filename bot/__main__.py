@@ -34,13 +34,29 @@ async def stats(_, message):
     osUptime = get_readable_time(time() - boot_time())
     cpuUsage = cpu_percent(interval=0.5)
     if await aiopath.exists('.git'):
+        command = '''
+                    remote_url=$(git config --get remote.origin.url) &&
+                    if echo "$remote_url" | grep -qE "github\.com[:/](.*)/(.*?)(\.git)?$"; then
+                        owner_name=$(echo "$remote_url" | awk -F/ '{ print $(NF-1) }') &&
+                        repo_name=$(echo "$remote_url" | awk -F/ '{ print $NF }' | sed 's/\.git$//') &&
+                        last_commit=$(git log -1 --pretty=format:'%h') &&
+                        commit_link="https://github.com/$owner_name/$repo_name/commit/$last_commit" &&
+                        echo $commit_link;
+                    else
+                        echo "Failed to extract repository name and owner name from the remote URL.";
+                    fi
+                '''
+        commit_link = (await cmd_exec(command, True))[0]
         commit_id = (await cmd_exec("git log -1 --pretty=format:'%h'", True))[0]
         commit_from = (await cmd_exec("git log -1 --date=short --pretty=format:'%cr'", True))[0]
         commit_date = (await cmd_exec("git log -1 --date=format:'%d %B %Y' --pretty=format:'%ad'", True))[0]
         commit_time = (await cmd_exec("git log -1 --date=format:'%I:%M:%S %p' --pretty=format:'%ad'", True))[0]
         commit_name = (await cmd_exec("git log -1 --pretty=format:'%s'", True))[0]
-    stats = f'<b><u>REPOSITORY INFO</u></b>\n\n' \
-            f'<b>• Last commit: </b>{commit_id}\n'\
+        
+        commit_html_link = f'<a href="{commit_link}">{commit_id}</a>'
+        
+        stats = f'<b><u>REPOSITORY INFO</u></b>\n\n' \
+            f"<b>• Last commit: </b>{commit_html_link}\n"\
             f'<b>• Commit date:</b> {commit_date}\n'\
             f'<b>• Commited on: </b>{commit_time}\n'\
             f'<b>• From now: </b>{commit_from}\n'\
@@ -54,7 +70,7 @@ async def stats(_, message):
             f'<b>• Disk usage:</b> {disk}%\n'\
             f'<b>• Free disk space:</b> {get_readable_file_size(free)}\n'\
             f'<b>• Total disk space:</b> {get_readable_file_size(total)}\n'
-    await sendMessage(message, stats)
+        await sendMessage(message, stats)
 
 async def start(_, message):
     token_timeout = config_dict['TOKEN_TIMEOUT']

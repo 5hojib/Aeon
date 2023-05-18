@@ -496,7 +496,7 @@ class MirrorLeechListener:
             count = len(download_dict)
             if self.uid in self.sameDir:
                 self.sameDir.remove(self.uid)
-        msg = f"{self.tag} Download: {escape(error)}\n<b>• Elapsed</b>: {get_readable_time(time() - self.extra_details['startTime'])}"
+        msg = f"{self.tag} Download: {escape(error)}\n\n<b>• Elapsed</b>: {get_readable_time(time() - self.extra_details['startTime'])}"
         await sendMessage(self.message, msg, button)
         if self.logMessage:
             await sendMessage(self.logMessage, msg, button)
@@ -537,7 +537,7 @@ class MirrorLeechListener:
             count = len(download_dict)
             if self.uid in self.sameDir:
                 self.sameDir.remove(self.uid)
-        msg = f"{self.tag} {escape(error)}\n<b>• Elapsed</b>: {get_readable_time(time() - self.extra_details['startTime'])}"
+        msg = f"{self.tag} {escape(error)}\n\n<b>• Elapsed</b>: {get_readable_time(time() - self.extra_details['startTime'])}"
         await sendMessage(self.message, msg)
         if self.logMessage:
             await sendMessage(self.logMessage, msg)
