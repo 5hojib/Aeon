@@ -82,23 +82,23 @@ async def stats(_, message):
             LEECH_LIMIT = config_dict['LEECH_LIMIT']
             USER_MAX_TASKS = config_dict['USER_MAX_TASKS']
         
-            torrent_limit = 'No Limit Set' if TORRENT_LIMIT == '' else f'{TORRENT_LIMIT}GB/Link'
-            clone_limit = 'No Limit Set' if CLONE_LIMIT == '' else f'{CLONE_LIMIT}GB/Link'
-            gdrive_limit = 'No Limit Set' if GDRIVE_LIMIT == '' else f'{GDRIVE_LIMIT}GB/Link'
-            mega_limit = 'No Limit Set' if MEGA_LIMIT == '' else f'{MEGA_LIMIT}GB/Link'
-            leech_limit = 'No Limit Set' if LEECH_LIMIT == '' else f'{LEECH_LIMIT}GB/Link'
-            user_task = 'No Limit Set' if USER_MAX_TASKS == '' else f'{USER_MAX_TASKS} Tasks/user'
-            ytdlp_limit = 'No Limit Set' if YTDLP_LIMIT == '' else f'{YTDLP_LIMIT}GB/Link'
-            direct_limit = 'No Limit Set' if DIRECT_LIMIT == '' else f'{DIRECT_LIMIT}GB/Link'
+            torrent_limit = 'No limits have been set.' if TORRENT_LIMIT == '' else f'{TORRENT_LIMIT}GB/Link'
+            clone_limit = 'No limits have been set.' if CLONE_LIMIT == '' else f'{CLONE_LIMIT}GB/Link'
+            gdrive_limit = 'No limits have been set.' if GDRIVE_LIMIT == '' else f'{GDRIVE_LIMIT}GB/Link'
+            mega_limit = 'No limits have been set.' if MEGA_LIMIT == '' else f'{MEGA_LIMIT}GB/Link'
+            leech_limit = 'No limits have been set.' if LEECH_LIMIT == '' else f'{LEECH_LIMIT}GB/Link'
+            user_task = 'No limits have been set.' if USER_MAX_TASKS == '' else f'{USER_MAX_TASKS} Tasks/user'
+            ytdlp_limit = 'No limits have been set.' if YTDLP_LIMIT == '' else f'{YTDLP_LIMIT}GB/Link'
+            direct_limit = 'No limits have been set.' if DIRECT_LIMIT == '' else f'{DIRECT_LIMIT}GB/Link'
             stats += f'<b><u>LIMIT</u></b>\n\n'\
-                         f'<b>• Torrent limit:</b> {torrent_limit}\n'\
-                         f'<b>• Gdrive limit:</b> {gdrive_limit}\n'\
-                         f'<b>• Ytdlp limit:</b> {ytdlp_limit}\n'\
-                         f'<b>• Direct limit:</b> {direct_limit}\n'\
-                         f'<b>• Leech limit:</b> {leech_limit}\n'\
-                         f'<b>• Clone limit:</b> {clone_limit}\n'\
-                         f'<b>• Mega limit:</b> {mega_limit}\n'\
-                         f'<b>• User max tasks:</b> {user_task}\n\n'
+                     f'<b>• Torrent limit:</b> {torrent_limit}\n'\
+                     f'<b>• Gdrive limit:</b> {gdrive_limit}\n'\
+                     f'<b>• Ytdlp limit:</b> {ytdlp_limit}\n'\
+                     f'<b>• Direct limit:</b> {direct_limit}\n'\
+                     f'<b>• Leech limit:</b> {leech_limit}\n'\
+                     f'<b>• Clone limit:</b> {clone_limit}\n'\
+                     f'<b>• Mega limit:</b> {mega_limit}\n'\
+                     f'<b>• User max tasks:</b> {user_task}\n\n'
     await sendMessage(message, stats)
 
 async def start(_, message):
