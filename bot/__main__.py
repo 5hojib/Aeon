@@ -71,7 +71,7 @@ async def stats(_, message):
             f'<b>• Free disk space:</b> {get_readable_file_size(free)}\n'\
             f'<b>• Total disk space:</b> {get_readable_file_size(total)}\n'
         
-        if config_dict['SHOW_LIMIT']:
+        if config_dict['SHOW_LIMITS']:
         
             DIRECT_LIMIT = config_dict['DIRECT_LIMIT']
             YTDLP_LIMIT = config_dict['YTDLP_LIMIT']
