@@ -379,7 +379,7 @@ DELETE_LINKS = environ.get('DELETE_LINKS', '')
 DELETE_LINKS = DELETE_LINKS.lower() == 'true'
 
 SHOW_LIMIT = environ.get('SHOW_LIMIT', '')
-SHOW_LIMIT SHOW_LIMIT.lower() == 'true'
+SHOW_LIMIT = SHOW_LIMIT.lower() == 'true'
 
 TOKEN_TIMEOUT = environ.get('TOKEN_TIMEOUT', '')
 if TOKEN_TIMEOUT.isdigit():
