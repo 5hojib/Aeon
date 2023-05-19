@@ -91,7 +91,7 @@ async def stats(_, message):
             ytdlp_limit = 'No Limit Set' if YTDLP_LIMIT == '' else f'{YTDLP_LIMIT}'
             direct_limit = 'No Limit Set' if DIRECT_LIMIT == '' else f'{DIRECT_LIMIT}GB/Link'
             stats += f'<b><u>LIMIT</u></b>\n\n'\
-                         f'Torrent limit: {torrent_direct}\n'\
+                         f'Torrent limit: {torrent_limit}\n'\
                          f'Gdrive limit: {gdrive_limit}\n'\
                          f'Ytdlp limit: {ytdlp_limit}\n'\
                          f'Direct limit: {direct_limit}\n'\
