@@ -89,7 +89,7 @@ async def stats(_, message):
             leech_limit = 'No Limit Set' if LEECH_LIMIT == '' else f'{LEECH_LIMIT}GB/Link'
             user_task = 'No Limit Set' if USER_MAX_TASKS == '' else f'{USER_MAX_TASKS} Tasks/user'
             ytdlp_limit = 'No Limit Set' if YTDLP_LIMIT == '' else f'{YTDLP_LIMIT}'
-            direct_limit = 'No Limit Set' if DIRECR_LIMIT == '' else f'{DIRECT_LIMIT}GB/Link'
+            direct_limit = 'No Limit Set' if DIRECT_LIMIT == '' else f'{DIRECT_LIMIT}GB/Link'
             stats += f'<b><u>LIMIT</u></b>\n\n'\
                          f'Torrent limit: {torrent_direct}\n'\
                          f'Gdrive limit: {gdrive_limit}\n'\
