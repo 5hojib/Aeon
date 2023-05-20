@@ -82,14 +82,14 @@ async def stats(_, message):
             LEECH_LIMIT = config_dict['LEECH_LIMIT']
             USER_MAX_TASKS = config_dict['USER_MAX_TASKS']
         
-            torrent_limit = 'No limits have been set.' if TORRENT_LIMIT == '' else f'{TORRENT_LIMIT}GB/Link'
-            clone_limit = 'No limits have been set.' if CLONE_LIMIT == '' else f'{CLONE_LIMIT}GB/Link'
-            gdrive_limit = 'No limits have been set.' if GDRIVE_LIMIT == '' else f'{GDRIVE_LIMIT}GB/Link'
-            mega_limit = 'No limits have been set.' if MEGA_LIMIT == '' else f'{MEGA_LIMIT}GB/Link'
-            leech_limit = 'No limits have been set.' if LEECH_LIMIT == '' else f'{LEECH_LIMIT}GB/Link'
-            user_task = 'No limits have been set.' if USER_MAX_TASKS == '' else f'{USER_MAX_TASKS} Tasks/user'
-            ytdlp_limit = 'No limits have been set.' if YTDLP_LIMIT == '' else f'{YTDLP_LIMIT}GB/Link'
-            direct_limit = 'No limits have been set.' if DIRECT_LIMIT == '' else f'{DIRECT_LIMIT}GB/Link'
+            torrent_limit = '∞' if TORRENT_LIMIT == '' else f'{TORRENT_LIMIT}GB/Link'
+            clone_limit = '∞' if CLONE_LIMIT == '' else f'{CLONE_LIMIT}GB/Link'
+            gdrive_limit = '∞' if GDRIVE_LIMIT == '' else f'{GDRIVE_LIMIT}GB/Link'
+            mega_limit = '∞' if MEGA_LIMIT == '' else f'{MEGA_LIMIT}GB/Link'
+            leech_limit = '∞' if LEECH_LIMIT == '' else f'{LEECH_LIMIT}GB/Link'
+            user_task = '∞' if USER_MAX_TASKS == '' else f'{USER_MAX_TASKS} Tasks/user'
+            ytdlp_limit = '∞' if YTDLP_LIMIT == '' else f'{YTDLP_LIMIT}GB/Link'
+            direct_limit = '∞' if DIRECT_LIMIT == '' else f'{DIRECT_LIMIT}GB/Link'
             stats += f'<b><u>LIMIT</u></b>\n\n'\
                      f'<b>• Torrent limit:</b> {torrent_limit}\n'\
                      f'<b>• Gdrive limit:</b> {gdrive_limit}\n'\
