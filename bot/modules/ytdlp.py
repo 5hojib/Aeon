@@ -25,14 +25,15 @@ from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import (anno_checker,
+from bot.helper.telegram_helper.message_utils import (auto_delete_message, anno_checker,
                                                       delete_links,
                                                       editMessage, isAdmin,
                                                       isBot_canDm,
                                                       open_category_btns,
                                                       request_limiter,
                                                       sendLogMessage,
-                                                      sendMessage, auto_delete_message)
+                                                      sendMessage)
+from bot.helper.ext_utils.bulk_links import extract_bulk_links
 
 
 @new_task
@@ -252,21 +253,24 @@ async def _mdisk(link, name):
 
 
 @new_task
-async def _ytdl(client, message, isZip=False, isLeech=False, sameDir={}):
+async def _ytdl(client, message, isZip=False, isLeech=False, sameDir={}, bulk=[]):
     mssg = message.text
     qual = ''
     select = False
     multi = 0
     link = ''
     folder_name = ''
+    bulk_start = 0
+    bulk_end = 0
+    is_bulk = False
+    index = 1
 
-    args = mssg.split(maxsplit=3)
+    args = mssg.split(maxsplit=4)
     args.pop(0)
     raw_url = None
     drive_id = None
     index_link = None
     if len(args) > 0:
-        index = 1
         for x in args:
             x = x.strip()
             if x == 's':
@@ -275,6 +279,7 @@ async def _ytdl(client, message, isZip=False, isLeech=False, sameDir={}):
             elif x.strip().isdigit():
                 multi = int(x)
                 mi = index
+                index += 1
             elif x.startswith('m:'):
                 marg = x.split('m:', 1)
                 if len(marg) > 1:
@@ -282,15 +287,45 @@ async def _ytdl(client, message, isZip=False, isLeech=False, sameDir={}):
                     if not sameDir:
                         sameDir = set()
                     sameDir.add(message.id)
+            elif x == 'b':
+                is_bulk = True
+                bi = index
+                index += 1
+            elif x.startswith('b:'):
+                is_bulk = True
+                bi = index
+                index += 1
+                dargs = x.split(':')
+                bulk_start = dargs[1] or 0
+                if len(dargs) == 3:
+                    bulk_end = dargs[2] or 0
             else:
                 break
-        if multi == 0:
+        if multi == 0 or len(bulk) != 0:
             args = mssg.split(maxsplit=index)
             if len(args) > index:
                 x = args[index].strip()
                 if not x.startswith(('n:', 'pswd:', 'up:', 'rcf:', 'opt:', 'id:', 'index:')):
                     link = re_split(r' opt: | pswd: | n: | rcf: | up: | id: | index: ', x)[
                         0].strip()
+
+    if is_bulk:
+        bulk = await extract_bulk_links(message, bulk_start, bulk_end)
+        if len(bulk) == 0:
+            await sendMessage(message, 'Reply to text file or to tg message that have links seperated by new line!')
+            return
+        b_msg = mssg.split(maxsplit=bi)
+        b_msg[bi] = f'{len(bulk)}'
+        b_msg.insert(index, bulk[0])
+        b_msg = " ".join(b_msg)
+        nextmsg = await sendMessage(message, b_msg)
+        nextmsg = await client.get_messages(chat_id=message.chat.id, message_ids=nextmsg.id)
+        nextmsg.from_user = message.from_user
+        _ytdl(client, nextmsg, isZip, isLeech, sameDir, bulk)
+        return
+
+    if len(bulk) != 0:
+        del bulk[0]
 
     @new_task
     async def __run_multi():
@@ -308,7 +343,7 @@ async def _ytdl(client, message, isZip=False, isLeech=False, sameDir={}):
         if message.sender_chat:
             nextmsg.sender_chat = message.sender_chat
         await sleep(1)
-        _ytdl(client, nextmsg, isZip, isLeech, sameDir)
+        _ytdl(client, nextmsg, isZip, isLeech, sameDir, bulk)
 
     path = f'{DOWNLOAD_DIR}{message.id}{folder_name}'
 
@@ -355,16 +390,8 @@ async def _ytdl(client, message, isZip=False, isLeech=False, sameDir={}):
     else:
         tag = message.from_user.mention
 
-    if reply_to := message.reply_to_message:
-        if len(link) == 0:
-            link = reply_to.text.split('\n', 1)[0].strip()
-        if sender_chat := reply_to.sender_chat:
-            tag = sender_chat.title
-        elif not reply_to.from_user.is_bot:
-            if username := reply_to.from_user.username:
-                tag = f'@{username}'
-            else:
-                tag = reply_to.from_user.mention
+    if len(link) == 0 and (reply_to := message.reply_to_message):
+        link = reply_to.text.split('\n', 1)[0].strip()
 
     if not is_url(link):
         reply_message = await sendMessage(message, YT_HELP_MESSAGE.format_map({'cmd': message.command[0], 'fmg': '{"ffmpeg": ["-threads", "4"]}'}))

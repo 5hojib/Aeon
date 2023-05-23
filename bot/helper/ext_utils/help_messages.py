@@ -13,8 +13,8 @@ drive_id must be folder id and index must be url else it will not accept
 This options should be always after n: or pswd:
 
 <b>Quality Buttons:</b>
-Incase default quality added but you need to select quality for specific link or links with multi links feature.
-<code>/{cmd}</code> s link
+Incase default quality added from yt-dlp options using format option and you need to select quality for specific link or links with multi links feature.
+<code>/cmd</code> s link
 This option should be always before n:, pswd: and opt:
 
 <b>Options Example:</b> opt: playliststart:^10|matchtitle:S13|writesubtitles:true|live_from_start:true|postprocessor_args:{fmg}|wait_for_video:(5, 100)
@@ -44,9 +44,18 @@ If you want to add path manually from your config (uploaded from usetting) add <
 This will override all other flags except --exclude
 Check here all <a href='https://rclone.org/flags/'>RcloneFlags</a>.
 
+<b>Bulk</b>:
+Bulk can be used by text message and by replying to text file contains links seperated by new line.
+You can use it only by reply to message(text/file). Options that came after link should be added along with and after link and not with cmd.
+Example:
+link n: newname up: remote1:path1
+link pswd: pass(zip/unzip) opt: ytdlpoptions up: remote2:path2
+Relply to this example by this cmd for example <code>/cmd</code> b(bulk) m:folder_name(same dir)
+You can set start and end of the links from the bulk with b:start:end or only end by b::end or only start by b:start. The default start is from zero(first link) to inf.
+
 <b>NOTES:</b>
 1. When use cmd by reply don't add any option in link msg! Always add them after cmd msg!
-2. Options (<b>s, m: and multi</b>) should be added randomly before link and before any other option.
+2. Options (<b>b, s, m: and multi</b>) should be added randomly before link and before any other option.
 3. Options (<b>n:, pswd: and opt:</b>) should be added randomly after the link if link along with the cmd or after cmd if by reply.
 4. You can always add video quality from yt-dlp api options.
 5. Don't add file extension while rename using `n:`
@@ -94,6 +103,14 @@ Users can add their own rclone from user settings
 If you want to add path manually from your config add <code>mrcc:</code> before the path without space
 <code>/{cmd}</code> <code>mrcc:</code>main:/dump/ubuntu.iso
 
+<b>TG Links</b>:
+Treat links like any direct link
+Some links need user access so sure you must add USER_SESSION_STRING for it.
+Three types of links:
+Public: <code>https://t.me/channel_name/message_id</code>
+Private: <code>tg://openmessage?user_id=xxxxxx&message_id=xxxxx</code>
+Super: <code>https://t.me/c/channel_id/message_id</code>
+
 <b>Upload</b>:
 <code>/{cmd}</code> link up: <code>rcl</code> (To select rclone config, remote and path)
 You can directly add the upload path. up: remote:dir/subdir
@@ -107,10 +124,19 @@ If you want to add path manually from your config (uploaded from usetting) add <
 This will override all other flags except --exclude
 Check here all <a href='https://rclone.org/flags/'>RcloneFlags</a>.
 
+<b>Bulk</b>:
+Bulk can be used by text message and by replying to text file contains links seperated by new line.
+You can use it only by reply to message(text/file). Options that came after link should be added along with and after link and not with cmd.
+Example:
+link n: newname up: remote1:path1
+link pswd: pass(zip/unzip) \\nusername\\npassword(authentication) up: remote2:path2
+Relply to this example by this cmd for example <code>/cmd</code> b(bulk) d:2:10(seed) m:folder_name(same dir)
+You can set start and end of the links from the bulk with b:start:end or only end by b::end or only start by b:start. The default start is from zero(first link) to inf.
+
 <b>NOTES:</b>
 1. When use cmd by reply don't add any option in link msg! Always add them after cmd msg!
 2. Options (<b>n: and pswd:</b>) should be added randomly after the link if link along with the cmd and after any other option
-3. Options (<b>d, s, m: and multi</b>) should be added randomly before the link and before any other option.
+3. Options (<b>d, s, m:, b and multi</b>) should be added randomly before the link and before any other option.
 4. Commands that start with <b>qb</b> are ONLY for torrents.
 5. (n:) option doesn't work with torrents.
 """
