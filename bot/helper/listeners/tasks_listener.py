@@ -14,7 +14,7 @@ from aioshutil import move
 from bot import (DATABASE_URL, DOWNLOAD_DIR, LOGGER, MAX_SPLIT_SIZE, Interval,
                  aria2, config_dict, download_dict, download_dict_lock,
                  non_queued_dl, non_queued_up, queue_dict_lock, queued_dl,
-                 queued_up, status_reply_dict_lock, user_data)
+                 queued_up, status_reply_dict_lock, user_data, GLOBAL_EXTENSION_FILTER)
 from bot.helper.ext_utils.bot_utils import (extra_btns, get_readable_file_size,
                                             get_readable_time, sync_to_async)
 from bot.helper.ext_utils.db_handler import DbManger
@@ -129,7 +129,12 @@ class MirrorLeechListener:
 
     async def onDownloadComplete(self):
         if len(self.sameDir) > 0:
-            await sleep(8)
+            await sleep(3)
+                for _ in range(10):
+                    if len(self.sameDir) > 1:
+                        break
+                    else:
+                        await sleep(1)
         multi_links = False
         async with download_dict_lock:
             if len(self.sameDir) > 1:
@@ -179,6 +184,9 @@ class MirrorLeechListener:
             LEECH_SPLIT_SIZE = min(LEECH_SPLIT_SIZE, MAX_SPLIT_SIZE)
             cmd = ["7z", f"-v{LEECH_SPLIT_SIZE}b", "a",
                    "-mx=0", f"-p{self.pswd}", path, m_path]
+            for ext in GLOBAL_EXTENSION_FILTER:
+                ex_ext = f'-x!*.{ext}'
+                cmd.append(ex_ext)
             if self.isLeech and int(size) > LEECH_SPLIT_SIZE:
                 if self.pswd is None:
                     del cmd[4]
