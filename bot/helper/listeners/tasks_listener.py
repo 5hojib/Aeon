@@ -129,12 +129,7 @@ class MirrorLeechListener:
 
     async def onDownloadComplete(self):
         if len(self.sameDir) > 0:
-            await sleep(3)
-                for _ in range(10):
-                    if len(self.sameDir) > 1:
-                        break
-                    else:
-                        await sleep(1)
+            await sleep(8)
         multi_links = False
         async with download_dict_lock:
             if len(self.sameDir) > 1:
