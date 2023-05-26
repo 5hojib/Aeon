@@ -350,6 +350,9 @@ async def load_config():
     DELETE_LINKS = environ.get('DELETE_LINKS', '')
     DELETE_LINKS = DELETE_LINKS.lower() == 'true'
 
+    SHOW_LIMITS = environ.get('SHOW_LIMITS', '')
+    SHOW_LIMITS = SHOW_LIMITS.lower() == 'true'
+    
     FSUB_IDS = environ.get('FSUB_IDS', '')
     if len(FSUB_IDS) == 0:
         FSUB_IDS = ''
@@ -468,6 +471,7 @@ async def load_config():
         "SEARCH_API_LINK": SEARCH_API_LINK,
         "SEARCH_LIMIT": SEARCH_LIMIT,
         "SEARCH_PLUGINS": SEARCH_PLUGINS,
+        "SHOW_LIMITS": SHOW_LIMITS,
         "STATUS_LIMIT": STATUS_LIMIT,
         "STATUS_UPDATE_INTERVAL": STATUS_UPDATE_INTERVAL,
         "STOP_DUPLICATE": STOP_DUPLICATE,

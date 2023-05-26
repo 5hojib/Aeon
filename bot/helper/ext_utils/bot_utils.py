@@ -318,7 +318,6 @@ def checking_access(user_id, button=None):
         return f'Your token has expired, please collect a new token.\n\n<b>It will expire after {time_str}</b>', button
     return None, button
 
-
 def format_validity_time(seconds):
     if seconds is None:
         return "Invalid input: seconds cannot be None"

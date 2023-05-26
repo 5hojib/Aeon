@@ -2,6 +2,7 @@
 from asyncio import sleep
 from random import SystemRandom
 from string import ascii_letters
+
 from telegraph.aio import Telegraph
 from telegraph.exceptions import RetryAfterError
 
@@ -10,6 +11,7 @@ from bot import LOGGER, bot_loop
 
 class TelegraphHelper:
     def __init__(self, author_name=None, author_url=None):
+        self.__error = False
         self.telegraph = Telegraph(domain='graph.org')
         self.short_name = ''.join(SystemRandom().choices(ascii_letters, k=8))
         self.access_token = None
@@ -17,15 +19,23 @@ class TelegraphHelper:
         self.author_url = author_url
 
     async def create_account(self):
-        await self.telegraph.create_account(
-            short_name=self.short_name,
-            author_name=self.author_name,
-            author_url=self.author_url
-        )
-        self.access_token = self.telegraph.get_access_token()
         LOGGER.info("Creating Telegraph Account")
+        try:
+            await self.telegraph.create_account(
+                short_name=self.short_name,
+                author_name=self.author_name,
+                author_url=self.author_url
+            )
+            self.access_token = self.telegraph.get_access_token()
+            self.__error = False
+        except Exception as e:
+            self.__error = True
+            LOGGER.error(e)
 
     async def create_page(self, title, content):
+        if self.__error:
+            LOGGER.info('Telegraph is not working')
+            return
         try:
             return await self.telegraph.create_page(
                 title=title,
@@ -40,6 +50,9 @@ class TelegraphHelper:
             return await self.create_page(title, content)
 
     async def edit_page(self, path, title, content):
+        if self.__error:
+            LOGGER.info('Telegraph is not working')
+            return
         try:
             return await self.telegraph.edit_page(
                 path=path,
@@ -55,6 +68,9 @@ class TelegraphHelper:
             return await self.edit_page(path, title, content)
 
     async def edit_telegraph(self, path, telegraph_content):
+        if self.__error:
+            LOGGER.info('Telegraph is not working')
+            return
         nxt_page = 1
         prev_page = 0
         num_of_path = len(path)
@@ -77,6 +93,9 @@ class TelegraphHelper:
         return
 
     async def revoke_access_token(self):
+        if self.__error:
+            LOGGER.info('Telegraph is not working')
+            return
         LOGGER.info('Revoking telegraph access token...')
         try:
             return await self.telegraph.revoke_access_token()

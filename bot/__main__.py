@@ -55,22 +55,50 @@ async def stats(_, message):
         
         commit_html_link = f'<a href="{commit_link}">{commit_id}</a>'
         
-        stats = f'<b><u>REPOSITORY INFO</u></b>\n\n' \
-            f"<b>• Last commit: </b>{commit_html_link}\n"\
-            f'<b>• Commit date:</b> {commit_date}\n'\
-            f'<b>• Commited on: </b>{commit_time}\n'\
-            f'<b>• From now: </b>{commit_from}\n'\
-            f'<b>• Changelog: </b>{commit_name}\n'\
+        stats = f'<b>REPOSITORY INFO</b>\n\n' \
+            f"<code>• Last commit: </code>{commit_html_link}\n"\
+            f'<code>• Commit date: </code>{commit_date}\n'\
+            f'<code>• Commited on: </code>{commit_time}\n'\
+            f'<code>• From now   : </code>{commit_from}\n'\
+            f"<code>• What's new : </code>{commit_name}\n"\
             f'\n'\
-            f'<b><u>SYSTEM INFO</u></b>\n\n'\
-            f'<b>• Bot uptime:</b> {currentTime}\n'\
-            f'<b>• System uptime:</b> {osUptime}\n'\
-            f'<b>• CPU usage:</b> {cpuUsage}%\n'\
-            f'<b>• RAM usage:</b> {mem_p}%\n'\
-            f'<b>• Disk usage:</b> {disk}%\n'\
-            f'<b>• Free disk space:</b> {get_readable_file_size(free)}\n'\
-            f'<b>• Total disk space:</b> {get_readable_file_size(total)}\n'
-        await sendMessage(message, stats)
+            f'<b>SYSTEM INFO</b>\n\n'\
+            f'<code>• Bot uptime :</code> {currentTime}\n'\
+            f'<code>• Sys uptime :</code> {osUptime}\n'\
+            f'<code>• CPU usage  :</code> {cpuUsage}%\n'\
+            f'<code>• RAM usage  :</code> {mem_p}%\n'\
+            f'<code>• Disk usage :</code> {disk}%\n'\
+            f'<code>• Disk space :</code> {get_readable_file_size(free)}/{get_readable_file_size(total)}\n\n'\
+            
+        if config_dict['SHOW_LIMITS']:
+        
+            DIRECT_LIMIT = config_dict['DIRECT_LIMIT']
+            YTDLP_LIMIT = config_dict['YTDLP_LIMIT']
+            GDRIVE_LIMIT = config_dict['GDRIVE_LIMIT']
+            TORRENT_LIMIT = config_dict['TORRENT_LIMIT']
+            CLONE_LIMIT = config_dict['CLONE_LIMIT']
+            MEGA_LIMIT = config_dict['MEGA_LIMIT']
+            LEECH_LIMIT = config_dict['LEECH_LIMIT']
+            USER_MAX_TASKS = config_dict['USER_MAX_TASKS']
+        
+            torrent_limit = '∞' if TORRENT_LIMIT == '' else f'{TORRENT_LIMIT}GB/Link'
+            clone_limit = '∞' if CLONE_LIMIT == '' else f'{CLONE_LIMIT}GB/Link'
+            gdrive_limit = '∞' if GDRIVE_LIMIT == '' else f'{GDRIVE_LIMIT}GB/Link'
+            mega_limit = '∞' if MEGA_LIMIT == '' else f'{MEGA_LIMIT}GB/Link'
+            leech_limit = '∞' if LEECH_LIMIT == '' else f'{LEECH_LIMIT}GB/Link'
+            user_task = '∞' if USER_MAX_TASKS == '' else f'{USER_MAX_TASKS} Tasks/user'
+            ytdlp_limit = '∞' if YTDLP_LIMIT == '' else f'{YTDLP_LIMIT}GB/Link'
+            direct_limit = '∞' if DIRECT_LIMIT == '' else f'{DIRECT_LIMIT}GB/Link'
+            stats += f'<b>LIMITATIONS</b>\n\n'\
+                f'<code>• Torrent    :</code> {torrent_limit}\n'\
+                f'<code>• Gdrive     :</code> {gdrive_limit}\n'\
+                f'<code>• Ytdlp      :</code> {ytdlp_limit}\n'\
+                f'<code>• Direct     :</code> {direct_limit}\n'\
+                f'<code>• Leech      :</code> {leech_limit}\n'\
+                f'<code>• Clone      :</code> {clone_limit}\n'\
+                f'<code>• Mega       :</code> {mega_limit}\n'\
+                f'<code>• User tasks :</code> {user_task}\n\n'
+    await sendMessage(message, stats)
 
 async def start(_, message):
     token_timeout = config_dict['TOKEN_TIMEOUT']
