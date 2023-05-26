@@ -60,7 +60,7 @@ async def stats(_, message):
             f'<code>• Commit date: </code>{commit_date}\n'\
             f'<code>• Commited on: </code>{commit_time}\n'\
             f'<code>• From now   : </code>{commit_from}\n'\
-            f'<code>• Changelog  : </code>{commit_name}\n'\
+            f"<code>• What's new  : </code>{commit_name}\n"\
             f'\n'\
             f'<b>SYSTEM INFO</b>\n\n'\
             f'<code>• Bot uptime :</code> {currentTime}\n'\

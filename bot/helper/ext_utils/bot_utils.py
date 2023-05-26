@@ -314,14 +314,9 @@ def checking_access(user_id, button=None):
         time_str = format_validity_time(token_timeout)
         if button is None:
             button = ButtonMaker()
-        button.ubutton('Collect token', atg(short_url(f'https://telegram.me/{bot_name}?start={token}')))
+        button.ubutton('Collect token', short_url(f'https://telegram.me/{bot_name}?start={token}'))
         return f'Your token has expired, please collect a new token.\n\n<b>It will expire after {time_str}</b>', button
     return None, button
-
-def atg(short_url):
-    if "files.technicalatg.com" in short_url:
-        short_url = short_url.replace("files.technicalatg.com", "atglinks.com")
-    return short_url
 
 def format_validity_time(seconds):
     if seconds is None:
