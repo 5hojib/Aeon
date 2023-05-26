@@ -79,4 +79,12 @@ help - All cmds with description
 * [Abdullah al noman](https://github.com/SN-Abdullah-Al-Noman)
 * [ChatGPT](https://chat.openai.com/)
 
-You can't donate me! 🤣
+### Donations
+Binance pay id 
+```
+540658045
+```
+BEP20 BTC/ETH/USDT address
+```
+0x1ad20373c1300f95bab1d4603e20c98da9244138
+```
