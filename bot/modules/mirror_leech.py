@@ -118,8 +118,8 @@ async def _mirror_leech(client, message, isZip=False, extract=False, isQbit=Fals
             seed_time = None
             if not is_bulk:
                 if sameDir is None:
-                    sameDir = set()
-                sameDir.add(message.id)
+                    sameDir = {'total': multi, 'tasks': set()}
+                sameDir['tasks'].add(message.id)
 
     if is_bulk:
         bulk = await extract_bulk_links(message, bulk_start, bulk_end)
@@ -158,7 +158,7 @@ async def _mirror_leech(client, message, isZip=False, extract=False, isQbit=Fals
 
         nextmsg = await client.get_messages(chat_id=message.chat.id, message_ids=nextmsg.id)
         if len(folder_name) > 0:
-            sameDir.add(nextmsg.id)
+            sameDir['tasks'].add(nextmsg.id)
         nextmsg.from_user = message.from_user
         if message.sender_chat:
             nextmsg.sender_chat = message.sender_chat
