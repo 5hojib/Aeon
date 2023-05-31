@@ -12,7 +12,7 @@ Incase default quality added from yt-dlp options using format option and you nee
 <code>/cmd</code> s link
 This option should be always before n:, pswd: and opt:
 
-<b>Options Example:</b> opt: playliststart:^10|fragment_retries:^inf|matchtitle:S13|writesubtitles:true|live_from_start:true|postprocessor_args:{"ffmpeg": ["-threads", "4"]}|wait_for_video:(5, 100)
+<b>Options Example:</b> opt: playliststart:^10|fragment_retries:^inf|matchtitle:S13|writesubtitles:true|live_from_start:true|postprocessor_args:{{"ffmpeg": ["-threads", "4"]}}|wait_for_video:(5, 100)
 
 <b>Multi links only by replying to first link:</b>
 <code>/cmd</code> 10(number of links)
