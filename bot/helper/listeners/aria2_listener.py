@@ -13,7 +13,6 @@ from bot.helper.mirror_utils.status_utils.aria2_status import Aria2Status
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.message_utils import deleteMessage, sendMessage, update_all_messages
 
-
 @new_thread
 async def __onDownloadStarted(api, gid):
     download = await sync_to_async(api.get_download, gid)
@@ -206,7 +205,7 @@ async def __onDownloadError(api, gid):
 
 
 def start_aria2_listener():
-    aria2.listen_to_notifications(threaded=True,
+    aria2.listen_to_notifications(threaded=False,
                                   on_download_start=__onDownloadStarted,
                                   on_download_error=__onDownloadError,
                                   on_download_stop=__onDownloadStopped,

@@ -24,8 +24,6 @@ from .helper.telegram_helper.filters import CustomFilters
 from .helper.telegram_helper.message_utils import editMessage, sendFile, sendMessage, auto_delete_message
 from .modules import anonymous, authorize, bot_settings, cancel_mirror, category_select, clone, eval, gd_count, gd_delete, gd_list, leech_del, mirror_leech, rmdb, rss, save_message, shell, status, torrent_search, torrent_select, users_settings, ytdlp
 
-start_aria2_listener()
-
 async def stats(_, message):
     total, used, free, disk = disk_usage('/')
     memory = virtual_memory()
@@ -248,7 +246,8 @@ async def restart_notification():
 
 async def main():
     await gather(start_cleanup(), torrent_search.initiate_search_tools(), restart_notification(), set_commands(bot))
-
+    await sync_to_async(start_aria2_listener, wait=False)
+    
     bot.add_handler(MessageHandler(
         start, filters=command(BotCommands.StartCommand)))
     bot.add_handler(MessageHandler(log, filters=command(
