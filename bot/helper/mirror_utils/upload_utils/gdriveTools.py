@@ -204,6 +204,8 @@ class GoogleDriveHelper:
         self.__updater = setInterval(self.__update_interval, self.__progress)
         try:
             if ospath.isfile(item_path):
+                if item_path.lower().endswith(tuple(GLOBAL_EXTENSION_FILTER)):
+                    raise Exception('This file extension is excluded by extension filter!')
                 mime_type = get_mime_type(item_path)
                 link = self.__upload_file(
                     item_path, file_name, mime_type, gdrive_id, is_dir=False)
