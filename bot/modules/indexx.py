@@ -38,24 +38,25 @@ def func(payload_input, url, username, password):
     except:
         return "something went wrong. check index link/username/password field again"
 
-    page_token = decrypted_response["nextPageToken"]
+    page_token = decrypted_response.get("nextPageToken")
     if page_token is None:
         next_page = False
     else:
         next_page = True
         next_page_token = page_token
 
-    if list(decrypted_response.get("data").keys())[0] != "error":
+    if decrypted_response.get("data") and decrypted_response["data"].get("files"):
         file_length = len(decrypted_response["data"]["files"])
         links = []
 
-        for i, _ in enumerate(range(file_length)):
-            files_type = decrypted_response["data"]["files"][i]["mimeType"]
+        for i in range(file_length):
+            file_data = decrypted_response["data"]["files"][i]
+            files_type = file_data.get("mimeType")
             if files_type != "application/vnd.google-apps.folder":
-                files_name = decrypted_response["data"]["files"][i]["name"]
-
-                direct_download_link = url + urllib.parse.quote(files_name)
-                links.append(direct_download_link)
+                files_name = file_data.get("name")
+                if files_name:
+                    direct_download_link = url + urllib.parse.quote(files_name)
+                    links.append(direct_download_link)
 
         result = '\n'.join(links)
         return result
@@ -73,3 +74,7 @@ def index_command(client, message):
 
     # Send the output to the user
     client.send_message(message.chat.id, output)
+
+
+app = Client("my_bot")
+app.run()
