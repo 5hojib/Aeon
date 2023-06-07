@@ -1,5 +1,7 @@
+import argparse
 import asyncio
 import os
+import re
 
 from json import loads as jloads
 from requests import post as rpost
@@ -60,6 +62,7 @@ async def get_direct_download_links(url, username="none", password="none"):
 
     return '\n'.join(links)
 
+
 async def extract_url(client, message):
     if len(message.text.split()) < 2:
         # Check if message is a reply and extract the URL from the replied message
@@ -74,9 +77,11 @@ Usage:
 
 Options:
 • -s: Send each link separately.
+• -u: Username
+• -p: Password
 
 Example:
-/index https://example.com/index.html -s
+/index https://example.com/index.html -s -u your_username -p your_password
 """
             await client.send_message(message.chat.id, help_message)
             return
@@ -94,21 +99,35 @@ Usage:
 
 Options:
 • -s: Send each link separately.
+• -u: Username
+• -p: Password
 
 Example:
-/index https://example.com/index.html -s
+/index https://example.com/index.html -s -u your_username -p your_password
 """
         await client.send_message(message.chat.id, help_message)
         return
 
     index_link = split_text[1]
-    username = "username-default"
-    password = "password-default"
 
-    if "-s" in split_text[1:]:
+    parser = argparse.ArgumentParser(prog="/index")
+    parser.add_argument("-s", action="store_true", help="Send each link separately")
+    parser.add_argument("-u", metavar="username", help="Username")
+    parser.add_argument("-p", metavar="password", help="Password")
+    args = parser.parse_args(split_text[2:])
+
+    username = args.u if args.u else "username-default"
+    password = args.p if args.p else "password-default"
+
+    if args.s:
         # Send each link separately
         if message.reply_to_message and message.reply_to_message.text:
-            index_link = message.reply_to_message.text.strip()
+            reply_to_text = message.reply_to_message.text
+            index_link = re.findall(r'(https?://\S+)', reply_to_text)
+            if not index_link:
+                await client.send_message(message.chat.id, "No valid URL found in the replied message.")
+                return
+            index_link = index_link[0]
 
         result = await get_direct_download_links(index_link, username, password)
         links = result.split('\n')
