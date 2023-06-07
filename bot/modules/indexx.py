@@ -53,7 +53,7 @@ async def get_direct_download_links(url, username="none", password="none"):
                     direct_download_link = url + uquote(file_name)
                     links.append(direct_download_link)
 
-    return '\n\n'.join(links)
+    return '\n'.join(links)
     
     
 async def extract_url(client, message):
