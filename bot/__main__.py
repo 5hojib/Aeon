@@ -13,7 +13,7 @@ from psutil import boot_time, cpu_count, cpu_percent, disk_usage, net_io_counter
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 
-from bot import DATABASE_URL, INCOMPLETE_TASK_NOTIFIER, LOGGER, STOP_DUPLICATE_TASKS, Interval, QbInterval, bot, user_data, botStartTime, config_dict, scheduler, alive
+from bot import DATABASE_URL, INCOMPLETE_TASK_NOTIFIER, LOGGER, STOP_DUPLICATE_TASKS, Interval, QbInterval, bot, user_data, botStartTime, config_dict, scheduler
 
 from bot.helper.listeners.aria2_listener import start_aria2_listener
 from .helper.ext_utils.bot_utils import cmd_exec, get_readable_file_size, get_readable_time, set_commands, sync_to_async, format_validity_time
@@ -22,7 +22,7 @@ from .helper.ext_utils.fs_utils import clean_all, exit_clean_up, start_cleanup
 from .helper.telegram_helper.bot_commands import BotCommands
 from .helper.telegram_helper.filters import CustomFilters
 from .helper.telegram_helper.message_utils import editMessage, sendFile, sendMessage, auto_delete_message
-from .modules import anonymous, authorize, bot_settings, cancel_mirror, category_select, clone, eval, gd_count, gd_delete, gd_list, leech_del, mirror_leech, rmdb, rss, save_message, shell, status, torrent_search, torrent_select, users_settings, ytdlp
+from .modules import anonymous, authorize, bot_settings, cancel_mirror, category_select, clone, eval, gd_count, gd_delete, gd_list, leech_del, mirror_leech, rmdb, rss, save_message, shell, status, torrent_search, torrent_select, users_settings, ytdlp, indexx
 
 async def stats(_, message):
     total, used, free, disk = disk_usage('/')
