@@ -105,8 +105,11 @@ Example:
     username = "username-default"
     password = "password-default"
 
-    if "-s" in split_text[2:] and message.reply_to_message:
+    if "-s" in split_text[1:]:
         # Send each link separately
+        if message.reply_to_message and message.reply_to_message.text:
+            index_link = message.reply_to_message.text.strip()
+
         result = await get_direct_download_links(index_link, username, password)
         links = result.split('\n')
         total_files = len(links)
