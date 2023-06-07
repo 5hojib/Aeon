@@ -1,3 +1,4 @@
+import os
 from json import loads as jloads
 from requests import post as rpost
 from base64 import b64encode, b64decode
@@ -66,6 +67,16 @@ async def extract_url(client, message):
         username = "username-default"
         password = "password-default"
         result = await get_direct_download_links(index_link, username, password)
-        await client.send_message(message.chat.id, result)
-        
+
+        # Save links to a text file
+        file_path = "extracted_links.txt"
+        with open(file_path, "w") as file:
+            file.write(result)
+
+        # Send the text file as a document
+        await client.send_document(message.chat.id, file_path)
+
+        # Remove the text file
+        os.remove(file_path)
+
 bot.add_handler(MessageHandler(extract_url, filters=command("index")))
