@@ -16,8 +16,10 @@ def authorization_token(username, password):
     user_pass = f"{username}:{password}"
     return f"Basic {b64encode(user_pass.encode()).decode()}"
 
+
 def decrypt(string):
     return b64decode(string[::-1][24:-20]).decode("utf-8")
+
 
 async def get_direct_download_links(url, username="none", password="none"):
     next_page = True
@@ -57,7 +59,21 @@ async def get_direct_download_links(url, username="none", password="none"):
                     links.append(direct_download_link)
 
     return '\n'.join(links)
-    
+
+
+@bot.on_message(filters.command("index"))
+async def extract_url_command(client, message):
+    await extract_url(client, message)
+
+
+@bot.on_message(filters.regex(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"))
+async def extract_url_reply(client, message):
+    if message.reply_to_message:
+        replied_message = message.reply_to_message
+        if "/index" in replied_message.text:
+            await extract_url(client, replied_message)
+
+
 async def extract_url(client, message):
     if len(message.text.split()) < 2:
         help_message = """No index link provided. Please use the /index command followed by the index link.
@@ -100,5 +116,6 @@ Example:
 
         # Remove the text file
         os.remove(file_path)
+
 
 bot.add_handler(MessageHandler(extract_url, filters=command("index")))
