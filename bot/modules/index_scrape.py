@@ -7,6 +7,7 @@ from requests import post as rpost
 from base64 import b64encode, b64decode
 from urllib.parse import quote as uquote
 
+from bot import bot
 from pyrogram import filters, Client
 from pyrogram.handlers import MessageHandler
 
