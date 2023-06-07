@@ -62,34 +62,25 @@ async def get_direct_download_links(url, username="none", password="none"):
 async def extract_url(client, message):
     global index_link
 
-    if len(message.text.split()) < 2:
-        help_message = """No index link provided. Please use the /index command followed by the index link.
-        
-Usage:
-/index <index_link> [-s]
-
-Options:
-- -s: Send each link separately with a delay of one second.
-  
-Example:
-/index https://example.com/index.html -s
-"""
-        await client.send_message(message.chat.id, help_message)
-        return
-
-    split_text = message.text.split()
-    if len(split_text) > 1:
-        index_link = split_text[1]
-
     if index_link is None:
         await client.send_message(message.chat.id, "No index link provided. Please send the index link first or use the /index command followed by the index link.")
         return
+
+    split_text = message.text.split()
+
+    if len(split_text) > 1:
+        if split_text[1] == "-s":
+            send_separately = True
+        else:
+            send_separately = False
+    else:
+        send_separately = False
 
     username = "username-default"
     password = "password-default"
     result = await get_direct_download_links(index_link, username, password)
 
-    if len(split_text) > 2 and split_text[2] == "-s":
+    if send_separately:
         # Send each link separately with a delay of one second
         links = result.split('\n')
         total_files = len(links)
@@ -110,12 +101,14 @@ Example:
         # Remove the text file
         os.remove(file_path)
 
+    # Reset the index link after processing
+    index_link = None
+
 # Handler for receiving the index link
 async def handle_index_link(client, message):
     global index_link
     index_link = message.text
 
-bot.add_handler(MessageHandler(handle_index_link))
-
 # Handler for the /index command
+bot.add_handler(MessageHandler(handle_index_link, filters=filters.text))
 bot.add_handler(MessageHandler(extract_url, filters=command("index")))
