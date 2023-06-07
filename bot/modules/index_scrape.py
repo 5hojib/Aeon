@@ -117,10 +117,14 @@ Example:
     for option in options:
         if option == "-s":
             send_separately = True
-        elif option == "-u" and len(options) > options.index(option) + 1:
-            username = options[options.index(option) + 1]
-        elif option == "-p" and len(options) > options.index(option) + 1:
-            password = options[options.index(option) + 1]
+        elif option == "-u":
+            index = options.index(option)
+            if index + 1 < len(options):
+                username = options[index + 1]
+        elif option == "-p":
+            index = options.index(option)
+            if index + 1 < len(options):
+                password = options[index + 1]
 
     if send_separately:
         # Send each link separately
@@ -131,7 +135,6 @@ Example:
                 await client.send_message(message.chat.id, "No valid URL found in the replied message.")
                 return
             index_link = urls[0]
-            options = [opt for opt in options if opt != "-s"]
 
         result = await get_direct_download_links(index_link, username, password)
         links = result.split('\n')
