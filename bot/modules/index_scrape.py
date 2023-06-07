@@ -60,7 +60,18 @@ async def get_direct_download_links(url, username="none", password="none"):
     
 async def extract_url(client, message):
     if len(message.text.split()) < 2:
-        await client.send_message(message.chat.id, "No index link provided. Please use the /index command followed by the index link.")
+        help_message = """No index link provided. Please use the /index command followed by the index link.
+        
+Usage:
+/index <index_link>
+
+Options:
+- -s: Send each link separately with a delay of one second.
+  
+Example:
+/index https://example.com/folder/ -s
+"""
+        await client.send_message(message.chat.id, help_message)
         return
 
     split_text = message.text.split()
@@ -69,12 +80,13 @@ async def extract_url(client, message):
     password = "password-default"
     result = await get_direct_download_links(index_link, username, password)
 
-    if len(split_text) > 2 and split_text[2] == "separate":
+    if len(split_text) > 2 and split_text[2] == "-s":
         # Send each link separately with a delay of one second
         links = result.split('\n')
         for link in links:
             await client.send_message(message.chat.id, link)
             await asyncio.sleep(1)
+        await client.send_message(message.chat.id, "Task done")  # Send default completion message
     else:
         # Save links to a text file
         file_path = "extracted_links.txt"
