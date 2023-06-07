@@ -63,13 +63,13 @@ async def extract_url(client, message):
         help_message = """No index link provided. Please use the /index command followed by the index link.
         
 Usage:
-/index <index_link>
+/index <index_link> [-s]
 
 Options:
 - -s: Send each link separately with a delay of one second.
   
 Example:
-/index https://example.com/folder/ -s
+/index https://example.com/index.html -s
 """
         await client.send_message(message.chat.id, help_message)
         return
@@ -83,10 +83,12 @@ Example:
     if len(split_text) > 2 and split_text[2] == "-s":
         # Send each link separately with a delay of one second
         links = result.split('\n')
+        total_files = len(links)
         for link in links:
             await client.send_message(message.chat.id, link)
             await asyncio.sleep(1)
-        await client.send_message(message.chat.id, "Task done")  # Send default completion message
+        completion_message = f"Your task done, total files: {total_files}"
+        await client.send_message(message.chat.id, completion_message)
     else:
         # Save links to a text file
         file_path = "extracted_links.txt"
