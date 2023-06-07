@@ -104,19 +104,20 @@ Example:
     index_link = split_text[1]
     username = "username-default"
     password = "password-default"
-    result = await get_direct_download_links(index_link, username, password)
 
     if len(split_text) > 2 and split_text[2] == "-s":
         # Send each link separately
+        result = await get_direct_download_links(index_link, username, password)
         links = result.split('\n')
         total_files = len(links)
         for link in links:
             await client.send_message(message.chat.id, link)
             await asyncio.sleep(1)
-        completion_message = f"Your task done, total files: {total_files}"
+        completion_message = f"Your task is done, total files: {total_files}"
         await client.send_message(message.chat.id, completion_message)
     else:
         # Save links to a text file
+        result = await get_direct_download_links(index_link, username, password)
         file_path = "extracted_links.txt"
         with open(file_path, "w") as file:
             file.write(result)
