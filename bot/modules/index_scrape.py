@@ -89,6 +89,9 @@ Example:
     else:
         split_text = message.text.split()
 
+    if split_text[0] != "/index":
+        return
+
     if len(split_text) < 2:
         help_message = """No index link provided. Please use the /index command followed by the index link.
 
