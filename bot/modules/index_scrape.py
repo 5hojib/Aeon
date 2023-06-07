@@ -11,6 +11,7 @@ from pyrogram import filters
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 
+index_link = None
 
 def authorization_token(username, password):
     user_pass = f"{username}:{password}"
@@ -59,6 +60,8 @@ async def get_direct_download_links(url, username="none", password="none"):
     return '\n'.join(links)
     
 async def extract_url(client, message):
+    global index_link
+
     if len(message.text.split()) < 2:
         help_message = """No index link provided. Please use the /index command followed by the index link.
         
@@ -75,7 +78,13 @@ Example:
         return
 
     split_text = message.text.split()
-    index_link = split_text[1]
+    if len(split_text) > 1:
+        index_link = split_text[1]
+
+    if index_link is None:
+        await client.send_message(message.chat.id, "No index link provided. Please send the index link first or use the /index command followed by the index link.")
+        return
+
     username = "username-default"
     password = "password-default"
     result = await get_direct_download_links(index_link, username, password)
