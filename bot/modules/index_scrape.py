@@ -105,7 +105,7 @@ Example:
     username = "username-default"
     password = "password-default"
 
-    if "-s" in split_text[2:]:
+    if "-s" in split_text[2:] and message.reply_to_message:
         # Send each link separately
         result = await get_direct_download_links(index_link, username, password)
         links = result.split('\n')
