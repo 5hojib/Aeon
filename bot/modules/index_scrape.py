@@ -57,12 +57,15 @@ async def get_direct_download_links(url, username="none", password="none"):
     
     
 async def extract_url(client, message):
+    if len(message.text.split()) < 2:
+        await client.send_message(message.chat.id, "No index link provided. Please use the /index command followed by the index link.")
+        return
+
     if message.text.endswith('/'):
         index_link = message.text.split()[1]
         username = "username-default"
         password = "password-default"
         result = await get_direct_download_links(index_link, username, password)
         await client.send_message(message.chat.id, result)
-
         
-bot.add_handler(MessageHandler(extract_url, filters=command("url")))
+bot.add_handler(MessageHandler(extract_url, filters=command("index")))
