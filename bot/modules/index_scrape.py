@@ -108,11 +108,7 @@ Example:
         return
 
     index_link = split_text[1]
-
-    options = []
-    for option in split_text[2:]:
-        if option.startswith("-"):
-            options.append(option)
+    options = split_text[2:]
 
     username = "username-default"
     password = "password-default"
@@ -121,24 +117,20 @@ Example:
     for option in options:
         if option == "-s":
             send_separately = True
-        elif option == "-u":
-            index = options.index(option)
-            if index + 1 < len(options):
-                username = options[index + 1]
-        elif option == "-p":
-            index = options.index(option)
-            if index + 1 < len(options):
-                password = options[index + 1]
+        elif option == "-u" and len(options) > options.index(option) + 1:
+            username = options[options.index(option) + 1]
+        elif option == "-p" and len(options) > options.index(option) + 1:
+            password = options[options.index(option) + 1]
 
     if send_separately:
         # Send each link separately
         if message.reply_to_message and message.reply_to_message.text:
             reply_to_text = message.reply_to_message.text
-            index_link = re.findall(r'(https?://\S+)', reply_to_text)
-            if not index_link:
+            urls = re.findall(r'(https?://\S+)', reply_to_text)
+            if not urls:
                 await client.send_message(message.chat.id, "No valid URL found in the replied message.")
                 return
-            index_link = index_link[0]
+            index_link = urls[0]
 
         result = await get_direct_download_links(index_link, username, password)
         links = result.split('\n')
