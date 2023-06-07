@@ -110,14 +110,14 @@ Example:
 
     index_link = split_text[1]
 
-    parser = argparse.ArgumentParser(prog="/index")
+    parser = argparse.ArgumentParser(prog="/index", add_help=False)
     parser.add_argument("-s", action="store_true", help="Send each link separately")
-    parser.add_argument("-u", metavar="username", help="Username")
-    parser.add_argument("-p", metavar="password", help="Password")
-    args = parser.parse_args(split_text[2:])
+    parser.add_argument("-u", dest="username", metavar="username", help="Username")
+    parser.add_argument("-p", dest="password", metavar="password", help="Password")
+    args, unknown = parser.parse_known_args(split_text[2:])
 
-    username = args.u if args.u else "username-default"
-    password = args.p if args.p else "password-default"
+    username = args.username if args.username else "username-default"
+    password = args.password if args.password else "password-default"
 
     if args.s:
         # Send each link separately
