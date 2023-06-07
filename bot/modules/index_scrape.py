@@ -110,4 +110,12 @@ Example:
         # Remove the text file
         os.remove(file_path)
 
+# Handler for receiving the index link
+async def handle_index_link(client, message):
+    global index_link
+    index_link = message.text
+
+bot.add_handler(MessageHandler(handle_index_link))
+
+# Handler for the /index command
 bot.add_handler(MessageHandler(extract_url, filters=command("index")))
