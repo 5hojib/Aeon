@@ -60,7 +60,6 @@ async def get_direct_download_links(url, username="none", password="none"):
 
     return '\n'.join(links)
 
-
 async def extract_url(client, message):
     if len(message.text.split()) < 2:
         # Check if message is a reply and extract the URL from the replied message
@@ -108,7 +107,7 @@ Example:
     result = await get_direct_download_links(index_link, username, password)
 
     if len(split_text) > 2 and split_text[2] == "-s":
-        # Send each link separately with a delay of one second
+        # Send each link separately
         links = result.split('\n')
         total_files = len(links)
         for link in links:
