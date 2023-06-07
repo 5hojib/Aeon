@@ -131,6 +131,7 @@ Example:
                 await client.send_message(message.chat.id, "No valid URL found in the replied message.")
                 return
             index_link = urls[0]
+            options = [opt for opt in options if opt != "-s"]
 
         result = await get_direct_download_links(index_link, username, password)
         links = result.split('\n')
