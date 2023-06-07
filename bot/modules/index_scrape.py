@@ -64,14 +64,9 @@ async def get_direct_download_links(url, username="none", password="none"):
 async def extract_url(client, message):
     if len(message.text.split()) < 2:
         # Check if message is a reply and extract the URL from the replied message
-        if len(message.text) == 0 and message.reply_to_message:
+        if message.reply_to_message and message.reply_to_message.text:
             reply_to_text = message.reply_to_message.text
-            if reply_to_text:
-                url = reply_to_text.split(maxsplit=1)[0].strip()
-                if url.startswith("http"):
-                    split_text = ["/index", url]
-                else:
-                    split_text = ["/index"]
+            split_text = ["/index", reply_to_text.strip()]
         else:
             help_message = """No index link provided. Please use the /index command followed by the index link.
 
