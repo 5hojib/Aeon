@@ -1,7 +1,6 @@
-import argparse
+import re
 import asyncio
 import os
-import re
 
 from json import loads as jloads
 from requests import post as rpost
@@ -62,6 +61,7 @@ async def get_direct_download_links(url, username="none", password="none"):
 
     return '\n'.join(links)
 
+
 async def extract_url(client, message):
     if len(message.text.split()) < 2:
         # Check if message is a reply and extract the URL from the replied message
@@ -118,23 +118,14 @@ Example:
         if option == "-s":
             send_separately = True
         elif option == "-u":
-            index = options.index(option)
-            if index + 1 < len(options):
-                username = options[index + 1]
+            username = options[options.index(option) + 1]
         elif option == "-p":
-            index = options.index(option)
-            if index + 1 < len(options):
-                password = options[index + 1]
+            password = options[options.index(option) + 1]
 
     if send_separately:
         # Send each link separately
         if message.reply_to_message and message.reply_to_message.text:
-            reply_to_text = message.reply_to_message.text
-            urls = re.findall(r'(https?://\S+)', reply_to_text)
-            if not urls:
-                await client.send_message(message.chat.id, "No valid URL found in the replied message.")
-                return
-            index_link = urls[0]
+            index_link = message.reply_to_message.text.strip()
 
         result = await get_direct_download_links(index_link, username, password)
         links = result.split('\n')
