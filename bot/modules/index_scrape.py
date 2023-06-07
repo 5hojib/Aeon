@@ -62,7 +62,6 @@ async def get_direct_download_links(url, username="none", password="none"):
 
     return '\n'.join(links)
 
-
 async def extract_url(client, message):
     if len(message.text.split()) < 2:
         # Check if message is a reply and extract the URL from the replied message
@@ -177,7 +176,6 @@ Example:
                     await asyncio.sleep(1)
                 completion_message = f"Your task is done, total files: {total_files}"
                 await client.send_message(message.chat.id, completion_message)
-                return
             else:
                 help_message = """Invalid option provided. Please use the /index command followed by the index link.
 
@@ -193,18 +191,18 @@ Example:
 /index https://example.com/index.html -s -u your_username -p your_password
 """
                 await client.send_message(message.chat.id, help_message)
-                return
+        else:
+            # Save links to a text file
+            result = await get_direct_download_links(index_link, username, password)
+            file_path = "extracted_links.txt"
+            with open(file_path, "w") as file:
+                file.write(result)
 
-        result = await get_direct_download_links(index_link, username, password)
-        file_path = "extracted_links.txt"
-        with open(file_path, "w") as file:
-            file.write(result)
+            # Send the text file as a document
+            await client.send_document(message.chat.id, file_path)
 
-        # Send the text file as a document
-        await client.send_document(message.chat.id, file_path)
-
-        # Remove the text file
-        os.remove(file_path)
+            # Remove the text file
+            os.remove(file_path)
 
 
 bot.add_handler(MessageHandler(extract_url, filters=command("index")))
