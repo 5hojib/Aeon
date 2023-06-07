@@ -61,36 +61,49 @@ async def get_direct_download_links(url, username="none", password="none"):
     return '\n'.join(links)
 
 
-@bot.on_message(filters.command("index"))
-async def extract_url_command(client, message):
-    await extract_url(client, message)
-
-
-@bot.on_message(filters.regex(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"))
-async def extract_url_reply(client, message):
-    if message.reply_to_message:
-        replied_message = message.reply_to_message
-        if replied_message.from_user.id == client.me.id and "/index" in replied_message.text:
-            await extract_url(client, replied_message)
-
-
 async def extract_url(client, message):
     if len(message.text.split()) < 2:
-        help_message = """No index link provided. Please use the /index command followed by the index link.
-        
+        # Check if message is a reply and extract the URL from the replied message
+        if len(message.text) == 0 and message.reply_to_message:
+            reply_to_text = message.reply_to_message.text
+            if reply_to_text:
+                url = reply_to_text.split(maxsplit=1)[0].strip()
+                if url.startswith("http"):
+                    split_text = ["/index", url]
+                else:
+                    split_text = ["/index"]
+        else:
+            help_message = """No index link provided. Please use the /index command followed by the index link.
+
 Usage:
 /index index_link
 
 Options:
 • -s: Send each link separately.
-  
+
+Example:
+/index https://example.com/index.html -s
+"""
+            await client.send_message(message.chat.id, help_message)
+            return
+    else:
+        split_text = message.text.split()
+
+    if len(split_text) < 2:
+        help_message = """No index link provided. Please use the /index command followed by the index link.
+
+Usage:
+/index index_link
+
+Options:
+• -s: Send each link separately.
+
 Example:
 /index https://example.com/index.html -s
 """
         await client.send_message(message.chat.id, help_message)
         return
 
-    split_text = message.text.split()
     index_link = split_text[1]
     username = "username-default"
     password = "password-default"
@@ -116,5 +129,6 @@ Example:
 
         # Remove the text file
         os.remove(file_path)
+
 
 bot.add_handler(MessageHandler(extract_url, filters=command("index")))
