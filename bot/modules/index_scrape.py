@@ -70,7 +70,7 @@ async def extract_url_command(client, message):
 async def extract_url_reply(client, message):
     if message.reply_to_message:
         replied_message = message.reply_to_message
-        if "/index" in replied_message.text:
+        if replied_message.from_user.id == client.me.id and "/index" in replied_message.text:
             await extract_url(client, replied_message)
 
 
@@ -116,6 +116,5 @@ Example:
 
         # Remove the text file
         os.remove(file_path)
-
 
 bot.add_handler(MessageHandler(extract_url, filters=command("index")))
