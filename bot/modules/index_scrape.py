@@ -88,8 +88,6 @@ Example:
 """
                 await client.send_message(message.chat.id, help_message)
                 return
-        else:
-            return
     else:
         # Handle the case when the message is not a reply
         if len(message.text.split()) < 2:
