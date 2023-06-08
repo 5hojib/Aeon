@@ -93,7 +93,10 @@ Example:
                         await client.send_message(message.chat.id, help_message)
                         return
                 else:
-                    return
+                    index_link = url
+                    send_separately = False
+                    username = "username-default"
+                    password = "password-default"
             else:
                 return
         else:
