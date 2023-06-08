@@ -63,7 +63,6 @@ async def get_direct_download_links(url, username="none", password="none"):
 
 
 async def extract_url(client, message):
-    # Check if the message is a reply
     if message.reply_to_message and message.reply_to_message.text:
         reply_to_text = message.reply_to_message.text
         match = re.match(r"/index(?:\s(-s))?(?:\s(-u)\s(\S+))?(?:\s(-p)\s(\S+))?", reply_to_text.strip())
@@ -89,45 +88,32 @@ Example:
                 await client.send_message(message.chat.id, help_message)
                 return
     else:
-        # Handle the case when the message is not a reply
-        if len(message.text.split()) < 2:
-            help_message = """No index link provided. Please use the /index command followed by the index link.
-
-Usage:
-/index index_link
-
-Options:
-• -s: Send each link separately.
-• -u: Username
-• -p: Password
-
-Example:
-/index https://example.com/index.html -s -u your_username -p your_password
+        # Extract the URL from the message
+        match = re.search(r"(?P<url>https?://[^\s]+)", message.text)
+        if not match:
+            help_message = """No URL found. Please provide a valid URL.
 """
             await client.send_message(message.chat.id, help_message)
             return
-        else:
-            split_text = message.text.split()
 
-            if split_text[0] != "/index":
-                return
+        url = match.group("url")
+        send_separately = False
+        username = "username-default"
+        password = "password-default"
 
-            index_link = split_text[1]
-            send_separately = False
-            username = "username-default"
-            password = "password-default"
-
-            for i in range(2, len(split_text)):
-                if split_text[i] == "-s":
-                    send_separately = True
-                elif split_text[i] == "-u" and i + 1 < len(split_text):
-                    username = split_text[i + 1]
-                elif split_text[i] == "-p" and i + 1 < len(split_text):
-                    password = split_text[i + 1]
+        # Extract options from the message
+        options_match = re.findall(r"-([spu])\s?(\S+)?", message.text)
+        for option, value in options_match:
+            if option == "s":
+                send_separately = True
+            elif option == "u":
+                username = value
+            elif option == "p":
+                password = value
 
     if send_separately:
         # Send each link separately
-        result = await get_direct_download_links(index_link, username, password)
+        result = await get_direct_download_links(url, username, password)
         links = result.split('\n')
         total_files = len(links)
         for link in links:
@@ -137,7 +123,7 @@ Example:
         await client.send_message(message.chat.id, completion_message)
     else:
         # Save links to a text file
-        result = await get_direct_download_links(index_link, username, password)
+        result = await get_direct_download_links(url, username, password)
         file_path = "extracted_links.txt"
         with open(file_path, "w") as file:
             file.write(result)
