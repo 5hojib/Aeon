@@ -8,38 +8,42 @@ from base64 import b64encode, b64decode
 from urllib.parse import quote as uquote
 
 from bot import bot
-from pyrogram import filters, Client
+from pyrogram import filters
+from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 
-def authorization_token(username: str, password: str) -> str:
+
+def authorization_token(username, password):
     user_pass = f"{username}:{password}"
     return f"Basic {b64encode(user_pass.encode()).decode()}"
 
-def decrypt(string: str) -> str:
+
+def decrypt(string):
     return b64decode(string[::-1][24:-20]).decode("utf-8")
 
-async def get_direct_download_links(url: str, username: str = "none", password: str = "none") -> str:
+
+async def get_direct_download_links(url, username="none", password="none"):
     next_page = True
     next_page_token = ""
     links = []
 
     while next_page:
         payload = {"page_token": next_page_token, "page_index": len(links)}
-        url = url.rstrip("/") + "/"
+        url = f"{url}/" if url[-1] != "/" else url
 
         try:
             headers = {"authorization": authorization_token(username, password)}
         except:
-            return "Username/password combination is wrong"
+            return "username/password combination is wrong"
 
         encrypted_response = rpost(url, data=payload, headers=headers)
         if encrypted_response.status_code == 401:
-            return "Username/password combination is wrong"
+            return "username/password combination is wrong"
 
         try:
             decrypted_response = jloads(decrypt(encrypted_response.text))
         except:
-            return "Something went wrong. Please check the index link/username/password field again"
+            return "something went wrong. check index link/username/password field again"
 
         page_token = decrypted_response.get("nextPageToken")
         if not page_token:
@@ -57,8 +61,10 @@ async def get_direct_download_links(url: str, username: str = "none", password: 
 
     return '\n'.join(links)
 
+
 async def extract_url(client, message):
     if len(message.text.split()) < 2:
+        # Check if message is a reply and extract the URL from the replied message
         if message.reply_to_message and message.reply_to_message.text:
             reply_to_text = message.reply_to_message.text
             match = re.match(r"/index(?:\s(-s))?(?:\s(-u)\s(\S+))?(?:\s(-p)\s(\S+))?", reply_to_text.strip())
@@ -121,6 +127,7 @@ Example:
                 password = split_text[i + 1]
 
     if send_separately:
+        # Send each link separately
         result = await get_direct_download_links(index_link, username, password)
         links = result.split('\n')
         total_files = len(links)
@@ -130,12 +137,16 @@ Example:
         completion_message = f"Your task is done, total files: {total_files}"
         await client.send_message(message.chat.id, completion_message)
     else:
+        # Save links to a text file
         result = await get_direct_download_links(index_link, username, password)
         file_path = "extracted_links.txt"
         with open(file_path, "w") as file:
             file.write(result)
 
+        # Send the text file as a document
         await client.send_document(message.chat.id, file_path)
+
+        # Remove the text file
         os.remove(file_path)
 
 
