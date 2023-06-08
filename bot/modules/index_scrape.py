@@ -94,22 +94,8 @@ async def extract_url(client, message):
                     username = username_match.group(1)
                 if password_match:
                     password = password_match.group(1)
-
-    if not index_link:
-        match = re.match(r"(?P<url>https?://[^\s]+)(?P<options>(?:\s+-\w+)+)?", message.text.strip())
-        if match:
-            index_link = match.group("url")
-            options = match.group("options")
-            if options:
-                send_separately = "-s" in options
-                username_match = re.search(r"-u\s(\S+)", options)
-                password_match = re.search(r"-p\s(\S+)", options)
-                if username_match:
-                    username = username_match.group(1)
-                if password_match:
-                    password = password_match.group(1)
         else:
-            help_message = """No valid index link provided. Please use the /index command followed by the index link.
+            help_message = """Invalid command usage. Please use the /index command followed by the index link.
 
 Usage:
 /index index_link
@@ -124,6 +110,23 @@ Example:
 """
             await client.send_message(message.chat.id, help_message)
             return
+
+    if not index_link:
+        help_message = """No valid index link provided. Please use the /index command followed by the index link.
+
+Usage:
+/index index_link
+
+Options:
+• -s: Send each link separately.
+• -u: Username
+• -p: Password
+
+Example:
+/index https://example.com/index.html -s -u your_username -p your_password
+"""
+        await client.send_message(message.chat.id, help_message)
+        return
 
     if send_separately:
         result = await get_direct_download_links(index_link, username, password)
