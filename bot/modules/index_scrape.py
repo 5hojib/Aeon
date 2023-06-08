@@ -63,30 +63,19 @@ async def get_direct_download_links(url, username="none", password="none"):
 
 
 async def extract_url(client, message):
+    index_link = ""
+    send_separately = False
+    username = "username-default"
+    password = "password-default"
+
     if message.reply_to_message and message.reply_to_message.text:
         reply_to_text = message.reply_to_message.text
-        match = re.match(r"(?P<url>https?://[^\s]+)", reply_to_text.strip())
+        match = re.match(r"(?P<url>https?://[^\s]+)(?P<option>\s-s)?(?P<username>\s-u\s\S+)?(?P<password>\s-p\s\S+)?", reply_to_text.strip())
         if match:
             index_link = match.group("url")
-            send_separately = False
-            username = "username-default"
-            password = "password-default"
-        else:
-            help_message = """No valid index link provided. Please use the /index command followed by the index link.
-
-Usage:
-/index index_link
-
-Options:
-• -s: Send each link separately.
-• -u: Username
-• -p: Password
-
-Example:
-/index https://example.com/index.html -s -u your_username -p your_password
-"""
-            await client.send_message(message.chat.id, help_message)
-            return
+            send_separately = bool(match.group("option"))
+            username = match.group("username").split()[1] if match.group("username") else "username-default"
+            password = match.group("password").split()[1] if match.group("password") else "password-default"
     else:
         match = re.match(r"/index\s(?P<url>https?://[^\s]+)(?P<option>\s-s)?(?P<username>\s-u\s\S+)?(?P<password>\s-p\s\S+)?", message.text.strip())
         if match:
@@ -94,8 +83,9 @@ Example:
             send_separately = bool(match.group("option"))
             username = match.group("username").split()[1] if match.group("username") else "username-default"
             password = match.group("password").split()[1] if match.group("password") else "password-default"
-        else:
-            help_message = """Invalid command usage. Please use the /index command followed by the index link.
+
+    if not index_link:
+        help_message = """Invalid command usage. Please use the /index command followed by the index link.
 
 Usage:
 /index index_link
@@ -108,8 +98,8 @@ Options:
 Example:
 /index https://example.com/index.html -s -u your_username -p your_password
 """
-            await client.send_message(message.chat.id, help_message)
-            return
+        await client.send_message(message.chat.id, help_message)
+        return
 
     if send_separately:
         result = await get_direct_download_links(index_link, username, password)
