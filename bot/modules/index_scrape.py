@@ -87,6 +87,9 @@ Example:
 """
                 await client.send_message(message.chat.id, help_message)
                 return
+            else:
+                # Initialize send_separately with False
+                send_separately = False
     else:
         # Extract the URL from the message
         match = re.search(r"(?P<url>https?://[^\s]+)", message.text)
@@ -97,9 +100,9 @@ Example:
             return
 
         url = match.group("url")
+
+        # Initialize send_separately with False
         send_separately = False
-        username = "username-default"
-        password = "password-default"
 
         # Extract options from the message
         options_match = re.findall(r"-([spu])\s?(\S+)?", message.text)
