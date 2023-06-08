@@ -72,6 +72,20 @@ async def extract_url(client, message):
             username = match.group("username").split()[1] if match.group("username") else "username-default"
             password = match.group("password").split()[1] if match.group("password") else "password-default"
         else:
+            help_message = """No valid index link provided. Please use the /index command followed by the index link.
+
+Usage:
+/index index_link
+
+Options:
+• -s: Send each link separately.
+• -u: Username
+• -p: Password
+
+Example:
+/index https://example.com/index.html -s -u your_username -p your_password
+"""
+            await client.send_message(message.chat.id, help_message)
             return
     else:
         match = re.match(r"/index\s(?P<url>https?://[^\s]+)(?P<option>\s-s)?(?P<username>\s-u\s\S+)?(?P<password>\s-p\s\S+)?", message.text.strip())
@@ -81,6 +95,20 @@ async def extract_url(client, message):
             username = match.group("username").split()[1] if match.group("username") else "username-default"
             password = match.group("password").split()[1] if match.group("password") else "password-default"
         else:
+            help_message = """Invalid command usage. Please use the /index command followed by the index link.
+
+Usage:
+/index index_link
+
+Options:
+• -s: Send each link separately.
+• -u: Username
+• -p: Password
+
+Example:
+/index https://example.com/index.html -s -u your_username -p your_password
+"""
+            await client.send_message(message.chat.id, help_message)
             return
 
     if send_separately:
