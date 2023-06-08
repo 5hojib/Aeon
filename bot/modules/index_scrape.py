@@ -70,7 +70,7 @@ async def extract_url(client, message):
             url_match = re.search(r"(?P<url>https?://[^\s]+)", reply_to_text)
             if url_match:
                 url = url_match.group("url")
-                match = re.match(r"/index(?:\s(-s))?(?:\s(-u)\s(\S+))?(?:\s(-p)\s(\S+))?", reply_to_text.strip())
+                match = re.match(r"/index(?:\s(-s))?(?:\s(-u)\s(\S+))?(?:\s(-p)\s(\S+))?", message.text.strip())
                 if match:
                     index_link = url
                     send_separately = bool(match.group(1))
