@@ -75,8 +75,8 @@ async def extract_url(client, message):
             options = match.group("options")
             if options:
                 send_separately = "-s" in options
-                username_match = re.search(r"-u\s(\S+)", options)
-                password_match = re.search(r"-p\s(\S+)", options)
+                username_match = re.search(r"-u\s+(\S+)", options)
+                password_match = re.search(r"-p\s+(\S+)", options)
                 if username_match:
                     username = username_match.group(1)
                 if password_match:
@@ -91,8 +91,8 @@ async def extract_url(client, message):
             options = match.group("options")
             if options:
                 send_separately = "-s" in options
-                username_match = re.search(r"-u\s(\S+)", options)
-                password_match = re.search(r"-p\s(\S+)", options)
+                username_match = re.search(r"-u\s+(\S+)", options)
+                password_match = re.search(r"-p\s+(\S+)", options)
                 if username_match:
                     username = username_match.group(1)
                 if password_match:
