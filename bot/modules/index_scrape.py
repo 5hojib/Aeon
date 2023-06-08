@@ -81,6 +81,9 @@ async def extract_url(client, message):
                     username = username_match.group(1)
                 if password_match:
                     password = password_match.group(1)
+            index_link_match = re.search(r"(?P<url>https?://[^\s]+)", reply_to_text.strip())
+            if index_link_match:
+                index_link = index_link_match.group("url")
     else:
         match = re.match(r"/index\s(?P<url>https?://[^\s]+)(?P<options>(?:\s+-\w+)+)?", message.text.strip())
         if match:
@@ -94,22 +97,6 @@ async def extract_url(client, message):
                     username = username_match.group(1)
                 if password_match:
                     password = password_match.group(1)
-        else:
-            help_message = """Invalid command usage. Please use the /index command followed by the index link.
-
-Usage:
-/index index_link
-
-Options:
-• -s: Send each link separately.
-• -u: Username
-• -p: Password
-
-Example:
-/index https://example.com/index.html -s -u your_username -p your_password
-"""
-            await client.send_message(message.chat.id, help_message)
-            return
 
     if not index_link:
         help_message = """No valid index link provided. Please use the /index command followed by the index link.
