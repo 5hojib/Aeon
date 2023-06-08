@@ -65,21 +65,21 @@ async def get_direct_download_links(url, username="none", password="none"):
 async def extract_url(client, message):
     if message.reply_to_message and message.reply_to_message.text:
         reply_to_text = message.reply_to_message.text
-        match = re.match(r"(?P<url>https?://[^\s]+)\s?((?P<option>-s)|(-u\s(?P<username>\S+))|(-p\s(?P<password>\S+)))*", reply_to_text.strip())
+        match = re.match(r"(?P<url>https?://[^\s]+)(?P<option>\s-s)?(?P<username>\s-u\s\S+)?(?P<password>\s-p\s\S+)?", reply_to_text.strip())
         if match:
             index_link = match.group("url")
             send_separately = bool(match.group("option"))
-            username = match.group("username") or "username-default"
-            password = match.group("password") or "password-default"
+            username = match.group("username").split()[1] if match.group("username") else "username-default"
+            password = match.group("password").split()[1] if match.group("password") else "password-default"
         else:
             return
     else:
-        match = re.match(r"/index\s(?P<url>https?://[^\s]+)\s?((?P<option>-s)|(-u\s(?P<username>\S+))|(-p\s(?P<password>\S+)))*", message.text.strip())
+        match = re.match(r"/index\s(?P<url>https?://[^\s]+)(?P<option>\s-s)?(?P<username>\s-u\s\S+)?(?P<password>\s-p\s\S+)?", message.text.strip())
         if match:
             index_link = match.group("url")
             send_separately = bool(match.group("option"))
-            username = match.group("username") or "username-default"
-            password = match.group("password") or "password-default"
+            username = match.group("username").split()[1] if match.group("username") else "username-default"
+            password = match.group("password").split()[1] if match.group("password") else "password-default"
         else:
             return
 
