@@ -451,6 +451,15 @@ async def edit_user_settings(client, query):
         else:
             await query.answer("Old Settings", show_alert=True)
             await update_user_settings(query)
+    elif data[2] == 'user_tds':
+        handler_dict[user_id] = False
+        await query.answer()
+        edit_mode = len(data) == 4
+        await update_user_settings(query, data[2], 'mirror')
+        if not edit_mode: return
+        pfunc = partial(set_custom, pre_event=query, key=data[2])
+        rfunc = partial(update_user_settings, query, data[2], 'mirror')
+        await event_handler(client, query, pfunc, rfunc)
     elif data[2] in ['prefix', 'suffix', 'remname']:
         handler_dict[user_id] = False
         await query.answer()
