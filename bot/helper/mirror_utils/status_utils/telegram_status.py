@@ -1,22 +1,15 @@
 #!/usr/bin/env python3
-from pkg_resources import get_distribution
-
-from bot.helper.ext_utils.bot_utils import (MirrorStatus,
-                                            get_readable_file_size,
-                                            get_readable_time)
-
-engine_ = "Pyrogram"
+from bot.helper.ext_utils.bot_utils import MirrorStatus, get_readable_file_size, get_readable_time
 
 
 class TelegramStatus:
-    def __init__(self, obj, size, message, gid, status, extra_details):
+    def __init__(self, obj, size, message, gid, status, upload_details):
         self.__obj = obj
         self.__size = size
         self.__gid = gid
         self.__status = status
+        self.upload_details = upload_details
         self.message = message
-        self.extra_details = extra_details
-        self.engine = engine_
 
     def processed_bytes(self):
         return get_readable_file_size(self.__obj.processed_bytes)

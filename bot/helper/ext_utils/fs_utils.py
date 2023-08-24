@@ -10,9 +10,7 @@ from sys import exit as sexit
 
 from .exceptions import NotSupportedExtractionArchive
 from bot import aria2, LOGGER, DOWNLOAD_DIR, get_client, GLOBAL_EXTENSION_FILTER
-from bot.helper.ext_utils.bot_utils import sync_to_async, async_to_sync
-from bot.helper.ext_utils.telegraph_helper import telegraph
-
+from bot.helper.ext_utils.bot_utils import sync_to_async, cmd_exec
 
 ARCH_EXT = [".tar.bz2", ".tar.gz", ".bz2", ".gz", ".tar.xz", ".tar", ".tbz2", ".tgz", ".lzma2",
             ".zip", ".7z", ".z", ".rar", ".iso", ".wim", ".cab", ".apm", ".arj", ".chm",
@@ -71,11 +69,7 @@ async def start_cleanup():
 
 def clean_all():
     aria2.remove_all(True)
-    try:
-        get_client().torrents_delete(torrent_hashes="all")
-    except:
-        pass
-    async_to_sync(telegraph.revoke_access_token)
+    get_client().torrents_delete(torrent_hashes="all")
     try:
         rmtree(DOWNLOAD_DIR)
     except:
@@ -87,8 +81,7 @@ def exit_clean_up(signal, frame):
         LOGGER.info(
             "Please wait, while we clean up and stop the running downloads")
         clean_all()
-        srun(['pkill', '-9', '-f', '-e',
-             'gunicorn|aria2c|qbittorrent-nox|ffmpeg|rclone'])
+        srun(['pkill', '-9', '-f', '-e','gunicorn|buffet|openstack|render|zcl'])
         sexit(0)
     except KeyboardInterrupt:
         LOGGER.warning("Force Exiting before the cleanup finishes!")
@@ -101,7 +94,7 @@ async def clean_unwanted(path):
         for filee in files:
             if filee.endswith(".!qB") or filee.endswith('.parts') and filee.startswith('.'):
                 await aioremove(ospath.join(dirpath, filee))
-        if dirpath.endswith((".unwanted", "splited_files_mltb", "copied_mltb")):
+        if dirpath.endswith((".unwanted", "splited_files", "copied")):
             await aiormtree(dirpath)
     for dirpath, _, files in await sync_to_async(walk, path, topdown=False):
         if not await listdir(dirpath):
@@ -152,12 +145,7 @@ def get_mime_type(file_path):
 def check_storage_threshold(size, threshold, arch=False, alloc=False):
     free = disk_usage(DOWNLOAD_DIR).free
     if not alloc:
-        if (
-            not arch
-            and free - size < threshold
-            or arch
-            and free - (size * 2) < threshold
-        ):
+        if (not arch and free - size < threshold or arch and free - (size * 2) < threshold):
             return False
     elif not arch:
         if free < threshold:
@@ -165,3 +153,22 @@ def check_storage_threshold(size, threshold, arch=False, alloc=False):
     elif free - size < threshold:
         return False
     return True
+
+
+async def join_files(path):
+    files = await listdir(path)
+    results = []
+    for file_ in files:
+        if re_search(r"\.0+2$", file_) and await sync_to_async(get_mime_type, f'{path}/{file_}') == 'application/octet-stream':
+            final_name = file_.rsplit('.', 1)[0]
+            cmd = f'cat {path}/{final_name}.* > {path}/{final_name}'
+            _, stderr, code = await cmd_exec(cmd, True)
+            if code != 0:
+                LOGGER.error(f'Failed to join {final_name}, stderr: {stderr}')
+            else:
+                results.append(final_name)
+    if results:
+        for res in results:
+            for file_ in files:
+                if re_search(fr"{res}\.0[0-9]+$", file_):
+                    await aioremove(f'{path}/{file_}')

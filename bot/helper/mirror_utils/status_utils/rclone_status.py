@@ -2,13 +2,12 @@ from bot.helper.ext_utils.bot_utils import MirrorStatus
 
 
 class RcloneStatus:
-    def __init__(self, obj, message, gid, status, extra_details):
+    def __init__(self, obj, message, gid, status, upload_details):
         self.__obj = obj
         self.__gid = gid
         self.__status = status
         self.message = message
-        self.extra_details = extra_details
-        self.engine = "rclone"
+        self.upload_details = upload_details
 
     def gid(self):
         return self.__gid

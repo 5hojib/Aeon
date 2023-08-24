@@ -1,19 +1,16 @@
 #!/usr/bin/env python3
-from asyncio import Event
 from random import SystemRandom
 from string import ascii_letters, digits
-
 from aiofiles.os import makedirs
-from mega import MegaApi, MegaError, MegaListener, MegaRequest, MegaTransfer
+from asyncio import Event
+from mega import MegaApi, MegaListener, MegaRequest, MegaTransfer, MegaError
 
-from bot import LOGGER, config_dict, download_dict, download_dict_lock, non_queued_dl, queue_dict_lock
-from bot.helper.ext_utils.bot_utils import async_to_sync, get_mega_link_type, sync_to_async
-from bot.helper.ext_utils.task_manager import is_queued, limit_checker, stop_duplicate_check
+from bot import LOGGER, config_dict, download_dict_lock, download_dict, non_queued_dl, queue_dict_lock
+from bot.helper.telegram_helper.message_utils import sendMessage, sendStatusMessage
+from bot.helper.ext_utils.bot_utils import get_mega_link_type, async_to_sync, sync_to_async
 from bot.helper.mirror_utils.status_utils.mega_download_status import MegaDownloadStatus
 from bot.helper.mirror_utils.status_utils.queue_status import QueueStatus
-from bot.helper.telegram_helper.message_utils import delete_links, sendMessage, sendStatusMessage
-
-DumpSession = None
+from bot.helper.ext_utils.task_manager import is_queued, limit_checker, stop_duplicate_check
 
 
 class MegaAppListener(MegaListener):
@@ -35,6 +32,7 @@ class MegaAppListener(MegaListener):
     @property
     def speed(self):
         return self.__speed
+
     @property
     def downloaded_bytes(self):
         return self.__bytes_transferred
@@ -42,8 +40,7 @@ class MegaAppListener(MegaListener):
     def onRequestFinish(self, api, request, error):
         if str(error).lower() != "no error":
             self.error = error.copy()
-            if str(self.error).casefold() != "not found":
-                LOGGER.error(f'Mega onRequestFinishError: {self.error}')
+            LOGGER.error(f'Mega onRequestFinishError: {self.error}')
             self.continue_event.set()
             return
         request_type = request.getType()
@@ -94,7 +91,7 @@ class MegaAppListener(MegaListener):
         LOGGER.error(
             f'Mega download error in file {transfer} {filen}: {error}')
         if state in [1, 4]:
-            # Sometimes MEGA (official client) can't stream a node either and raises a temp failed error.
+            # Sometimes MEGA (offical client) can't stream a node either and raises a temp failed error.
             # Don't break the transfer queue if transfer's in queued (1) or retrying (4) state [causes seg fault]
             return
 
@@ -126,7 +123,7 @@ async def add_mega_download(mega_link, path, listener, name):
     MEGA_PASSWORD = config_dict['MEGA_PASSWORD']
 
     executor = AsyncExecutor()
-    api = MegaApi(None, None, None, 'mirror-leech-telegram-bot')
+    api = MegaApi(None, None, None, 'WZML-X')
     folder_api = None
 
     mega_listener = MegaAppListener(executor.continue_event, listener)
@@ -139,7 +136,7 @@ async def add_mega_download(mega_link, path, listener, name):
         await executor.do(api.getPublicNode, (mega_link,))
         node = mega_listener.public_node
     else:
-        folder_api = MegaApi(None, None, None, 'mirror-leech-telegram-bot')
+        folder_api = MegaApi(None, None, None, 'WZML-X')
         folder_api.addListener(mega_listener)
         await executor.do(folder_api.loginToFolder, (mega_link,))
         node = await sync_to_async(folder_api.authorizeNode, mega_listener.node)
@@ -148,7 +145,6 @@ async def add_mega_download(mega_link, path, listener, name):
         await executor.do(api.logout, ())
         if folder_api is not None:
             await executor.do(folder_api.logout, ())
-        await delete_links(listener.message)
         return
 
     name = name or node.getName()
@@ -158,14 +154,12 @@ async def add_mega_download(mega_link, path, listener, name):
         await executor.do(api.logout, ())
         if folder_api is not None:
             await executor.do(folder_api.logout, ())
-        await delete_links(listener.message)
         return
 
     gid = ''.join(SystemRandom().choices(ascii_letters + digits, k=8))
     size = api.getSize(node)
     if limit_exceeded := await limit_checker(size, listener, isMega=True):
-        await sendMessage(listener.message, limit_exceeded)
-        await delete_links(listener.message)
+        await listener.onDownloadError(limit_exceeded)
         return
     added_to_queue, event = await is_queued(listener.uid)
     if added_to_queue:
@@ -181,7 +175,6 @@ async def add_mega_download(mega_link, path, listener, name):
                 await executor.do(api.logout, ())
                 if folder_api is not None:
                     await executor.do(folder_api.logout, ())
-                await delete_links(listener.message)
                 return
         from_queue = True
         LOGGER.info(f'Start Queued Download from Mega: {name}')
@@ -189,8 +182,7 @@ async def add_mega_download(mega_link, path, listener, name):
         from_queue = False
 
     async with download_dict_lock:
-        download_dict[listener.uid] = MegaDownloadStatus(
-            name, size, gid, mega_listener, listener.message, listener.extra_details)
+        download_dict[listener.uid] = MegaDownloadStatus(name, size, gid, mega_listener, listener.message, listener.upload_details)
     async with queue_dict_lock:
         non_queued_dl.add(listener.uid)
 

@@ -2,9 +2,7 @@
 from time import time
 
 from bot import LOGGER
-from bot.helper.ext_utils.bot_utils import (MirrorStatus, async_to_sync,
-                                            get_readable_file_size,
-                                            get_readable_time)
+from bot.helper.ext_utils.bot_utils import get_readable_file_size, MirrorStatus, get_readable_time, async_to_sync
 from bot.helper.ext_utils.fs_utils import get_path_size
 
 
@@ -14,10 +12,10 @@ class ZipStatus:
         self.__size = size
         self.__gid = gid
         self.__listener = listener
+        self.upload_details = listener.upload_details
+        self.__uid = listener.uid
         self.__start_time = time()
-        self.message = self.__listener.message
-        self.extra_details = self.__listener.extra_details
-        self.engine = "7z"
+        self.message = listener.message
 
     def gid(self):
         return self.__gid
@@ -67,7 +65,7 @@ class ZipStatus:
 
     async def cancel_download(self):
         LOGGER.info(f'Cancelling Archive: {self.__name}')
-        if self.__listener.suproc:
+        if self.__listener.suproc is not None:
             self.__listener.suproc.kill()
         else:
             self.__listener.suproc = 'cancelled'

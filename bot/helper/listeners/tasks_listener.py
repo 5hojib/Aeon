@@ -1,82 +1,81 @@
 #!/usr/bin/env python3
-from asyncio import Event, create_subprocess_exec, sleep
-from html import escape
-from os import path as ospath
-from os import walk
+from random import choice
 from time import time
-from urllib.parse import quote as url_quote
-
-from aiofiles.os import listdir, makedirs
-from aiofiles.os import path as aiopath
-from aiofiles.os import remove as aioremove
+from pytz import timezone
+from datetime import datetime
+from urllib.parse import unquote, quote
+from requests import utils as rutils
+from aiofiles.os import path as aiopath, remove as aioremove, listdir, makedirs
+from os import walk, path as ospath
+from html import escape
 from aioshutil import move
+from asyncio import create_subprocess_exec, sleep, Event
+from pyrogram.enums import ChatType
 
-from bot import (DATABASE_URL, DOWNLOAD_DIR, LOGGER, MAX_SPLIT_SIZE, Interval,
-                 aria2, config_dict, download_dict, download_dict_lock,
-                 non_queued_dl, non_queued_up, queue_dict_lock, queued_dl,
-                 queued_up, status_reply_dict_lock, user_data, GLOBAL_EXTENSION_FILTER)
-from bot.helper.ext_utils.bot_utils import (extra_btns, get_readable_file_size,
-                                            get_readable_time, sync_to_async)
-from bot.helper.ext_utils.db_handler import DbManger
+from bot import OWNER_ID, Interval, aria2, DOWNLOAD_DIR, download_dict, download_dict_lock, LOGGER, bot_name, DATABASE_URL, \
+    MAX_SPLIT_SIZE, config_dict, status_reply_dict_lock, user_data, non_queued_up, non_queued_dl, queued_up, \
+    queued_dl, queue_dict_lock, bot, GLOBAL_EXTENSION_FILTER
+from bot.helper.ext_utils.bot_utils import extra_btns, sync_to_async, get_readable_file_size, get_readable_time, is_mega_link, is_gdrive_link, new_thread
+from bot.helper.ext_utils.fs_utils import get_base_name, get_path_size, clean_download, clean_target, \
+    is_first_archive_split, is_archive, is_archive_split, join_files
+from bot.helper.ext_utils.leech_utils import split_file, format_filename
 from bot.helper.ext_utils.exceptions import NotSupportedExtractionArchive
-from bot.helper.ext_utils.fs_utils import (clean_download, clean_target,
-                                           get_base_name, get_path_size,
-                                           is_archive, is_archive_split,
-                                           is_first_archive_split)
-from bot.helper.ext_utils.leech_utils import split_file
 from bot.helper.ext_utils.task_manager import start_from_queued
-from bot.helper.mirror_utils.rclone_utils.transfer import RcloneTransferHelper
 from bot.helper.mirror_utils.status_utils.extract_status import ExtractStatus
-from bot.helper.mirror_utils.status_utils.gdrive_status import GdriveStatus
-from bot.helper.mirror_utils.status_utils.queue_status import QueueStatus
-from bot.helper.mirror_utils.status_utils.rclone_status import RcloneStatus
-from bot.helper.mirror_utils.status_utils.split_status import SplitStatus
-from bot.helper.mirror_utils.status_utils.telegram_status import TelegramStatus
 from bot.helper.mirror_utils.status_utils.zip_status import ZipStatus
+from bot.helper.mirror_utils.status_utils.split_status import SplitStatus
+from bot.helper.mirror_utils.status_utils.gdrive_status import GdriveStatus
+from bot.helper.mirror_utils.status_utils.telegram_status import TelegramStatus
+from bot.helper.mirror_utils.status_utils.rclone_status import RcloneStatus
+from bot.helper.mirror_utils.status_utils.queue_status import QueueStatus
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.mirror_utils.upload_utils.pyrogramEngine import TgUploader
+from bot.helper.mirror_utils.rclone_utils.transfer import RcloneTransferHelper
+from bot.helper.telegram_helper.message_utils import sendCustomMsg, sendMessage, editMessage, delete_all_messages, delete_links, sendMultiMessage, update_all_messages, deleteMessage, five_minute_del
 from bot.helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.telegram_helper.message_utils import (delete_all_messages,
-                                                      delete_links,
-                                                      send_to_chat,
-                                                      sendMessage,
-                                                      update_all_messages)
+from bot.helper.ext_utils.db_handler import DbManger
+from bot.helper.themes import BotTheme
 
 
 class MirrorLeechListener:
-    def __init__(self, message, isZip=False, extract=False, isQbit=False,
-                 isLeech=False, pswd=None, tag=None, select=False,
-                 seed=False, sameDir=None, rcFlags=None, upPath=None, isClone=False, raw_url=None,
-                 drive_id=None, index_link=None, dmMessage=None, logMessage=None):
-        if not sameDir:
+    def __init__(self, message, compress=False, extract=False, isQbit=False, isLeech=False, tag=None, select=False, seed=False, sameDir=None, rcFlags=None, upPath=None, isClone=False, join=False, isYtdlp=False, source_url=None, drive_id=None, index_link=None):
+        if sameDir is None:
             sameDir = {}
         self.message = message
         self.uid = message.id
         self.extract = extract
-        self.isZip = isZip
+        self.compress = compress
         self.isQbit = isQbit
         self.isLeech = isLeech
-        self.pswd = pswd
+        self.isClone = isClone
+        self.isMega = is_mega_link(source_url) if source_url else False
+        self.isGdrive = is_gdrive_link(source_url) if source_url else False
+        self.isYtdlp = isYtdlp
         self.tag = tag
         self.seed = seed
         self.newDir = ""
         self.dir = f"{DOWNLOAD_DIR}{self.uid}"
         self.select = select
-        self.isSuperGroup = self.message.chat.type in [
-            self.message.chat.type.SUPERGROUP, self.message.chat.type.CHANNEL]
+        self.isSuperGroup = message.chat.type in [ChatType.SUPERGROUP, ChatType.CHANNEL]
+        self.isPrivate = message.chat.type == ChatType.BOT
         self.suproc = None
         self.sameDir = sameDir
         self.rcFlags = rcFlags
         self.upPath = upPath
-        self.isClone = isClone
-        self.raw_url = raw_url
+        self.random_pic = 'IMAGES'
+        self.join = join
+        self.linkslogmsg = None
+        self.botpmmsg = None
+        self.upload_details = {}
+        self.source_url = (
+            source_url if (source_url and (source_url.startswith('http')))
+            else (f"https://t.me/share/url?url={source_url}" if source_url else '')
+        )
+        self.source_msg = ''
+        self.__setModeEng()
+        self.__parseSource()
         self.drive_id = drive_id
         self.index_link = index_link
-        self.dmMessage = dmMessage
-        self.logMessage = logMessage
-        self.extra_details = {'startTime': time()}
-        self.__setMode()
-        self.__source()
 
     async def clean(self):
         try:
@@ -89,41 +88,58 @@ class MirrorLeechListener:
         except:
             pass
 
-    def __setMode(self):
-        if self.isLeech:
-            mode = 'Leech'
-        elif self.isClone:
-            mode = 'Clone'
-        elif self.upPath != 'gd':
-            mode = 'Rclone'
+    def __setModeEng(self):
+        mode = (
+            'leech'
+            if self.isLeech
+            else 'clone'
+            if self.isClone
+            else 'rclone'
+            if self.upPath != 'gd'
+            else 'gdrive'
+        ) + (' as zip' if self.compress else ' as unzip' if self.extract else '')
+        mode += f" | {'qbit' if self.isQbit else 'ytdlp' if self.isYtdlp else 'gdrive' if (self.isClone or self.isGdrive) else 'mega' if self.isMega else 'aria2' if self.source_url and self.source_url != self.message.link else 'tgram'}"
+        self.upload_details['mode'] = mode
+        
+    def __parseSource(self):
+        if self.source_url == self.message.link:
+            file = self.message.reply_to_message
+            if file is not None and file.media is not None:
+                mtype = file.media.value
+                media = getattr(file, mtype)
+                self.source_msg = f'<b>• Name:</b> <i>{media.file_name if hasattr(media, "file_name") else mtype+"_"+media.file_unique_id}</i>\n' \
+                                  f'<b>• Type:</b> {media.mime_type if hasattr(media, "mime_type") else "image/jpeg" if mtype == "photo" else "text/plain"}\n' \
+                                  f'<b>• Size:</b> {get_readable_file_size(media.file_size)}\n' \
+                                  f'<b>• Created Date:</b> {media.date}\n' \
+                                  f'<b>• Media Type:</b> {mtype.capitalize()}'
+            else:
+                self.source_msg = f"<code>{self.message.reply_to_message.text}</code>"
+        elif self.source_url.startswith('https://t.me/share/url?url='):
+            msg = self.source_url.replace('https://t.me/share/url?url=', '')
+            if msg.startswith('magnet'):
+                mag = unquote(msg).split('&')
+                tracCount, name, amper = 0, '', False
+                for check in mag:
+                    if check.startswith('tr='):
+                        tracCount += 1
+                    elif check.startswith('magnet:?xt=urn:btih:'):
+                        hashh = check.replace('magnet:?xt=urn:btih:', '')
+                    else:
+                        name += ('&' if amper else '') + check.replace('dn=', '').replace('+', '')
+                        amper = True
+                self.source_msg = f"<b>• Name:</b> <i>{name}</i>\n<b>• Magnet Hash:</b> <code>{hashh}</code>\n<b>• Total Trackers:</b> {tracCount} \n<b>• Share:</b> <a href='https://t.me/share/url?url={quote(msg)}'>Share To Telegram</a>"
+            else:
+                self.source_msg = f"<code>{msg}</code>"
         else:
-            mode = 'Drive'
-        if self.isZip:
-            mode += ' as Zip'
-        elif self.extract:
-            mode += ' as Unzip'
-        self.extra_details['mode'] = mode
-
-    def __source(self):
-        if sender_chat := self.message.sender_chat:
-            source = sender_chat.title
-        else:
-            source = self.message.from_user.username or self.message.from_user.id
-        if reply_to := self.message.reply_to_message:
-            if sender_chat := reply_to.sender_chat:
-                source = reply_to.sender_chat.title
-            elif not reply_to.from_user.is_bot:
-                source = reply_to.from_user.username or reply_to.from_user.id
-        if self.isSuperGroup:
-            self.extra_details['source'] = f"<a href='{self.message.link}'>{source}</a>"
-        else:
-            self.extra_details['source'] = f"<i>{source}</i>"
-
+            self.source_msg = f"<code>{self.source_url}</code>"
+        
     async def onDownloadStart(self):
-        if self.dmMessage == 'BotStarted':
-            self.dmMessage = await send_to_chat(self.message._client, self.message.from_user.id, self.message.link)
-        if DATABASE_URL and config_dict['STOP_DUPLICATE_TASKS'] and self.raw_url:
-            await DbManger().add_download_url(self.raw_url, self.tag)
+        if config_dict['LINKS_LOG_ID']:
+            source = self.source_msg
+            self.linkslogmsg = await sendCustomMsg(config_dict['LINKS_LOG_ID'], BotTheme('LINKS_START', Mode=self.upload_details['mode'], Tag=self.tag) + source)
+        user_dict = user_data.get(self.message.from_user.id, {})
+        if config_dict['BOT_PM'] or user_dict.get('bot_pm'):
+            self.botpmmsg = await sendCustomMsg(self.message.from_user.id, BotTheme('L_PM_START'))
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
             await DbManger().add_incomplete_task(self.message.chat.id, self.message.link, self.tag)
 
@@ -131,20 +147,20 @@ class MirrorLeechListener:
         multi_links = False
         while True:
             if self.sameDir:
-                if self.sameDir['total'] == 1 or self.sameDir['total'] > 1 and len(self.sameDir['tasks']) > 1:
+                if self.sameDir['total'] in [1, 0] or self.sameDir['total'] > 1 and len(self.sameDir['tasks']) > 1:
                     break
             else:
                 break
-            await sleep(0)
+            await sleep(0.2)
         async with download_dict_lock:
             if self.sameDir and self.sameDir['total'] > 1:
                 self.sameDir['tasks'].remove(self.uid)
                 self.sameDir['total'] -= 1
-                folder_name = (await listdir(self.dir))[-1]
-                path = f"{self.dir}/{folder_name}"
+                folder_name = self.sameDir['name']
+                spath = f"{self.dir}/{folder_name}"
                 des_path = f"{DOWNLOAD_DIR}{list(self.sameDir['tasks'])[0]}/{folder_name}"
                 await makedirs(des_path, exist_ok=True)
-                for item in await listdir(path):
+                for item in await listdir(spath):
                     if item.endswith(('.aria2', '.!qB')):
                         continue
                     item_path = f"{self.dir}/{folder_name}/{item}"
@@ -158,76 +174,55 @@ class MirrorLeechListener:
             gid = download.gid()
         LOGGER.info(f"Download completed: {name}")
         if multi_links:
-            await self.onUploadError('Downloaded! Waiting for other tasks...')
+            await self.onUploadError('Downloaded! Starting other part of the Task...')
             return
         if name == "None" or self.isQbit or not await aiopath.exists(f"{self.dir}/{name}"):
-            files = await listdir(self.dir)
+            try:
+                files = await listdir(self.dir)
+            except Exception as e:
+                await self.onUploadError(str(e))
+                return
             name = files[-1]
             if name == "yt-dlp-thumb":
                 name = files[0]
-        m_path = f"{self.dir}/{name}"
-        size = await get_path_size(m_path)
+
+        dl_path = f"{self.dir}/{name}"
+        up_path = ''
+        size = await get_path_size(dl_path)
         async with queue_dict_lock:
             if self.uid in non_queued_dl:
                 non_queued_dl.remove(self.uid)
         await start_from_queued()
         user_dict = user_data.get(self.message.from_user.id, {})
-        if self.isZip:
-            if self.seed and self.isLeech:
-                self.newDir = f"{self.dir}10000"
-                path = f"{self.newDir}/{name}.zip"
-            else:
-                path = f"{m_path}.zip"
-            async with download_dict_lock:
-                download_dict[self.uid] = ZipStatus(name, size, gid, self)
-            LEECH_SPLIT_SIZE = user_dict.get(
-                'split_size', False) or config_dict['LEECH_SPLIT_SIZE']
-            LEECH_SPLIT_SIZE = min(LEECH_SPLIT_SIZE, MAX_SPLIT_SIZE)
-            cmd = ["7z", f"-v{LEECH_SPLIT_SIZE}b", "a",
-                   "-mx=0", f"-p{self.pswd}", path, m_path]
-            for ext in GLOBAL_EXTENSION_FILTER:
-                ex_ext = f'-xr!*.{ext}'
-                cmd.append(ex_ext)
-            if self.isLeech and int(size) > LEECH_SPLIT_SIZE:
-                if self.pswd is None:
-                    del cmd[4]
-                LOGGER.info(f'Zip: orig_path: {m_path}, zip_path: {path}.0*')
-            else:
-                del cmd[1]
-                if self.pswd is None:
-                    del cmd[3]
-                LOGGER.info(f'Zip: orig_path: {m_path}, zip_path: {path}')
-            if self.suproc == 'cancelled':
-                return
-            self.suproc = await create_subprocess_exec(*cmd)
-            code = await self.suproc.wait()
-            if code == -9:
-                return
-            elif not self.seed:
-                await clean_target(m_path)
-        elif self.extract:
+        
+        if self.join:
+            if await aiopath.isdir(dl_path):
+                await join_files(dl_path)
+
+        if self.extract:
+            pswd = self.extract if isinstance(self.extract, str) else ''
             try:
-                if await aiopath.isfile(m_path):
-                    path = get_base_name(m_path)
+                if await aiopath.isfile(dl_path):
+                    up_path = get_base_name(dl_path)
                 LOGGER.info(f"Extracting: {name}")
                 async with download_dict_lock:
                     download_dict[self.uid] = ExtractStatus(
                         name, size, gid, self)
-                if await aiopath.isdir(m_path):
+                if await aiopath.isdir(dl_path):
                     if self.seed:
                         self.newDir = f"{self.dir}10000"
-                        path = f"{self.newDir}/{name}"
+                        up_path = f"{self.newDir}/{name}"
                     else:
-                        path = m_path
-                    for dirpath, subdir, files in await sync_to_async(walk, m_path, topdown=False):
+                        up_path = dl_path
+                    for dirpath, _, files in await sync_to_async(walk, dl_path, topdown=False):
                         for file_ in files:
                             if is_first_archive_split(file_) or is_archive(file_) and not file_.endswith('.rar'):
                                 f_path = ospath.join(dirpath, file_)
                                 t_path = dirpath.replace(
                                     self.dir, self.newDir) if self.seed else dirpath
                                 cmd = [
-                                    "7z", "x", f"-p{self.pswd}", f_path, f"-o{t_path}", "-aot", "-xr!@PaxHeader"]
-                                if self.pswd is None:
+                                    "7z", "x", f"-p{pswd}", f_path, f"-o{t_path}", "-aot", "-xr!@PaxHeader"]
+                                if not pswd:
                                     del cmd[2]
                                 if self.suproc == 'cancelled' or self.suproc is not None and self.suproc.returncode == -9:
                                     return
@@ -247,12 +242,12 @@ class MirrorLeechListener:
                                     except:
                                         return
                 else:
-                    if self.seed and self.isLeech:
+                    if self.seed:
                         self.newDir = f"{self.dir}10000"
-                        path = path.replace(self.dir, self.newDir)
-                    cmd = ["7z", "x", f"-p{self.pswd}", m_path,
-                           f"-o{path}", "-aot", "-xr!@PaxHeader"]
-                    if self.pswd is None:
+                        up_path = up_path.replace(self.dir, self.newDir)
+                    cmd = ["7z", "x", f"-p{pswd}", dl_path,
+                           f"-o{up_path}", "-aot", "-xr!@PaxHeader"]
+                    if not pswd:
                         del cmd[2]
                     if self.suproc == 'cancelled':
                         return
@@ -261,33 +256,70 @@ class MirrorLeechListener:
                     if code == -9:
                         return
                     elif code == 0:
-                        LOGGER.info(f"Extracted Path: {path}")
+                        LOGGER.info(f"Extracted Path: {up_path}")
                         if not self.seed:
                             try:
-                                await aioremove(m_path)
+                                await aioremove(dl_path)
                             except:
                                 return
                     else:
                         LOGGER.error(
                             'Unable to extract archive! Uploading anyway')
                         self.newDir = ""
-                        path = m_path
+                        up_path = dl_path
             except NotSupportedExtractionArchive:
                 LOGGER.info("Not any valid archive, uploading file as it is.")
                 self.newDir = ""
-                path = m_path
-        else:
-            path = m_path
-        up_dir, up_name = path.rsplit('/', 1)
+                up_path = dl_path
+
+        if self.compress:
+            pswd = self.compress if isinstance(self.compress, str) else ''
+            if up_path:
+                dl_path = up_path
+                up_path = f"{up_path}.zip"
+            elif self.seed and self.isLeech:
+                self.newDir = f"{self.dir}10000"
+                up_path = f"{self.newDir}/{name}.zip"
+            else:
+                up_path = f"{dl_path}.zip"
+            async with download_dict_lock:
+                download_dict[self.uid] = ZipStatus(name, size, gid, self)
+            LEECH_SPLIT_SIZE = user_dict.get('split_size', False) or config_dict['LEECH_SPLIT_SIZE']
+            cmd = ["7z", f"-v{LEECH_SPLIT_SIZE}b", "a",
+                   "-mx=0", f"-p{pswd}", up_path, dl_path]
+            for ext in GLOBAL_EXTENSION_FILTER:
+                ex_ext = f'-xr!*.{ext}'
+                cmd.append(ex_ext)
+            if self.isLeech and int(size) > LEECH_SPLIT_SIZE:
+                if not pswd:
+                    del cmd[4]
+                LOGGER.info(f'Zip: orig_path: {dl_path}, zip_path: {up_path}.0*')
+            else:
+                del cmd[1]
+                if not pswd:
+                    del cmd[3]
+                LOGGER.info(f'Zip: orig_path: {dl_path}, zip_path: {up_path}')
+            if self.suproc == 'cancelled':
+                return
+            self.suproc = await create_subprocess_exec(*cmd)
+            code = await self.suproc.wait()
+            if code == -9:
+                return
+            elif not self.seed:
+                await clean_target(dl_path)
+
+        if not self.compress and not self.extract:
+            up_path = dl_path
+
+        up_dir, up_name = up_path.rsplit('/', 1)
         size = await get_path_size(up_dir)
         if self.isLeech:
             m_size = []
             o_files = []
-            if not self.isZip:
+            if not self.compress:
                 checked = False
                 LEECH_SPLIT_SIZE = user_dict.get(
                     'split_size', False) or config_dict['LEECH_SPLIT_SIZE']
-                LEECH_SPLIT_SIZE = min(LEECH_SPLIT_SIZE, MAX_SPLIT_SIZE)
                 for dirpath, _, files in await sync_to_async(walk, up_dir, topdown=False):
                     for file_ in files:
                         f_path = ospath.join(dirpath, file_)
@@ -340,7 +372,6 @@ class MirrorLeechListener:
             LOGGER.info(f'Start from Queued/Upload: {name}')
         async with queue_dict_lock:
             non_queued_up.add(self.uid)
-
         if self.isLeech:
             size = await get_path_size(up_dir)
             for s in m_size:
@@ -348,73 +379,108 @@ class MirrorLeechListener:
             LOGGER.info(f"Leech Name: {up_name}")
             tg = TgUploader(up_name, up_dir, self)
             tg_upload_status = TelegramStatus(
-                tg, size, self.message, gid, 'up', self.extra_details)
+                tg, size, self.message, gid, 'up', self.upload_details)
             async with download_dict_lock:
                 download_dict[self.uid] = tg_upload_status
             await update_all_messages()
             await tg.upload(o_files, m_size, size)
         elif self.upPath == 'gd':
-            size = await get_path_size(path)
+            size = await get_path_size(up_path)
             LOGGER.info(f"Upload Name: {up_name}")
             drive = GoogleDriveHelper(up_name, up_dir, self)
-            upload_status = GdriveStatus(
-                drive, size, self.message, gid, 'up', self.extra_details)
+            upload_status = GdriveStatus(drive, size, self.message, gid, 'up', self.upload_details)
             async with download_dict_lock:
                 download_dict[self.uid] = upload_status
             await update_all_messages()
             await sync_to_async(drive.upload, up_name, size, self.drive_id)
         else:
-            size = await get_path_size(path)
-            LOGGER.info(f"Upload Name: {up_name}")
+            size = await get_path_size(up_path)
+            LOGGER.info(f"Upload Name: {up_name} via RClone")
             RCTransfer = RcloneTransferHelper(self, up_name)
             async with download_dict_lock:
                 download_dict[self.uid] = RcloneStatus(
-                    RCTransfer, self.message, gid, 'up', self.extra_details)
+                    RCTransfer, self.message, gid, 'up', self.upload_details)
             await update_all_messages()
-            await RCTransfer.upload(path, size)
+            await RCTransfer.upload(up_path, size)
 
     async def onUploadComplete(self, link, size, files, folders, mime_type, name, rclonePath=''):
-        if DATABASE_URL and config_dict['STOP_DUPLICATE_TASKS'] and self.raw_url:
-            await DbManger().remove_download(self.raw_url)
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
             await DbManger().rm_complete_task(self.message.link)
-        msg = f"<i><b>{escape(name)}</b></i>\n"
-        msg += f"\n<b>• Size: </b>{get_readable_file_size(size)}"
+        user_id = self.message.from_user.id
+        name, _ = await format_filename(name, user_id, isMirror=not self.isLeech)
+        user_dict = user_data.get(user_id, {})
+        msg = BotTheme('NAME', Name=escape(name))
+        msg += BotTheme('SIZE', Size=get_readable_file_size(size))
+        msg += BotTheme('ELAPSE', Time=get_readable_time(time() - self.message.date.timestamp()))
+        msg += BotTheme('MODE', Mode=self.upload_details['mode'])
         LOGGER.info(f'Task Done: {name}')
+        buttons = ButtonMaker()
         if self.isLeech:
-            msg += f'\n<b>• Total Files</b>: {folders}'
-            msg += f"\n<b>• Elapsed</b>: {get_readable_time(time() - self.extra_details['startTime'])}"
+            msg += BotTheme('L_TOTAL_FILES', Files=folders)
             if mime_type != 0:
-                msg += f'\n<b>• Corrupted Files</b>: {mime_type}'
-            msg += f'\n<b>• Leeched by</b>: {self.tag}\n\n'
+                msg += BotTheme('L_CORRUPTED_FILES', Corrupt=mime_type)
+            msg += BotTheme('L_CC', Tag=self.tag)
             if not files:
-                await sendMessage(self.message, msg)
-                if self.logMessage:
-                    await sendMessage(self.logMessage, msg)
-            elif self.dmMessage and not config_dict['DUMP_CHAT_ID']:
-                await sendMessage(self.dmMessage, msg)
-                msg += '<b>Files has been sent in your DM.</b>'
-                await sendMessage(self.message, msg)
-                if self.logMessage:
-                    await sendMessage(self.logMessage, msg)
+                if self.isPrivate:
+                    msg += BotTheme('PM_BOT_MSG')
+                await sendMessage(self.message, msg, photo=self.random_pic)
             else:
-                fmsg = ''
-                buttons = ButtonMaker()
-                buttons = extra_btns(buttons)
-                if self.isSuperGroup and not self.message.chat.has_protected_content:
-                    buttons.ibutton('Save This Message', 'save', 'footer')
+                attachmsg = True
+                fmsg, totalmsg = '\n\n', ''
                 for index, (link, name) in enumerate(files.items(), start=1):
                     fmsg += f"{index}. <a href='{link}'>{name}</a>\n"
-                    if len(fmsg.encode() + msg.encode()) > 4000:
-                        if self.logMessage:
-                            await sendMessage(self.logMessage, msg + fmsg)
-                        await sendMessage(self.message, msg + fmsg, buttons.build_menu(2))
+                    totalmsg = (msg + BotTheme('L_LL_MSG') + fmsg) if attachmsg else fmsg
+                    if len(totalmsg.encode()) > 3900:
+                        if self.linkslogmsg:
+                            sbtn = ButtonMaker()
+                            if self.source_url:
+                                sbtn.ubutton(BotTheme('SOURCE_URL'), self.source_url)
+                                await editMessage(self.linkslogmsg, totalmsg, sbtn.build_menu(1))
+                                await sendMessage(self.botpmmsg,  totalmsg, sbtn.build_menu(1))
+                            else:
+                                await editMessage(self.linkslogmsg, totalmsg)
+                                await sendMessage(self.botpmmsg,  totalmsg)
+                            self.linkslogmsg = await sendMessage(self.linkslogmsg, "<i>Fetching Details...</i>")
+                        elif not (config_dict['BOT_PM'] or user_dict.get('bot_pm')):
+                            await sendMessage(self.message, msg + BotTheme('L_LL_MSG') + fmsg)
+                        attachmsg = False
                         await sleep(1)
-                        fmsg = ''
-                if fmsg != '':
-                    if self.logMessage:
-                        await sendMessage(self.logMessage, msg + fmsg)
-                    await sendMessage(self.message, msg + fmsg, buttons.build_menu(2))
+                        fmsg = '\n\n'
+                if fmsg != '\n\n':
+                    if self.linkslogmsg:
+                        sbtn = ButtonMaker()
+                        if self.source_url:
+                            sbtn.ubutton(BotTheme('SOURCE_URL'), self.source_url)
+                            await sendMessage(self.linkslogmsg, msg + BotTheme('L_LL_MSG') + fmsg, sbtn.build_menu(1))
+                            await deleteMessage(self.linkslogmsg)
+                        else:
+                            await sendMessage(self.linkslogmsg, msg + BotTheme('L_LL_MSG') + fmsg)
+                            await deleteMessage(self.linkslogmsg)
+                    elif not (config_dict['BOT_PM'] or user_dict.get('bot_pm')):
+                        await sendMessage(self.message, msg + BotTheme('L_LL_MSG') + fmsg, buttons.build_menu(1))
+                btn = ButtonMaker()
+                if config_dict['BOT_PM'] or user_dict.get('bot_pm'):
+                    sbtn = ButtonMaker()
+                    if self.source_url and config_dict['SOURCE_LINK']:
+                        sbtn.ubutton(BotTheme('SOURCE_URL'), self.source_url)
+                        await sendMessage(self.botpmmsg, msg + BotTheme('L_LL_MSG') + fmsg, sbtn.build_menu(1))
+                    else:
+                        await sendMessage(self.botpmmsg, msg + BotTheme('L_LL_MSG') + fmsg)
+                    await deleteMessage(self.botpmmsg)
+                    if self.isSuperGroup:
+                        btn.ibutton(BotTheme('CHECK_PM'), f"wzmlx {user_id} botpm", 'header')
+                        if self.source_url and config_dict['SOURCE_LINK']:
+                            btn.ubutton(BotTheme('SOURCE_URL'), self.source_url)
+                        btn = extra_btns(btn)
+                        await sendMessage(self.message, msg + BotTheme('L_BOT_MSG'), btn.build_menu(1))
+                    else:
+                        await deleteMessage(self.botpmmsg)
+                elif self.linkslogmsg:
+                    if self.source_url:
+                        btn.ubutton(BotTheme('SOURCE_URL'), self.source_url)
+                    btn = extra_btns(btn)
+                    await sendMessage(self.message, msg + BotTheme('L_LL_MSG'), btn.build_menu(1), self.random_pic)
+                    
             if self.seed:
                 if self.newDir:
                     await clean_target(self.newDir)
@@ -424,66 +490,77 @@ class MirrorLeechListener:
                 await start_from_queued()
                 return
         else:
-            msg += f'\n<b>• Type: </b>{mime_type}'
+            msg += BotTheme('M_TYPE', Mimetype=mime_type)
             if mime_type == "Folder":
-                msg += f'\n<b>• SubFolders: </b>{folders}'
-                msg += f'\n<b>• Files: </b>{files}'
-            msg += f'\n<b>• Uploaded by</b>: {self.tag}'
-            msg += f'\n<b>• Elapsed</b>: {get_readable_time(time() - self.extra_details["startTime"])}'
+                msg += BotTheme('M_SUBFOLD', Folder=folders)
+                msg += BotTheme('TOTAL_FILES', Files=files)
             if link or rclonePath and config_dict['RCLONE_SERVE_URL']:
-                buttons = ButtonMaker()
+
                 if link:
-                    buttons.ubutton("Drive Link", link)
+                    buttons.ubutton(BotTheme('CLOUD_LINK'), link)
                 else:
-                    msg += f'\n\n<b>Path</b>: <code>{rclonePath}</code>'
+                    msg += BotTheme('RCPATH', RCpath=rclonePath)
                 if rclonePath and (RCLONE_SERVE_URL := config_dict['RCLONE_SERVE_URL']):
                     remote, path = rclonePath.split(':', 1)
-                    url_path = url_quote(f'{path}')
+                    url_path = rutils.quote(f'{path}')
                     share_url = f'{RCLONE_SERVE_URL}/{remote}/{url_path}'
                     if mime_type == "Folder":
                         share_url += '/'
-                    buttons.ubutton("Rclone Link", share_url)
+                    buttons.ubutton(BotTheme('RCLONE_LINK'), share_url)
                 elif not rclonePath:
                     INDEX_URL = self.index_link if self.drive_id else config_dict['INDEX_URL']
                     if INDEX_URL:
-                        url_path = url_quote(f'{name}')
+                        url_path = rutils.quote(f'{name}')
                         share_url = f'{INDEX_URL}/{url_path}'
                         if mime_type == "Folder":
                             share_url += '/'
-                            buttons.ubutton("Index Link", share_url)
+                            buttons.ubutton(BotTheme('INDEX_LINK'), share_url)
                         else:
-                            buttons.ubutton("Index Link", share_url)
-                            if mime_type.startswith(('image', 'video', 'audio')):
-                                share_urls = f'{INDEX_URL}/{url_path}?a=view'
-                                buttons.ubutton("View Link", share_urls)
+                            buttons.ubutton(BotTheme('INDEX_LINK'), share_url)
+
                 buttons = extra_btns(buttons)
-                if self.dmMessage:
-                    msg += '\n\n<b>Links has been sent in your DM.</b>'
-                    await sendMessage(self.message, msg)
-                    await sendMessage(self.dmMessage, msg, buttons.build_menu(2))
-                else:
-                    if self.isSuperGroup and not self.message.chat.has_protected_content:
-                        buttons.ibutton("Save This Message", 'save', 'footer')
-                    await sendMessage(self.message, msg, buttons.build_menu(2))
-                if self.logMessage:
-                    await sendMessage(self.logMessage, msg, buttons.build_menu(2))
+                button = buttons.build_menu(2)
             else:
-                msg += f'\n\nPath: <code>{rclonePath}</code>'
-                await sendMessage(self.message, msg)
-                if self.logMessage:
-                    await sendMessage(self.logMessage, msg)
-            if self.seed and not self.isClone:
-                if self.isZip:
-                    await clean_target(f"{self.dir}/{name}")
-                elif self.newDir:
+                msg += BotTheme('RCPATH', RCpath=rclonePath)
+                button = None
+            msg += BotTheme('M_CC', Tag=self.tag)
+
+            if config_dict['MIRROR_LOG_ID']:
+                buttonss = button
+                log_msg = list((await sendMultiMessage(config_dict['MIRROR_LOG_ID'], msg, buttonss)).values())[0]
+                if self.linkslogmsg:
+                    await deleteMessage(self.linkslogmsg)
+            
+            buttons = ButtonMaker()
+            if config_dict['BOT_PM'] or user_dict.get('bot_pm'):
+                await sendMessage(self.botpmmsg, msg, button, self.random_pic)
+                await deleteMessage(self.botpmmsg)
+                if self.isSuperGroup:
+                    buttons.ibutton(BotTheme('CHECK_PM'), f"wzmlx {user_id} botpm", 'header')
+                    if self.source_url and config_dict['SOURCE_LINK']:
+                        buttons.ubutton(BotTheme('SOURCE_URL'), self.source_url)
+                    buttons = extra_btns(buttons)
+                    await sendMessage(self.message, msg + BotTheme('M_BOT_MSG'), buttons.build_menu(1))
+                else:
+                    await deleteMessage(self.botpmmsg)
+            elif self.linkslogmsg:
+                if self.source_url and config_dict['SOURCE_LINK']:
+                    buttons.ubutton(BotTheme('SOURCE_URL'), self.source_url)
+                buttons = extra_btns(buttons)
+                await sendMessage(self.message, msg, buttons.build_menu(1), self.random_pic)
+
+            if self.seed:
+                if self.newDir:
                     await clean_target(self.newDir)
+                elif self.compress:
+                    await clean_target(f"{self.dir}/{name}")
                 async with queue_dict_lock:
                     if self.uid in non_queued_up:
                         non_queued_up.remove(self.uid)
                 await start_from_queued()
                 return
-        if not self.isClone:
-            await clean_download(self.dir)
+
+        await clean_download(self.dir)
         async with download_dict_lock:
             if self.uid in download_dict.keys():
                 del download_dict[self.uid]
@@ -508,20 +585,26 @@ class MirrorLeechListener:
             if self.sameDir and self.uid in self.sameDir['tasks']:
                 self.sameDir['tasks'].remove(self.uid)
                 self.sameDir['total'] -= 1
-        msg = f"{self.tag} Download: {escape(error)}\n\n<b>• Elapsed</b>: {get_readable_time(time() - self.extra_details['startTime'])}"
-        await sendMessage(self.message, msg, button)
-        if self.logMessage:
-            await sendMessage(self.logMessage, msg, button)
+        msg = f'''Hey, {self.tag}!
+Your download has been stopped!
+
+<b>Reason:</b> {escape(error)}
+<b>Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}'''
+        x = await sendMessage(self.message, msg, button)
+        await delete_links(self.message)
+        await deleteMessage(self.botpmmsg)
+        if self.linkslogmsg:
+            await deleteMessage(self.linkslogmsg)
         if count == 0:
             await self.clean()
         else:
             await update_all_messages()
-
-        if DATABASE_URL and config_dict['STOP_DUPLICATE_TASKS'] and self.raw_url:
-            await DbManger().remove_download(self.raw_url)
+        if self.isSuperGroup and self.botpmmsg:
+            await sendMessage(self.botpmmsg, msg, button)
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
             await DbManger().rm_complete_task(self.message.link)
-
+        await five_minute_del(x)
+        
         async with queue_dict_lock:
             if self.uid in queued_dl:
                 queued_dl[self.uid].set()
@@ -535,31 +618,36 @@ class MirrorLeechListener:
                 non_queued_up.remove(self.uid)
 
         await start_from_queued()
-        await delete_links(self.message)
         await sleep(3)
-        if not self.isClone:
-            await clean_download(self.dir)
-            if self.newDir:
-                await clean_download(self.newDir)
-
+        await clean_download(self.dir)
+        if self.newDir:
+            await clean_download(self.newDir)
+    
     async def onUploadError(self, error):
         async with download_dict_lock:
             if self.uid in download_dict.keys():
                 del download_dict[self.uid]
             count = len(download_dict)
-        msg = f"{self.tag} {escape(error)}\n\n<b>• Elapsed</b>: {get_readable_time(time() - self.extra_details['startTime'])}"
-        await sendMessage(self.message, msg)
-        if self.logMessage:
-            await sendMessage(self.logMessage, msg)
+        msg = f'''Hey, {self.tag}!
+Your upload has been stopped!
+
+<b>Reason:</b> {escape(error)}
+<b>Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}'''
+        x = await sendMessage(self.message, msg)
+        if self.linkslogmsg:
+            await deleteMessage(self.linkslogmsg)
+        await delete_links(self.message)
+        await deleteMessage(self.botpmmsg)
         if count == 0:
             await self.clean()
         else:
             await update_all_messages()
-        if DATABASE_URL and config_dict['STOP_DUPLICATE_TASKS'] and self.raw_url:
-            await DbManger().remove_download(self.raw_url)
+        if self.isSuperGroup and self.botpmmsg:
+            await sendMessage(self.botpmmsg, msg)
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
             await DbManger().rm_complete_task(self.message.link)
-
+        await five_minute_del(x)
+        
         async with queue_dict_lock:
             if self.uid in queued_dl:
                 queued_dl[self.uid].set()
@@ -573,9 +661,8 @@ class MirrorLeechListener:
                 non_queued_up.remove(self.uid)
 
         await start_from_queued()
-        await delete_links(self.message)
         await sleep(3)
-        if not self.isClone:
-            await clean_download(self.dir)
-            if self.newDir:
-                await clean_download(self.newDir)
+        await clean_download(self.dir)
+        if self.newDir:
+            await clean_download(self.newDir)
+        

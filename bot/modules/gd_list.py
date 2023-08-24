@@ -1,21 +1,16 @@
 #!/usr/bin/env python3
-from time import time
-
+from random import choice
+from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.filters import command, regex
-from pyrogram.handlers import CallbackQueryHandler, MessageHandler
 
-from bot import LOGGER, bot
-from bot.helper.ext_utils.bot_utils import (checking_access, get_readable_time,
-                                            get_telegraph_list, new_task,
-                                            sync_to_async)
+from bot import LOGGER, bot, config_dict
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
+from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, delete_links, one_minute_del, five_minute_del, isAdmin
+from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import (anno_checker,
-                                                      editMessage, isAdmin,
-                                                      request_limiter,
-                                                      sendMessage)
+from bot.helper.ext_utils.bot_utils import sync_to_async, new_task, get_telegraph_list, checking_access, new_thread
+from bot.helper.themes import BotTheme
 
 
 async def list_buttons(user_id, isRecursive=True):
@@ -31,21 +26,18 @@ async def list_buttons(user_id, isRecursive=True):
 
 async def _list_drive(key, message, item_type, isRecursive):
     LOGGER.info(f"listing: {key}")
-    start_time = time()
     gdrive = GoogleDriveHelper()
     telegraph_content, contents_no = await sync_to_async(gdrive.drive_list, key, isRecursive=isRecursive, itemType=item_type)
-    Elapsed = get_readable_time(time() - start_time)
     if telegraph_content:
         try:
             button = await get_telegraph_list(telegraph_content)
         except Exception as e:
             await editMessage(message, e)
             return
-        msg = f'<b>Found {contents_no} result for <i>{key}</i></b>\n\n<b>Type</b>: {item_type} | <b>Recursive list</b>: {isRecursive}\n<b>Elapsed</b>: {Elapsed}'
+        msg = BotTheme('LIST_FOUND', NO=contents_no, NAME=key)
         await editMessage(message, msg, button)
     else:
-        msg = f'No result found for <i>{key}</i>\n\n<b>Type</b>: {item_type} | <b>Recursive list</b>: {isRecursive}\n<b>Elapsed</b>: {Elapsed}'
-        await editMessage(message, msg)
+        await editMessage(message, BotTheme('LIST_NOT_FOUND', NAME=key))
 
 
 @new_task
@@ -67,28 +59,29 @@ async def select_type(_, query):
     await query.answer()
     item_type = data[2]
     isRecursive = eval(data[3])
-    await editMessage(message, f"<b>Searching for <i>{key}</i></b>")
+    await editMessage(message, BotTheme('LIST_SEARCHING', NAME=key))
     await _list_drive(key, message, item_type, isRecursive)
 
-
+@new_task
 async def drive_list(_, message):
     if len(message.text.split()) == 1:
-        return await sendMessage(message, 'Send a search key along with command')
-    if not message.from_user:
-        message.from_user = await anno_checker(message)
-    if not message.from_user:
+        reply_message = await sendMessage(message, 'Send a search key along with command')
+        await delete_links(message)
+        await one_minute_del(reply_message)
         return
     user_id = message.from_user.id
     if not await isAdmin(message, user_id):
-        if await request_limiter(message):
-            return
         if message.chat.type != message.chat.type.PRIVATE:
             msg, btn = checking_access(user_id)
             if msg is not None:
-                await sendMessage(message, msg, btn.build_menu(1))
+                reply_message = await sendMessage(message, msg, btn.build_menu(1))
+                await delete_links(message)
+                await five_minute_del(reply_message)
                 return
     buttons = await list_buttons(user_id)
-    await sendMessage(message, 'Choose list options:', buttons)
+    reply_message = await sendMessage(message, 'Choose list options:', buttons)
+    await delete_links(message)
+    await five_minute_del(reply_message)
 
 bot.add_handler(MessageHandler(drive_list, filters=command(
     BotCommands.ListCommand) & CustomFilters.authorized))

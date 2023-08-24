@@ -1,16 +1,11 @@
 #!/usr/bin/env python3
-from aiofiles.os import path as aiopath
-from aiofiles.os import remove as aioremove
+from aiofiles.os import remove as aioremove, path as aiopath
 
-from bot import (LOGGER, aria2, aria2_options, aria2c_global, config_dict,
-                 download_dict, download_dict_lock, non_queued_dl,
-                 queue_dict_lock)
+from bot import aria2, download_dict_lock, download_dict, LOGGER, config_dict, aria2_options, aria2c_global, non_queued_dl, queue_dict_lock
 from bot.helper.ext_utils.bot_utils import bt_selection_buttons, sync_to_async
-from bot.helper.ext_utils.task_manager import is_queued
 from bot.helper.mirror_utils.status_utils.aria2_status import Aria2Status
-from bot.helper.telegram_helper.message_utils import (delete_links,
-                                                      sendMessage,
-                                                      sendStatusMessage)
+from bot.helper.telegram_helper.message_utils import sendStatusMessage, sendMessage
+from bot.helper.ext_utils.task_manager import is_queued
 
 
 async def add_aria2c_download(link, path, listener, filename, auth, ratio, seed_time):
@@ -20,7 +15,7 @@ async def add_aria2c_download(link, path, listener, filename, auth, ratio, seed_
     if filename:
         a2c_opt['out'] = filename
     if auth:
-        a2c_opt['header'] = auth
+        a2c_opt['header'] = f"authorization: {auth}"
     if ratio:
         a2c_opt['seed-ratio'] = ratio
     if seed_time:
@@ -38,7 +33,6 @@ async def add_aria2c_download(link, path, listener, filename, auth, ratio, seed_
     except Exception as e:
         LOGGER.info(f"Aria2c Download Error: {e}")
         await sendMessage(listener.message, f'{e}')
-        await delete_links(listener.message)
         return
     if await aiopath.exists(link):
         await aioremove(link)
@@ -46,7 +40,6 @@ async def add_aria2c_download(link, path, listener, filename, auth, ratio, seed_
         error = str(download.error_message).replace('<', ' ').replace('>', ' ')
         LOGGER.info(f"Aria2c Download Error: {error}")
         await sendMessage(listener.message, error)
-        await delete_links(listener.message)
         return
 
     gid = download.gid

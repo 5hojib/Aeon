@@ -2,12 +2,12 @@
 from asyncio import sleep
 from time import time
 
-from bot import LOGGER, QbInterval, QbTorrents, bot_loop, config_dict, download_dict, download_dict_lock, get_client, qb_listener_lock
+from bot import download_dict, download_dict_lock, get_client, QbInterval, config_dict, QbTorrents, qb_listener_lock, LOGGER, bot_loop
+from bot.helper.mirror_utils.status_utils.qbit_status import QbittorrentStatus
+from bot.helper.telegram_helper.message_utils import update_all_messages
 from bot.helper.ext_utils.bot_utils import get_readable_time, getDownloadByGid, new_task, sync_to_async
 from bot.helper.ext_utils.fs_utils import clean_unwanted
 from bot.helper.ext_utils.task_manager import limit_checker, stop_duplicate_check
-from bot.helper.mirror_utils.status_utils.qbit_status import QbittorrentStatus
-from bot.helper.telegram_helper.message_utils import update_all_messages
 
 
 async def __remove_torrent(client, hash_, tag):
@@ -58,7 +58,6 @@ async def __stop_duplicate(tor):
     if msg:
         __onDownloadError(msg, tor, button)
 
-
 @new_task
 async def __size_checked(tor):
     download = await getDownloadByGid(tor.hash[:8])
@@ -67,7 +66,6 @@ async def __size_checked(tor):
         size = tor.size
         if limit_exceeded := await limit_checker(size, listener, True):
             await __onDownloadError(limit_exceeded, tor)
-
 
 @new_task
 async def __onDownloadComplete(tor):

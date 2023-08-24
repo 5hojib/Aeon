@@ -1,22 +1,15 @@
 #!/usr/bin/env python3
-from pkg_resources import get_distribution
-
-from bot.helper.ext_utils.bot_utils import (MirrorStatus, async_to_sync,
-                                            get_readable_file_size,
-                                            get_readable_time)
+from bot.helper.ext_utils.bot_utils import MirrorStatus, get_readable_file_size, get_readable_time, async_to_sync
 from bot.helper.ext_utils.fs_utils import get_path_size
-
-engine_ = "yt-dlp"
 
 
 class YtDlpDownloadStatus:
     def __init__(self, obj, listener, gid):
         self.__obj = obj
-        self.__gid = gid
         self.__listener = listener
-        self.message = self.__listener.message
-        self.extra_details = self.__listener.extra_details
-        self.engine = engine_
+        self.upload_details = listener.upload_details
+        self.__gid = gid
+        self.message = listener.message
 
     def gid(self):
         return self.__gid
@@ -41,9 +34,6 @@ class YtDlpDownloadStatus:
 
     def progress(self):
         return f'{round(self.__obj.progress, 2)}%'
-
-    def listener(self):
-        return self.__listener
 
     def speed(self):
         return f'{get_readable_file_size(self.__obj.download_speed)}/s'

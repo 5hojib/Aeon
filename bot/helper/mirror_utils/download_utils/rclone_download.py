@@ -4,13 +4,14 @@ from json import loads
 from random import SystemRandom
 from string import ascii_letters, digits
 
-from bot import LOGGER, download_dict, download_dict_lock, non_queued_dl, queue_dict_lock
+from bot import download_dict, download_dict_lock, queue_dict_lock, non_queued_dl, LOGGER
 from bot.helper.ext_utils.bot_utils import cmd_exec
-from bot.helper.ext_utils.task_manager import is_queued, stop_duplicate_check
-from bot.helper.mirror_utils.rclone_utils.transfer import RcloneTransferHelper
-from bot.helper.mirror_utils.status_utils.queue_status import QueueStatus
-from bot.helper.mirror_utils.status_utils.rclone_status import RcloneStatus
 from bot.helper.telegram_helper.message_utils import sendMessage, sendStatusMessage
+from bot.helper.ext_utils.task_manager import is_queued, stop_duplicate_check
+from bot.helper.mirror_utils.status_utils.rclone_status import RcloneStatus
+from bot.helper.mirror_utils.status_utils.queue_status import QueueStatus
+from bot.helper.mirror_utils.rclone_utils.transfer import RcloneTransferHelper
+
 
 async def add_rclone_download(rc_path, config_path, path, name, listener):
     remote, rc_path = rc_path.split(':', 1)
@@ -27,8 +28,12 @@ async def add_rclone_download(rc_path, config_path, path, name, listener):
             msg = f'Error: While getting rclone stat/size. Path: {remote}:{rc_path}. Stderr: {err[:4000]}'
             await sendMessage(listener.message, msg)
         return
-    rstat = loads(res1[0])
-    rsize = loads(res2[0])
+    try:
+        rstat = loads(res1[0])
+        rsize = loads(res2[0])
+    except Exception as err:
+        await sendMessage(listener.message, f'RcloneDownload JsonLoad: {err}')
+        return
     if rstat['IsDir']:
         if not name:
             name = rc_path.rsplit('/', 1)[-1] if rc_path else remote
@@ -62,7 +67,7 @@ async def add_rclone_download(rc_path, config_path, path, name, listener):
     RCTransfer = RcloneTransferHelper(listener, name)
     async with download_dict_lock:
         download_dict[listener.uid] = RcloneStatus(
-            RCTransfer, listener.message, gid, 'dl', listener.extra_details)
+            RCTransfer, listener.message, gid, 'dl', listener.upload_details)
     async with queue_dict_lock:
         non_queued_dl.add(listener.uid)
 

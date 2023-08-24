@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 from asyncio import sleep
 
-from bot import LOGGER, QbTorrents, get_client, qb_listener_lock
-from bot.helper.ext_utils.bot_utils import (MirrorStatus,
-                                            get_readable_file_size,
-                                            get_readable_time, sync_to_async)
+from bot import LOGGER, get_client, QbTorrents, qb_listener_lock
+from bot.helper.ext_utils.bot_utils import MirrorStatus, get_readable_file_size, get_readable_time, sync_to_async
 
 
 def get_download(client, tag):
@@ -13,9 +11,7 @@ def get_download(client, tag):
     except Exception as e:
         LOGGER.error(
             f'{e}: Qbittorrent, while getting torrent info. Tag: {tag}')
-
-
-engine_ = "qBittorrent"
+        return None
 
 
 class QbittorrentStatus:
@@ -23,15 +19,15 @@ class QbittorrentStatus:
     def __init__(self, listener, seeding=False, queued=False):
         self.__client = get_client()
         self.__listener = listener
+        self.upload_details = listener.upload_details
         self.__info = get_download(self.__client, f'{self.__listener.uid}')
         self.queued = queued
         self.seeding = seeding
         self.message = listener.message
-        self.extra_details = self.__listener.extra_details
-        self.engine = engine_
 
     def __update(self):
-        if new_info := get_download(self.__client, f'{self.__listener.uid}'):
+        new_info = get_download(self.__client, f'{self.__listener.uid}')
+        if new_info is not None:
             self.__info = new_info
 
     def progress(self):
@@ -116,9 +112,9 @@ class QbittorrentStatus:
                 LOGGER.info(f"Cancelling Download: {self.__info.name}")
                 msg = 'Download stopped by user!'
             await sleep(0.3)
-            await self.__listener.onDownloadError(msg)
             await sync_to_async(self.__client.torrents_delete, torrent_hashes=self.__info.hash, delete_files=True)
             await sync_to_async(self.__client.torrents_delete_tags, tags=self.__info.tags)
             async with qb_listener_lock:
                 if self.__info.tags in QbTorrents:
                     del QbTorrents[self.__info.tags]
+            await self.__listener.onDownloadError(msg)
