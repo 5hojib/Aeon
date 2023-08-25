@@ -19,7 +19,7 @@ from aiofiles.os import path as aiopath, remove as aioremove
 from aiofiles import open as aiopen
 from psutil import disk_usage, cpu_percent, swap_memory, cpu_count, cpu_freq, virtual_memory, net_io_counters, boot_time
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
-from pyrogram.filters import command, private, regex, new_chat_members
+from pyrogram.filters import command, private, regex
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot import bot, config_dict, user_data, botStartTime, LOGGER, Interval, DATABASE_URL, QbInterval, INCOMPLETE_TASK_NOTIFIER, scheduler, bot_name
@@ -32,7 +32,7 @@ from .helper.telegram_helper.filters import CustomFilters
 from .helper.telegram_helper.button_build import ButtonMaker
 from .helper.listeners.aria2_listener import start_aria2_listener
 from .helper.themes import BotTheme
-from .modules import authorize, clone, gd_count, gd_delete, gd_list, cancel_mirror, mirror_leech, status, torrent_search, torrent_select, ytdlp, rss, shell, eval, users_settings, bot_settings, speedtest, save_msg, images, mediainfo, broadcast, gen_pyro_sess
+from .modules import authorize, clone, gd_count, gd_delete, gd_list, cancel_mirror, mirror_leech, status, torrent_search, torrent_select, ytdlp, rss, shell, eval, users_settings, bot_settings, speedtest, images, mediainfo, broadcast
 
 @new_thread
 async def stats(_, message):
@@ -307,18 +307,6 @@ async def restart_notification():
         await aioremove(".restartmsg")
 
 
-@new_task
-async def new_mem(_, message):
-    buttons = ButtonMaker()
-    buttons.ubutton('Join', 'https://t.me/LunaMirrorLeech')
-    buttons.ubutton('Owner', 'https://t.me/JuniorXcientist')
-    a  = f"• Hello there {message.from_user.first_name}.\n"
-    a += f"• Welcome to {message.chat.title}.\n"
-    a += f"• Read pin post."
-    x = await sendMessage(message, a, buttons.build_menu(2))#, 'https://graph.org/file/f34e0aaf6f61256532932.png')
-    await deleteMessage(message)
-    await one_minute_del(x)
-
 async def main():
     await gather(start_cleanup(), torrent_search.initiate_search_tools(), restart_notification(), search_images(), set_commands(bot))
     await sync_to_async(start_aria2_listener, wait=False)
@@ -338,7 +326,6 @@ async def main():
     bot.add_handler(MessageHandler(stats, filters=command(
         BotCommands.StatsCommand) & CustomFilters.authorized))
     bot.add_handler(CallbackQueryHandler(wzmlxcb, filters=regex(r'^wzmlx')))
-    bot.add_handler(MessageHandler(new_mem, filters=new_chat_members))
     LOGGER.info("Bot Started!")
     signal(SIGINT, exit_clean_up)
 

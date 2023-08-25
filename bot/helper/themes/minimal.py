@@ -56,7 +56,6 @@ class style:
     
     # ----- BUTTONS -------
     CLOUD_LINK     =  'Cloud Link'
-    SAVE_MSG       =  'Save Message'
     RCLONE_LINK    =  'Rclone Link'
     SOURCE_URL     =  'Source Link'
     INDEX_LINK     =  'Index Link'

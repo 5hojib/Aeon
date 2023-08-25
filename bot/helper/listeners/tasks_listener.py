@@ -134,9 +134,9 @@ class MirrorLeechListener:
             self.source_msg = f"<code>{self.source_url}</code>"
         
     async def onDownloadStart(self):
-        if config_dict['LINKS_LOG_ID']:
+        if config_dict['LEECH_LOG_ID']:
             source = self.source_msg
-            self.linkslogmsg = await sendCustomMsg(config_dict['LINKS_LOG_ID'], BotTheme('LINKS_START', Mode=self.upload_details['mode'], Tag=self.tag) + source)
+            self.linkslogmsg = await sendCustomMsg(config_dict['LEECH_LOG_ID'], BotTheme('LINKS_START', Mode=self.upload_details['mode'], Tag=self.tag) + source)
         user_dict = user_data.get(self.message.from_user.id, {})
         if config_dict['BOT_PM'] or user_dict.get('bot_pm'):
             self.botpmmsg = await sendCustomMsg(self.message.from_user.id, BotTheme('L_PM_START'))

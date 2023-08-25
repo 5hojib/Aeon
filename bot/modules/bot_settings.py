@@ -41,7 +41,7 @@ default_values = {'DEFAULT_UPLOAD': 'gd',
                   'IMG_PAGE': 1,
                   'TORRENT_TIMEOUT': 3000
                   }
-bool_vars = ['AS_DOCUMENT', 'BOT_PM', 'STOP_DUPLICATE', 'SET_COMMANDS', 'SAVE_MSG', 'SHOW_MEDIAINFO', 'SOURCE_LINK',
+bool_vars = ['AS_DOCUMENT', 'BOT_PM', 'STOP_DUPLICATE', 'SET_COMMANDS', 'SHOW_MEDIAINFO', 'SOURCE_LINK',
              'IS_TEAM_DRIVE', 'USE_SERVICE_ACCOUNTS', 'WEB_PINCODE', 'EQUAL_SPLITS']
 
 
@@ -145,8 +145,8 @@ async def load_config():
     if CAP_FONT.strip() not in ['', 'b', 'i', 'u', 's', 'spoiler', 'code']:
         CAP_FONT = 'code'
         
-    LINKS_LOG_ID = environ.get('LINKS_LOG_ID', '')
-    LINKS_LOG_ID = '' if len(LINKS_LOG_ID) == 0 else int(LINKS_LOG_ID)
+    LEECH_LOG_ID = environ.get('LEECH_LOG_ID', '')
+    LEECH_LOG_ID = '' if len(LEECH_LOG_ID) == 0 else int(LEECH_LOG_ID)
     
     SEARCH_PLUGINS = environ.get('SEARCH_PLUGINS', '')
     if len(SEARCH_PLUGINS) == 0:
@@ -174,9 +174,9 @@ async def load_config():
     SEARCH_LIMIT = environ.get('SEARCH_LIMIT', '')
     SEARCH_LIMIT = 0 if len(SEARCH_LIMIT) == 0 else int(SEARCH_LIMIT)
 
-    LEECH_LOG_ID = environ.get('LEECH_LOG_ID', '')
-    if len(LEECH_LOG_ID) == 0: 
-        LEECH_LOG_ID = ''
+    LEECH_DUMP_ID = environ.get('LEECH_DUMP_ID', '')
+    if len(LEECH_DUMP_ID) == 0: 
+        LEECH_DUMP_ID = ''
 
     RSS_CHAT_ID = environ.get('RSS_CHAT_ID', '')
     RSS_CHAT_ID = '' if len(RSS_CHAT_ID) == 0 else int(RSS_CHAT_ID)
@@ -342,9 +342,6 @@ async def load_config():
     IMAGES = (IMAGES.replace("'", '').replace('"', '').replace(
         '[', '').replace(']', '').replace(",", "")).split()
 
-    SAVE_MSG = environ.get('SAVE_MSG', '')
-    SAVE_MSG = SAVE_MSG.lower() == 'true'
-
     SET_COMMANDS = environ.get('SET_COMMANDS', '')
     SET_COMMANDS = SET_COMMANDS.lower() == 'true'
     
@@ -409,7 +406,7 @@ async def load_config():
                         'USER_MAX_TASKS': USER_MAX_TASKS,
                         'PLAYLIST_LIMIT': PLAYLIST_LIMIT,
                         'MIRROR_LOG_ID': MIRROR_LOG_ID,
-                        'LEECH_LOG_ID': LEECH_LOG_ID,
+                        'LEECH_DUMP_ID': LEECH_DUMP_ID,
                         'BOT_PM': BOT_PM,
                         'IMAGES': IMAGES,
                         'IMG_SEARCH': IMG_SEARCH,
@@ -420,7 +417,7 @@ async def load_config():
                         'INCOMPLETE_TASK_NOTIFIER': INCOMPLETE_TASK_NOTIFIER,
                         'INDEX_URL': INDEX_URL,
                         'IS_TEAM_DRIVE': IS_TEAM_DRIVE,
-                        'LINKS_LOG_ID': LINKS_LOG_ID,
+                        'LEECH_LOG_ID': LEECH_LOG_ID,
                         'LEECH_SPLIT_SIZE': LEECH_SPLIT_SIZE,
                         'TOKEN_TIMEOUT': TOKEN_TIMEOUT,
                         'MEDIA_GROUP': MEDIA_GROUP,
@@ -438,7 +435,6 @@ async def load_config():
                         'RCLONE_SERVE_PORT': RCLONE_SERVE_PORT,
                         'RSS_CHAT_ID': RSS_CHAT_ID,
                         'RSS_DELAY': RSS_DELAY,
-                        'SAVE_MSG': SAVE_MSG,
                         'SEARCH_API_LINK': SEARCH_API_LINK,
                         'SEARCH_LIMIT': SEARCH_LIMIT,
                         'SEARCH_PLUGINS': SEARCH_PLUGINS,
@@ -532,7 +528,7 @@ async def edit_variable(_, message, pre_message, key):
     elif key == 'DOWNLOAD_DIR':
         if not value.endswith('/'):
             value += '/'
-    elif key in ['LINKS_LOG_ID', 'RSS_CHAT_ID']:
+    elif key in ['LEECH_LOG_ID', 'RSS_CHAT_ID']:
         value = int(value)
     elif key == 'STATUS_UPDATE_INTERVAL':
         value = int(value)

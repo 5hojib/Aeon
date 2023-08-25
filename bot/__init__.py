@@ -216,8 +216,8 @@ else:
 BOT_MAX_TASKS = environ.get('BOT_MAX_TASKS', '')
 BOT_MAX_TASKS = int(BOT_MAX_TASKS) if BOT_MAX_TASKS.isdigit() else ''
 
-LINKS_LOG_ID = environ.get('LINKS_LOG_ID', '')
-LINKS_LOG_ID = '' if len(LINKS_LOG_ID) == 0 else int(LINKS_LOG_ID)
+LEECH_LOG_ID = environ.get('LEECH_LOG_ID', '')
+LEECH_LOG_ID = '' if len(LEECH_LOG_ID) == 0 else int(LEECH_LOG_ID)
 
 YT_DLP_OPTIONS = environ.get('YT_DLP_OPTIONS', '')
 if len(YT_DLP_OPTIONS) == 0:
@@ -226,9 +226,9 @@ if len(YT_DLP_OPTIONS) == 0:
 SEARCH_LIMIT = environ.get('SEARCH_LIMIT', '')
 SEARCH_LIMIT = 0 if len(SEARCH_LIMIT) == 0 else int(SEARCH_LIMIT)
 
-LEECH_LOG_ID = environ.get('LEECH_LOG_ID', '')
-if len(LEECH_LOG_ID) == 0: 
-    LEECH_LOG_ID = ''
+LEECH_DUMP_ID = environ.get('LEECH_DUMP_ID', '')
+if len(LEECH_DUMP_ID) == 0: 
+    LEECH_DUMP_ID = ''
 
 CMD_SUFFIX = environ.get('CMD_SUFFIX', '')
 
@@ -370,9 +370,6 @@ IMG_SEARCH = (IMG_SEARCH.replace("'", '').replace('"', '').replace(
 IMG_PAGE = environ.get('IMG_PAGE', '')
 IMG_PAGE = 1 if not IMG_PAGE else int(IMG_PAGE)
 
-SAVE_MSG = environ.get('SAVE_MSG', '')
-SAVE_MSG = SAVE_MSG.lower() == 'true'
-
 SET_COMMANDS = environ.get('SET_COMMANDS', '')
 SET_COMMANDS = SET_COMMANDS.lower() == 'true'
 
@@ -403,7 +400,7 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'USER_MAX_TASKS': USER_MAX_TASKS,
                'PLAYLIST_LIMIT': PLAYLIST_LIMIT,
                'MIRROR_LOG_ID': MIRROR_LOG_ID,
-               'LEECH_LOG_ID': LEECH_LOG_ID,
+               'LEECH_DUMP_ID': LEECH_DUMP_ID,
                'BOT_PM': BOT_PM,
                'IMAGES': IMAGES,
                'IMG_SEARCH': IMG_SEARCH,
@@ -414,7 +411,7 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'INCOMPLETE_TASK_NOTIFIER': INCOMPLETE_TASK_NOTIFIER,
                'INDEX_URL': INDEX_URL,
                'IS_TEAM_DRIVE': IS_TEAM_DRIVE,
-               'LINKS_LOG_ID': LINKS_LOG_ID,
+               'LEECH_LOG_ID': LEECH_LOG_ID,
                'LEECH_SPLIT_SIZE': LEECH_SPLIT_SIZE,
                'TOKEN_TIMEOUT': TOKEN_TIMEOUT,
                'MEDIA_GROUP': MEDIA_GROUP,
@@ -432,7 +429,6 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'RCLONE_SERVE_PORT': RCLONE_SERVE_PORT,
                'RSS_CHAT_ID': RSS_CHAT_ID,
                'RSS_DELAY': RSS_DELAY,
-               'SAVE_MSG': SAVE_MSG,
                'SEARCH_API_LINK': SEARCH_API_LINK,
                'SEARCH_LIMIT': SEARCH_LIMIT,
                'SEARCH_PLUGINS': SEARCH_PLUGINS,

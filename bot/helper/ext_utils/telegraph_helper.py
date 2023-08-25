@@ -77,6 +77,6 @@ class TelegraphHelper:
         return
 
 
-telegraph = TelegraphHelper('Luna Mirror', 'https://t.me/LunaMirrorLeech')
+telegraph = TelegraphHelper('Aeon', 'https://t.me/ProjectAeon')
 
 bot_loop.run_until_complete(telegraph.create_account())

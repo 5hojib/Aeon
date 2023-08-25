@@ -62,8 +62,6 @@ class TgUploader:
                 buttons.ubutton(BotTheme('MEDIAINFO_LINK'), await get_mediainfo_link(up_path))
         except Exception as e:
             LOGGER.error(f"MediaInfo Error: {str(e)}")
-        if config_dict['SAVE_MSG'] and (config_dict['LEECH_LOG_ID'] or not self.__listener.isPrivate):
-            buttons.ibutton(BotTheme('SAVE_MSG'), 'save', 'footer')
         return buttons.build_menu(1) if self.__has_buttons else None
 
     async def __copy_file(self):
@@ -72,7 +70,7 @@ class TgUploader:
                 destination = 'Bot PM'
                 copied = await bot.copy_message(chat_id=self.__user_id, from_chat_id=self.__sent_msg.chat.id, message_id=self.__sent_msg.id, reply_to_message_id=self.__listener.botpmmsg.id) 
                 if self.__has_buttons:
-                    rply = (InlineKeyboardMarkup(BTN) if (BTN := self.__sent_msg.reply_markup.inline_keyboard[:-1]) else None) if config_dict['SAVE_MSG'] else self.__sent_msg.reply_markup
+                    rply = self.__sent_msg.reply_markup
                     try:
                         await copied.edit_reply_markup(rply)
                     except MessageNotModified:
@@ -97,7 +95,7 @@ class TgUploader:
                     try:
                         dump_copy = await bot.copy_message(chat_id=chat.id, from_chat_id=self.__sent_msg.chat.id, message_id=self.__sent_msg.id)
                         if self.__has_buttons:
-                            rply = (InlineKeyboardMarkup(BTN) if (BTN := self.__sent_msg.reply_markup.inline_keyboard[:-1]) else None) if config_dict['SAVE_MSG'] else self.__sent_msg.reply_markup
+                            rply = self.__sent_msg.reply_markup
                             try:
                                 await dump_copy.edit_reply_markup(rply)
                             except MessageNotModified:
@@ -125,28 +123,28 @@ class TgUploader:
         self.__bot_pm = config_dict['BOT_PM'] or user_dict.get('bot_pm')
         self.__mediainfo = config_dict['SHOW_MEDIAINFO'] or user_dict.get('mediainfo')
         self.__ldump = user_dict.get('ldump', '') or ''
-        self.__has_buttons = bool(config_dict['SAVE_MSG'] or self.__mediainfo)
+        self.__has_buttons = bool(self.__mediainfo)
         if not await aiopath.exists(self.__thumb):
             self.__thumb = None
 
     async def __msg_to_reply(self):
         msg_link = self.__listener.message.link if self.__listener.isSuperGroup else ''
         msg_user = self.__listener.message.from_user
-        if config_dict['LEECH_LOG_ID']:
+        if config_dict['LEECH_DUMP_ID']:
             try:
                 if self.__listener.source_url:
                     sbtn = ButtonMaker()
                     sbtn.ubutton('Source', self.__listener.source_url)
-                    self.__leechmsg = await sendMultiMessage(config_dict['LEECH_LOG_ID'], BotTheme('L_LOG_START', mention=msg_user.mention(style='HTML'), uid=msg_user.id, msg_link=self.__listener.source_url), sbtn.build_menu(1))
+                    self.__leechmsg = await sendMultiMessage(config_dict['LEECH_DUMP_ID'], BotTheme('L_LOG_START', mention=msg_user.mention(style='HTML'), uid=msg_user.id, msg_link=self.__listener.source_url), sbtn.build_menu(1))
                 else:
-                    self.__leechmsg = await sendMultiMessage(config_dict['LEECH_LOG_ID'], BotTheme('L_LOG_START', mention=msg_user.mention(style='HTML'), uid=msg_user.id, msg_link=self.__listener.source_url))
+                    self.__leechmsg = await sendMultiMessage(config_dict['LEECH_DUMP_ID'], BotTheme('L_LOG_START', mention=msg_user.mention(style='HTML'), uid=msg_user.id, msg_link=self.__listener.source_url))
             except Exception as er:
                 await self.__listener.onUploadError(str(er))
                 return False
             self.__sent_msg = list(self.__leechmsg.values())[0]
         elif IS_PREMIUM_USER:
             if not self.__listener.isSuperGroup:
-                await self.__listener.onUploadError('Use SuperGroup to leech with User Client! or Set LEECH_LOG_ID to Leech in PM')
+                await self.__listener.onUploadError('Use SuperGroup to leech with User Client! or Set LEECH_DUMP_ID to Leech in PM')
                 return False
             self.__sent_msg = self.__listener.message
         else:
@@ -216,7 +214,7 @@ class TgUploader:
                 del self.__msgs_dict[msg.link]
             await deleteMessage(msg)
         del self.__media_dict[key][subkey]
-        if self.__listener.isSuperGroup or config_dict['LEECH_LOG_ID']:
+        if self.__listener.isSuperGroup or config_dict['LEECH_DUMP_ID']:
             for m in msgs_list:
                 self.__msgs_dict[m.link] = m.caption
         self.__sent_msg = msgs_list[-1]
@@ -281,7 +279,7 @@ class TgUploader:
                         isDeleted = True
                     if self.__is_cancelled:
                         return
-                    if not self.__is_corrupted and (self.__listener.isSuperGroup or config_dict['LEECH_LOG_ID']):
+                    if not self.__is_corrupted and (self.__listener.isSuperGroup or config_dict['LEECH_DUMP_ID']):
                         self.__msgs_dict[self.__sent_msg.link] = file_
                     await sleep(1)
                 except Exception as err:
