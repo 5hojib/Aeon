@@ -8,30 +8,7 @@ class style:
     ST_MSG = '''This bot can mirror all your links|files|torrents to Google Drive or any rclone cloud or to telegram.
 <b>Type {help_command} to get a list of available commands</b>'''
     ST_BOTPM = '''Now, This bot will send all your files and links here. Start Using ...'''
-    ST_UNAUTH = '''You Are not authorized user!'''
-    # ---------------------
-
-    # async def restart(client, message): ---> __main__.py
-    RESTARTING = 'Restarting...'
-    # ---------------------
-
-    # async def restart_notification(): ---> __main__.py
-    RESTART_SUCCESS = '''Restarted Successfully!
-
-<b>Date:</b> {date}
-<b>Time:</b> {time}'''
-    RESTARTED = '''Bot Restarted!'''
-    # ---------------------
-
-    # async def ping(client, message): ---> __main__.py
-    PING = 'Starting Ping...'
-    PING_VALUE = '{value} ms'
-    # ---------------------
-
-    # async def __msg_to_reply(self): ---> pyrogramEngine.py
-    L_PM_START =          "<b>Task started</b>"
-    L_LOG_START =         "<b>Task started</b>\n\n<b>• User:</b> {mention}\n<b>• ID:</b> <code>{uid}</code>"
-
+    
     # async def onUploadComplete(): ---> tasks_listener.py
     NAME =                '{Name}\n\n'
     SIZE =                '<b>• Size: </b>{Size}\n'

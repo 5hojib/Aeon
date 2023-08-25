@@ -102,7 +102,7 @@ async def start(client, message):
     elif config_dict['BOT_PM']:
         await sendMessage(message, BotTheme('ST_BOTPM'), photo='IMAGES')
     else:
-        await sendMessage(message, BotTheme('ST_UNAUTH'), photo='IMAGES')
+        await sendMessage(message, 'You Are not authorized user!', photo='IMAGES')
     await DbManger().update_pm_users(message.from_user.id)
 
 async def token_callback(_, query):
@@ -119,7 +119,7 @@ async def token_callback(_, query):
     await query.edit_message_reply_markup(InlineKeyboardMarkup(kb))
     
 async def restart(client, message):
-    restart_message = await sendMessage(message, BotTheme('RESTARTING'))
+    restart_message = await sendMessage(message, 'Restarting...')
     if scheduler.running:
         scheduler.shutdown(wait=False)
     for interval in [QbInterval, Interval]:
@@ -136,9 +136,10 @@ async def restart(client, message):
 
 async def ping(_, message):
     start_time = int(round(time() * 1000))
-    reply = await sendMessage(message, BotTheme('PING'))
+    reply = await sendMessage(message, 'Starting ping...')
     end_time = int(round(time() * 1000))
-    await editMessage(reply, BotTheme('PING_VALUE', value=(end_time - start_time)))
+    value=(end_time - start_time)
+    await editMessage(reply, f'{value} ms.')
 
 
 @new_task
@@ -267,7 +268,10 @@ async def bot_help(client, message):
 
 
 async def restart_notification():
-    now=datetime.now(timezone('Asia/Dhaka'))
+    now = datetime.now(timezone('Asia/Dhaka'))
+    date = now.strftime('%d/%m/%y')
+    time = now.strftime('%I:%M:%S %p')
+    rmsg = f'Restarted Successfully!\n\n<b>Date:</b> {date}\n<b>Time:</b> {time}'
     if await aiopath.isfile(".restartmsg"):
         with open(".restartmsg") as f:
             chat_id, msg_id = map(int, f)
@@ -276,19 +280,18 @@ async def restart_notification():
 
     async def send_incompelete_task_message(cid, msg):
         try:
-            if msg.startswith(BotTheme('RESTART_SUCCESS')):
+            if msg.startswith(rmsg):
                 await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text=msg)
                 await aioremove(".restartmsg")
             else:
-                await bot.send_message(chat_id=cid, text=msg, disable_web_page_preview=True,
-                                       disable_notification=True)
+                await bot.send_message(chat_id=cid, text=msg, disable_web_page_preview=True, disable_notification=True)
         except Exception as e:
             LOGGER.error(e)
 
     if INCOMPLETE_TASK_NOTIFIER and DATABASE_URL:
         if notifier_dict := await DbManger().get_incomplete_tasks():
             for cid, data in notifier_dict.items():
-                msg = BotTheme('RESTART_SUCCESS', time=now.strftime('%I:%M:%S %p'), date=now.strftime('%d/%m/%y'))if cid == chat_id else BotTheme('RESTARTED')
+                msg = rmsg if cid == chat_id else 'Bot restarted!'
                 for tag, links in data.items():
                     msg += f"\n\n{tag}: "
                     for index, link in enumerate(links, start=1):
@@ -301,7 +304,7 @@ async def restart_notification():
 
     if await aiopath.isfile(".restartmsg"):
         try:
-            await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text=BotTheme('RESTART_SUCCESS', time=now.strftime('%I:%M:%S %p'), date=now.strftime('%d/%m/%y')))
+            await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text=rmsg)
         except:
             pass
         await aioremove(".restartmsg")

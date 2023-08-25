@@ -139,7 +139,7 @@ class MirrorLeechListener:
             self.linkslogmsg = await sendCustomMsg(config_dict['LEECH_LOG_ID'], BotTheme('LINKS_START', Mode=self.upload_details['mode'], Tag=self.tag) + source)
         user_dict = user_data.get(self.message.from_user.id, {})
         if config_dict['BOT_PM'] or user_dict.get('bot_pm'):
-            self.botpmmsg = await sendCustomMsg(self.message.from_user.id, BotTheme('L_PM_START'))
+            self.botpmmsg = await sendCustomMsg(self.message.from_user.id, '<b>Task started</b>')
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
             await DbManger().add_incomplete_task(self.message.chat.id, self.message.link, self.tag)
 
