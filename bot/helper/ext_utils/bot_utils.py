@@ -262,7 +262,7 @@ async def turn_page(data):
 
 
 def get_readable_time(seconds):
-    periods = [('cosmic year', 31557600000000000), ('galactic year', 225000000000000000), ('aeon', 31536000000000000), ('epoch', 315360000000), ('millennium', 31536000000), ('century', 3153600000), ('decade', 315360000), ('year', 31536000), ('month', 2592000), ('week', 604800), ('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
+    periods = [('millennium', 31536000000), ('century', 3153600000), ('decade', 315360000), ('year', 31536000), ('month', 2592000), ('week', 604800), ('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
     result = ''
     for period_name, period_seconds in periods:
         if seconds >= period_seconds:
@@ -355,7 +355,7 @@ async def get_content_type(url):
 
 
 def update_user_ldata(id_, key=None, value=None):
-    exception_keys = ['is_sudo', 'is_auth', 'dly_tasks']
+    exception_keys = ['is_sudo', 'is_auth']
     if not key and not value:
         if id_ in user_data:
             updated_data = {k: v for k, v in user_data[id_].items() if k in exception_keys}
@@ -444,7 +444,7 @@ def checking_access(user_id, button=None):
 
 
 def format_validity_time(seconds):
-    periods = [('cosmic year', 31557600000000000), ('galactic year', 225000000000000000), ('aeon', 31536000000000000), ('epoch', 315360000000), ('millennium', 31536000000), ('century', 3153600000), ('decade', 315360000), ('year', 31536000), ('month', 2592000), ('week', 604800), ('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
+    periods = [('millennium', 31536000000), ('century', 3153600000), ('decade', 315360000), ('year', 31536000), ('month', 2592000), ('week', 604800), ('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
     result = ''
     for period_name, period_seconds in periods:
         if seconds >= period_seconds:

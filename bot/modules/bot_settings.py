@@ -39,9 +39,10 @@ default_values = {'DEFAULT_UPLOAD': 'gd',
                   'UPSTREAM_BRANCH': 'main',
                   'BOT_LANG': 'en',
                   'IMG_PAGE': 1,
+                  'TORRENT_TIMEOUT': 3000
                   }
 bool_vars = ['AS_DOCUMENT', 'BOT_PM', 'STOP_DUPLICATE', 'SET_COMMANDS', 'SAVE_MSG', 'SHOW_MEDIAINFO', 'SOURCE_LINK',
-             'IS_TEAM_DRIVE', 'USE_SERVICE_ACCOUNTS', 'WEB_PINCODE', 'EQUAL_SPLITS', 'DISABLE_DRIVE_LINK']
+             'IS_TEAM_DRIVE', 'USE_SERVICE_ACCOUNTS', 'WEB_PINCODE', 'EQUAL_SPLITS']
 
 
 async def load_config():
@@ -188,6 +189,7 @@ async def load_config():
     USER_SESSION_STRING = environ.get('USER_SESSION_STRING', '')
 
     TORRENT_TIMEOUT = environ.get('TORRENT_TIMEOUT', '')
+    TORRENT_TIMEOUT = 3000 if len(TORRENT_TIMEOUT) == 0 else int(TORRENT_TIMEOUT)
     downloads = aria2.get_downloads()
     if len(TORRENT_TIMEOUT) == 0:
         for download in downloads:
