@@ -529,7 +529,7 @@ class MirrorLeechListener:
             else:
                 msg += f'<b>• Path: </b><code>{rclonePath}</code>/n'
                 button = None
-            msg += f'<b>• Uploaded by: {self.tag}\n'
+            msg += f'<b>• Uploaded by: </b>{self.tag}\n'
             msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n\n'
 
             if config_dict['MIRROR_LOG_ID']:
