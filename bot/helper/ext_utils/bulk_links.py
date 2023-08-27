@@ -1,11 +1,15 @@
+#!/usr/bin/env python3
 import re
 from aiofiles import open as aiopen
 from aiofiles.os import remove
 
+async def extract_links_from_text(text):
+    pattern = r'\bhttps?://\S+\b'
+    links = re.findall(pattern, text)
+    return links
 
-async def get_links_from_message(text):
-    links_list = re.findall(r'\bhttps?://\S+\b', text)
-    links_list = [item.strip() for item in links_list if len(item) != 0]
+async def get_links_from_message(text, bulk_start, bulk_end):
+    links_list = await extract_links_from_text(text)
 
     if bulk_start != 0 and bulk_end != 0:
         links_list = links_list[bulk_start:bulk_end]
@@ -15,7 +19,6 @@ async def get_links_from_message(text):
         links_list = links_list[:bulk_end]
 
     return links_list
-
 
 async def get_links_from_file(message, bulk_start, bulk_end):
     links_list = []
@@ -23,19 +26,12 @@ async def get_links_from_file(message, bulk_start, bulk_end):
 
     async with aiopen(text_file_dir, 'r+') as f:
         lines = await f.readlines()
-        links_list.extend(line.strip() for line in lines if len(line) != 0)
-
-    if bulk_start != 0 and bulk_end != 0:
-        links_list = links_list[bulk_start:bulk_end]
-    elif bulk_start != 0:
-        links_list = links_list[bulk_start:]
-    elif bulk_end != 0:
-        links_list = links_list[:bulk_end]
+        text = ''.join(lines)
+        links_list.extend(await get_links_from_message(text, bulk_start, bulk_end))
 
     await remove(text_file_dir)
 
     return links_list
-
 
 async def extract_bulk_links(message, bulk_start, bulk_end):
     bulk_start = int(bulk_start)
