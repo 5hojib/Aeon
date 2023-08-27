@@ -4,7 +4,7 @@ from aiofiles import open as aiopen
 from aiofiles.os import remove
 
 async def extract_links_from_text(text):
-    pattern = r'\bhttps?://\S+\b'
+    pattern = r'(https?://\S+)'
     links = re.findall(pattern, text)
     return links
 

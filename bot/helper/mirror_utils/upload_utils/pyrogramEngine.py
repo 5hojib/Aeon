@@ -14,7 +14,6 @@ from natsort import natsorted
 from aioshutil import copy
 
 from bot import config_dict, user_data, GLOBAL_EXTENSION_FILTER, bot, user, IS_PREMIUM_USER
-from bot.helper.themes import BotTheme
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import sendCustomMsg, sendMultiMessage, chat_info
 from bot.helper.ext_utils.fs_utils import clean_unwanted, is_archive, get_base_name
@@ -59,7 +58,7 @@ class TgUploader:
         buttons = ButtonMaker()
         try:
             if self.__mediainfo:
-                buttons.ubutton(BotTheme('MEDIAINFO_LINK'), await get_mediainfo_link(up_path))
+                buttons.ubutton('MediaInfo', await get_mediainfo_link(up_path))
         except Exception as e:
             LOGGER.error(f"MediaInfo Error: {str(e)}")
         return buttons.build_menu(1) if self.__has_buttons else None

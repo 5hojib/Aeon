@@ -34,7 +34,6 @@ from bot.helper.mirror_utils.rclone_utils.transfer import RcloneTransferHelper
 from bot.helper.telegram_helper.message_utils import sendCustomMsg, sendMessage, editMessage, delete_all_messages, delete_links, sendMultiMessage, update_all_messages, deleteMessage, five_minute_del
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.db_handler import DbManger
-from bot.helper.themes import BotTheme
 
 
 class MirrorLeechListener:
@@ -418,29 +417,30 @@ class MirrorLeechListener:
         msg += f'<b>• Size: </b>{get_readable_file_size(size)}\n'
         msg += f'<b>• Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n'
         msg += f'<b>• Mode: </b>{self.upload_details["mode"]}\n'
+        lmsg = '<b>Files are sent. Access via links</b>'
         LOGGER.info(f'Task Done: {name}')
         buttons = ButtonMaker()
         if self.isLeech:
-            msg += BotTheme('L_TOTAL_FILES', Files=folders)
+            msg += f'<b>• Total files: </b>{folders}\n'
             if mime_type != 0:
-                msg += BotTheme('L_CORRUPTED_FILES', Corrupt=mime_type)
-            msg += BotTheme('L_CC', Tag=self.tag)
-            msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n'
+                msg += f'<b>• Corrupted files: </b>{mime_type}\n'
+            msg += f'<b>• Leeched by: </b>{self.tag}\n'
+            msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n\n'
             if not files:
                 if self.isPrivate:
-                    msg += BotTheme('PM_BOT_MSG')
+                    msg += '<b>Files are send above</b>'
                 await sendMessage(self.message, msg, photo=self.random_pic)
             else:
                 attachmsg = True
                 fmsg, totalmsg = '\n\n', ''
                 for index, (link, name) in enumerate(files.items(), start=1):
                     fmsg += f"{index}. <a href='{link}'>{name}</a>\n"
-                    totalmsg = (msg + BotTheme('L_LL_MSG') + fmsg) if attachmsg else fmsg
+                    totalmsg = (msg + lmsg + fmsg) if attachmsg else fmsg
                     if len(totalmsg.encode()) > 3900:
                         if self.linkslogmsg:
                             sbtn = ButtonMaker()
                             if self.source_url:
-                                sbtn.ubutton(BotTheme('SOURCE_URL'), self.source_url)
+                                sbtn.ubutton('Source link', self.source_url)
                                 await editMessage(self.linkslogmsg, totalmsg, sbtn.build_menu(1))
                                 await sendMessage(self.botpmmsg,  totalmsg, sbtn.build_menu(1))
                             else:
@@ -448,7 +448,7 @@ class MirrorLeechListener:
                                 await sendMessage(self.botpmmsg,  totalmsg)
                             self.linkslogmsg = await sendMessage(self.linkslogmsg, "<i>Fetching Details...</i>")
                         elif not (config_dict['BOT_PM'] or user_dict.get('bot_pm')):
-                            await sendMessage(self.message, msg + BotTheme('L_LL_MSG') + fmsg)
+                            await sendMessage(self.message, msg + lmsg + fmsg)
                         attachmsg = False
                         await sleep(1)
                         fmsg = '\n\n'
@@ -456,36 +456,36 @@ class MirrorLeechListener:
                     if self.linkslogmsg:
                         sbtn = ButtonMaker()
                         if self.source_url:
-                            sbtn.ubutton(BotTheme('SOURCE_URL'), self.source_url)
-                            await sendMessage(self.linkslogmsg, msg + BotTheme('L_LL_MSG') + fmsg, sbtn.build_menu(1))
+                            sbtn.ubutton('Source link', self.source_url)
+                            await sendMessage(self.linkslogmsg, msg + lmsg + fmsg, sbtn.build_menu(1))
                             await deleteMessage(self.linkslogmsg)
                         else:
-                            await sendMessage(self.linkslogmsg, msg + BotTheme('L_LL_MSG') + fmsg)
+                            await sendMessage(self.linkslogmsg, msg + lmsg + fmsg)
                             await deleteMessage(self.linkslogmsg)
                     elif not (config_dict['BOT_PM'] or user_dict.get('bot_pm')):
-                        await sendMessage(self.message, msg + BotTheme('L_LL_MSG') + fmsg, buttons.build_menu(1))
+                        await sendMessage(self.message, msg + lmsg + fmsg, buttons.build_menu(1))
                 btn = ButtonMaker()
                 if config_dict['BOT_PM'] or user_dict.get('bot_pm'):
                     sbtn = ButtonMaker()
                     if self.source_url and config_dict['SOURCE_LINK']:
-                        sbtn.ubutton(BotTheme('SOURCE_URL'), self.source_url)
-                        await sendMessage(self.botpmmsg, msg + BotTheme('L_LL_MSG') + fmsg, sbtn.build_menu(1))
+                        sbtn.ubutton('Source link', self.source_url)
+                        await sendMessage(self.botpmmsg, msg + lmsg + fmsg, sbtn.build_menu(1))
                     else:
-                        await sendMessage(self.botpmmsg, msg + BotTheme('L_LL_MSG') + fmsg)
+                        await sendMessage(self.botpmmsg, msg + lmsg + fmsg)
                     await deleteMessage(self.botpmmsg)
                     if self.isSuperGroup:
-                        btn.ibutton(BotTheme('CHECK_PM'), f"wzmlx {user_id} botpm", 'header')
+                        btn.ibutton('View in inbox', f"wzmlx {user_id} botpm", 'header')
                         if self.source_url and config_dict['SOURCE_LINK']:
-                            btn.ubutton(BotTheme('SOURCE_URL'), self.source_url)
+                            btn.ubutton('Source link', self.source_url)
                         btn = extra_btns(btn)
-                        await sendMessage(self.message, msg + BotTheme('L_BOT_MSG'), btn.build_menu(1))
+                        await sendMessage(self.message, msg + '<b>Files has been sent to your inbox</b>', btn.build_menu(1))
                     else:
                         await deleteMessage(self.botpmmsg)
                 elif self.linkslogmsg:
                     if self.source_url:
-                        btn.ubutton(BotTheme('SOURCE_URL'), self.source_url)
+                        btn.ubutton('Source link', self.source_url)
                     btn = extra_btns(btn)
-                    await sendMessage(self.message, msg + BotTheme('L_LL_MSG'), btn.build_menu(1), self.random_pic)
+                    await sendMessage(self.message, msg + lmsg, btn.build_menu(1), self.random_pic)
                     
             if self.seed:
                 if self.newDir:
@@ -496,23 +496,23 @@ class MirrorLeechListener:
                 await start_from_queued()
                 return
         else:
-            msg += BotTheme('M_TYPE', Mimetype=mime_type)
+            msg += f'<b>• Type: </b>{mime_type}\n'
             if mime_type == "Folder":
-                msg += BotTheme('M_SUBFOLD', Folder=folders)
-                msg += BotTheme('TOTAL_FILES', Files=files)
+                msg += f'<b>• SubFolders: </b>{folders}\n'
+                msg += f'<b>• Files: </b>{files}\n'
             if link or rclonePath and config_dict['RCLONE_SERVE_URL']:
 
                 if link:
-                    buttons.ubutton(BotTheme('CLOUD_LINK'), link)
+                    buttons.ubutton('Cloud link', link)
                 else:
-                    msg += BotTheme('RCPATH', RCpath=rclonePath)
+                    msg += f'<b>• Path: </b><code>{rclonePath}</code>\n'
                 if rclonePath and (RCLONE_SERVE_URL := config_dict['RCLONE_SERVE_URL']):
                     remote, path = rclonePath.split(':', 1)
                     url_path = rutils.quote(f'{path}')
                     share_url = f'{RCLONE_SERVE_URL}/{remote}/{url_path}'
                     if mime_type == "Folder":
                         share_url += '/'
-                    buttons.ubutton(BotTheme('RCLONE_LINK'), share_url)
+                    buttons.ubutton('Rclone link', share_url)
                 elif not rclonePath:
                     INDEX_URL = self.index_link if self.drive_id else config_dict['INDEX_URL']
                     if INDEX_URL:
@@ -520,17 +520,17 @@ class MirrorLeechListener:
                         share_url = f'{INDEX_URL}/{url_path}'
                         if mime_type == "Folder":
                             share_url += '/'
-                            buttons.ubutton(BotTheme('INDEX_LINK'), share_url)
+                            buttons.ubutton('Index link', share_url)
                         else:
-                            buttons.ubutton(BotTheme('INDEX_LINK'), share_url)
+                            buttons.ubutton('Index link', share_url)
 
                 buttons = extra_btns(buttons)
                 button = buttons.build_menu(2)
             else:
-                msg += BotTheme('RCPATH', RCpath=rclonePath)
+                msg += f'<b>• Path: </b><code>{rclonePath}</code>/n'
                 button = None
-            msg += BotTheme('M_CC', Tag=self.tag)
-            msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n'
+            msg += f'<b>• Uploaded by: {self.tag}\n'
+            msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n\n'
 
             if config_dict['MIRROR_LOG_ID']:
                 buttonss = button
@@ -543,16 +543,16 @@ class MirrorLeechListener:
                 await sendMessage(self.botpmmsg, msg, button, self.random_pic)
                 await deleteMessage(self.botpmmsg)
                 if self.isSuperGroup:
-                    buttons.ibutton(BotTheme('CHECK_PM'), f"wzmlx {user_id} botpm", 'header')
+                    buttons.ibutton('View in inbox', f"wzmlx {user_id} botpm", 'header')
                     if self.source_url and config_dict['SOURCE_LINK']:
-                        buttons.ubutton(BotTheme('SOURCE_URL'), self.source_url)
+                        buttons.ubutton('Source link', self.source_url)
                     buttons = extra_btns(buttons)
-                    await sendMessage(self.message, msg + BotTheme('M_BOT_MSG'), buttons.build_menu(1))
+                    await sendMessage(self.message, msg + '<b>Links has been sent to your inbox</b>', buttons.build_menu(1))
                 else:
                     await deleteMessage(self.botpmmsg)
             elif self.linkslogmsg:
                 if self.source_url and config_dict['SOURCE_LINK']:
-                    buttons.ubutton(BotTheme('SOURCE_URL'), self.source_url)
+                    buttons.ubutton('Source link', self.source_url)
                 buttons = extra_btns(buttons)
                 await sendMessage(self.message, msg, buttons.build_menu(1), self.random_pic)
 

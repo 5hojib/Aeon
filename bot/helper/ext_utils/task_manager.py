@@ -6,7 +6,6 @@ from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.ext_utils.fs_utils import get_base_name, check_storage_threshold
 from bot.helper.ext_utils.bot_utils import get_user_tasks, sync_to_async, get_telegraph_list, get_readable_file_size, checking_access
 from bot.helper.telegram_helper.message_utils import forcesub, BotPm_check, user_info
-from bot.helper.themes import BotTheme
 
 
 async def stop_duplicate_check(name, listener):

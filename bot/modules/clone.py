@@ -23,7 +23,6 @@ from bot.helper.mirror_utils.rclone_utils.transfer import RcloneTransferHelper
 from bot.helper.ext_utils.help_messages import CLONE_HELP_MESSAGE
 from bot.helper.mirror_utils.status_utils.rclone_status import RcloneStatus
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
-from bot.helper.themes import BotTheme
 
 
 async def rcloneNode(client, message, link, dst_path, rcf, tag):
@@ -142,7 +141,7 @@ async def gdcloneNode(message, link, listen_up):
             LOGGER.info('Checking File/Folder if already in Drive...')
             telegraph_content, contents_no = await sync_to_async(gd.drive_list, name, True, True)
             if telegraph_content:
-                msg = BotTheme('STOP_DUPLICATE', content=contents_no)
+                msg = f'File/Folder is already available in Drive.\nHere are {contents_no} list results:'
                 button = await get_telegraph_list(telegraph_content)
                 await sendMessage(message, msg, button)
                 return
