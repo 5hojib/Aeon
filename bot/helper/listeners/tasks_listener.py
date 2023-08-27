@@ -417,7 +417,7 @@ class MirrorLeechListener:
         msg = f'{escape(name)}\n\n',
         msg += f'<b>• Size: </b>{get_readable_file_size(size)}\n'
         msg += f'<b>• Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n'
-        msg += f'<b>• Mode: </b>{self.upload_details['mode']}\n'
+        msg += f'<b>• Mode: </b>{self.upload_details["mode"]}\n'
         msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n'
         LOGGER.info(f'Task Done: {name}')
         buttons = ButtonMaker()
