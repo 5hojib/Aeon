@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 class style:
-    LINKS_START = 
-
     # ----- LEECH -------
     L_TOTAL_FILES =       '<b>• Total files: </b>{Files}\n'
     L_CORRUPTED_FILES =   '<b>• Corrupted files: </b>{Corrupt}\n'
@@ -27,9 +25,6 @@ class style:
     CHECK_PM       =  'View in inbox'
     MEDIAINFO_LINK =  'Media Info'
     # ---------------------
-
-    # USER Setting --> user_setting.py 
-    USER_SETTING = 
 
     UNIVERSAL = '''<b>Universal Settings for {NAME}</b>
 
