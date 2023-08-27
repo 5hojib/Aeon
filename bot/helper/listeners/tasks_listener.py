@@ -418,7 +418,6 @@ class MirrorLeechListener:
         msg += f'<b>• Size: </b>{get_readable_file_size(size)}\n'
         msg += f'<b>• Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n'
         msg += f'<b>• Mode: </b>{self.upload_details["mode"]}\n'
-        msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n'
         LOGGER.info(f'Task Done: {name}')
         buttons = ButtonMaker()
         if self.isLeech:
@@ -426,6 +425,7 @@ class MirrorLeechListener:
             if mime_type != 0:
                 msg += BotTheme('L_CORRUPTED_FILES', Corrupt=mime_type)
             msg += BotTheme('L_CC', Tag=self.tag)
+            msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n'
             if not files:
                 if self.isPrivate:
                     msg += BotTheme('PM_BOT_MSG')
@@ -530,6 +530,7 @@ class MirrorLeechListener:
                 msg += BotTheme('RCPATH', RCpath=rclonePath)
                 button = None
             msg += BotTheme('M_CC', Tag=self.tag)
+            msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n'
 
             if config_dict['MIRROR_LOG_ID']:
                 buttonss = button
