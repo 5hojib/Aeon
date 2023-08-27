@@ -34,10 +34,10 @@ async def _list_drive(key, message, item_type, isRecursive):
         except Exception as e:
             await editMessage(message, e)
             return
-        msg = BotTheme('LIST_FOUND', NO=contents_no, NAME=key)
+        msg = f'<b>Found {contents_no} result for </b>{key}'
         await editMessage(message, msg, button)
     else:
-        await editMessage(message, BotTheme('LIST_NOT_FOUND', NAME=key))
+        await editMessage(message, f'<b>No result found for </b>{key}')
 
 
 @new_task
@@ -59,7 +59,7 @@ async def select_type(_, query):
     await query.answer()
     item_type = data[2]
     isRecursive = eval(data[3])
-    await editMessage(message, BotTheme('LIST_SEARCHING', NAME=key))
+    await editMessage(message, f'<b>Searching for </b>{key}...')
     await _list_drive(key, message, item_type, isRecursive)
 
 @new_task

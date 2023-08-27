@@ -24,20 +24,21 @@ async def countNode(_, message):
         link = reply_to.text.split(maxsplit=1)[0].strip()
 
     if is_gdrive_link(link):
-        msg = await sendMessage(message, BotTheme('COUNT_MSG', LINK=link))
+        msg = await sendMessage(message, f'<b>Counting:</b> <code>{link}</code>')
         gd = GoogleDriveHelper()
         name, mime_type, size, files, folders = await sync_to_async(gd.count, link)
         if mime_type is None:
             await sendMessage(message, name)
             return
         await deleteMessage(msg)
-        msg = BotTheme('COUNT_NAME', COUNT_NAME=name)
-        msg += BotTheme('COUNT_SIZE', COUNT_SIZE=get_readable_file_size(size))
-        msg += BotTheme('COUNT_TYPE', COUNT_TYPE=mime_type)
+        msg  = f'{name}\n\n'
+        msg += f'<b>• Size: </b>{get_readable_file_size(size)}\n'
+        msg += f'<b>• Type: </b>{mime_type}\n'
         if mime_type == 'Folder':
-            msg += BotTheme('COUNT_SUB', COUNT_SUB=folders)
-            msg += BotTheme('COUNT_FILE', COUNT_FILE=files)
-        msg += BotTheme('COUNT_CC', COUNT_CC=tag)
+            msg += f'<b>• SubFolders: </b>{folders}\n'
+            msg += f'<b>• Files: </b>{files}\n'
+        msg += f'<b>• Counted by: </b>{tag}\n'
+        msg += f'<b>• User ID: </b><code>{message.from_user.id}</code>\n'
     else:
         msg = 'Send Gdrive link along with command or by replying to the link by command'
     await sendMessage(message, msg)

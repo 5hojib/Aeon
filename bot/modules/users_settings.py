@@ -60,7 +60,7 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         if user_dict and any(key in user_dict for key in ['prefix', 'suffix', 'remname', 'ldump', 'yt_opt', 'bot_pm', 'media_group', 'equal_splits', 'split_size', 'rclone', 'thumb', 'as_doc']):
             buttons.ibutton("Reset Setting", f"userset {user_id} reset_all")
         buttons.ibutton("Close", f"userset {user_id} close")
-        text = BotTheme('USER_SETTING', NAME=name)
+        text = f'<b>User Settings for {name}</b>'
         button = buttons.build_menu(2)
         
     elif key == 'universal':

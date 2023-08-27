@@ -136,7 +136,12 @@ class MirrorLeechListener:
     async def onDownloadStart(self):
         if config_dict['LEECH_LOG_ID']:
             source = self.source_msg
-            self.linkslogmsg = await sendCustomMsg(config_dict['LEECH_LOG_ID'], BotTheme('LINKS_START', Mode=self.upload_details['mode'], Tag=self.tag) + source)
+            msg = f"""<b>Task Started</b>
+
+<b>• Mode:</b> {self.upload_details['mode']}
+<b>• Task by:</b> {self.tag}
+<b>• User ID: </b><code>{self.message.from_user.id}</code>"""
+            self.linkslogmsg = await sendCustomMsg(config_dict['LEECH_LOG_ID'], msg + source)
         user_dict = user_data.get(self.message.from_user.id, {})
         if config_dict['BOT_PM'] or user_dict.get('bot_pm'):
             self.botpmmsg = await sendCustomMsg(self.message.from_user.id, '<b>Task started</b>')
@@ -409,10 +414,11 @@ class MirrorLeechListener:
         user_id = self.message.from_user.id
         name, _ = await format_filename(name, user_id, isMirror=not self.isLeech)
         user_dict = user_data.get(user_id, {})
-        msg = BotTheme('NAME', Name=escape(name))
-        msg += BotTheme('SIZE', Size=get_readable_file_size(size))
-        msg += BotTheme('ELAPSE', Time=get_readable_time(time() - self.message.date.timestamp()))
-        msg += BotTheme('MODE', Mode=self.upload_details['mode'])
+        msg = f'{escape(name)}\n\n',
+        msg += f'<b>• Size: </b>{get_readable_file_size(size)}\n'
+        msg += f'<b>• Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n'
+        msg += f'<b>• Mode: </b>{self.upload_details['mode']}\n'
+        msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n'
         LOGGER.info(f'Task Done: {name}')
         buttons = ButtonMaker()
         if self.isLeech:
