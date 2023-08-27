@@ -4,7 +4,7 @@ from aiofiles.os import remove
 
 
 async def get_links_from_message(text, bulk_start, bulk_end):
-    links_list = re.findall(r'\bhttps?://\S+\b', text)
+    links_list = re.findall(r'\b\d+\.\s*https?://\S+\b', text)
     links_list = [item.strip() for item in links_list if len(item) != 0]
 
     if bulk_start != 0 and bulk_end != 0:
