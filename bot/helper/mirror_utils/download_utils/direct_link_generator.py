@@ -1,16 +1,19 @@
+from base64 import b64decode
 from http.cookiejar import MozillaCookieJar
 from json import loads
 from os import path
 from re import findall, match, search, sub
 from time import sleep
-from urllib.parse import quote, unquote, urlparse, parse_qs
+from urllib.parse import parse_qs, quote, unquote, urlparse
 from uuid import uuid4
+
 from bs4 import BeautifulSoup
 from cloudscraper import create_scraper
 from lk21 import Bypass
 from lxml import etree
+from requests import Session
 
-from bot import config_dict
+from bot import LOGGER, config_dict
 from bot.helper.ext_utils.bot_utils import get_readable_time, is_share_link
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 
@@ -27,8 +30,11 @@ def direct_link_generator(link: str):
     if not domain:
         raise DirectDownloadLinkException("ERROR: Invalid URL")
     if 'youtube.com' in domain or 'youtu.be' in domain:
-        raise DirectDownloadLinkException(
-            "ERROR: Use ytdl cmds for Youtube links")
+        raise DirectDownloadLinkException("ERROR: Use ytdl cmds for Youtube links")
+    elif 'gofile.io' in domain:
+        return gofile_dl(link)
+    elif any(x in domain for x in ['send.cm', 'desiupload.co']):
+        return nURL_resolver(link)
     elif 'yadi.sk' in domain or 'disk.yandex.com' in domain:
         return yandex_disk(link)
     elif 'mediafire.com' in domain:
@@ -71,7 +77,7 @@ def direct_link_generator(link: str):
         return wetransfer(link)
     elif any(x in domain for x in anonfilesBaseSites):
         return anonfilesBased(link)
-    elif any(x in domain for x in ['terabox', 'nephobox', '4funbox', 'mirrobox', '1024tera', 'momerybox', 'teraboxapp']):
+    elif any(x in domain for x in ['terabox', 'nephobox', '4funbox', 'mirrobox', 'momerybox', 'teraboxapp', '1024tera']):
         return terabox(link)
     elif any(x in domain for x in fmed_list):
         return fembed(link)
@@ -85,9 +91,51 @@ def direct_link_generator(link: str):
         else:
             return sharer_scraper(link)
     else:
-        raise DirectDownloadLinkException(
-            f'No Direct link function found for {link}')
+        raise DirectDownloadLinkException(f'No Direct link function found for {link}')
 
+
+def gofile_dl(url: str):
+    rget = Session()
+    resp = rget.get('https://api.gofile.io/createAccount')
+    if resp.status_code == 200:
+        data = resp.json()
+        if data['status'] == 'ok' and data.get('data', {}).get('token', None):
+            token = data['data']['token']
+        else:
+            raise DirectDownloadLinkException(f'ERROR: Failed to Create GoFile Account')
+    else:
+        raise DirectDownloadLinkException(f'ERROR: GoFile Server Response Failed')
+    headers = f'Cookie: accountToken={token}'
+    def getNextedFolder(contentId, path):
+        params = {'contentId': contentId, 'token': token, 'websiteToken': '7fd94ds12fds4'}
+        res = rget.get('https://api.gofile.io/getContent', params=params)
+        if res.status_code == 200:
+            json_data = res.json()
+            if json_data['status'] == 'ok':
+                links = {}
+                for content in json_data['data']['contents'].values():
+                    if content["type"] == "folder":
+                        path = path+"/"+content['name']
+                        links.update(getNextedFolder(content['id'], path))
+                    elif content["type"] == "file":
+                        links[content['link']] = path
+                return links
+            else:
+                raise DirectDownloadLinkException(f'ERROR: Failed to Receive All Files List')
+        else:
+            raise DirectDownloadLinkException(f'ERROR: GoFile Server Response Failed')
+    return [getNextedFolder(url[url.rfind('/')+1:], ""), headers]
+
+
+def nURL_resolver(url: str):
+    cget = create_scraper().request
+    resp = cget('GET', f"https://nurlresolver.netlify.app/.netlify/functions/server/resolve?q={url}&m=&r=false").json()
+    if len(resp) == 0:
+        raise DirectDownloadLinkException(f'ERROR: Failed to extract Direct Link!')
+    headers = ""
+    for header, value in (resp[0].get("headers", {})).items():
+        headers = f"{header}: {value}"
+    return [resp[0].get("link"), headers]
 
 def yandex_disk(url: str) -> str:
     try:
@@ -99,8 +147,7 @@ def yandex_disk(url: str) -> str:
     try:
         return cget('get', api.format(link)).json()['href']
     except KeyError:
-        raise DirectDownloadLinkException(
-            "ERROR: File not found/Download limit reached")
+        raise DirectDownloadLinkException("ERROR: File not found/Download limit reached")
 
 
 def uptobox(url: str) -> str:
@@ -113,7 +160,7 @@ def uptobox(url: str) -> str:
     cget = create_scraper().request
     try:
         file_id = findall(r'\bhttps?://.*uptobox\.com/(\w+)', url)[0]
-        if UPTOBOX_TOKEN := config_dict.get('UPTOBOX_TOKEN'):
+        if UPTOBOX_TOKEN := config_dict['UPTOBOX_TOKEN']:
             file_link = f'https://uptobox.com/api/link?token={UPTOBOX_TOKEN}&file_code={file_id}'
         else:
             file_link = f'https://uptobox.com/api/link?file_code={file_id}'
@@ -458,23 +505,40 @@ def terabox(url) -> str:
         raise DirectDownloadLinkException("ERROR: terabox.txt not found")
     session = create_scraper()
     try:
-        res = session.request('GET', url)
-        key = res.url.split('?surl=')[-1]
         jar = MozillaCookieJar('terabox.txt')
         jar.load()
+        cookie_string = ''.join(f'{cookie.name}={cookie.value}; ' for cookie in jar)
         session.cookies.update(jar)
+        res = session.request('GET', url)
+        key = res.url.split('?surl=')[-1]
+        soup = BeautifulSoup(res.content, 'lxml')
+        jsToken = None
+        for fs in soup.find_all('script'):
+            fstring = fs.string
+            if fstring and fstring.startswith('try {eval(decodeURIComponent'):
+                jsToken = fstring.split('%22')[1]
+        headers = {"Cookie": cookie_string}
         res = session.request(
-            'GET', f'https://www.terabox.com/share/list?app_id=250528&shorturl={key}&root=1')
-        result = res.json()['list']
+            'GET', f'https://www.terabox.com/share/list?app_id=250528&jsToken={jsToken}&shorturl={key}&root=1', headers=headers)
+        result = res.json()
     except Exception as e:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
+    if result['errno'] != 0: raise DirectDownloadLinkException(f"ERROR: '{result['errmsg']}' Check cookies")
+    result = result['list']
     if len(result) > 1:
         raise DirectDownloadLinkException(
             "ERROR: Can't download mutiple files")
     result = result[0]
+    
     if result['isdir'] != '0':
         raise DirectDownloadLinkException("ERROR: Can't download folder")
-    return result['dlink']
+    
+    try:
+        dlink = result['dlink']
+    except Exception as e:
+        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}, Check cookies")
+
+    return dlink
 
 
 def filepress(url):
@@ -499,30 +563,36 @@ def filepress(url):
 def gdtot(url):
     cget = create_scraper().request
     try:
-        res = cget('GET', f'https://gdbot.xyz/file/{url.split("/")[-1]}')
+        res = cget('GET', f'https://gdtot.pro/file/{url.split("/")[-1]}')
     except Exception as e:
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
-    token_url = etree.HTML(res.content).xpath(
-        "//a[contains(@class,'inline-flex items-center justify-center')]/@href")
+    token_url = etree.HTML(res.content).xpath("//a[contains(@class,'inline-flex items-center justify-center')]/@href")
     if not token_url:
         try:
             url = cget('GET', url).url
             p_url = urlparse(url)
-            res = cget(
-                "GET", f"{p_url.scheme}://{p_url.hostname}/ddl/{url.split('/')[-1]}")
+            res = cget("GET", f"{p_url.scheme}://{p_url.hostname}/ddl/{url.split('/')[-1]}")
         except Exception as e:
             raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
         if (drive_link := findall(r"myDl\('(.*?)'\)", res.text)) and "drive.google.com" in drive_link[0]:
             return drive_link[0]
+        elif config_dict['GDTOT_CRYPT']:
+            cget('GET', url, cookies={'crypt': config_dict['GDTOT_CRYPT']})
+            p_url = urlparse(url)
+            js_script = cget('GET', f"{p_url.scheme}://{p_url.hostname}/dld?id={url.split('/')[-1]}")
+            g_id = findall('gd=(.*?)&', js_script.text)
+            try:
+                decoded_id = b64decode(str(g_id[0])).decode('utf-8')
+            except:
+                raise DirectDownloadLinkException("ERROR: Try in your browser, mostly file not found or user limit exceeded!")
+            return f'https://drive.google.com/open?id={decoded_id}'
         else:
-            raise DirectDownloadLinkException(
-                'ERROR: Drive Link not found, Try in your broswer')
+            raise DirectDownloadLinkException('ERROR: Drive Link not found, Try in your broswer! GDTOT_CRYPT not Provided, it increases efficiency!')
     token_url = token_url[0]
     try:
         token_page = cget('GET', token_url)
     except Exception as e:
-        raise DirectDownloadLinkException(
-            f'ERROR: {e.__class__.__name__} with {token_url}')
+        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__} with {token_url}')
     path = findall('\("(.*?)"\)', token_page.text)
     if not path:
         raise DirectDownloadLinkException('ERROR: Cannot bypass this')
@@ -580,7 +650,6 @@ def sharer_scraper(url):
         raise DirectDownloadLinkException(
             'ERROR: Drive Link not found, Try in your broswer')
 
-
 def wetransfer(url):
     cget = create_scraper().request
     try:
@@ -624,13 +693,11 @@ def shrdsk(url):
     cget = create_scraper().request
     try:
         url = cget('GET', url).url
-        res = cget(
-            'GET', f'https://us-central1-affiliate2apk.cloudfunctions.net/get_data?shortid={url.split("/")[-1]}')
+        res = cget('GET', f'https://us-central1-affiliate2apk.cloudfunctions.net/get_data?shortid={url.split("/")[-1]}')
     except Exception as e:
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
     if res.status_code != 200:
-        raise DirectDownloadLinkException(
-            f'ERROR: Status Code {res.status_code}')
+        raise DirectDownloadLinkException(f'ERROR: Status Code {res.status_code}')
     res = res.json()
     if ("type" in res and res["type"].lower() == "upload" and "video_url" in res):
         return res["video_url"]
@@ -641,8 +708,7 @@ def linkbox(url):
     cget = create_scraper().request
     try:
         url = cget('GET', url).url
-        res = cget(
-            'GET', f'https://www.linkbox.to/api/file/detail?itemId={url.split("/")[-1]}').json()
+        res = cget('GET', f'https://www.linkbox.to/api/file/detail?itemId={url.split("/")[-1]}').json()
     except Exception as e:
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
     if 'data' not in res:
@@ -656,8 +722,14 @@ def linkbox(url):
     if 'url' not in itemInfo:
         raise DirectDownloadLinkException('ERROR: url not found in itemInfo!!')
     if "name" not in itemInfo:
-        raise DirectDownloadLinkException(
-            'ERROR: Name not found in itemInfo!!')
+        raise DirectDownloadLinkException('ERROR: Name not found in itemInfo!!')
     name = quote(itemInfo["name"])
     raw = itemInfo['url'].split("/", 3)[-1]
     return f'https://wdl.nuplink.net/{raw}&filename={name}'
+
+
+def route_intercept(route, request):
+    if request.resource_type == 'script':
+        route.abort()
+    else:
+        route.continue_()

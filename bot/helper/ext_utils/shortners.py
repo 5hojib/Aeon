@@ -6,16 +6,16 @@ from urllib.parse import quote
 from cloudscraper import create_scraper
 from urllib3 import disable_warnings
 
-from bot import LOGGER, shorteneres_list
+from bot import LOGGER, shorteners_list
 
 
 def short_url(longurl, attempt=0):
-    if not shorteneres_list:
+    if not shorteners_list:
         return longurl
     if attempt >= 4:
         return longurl
-    i = 0 if len(shorteneres_list) == 1 else randrange(len(shorteneres_list))
-    _shorten_dict = shorteneres_list[i]
+    i = 0 if len(shorteners_list) == 1 else randrange(len(shorteners_list))
+    _shorten_dict = shorteners_list[i]
     _shortener = _shorten_dict['domain']
     _shortener_api =  _shorten_dict['api_key']
     cget = create_scraper().request
@@ -39,7 +39,7 @@ def short_url(longurl, attempt=0):
         elif "ouo.io" in _shortener:
             return cget('GET', f'http://ouo.io/api/{_shortener_api}?s={longurl}', verify=False).text
         elif "cutt.ly" in _shortener:
-            return cget('GET', f'http://cutt.ly/api/api.php?key={_shortener_api}&short={longurl}', verify=False).json()['url']['shortLink']
+            return cget('GET', f'http://cutt.ly/api/api.php?key={_shortener_api}&short={longurl}').json()['url']['shortLink']
         else:
             res = cget('GET', f'https://{_shortener}/api?api={_shortener_api}&url={quote(longurl)}').json()
             shorted = res['shortenedUrl']

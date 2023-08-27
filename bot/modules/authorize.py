@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
+from pyrogram.filters import command
 
-from bot import DATABASE_URL, bot, user_data
-from bot.helper.ext_utils.bot_utils import update_user_ldata
-from bot.helper.ext_utils.db_handler import DbManger
-from bot.helper.telegram_helper.bot_commands import BotCommands
-from bot.helper.telegram_helper.filters import CustomFilters
+from bot import user_data, DATABASE_URL, bot
 from bot.helper.telegram_helper.message_utils import sendMessage
+from bot.helper.telegram_helper.filters import CustomFilters
+from bot.helper.telegram_helper.bot_commands import BotCommands
+from bot.helper.ext_utils.db_handler import DbManger
+from bot.helper.ext_utils.bot_utils import update_user_ldata
 
 
-async def authorize(_, message):
+async def authorize(client, message):
     msg = message.text.split()
     if len(msg) > 1:
         id_ = int(msg[1].strip())
@@ -28,7 +28,7 @@ async def authorize(_, message):
     await sendMessage(message, msg)
 
 
-async def unauthorize(_, message):
+async def unauthorize(client, message):
     msg = message.text.split()
     if len(msg) > 1:
         id_ = int(msg[1].strip())
@@ -46,7 +46,7 @@ async def unauthorize(_, message):
     await sendMessage(message, msg)
 
 
-async def addSudo(_, message):
+async def addSudo(client, message):
     id_ = ""
     msg = message.text.split()
     if len(msg) > 1:
@@ -66,7 +66,7 @@ async def addSudo(_, message):
     await sendMessage(message, msg)
 
 
-async def removeSudo(_, message):
+async def removeSudo(client, message):
     id_ = ""
     msg = message.text.split()
     if len(msg) > 1:

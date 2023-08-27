@@ -1,28 +1,17 @@
 #!/usr/bin/env python3
-from aiofiles.os import path as aiopath
-from aiofiles.os import remove as aioremove
+from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.filters import command, regex
-from pyrogram.handlers import CallbackQueryHandler, MessageHandler
+from aiofiles.os import remove as aioremove, path as aiopath
 
-from bot import LOGGER, aria2, bot, download_dict, download_dict_lock
-from bot.helper.ext_utils.bot_utils import (MirrorStatus, bt_selection_buttons,
-                                            getDownloadByGid, sync_to_async)
+from bot import bot, aria2, download_dict, download_dict_lock, OWNER_ID, user_data, LOGGER
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import (anno_checker, isAdmin,
-                                                      request_limiter,
-                                                      sendMessage,
-                                                      sendStatusMessage)
+from bot.helper.telegram_helper.message_utils import sendMessage, sendStatusMessage
+from bot.helper.ext_utils.bot_utils import getDownloadByGid, MirrorStatus, bt_selection_buttons, sync_to_async
 
 
 async def select(client, message):
-    if not message.from_user:
-        message.from_user = await anno_checker(message)
-    if not message.from_user:
-        return
     user_id = message.from_user.id
-    if not await isAdmin(message, user_id) and await request_limiter(message):
-        return
     msg = message.text.split()
     if len(msg) > 1:
         gid = msg[1]
@@ -37,14 +26,14 @@ async def select(client, message):
             await sendMessage(message, "This is not an active task!")
             return
     elif len(msg) == 1:
-        msg = ("Reply to an active /{cmd} which was used to start the qb-download or add gid along with cmd\n\n"
+        msg = ("Reply to an active /cmd which was used to start the qb-download or add gid along with cmd\n\n"
                + "This command mainly for selection incase you decided to select files from already added torrent. "
-               + "But you can always use /{mir} with arg `s` to select files before download start."
-               .format_map({'cmd': BotCommands.BtSelectCommand, 'mir': BotCommands.MirrorCommand[0]}))
+               + "But you can always use /cmd with arg `s` to select files before download start.")
         await sendMessage(message, msg)
         return
 
-    if not await CustomFilters.sudo(client, message) and dl.message.from_user.id != user_id:
+    if OWNER_ID != user_id and dl.message.from_user.id != user_id and \
+       (user_id not in user_data or not user_data[user_id].get('is_sudo')):
         await sendMessage(message, "This task is not for you!")
         return
     if dl.status() not in [MirrorStatus.STATUS_DOWNLOADING, MirrorStatus.STATUS_PAUSED, MirrorStatus.STATUS_QUEUEDL]:
@@ -74,9 +63,8 @@ async def select(client, message):
         await sendMessage(message, "This is not a bittorrent task!")
         return
 
-    SBUTTONS = bt_selection_buttons(id_, False)
-    msg = f"<b>Name</b>: <code>{dl.name()}</code>\n\nYour download paused. Choose files then press Done Selecting button to resume downloading." \
-        "\n<b><i>Your download will not start automatically</i></b>"
+    SBUTTONS = bt_selection_buttons(id_)
+    msg = "Your download paused. Choose files then press Done Selecting button to resume downloading."
     await sendMessage(message, msg, SBUTTONS)
 
 
@@ -94,7 +82,7 @@ async def get_confirm(client, query):
     else:
         await query.answer("Not in download state anymore! Keep this message to resume the seed if seed enabled!", show_alert=True)
         return
-    if user_id != listener.message.from_user.id and not await CustomFilters.sudo(client, query):
+    if user_id != listener.message.from_user.id and not await CustomFilters.sudo_user(client, query):
         await query.answer("This task is not for you!", show_alert=True)
     elif data[1] == "pin":
         await query.answer(data[3], show_alert=True)
@@ -129,14 +117,12 @@ async def get_confirm(client, query):
                 try:
                     await sync_to_async(aria2.client.unpause, id_)
                 except Exception as e:
-                    LOGGER.error(
-                        f"{e} Error in resume, this mostly happens after abuse aria2. Try to use select cmd again!")
+                    LOGGER.error(f"{e} Error in resume, this mostly happens after abuse aria2. Try to use select cmd again!")
         await sendStatusMessage(message)
         await message.delete()
     elif data[1] == "rm":
         await query.answer()
-        obj = dl.download()
-        await obj.cancel_download()
+        await (dl.download()).cancel_download()
         await message.delete()
 
 

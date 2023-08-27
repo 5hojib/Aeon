@@ -1,43 +1,30 @@
 #!/usr/bin/env python3
-from asyncio import Event, sleep, wait_for, wrap_future
+from pyrogram.handlers import MessageHandler, CallbackQueryHandler
+from pyrogram.filters import command, regex, user
+from asyncio import sleep, wait_for, Event, wrap_future
+from aiohttp import ClientSession
+from aiofiles.os import path as aiopath
+from yt_dlp import YoutubeDL
 from functools import partial
-from re import split as re_split
 from time import time
 
-from aiofiles.os import path as aiopath
-from aiohttp import ClientSession
-from pyrogram.filters import command, regex, user
-from pyrogram.handlers import CallbackQueryHandler, MessageHandler
-from yt_dlp import YoutubeDL
-
-from bot import (DOWNLOAD_DIR, IS_PREMIUM_USER, LOGGER, bot, config_dict, categories_dict,
-                 user_data)
-from bot.helper.ext_utils.bot_utils import (get_readable_file_size,
-                                            get_readable_time, is_gdrive_link,
-                                            is_rclone_path, is_url, new_task,
-                                            new_thread, sync_to_async)
-from bot.helper.ext_utils.help_messages import YT_HELP_MESSAGE
-from bot.helper.jmdkh_utils import none_admin_utils, stop_duplicate_tasks
-from bot.helper.listeners.tasks_listener import MirrorLeechListener
+from bot import DOWNLOAD_DIR, bot, config_dict, user_data, LOGGER
+from bot.helper.ext_utils.task_manager import task_utils
+from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, delete_links, deleteMessage, one_minute_del, five_minute_del, isAdmin
+from bot.helper.telegram_helper.button_build import ButtonMaker
+from bot.helper.ext_utils.bot_utils import get_readable_file_size, fetch_user_tds, is_url, is_gdrive_link, new_task, sync_to_async, new_task, is_rclone_path, new_thread, get_readable_time, arg_parser
 from bot.helper.mirror_utils.download_utils.yt_dlp_download import YoutubeDLHelper
 from bot.helper.mirror_utils.rclone_utils.list import RcloneList
-from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.bot_commands import BotCommands
-from bot.helper.telegram_helper.button_build import ButtonMaker
+from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import (auto_delete_message, anno_checker,
-                                                      delete_links,
-                                                      editMessage, isAdmin,
-                                                      isBot_canDm,
-                                                      open_category_btns,
-                                                      request_limiter,
-                                                      sendLogMessage,
-                                                      sendMessage)
+from bot.helper.listeners.tasks_listener import MirrorLeechListener
+from bot.helper.ext_utils.help_messages import YT_HELP_MESSAGE
 from bot.helper.ext_utils.bulk_links import extract_bulk_links
 
 
 @new_task
-async def select_format(client, query, obj):
+async def select_format(_, query, obj):
     data = query.data.split()
     message = query.message
     await query.answer()
@@ -172,7 +159,7 @@ class YtSelection:
         self.__reply_to = await sendMessage(self.__message, msg, self.__main_buttons)
         await wrap_future(future)
         if not self.is_cancelled:
-            await self.__reply_to.delete()
+            await deleteMessage(self.__reply_to)
         return self.qual
 
     async def back_to_main(self):
@@ -253,77 +240,76 @@ async def _mdisk(link, name):
 
 
 @new_task
-async def _ytdl(client, message, isZip=False, isLeech=False, sameDir=None, bulk=[]):
-    mssg = message.text
+async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
+    text = message.text.split('\n')
+    input_list = text[0].split(' ')
     qual = ''
-    select = False
-    multi = 0
-    link = ''
-    folder_name = ''
-    bulk_start = 0
-    bulk_end = 0
-    is_bulk = False
-    index = 1
+    arg_base = {'link': '', 
+                '-i': 0, 
+                '-m': '', '-sd': '', '-samedir': '',
+                '-s': False, '-select': False,
+                '-opt': '', '-options': '',
+                '-b': False, '-bulk': False,
+                '-n': '', '-name': '',
+                '-z': False, '-zip': False,
+                '-up': '', '-upload': False,
+                '-rcf': '',
+                '-id': '',
+                '-index': '',
+    }
 
-    args = mssg.split(maxsplit=4)
-    args.pop(0)
-    raw_url = None
-    drive_id = None
-    index_link = None
-    if len(args) > 0:
-        for x in args:
-            x = x.strip()
-            if x == 's':
-                select = True
-                index += 1
-            elif x.strip().isdigit():
-                multi = int(x)
-                mi = index
-                index += 1
-            elif x.startswith('m:'):
-                marg = x.split('m:', 1)
-                index += 1
-                if len(marg) > 1:
-                    folder_name = f'/{marg[1]}'
-            elif x == 'b':
-                is_bulk = True
-                bi = index
-                index += 1
-            elif x.startswith('b:'):
-                is_bulk = True
-                bi = index
-                index += 1
-                dargs = x.split(':')
-                bulk_start = dargs[1] or 0
-                if len(dargs) == 3:
-                    bulk_end = dargs[2] or 0
-            else:
-                break
-        if multi == 0 or len(bulk) != 0:
-            args = mssg.split(maxsplit=index)
-            if len(args) > index:
-                x = args[index].strip()
-                if not x.startswith(('n:', 'pswd:', 'up:', 'rcf:', 'opt:', 'id:', 'index:')):
-                    link = re_split(r' opt: | pswd: | n: | rcf: | up: | id: | index: ', x)[
-                        0].strip()
+    args = arg_parser(input_list[1:], arg_base)
 
-        if len(folder_name) > 0 and not is_bulk:
-            if sameDir is None:
-                sameDir = {'total': multi, 'tasks': set()}
-            sameDir['tasks'].add(message.id)
-  
-    if is_bulk:
-        bulk = await extract_bulk_links(message, bulk_start, bulk_end)
-        if len(bulk) == 0:
-            await sendMessage(message, 'Reply to text file or to tg message that have links seperated by new line!')
+    try:
+        multi = int(args['-i'])
+    except:
+        multi = 0
+
+    select      = args['-s'] or args['-select']
+    isBulk      = args['-b'] or args['-bulk']
+    opt         = args['-opt'] or args['-options']
+    folder_name = args['-m'] or args['-sd'] or args['-samedir']
+    name        = args['-n'] or args['-name']
+    up          = args['-up'] or args['-upload']
+    rcf         = args['-rcf']
+    link        = args['link']
+    compress    = args['-z'] or args['-zip'] or 'z' in input_list[0] or 'zip' in input_list[0]
+    drive_id    = args['-id']
+    index_link  = args['-index']
+    bulk_start  = 0
+    bulk_end    = 0
+
+
+    if not isinstance(isBulk, bool):
+        dargs = isBulk.split(':')
+        bulk_start = dargs[0] or None
+        if len(dargs) == 2:
+            bulk_end = dargs[1] or None
+        isBulk = True
+        
+    if drive_id and is_gdrive_link(drive_id):
+        drive_id = GoogleDriveHelper.getIdFromUrl(drive_id)
+
+    if folder_name and not isBulk:
+        folder_name = f'/{folder_name}'
+        if sameDir is None:
+            sameDir = {'total': multi, 'tasks': set(), 'name': folder_name}
+        sameDir['tasks'].add(message.id)
+
+    if isBulk:
+        try:
+            bulk = await extract_bulk_links(message, bulk_start, bulk_end)
+            if len(bulk) == 0:
+                raise ValueError('Bulk Empty!')
+        except:
+            await sendMessage(message, 'Reply to text file or tg message that have links seperated by new line!')
             return
-        b_msg = mssg.split(maxsplit=index)
-        b_msg[bi] = f'{len(bulk)}'
-        b_msg.insert(index, bulk[0])
+        b_msg = input_list[:1]
+        b_msg.append(f'{bulk[0]} -i {len(bulk)}')
         nextmsg = await sendMessage(message, " ".join(b_msg))
         nextmsg = await client.get_messages(chat_id=message.chat.id, message_ids=nextmsg.id)
         nextmsg.from_user = message.from_user
-        _ytdl(client, nextmsg, isZip, isLeech, sameDir, bulk)
+        _ytdl(client, nextmsg, isLeech, sameDir, bulk)
         return
 
     if len(bulk) != 0:
@@ -333,151 +319,109 @@ async def _ytdl(client, message, isZip=False, isLeech=False, sameDir=None, bulk=
     async def __run_multi():
         if multi <= 1:
             return
-        await sleep(1)
-        ymsg = mssg.split(maxsplit=index)
-        ymsg[mi] = f'{multi - 1}'
+        await sleep(5)
         if len(bulk) != 0:
-            ymsg[index] = bulk[0]
-            nextmsg = await sendMessage(message, " ".join(ymsg))
+            msg = input_list[:1]
+            msg.append(f'{bulk[0]} -i {multi - 1}')
+            nextmsg = await sendMessage(message, " ".join(msg))
         else:
+            msg = [s.strip() for s in input_list]
+            index = msg.index('-i')
+            msg[index+1] = f"{multi - 1}"
             nextmsg = await client.get_messages(chat_id=message.chat.id, message_ids=message.reply_to_message_id + 1)
-            nextmsg = await sendMessage(nextmsg, ' '.join(ymsg))
-            nextmsg = await client.get_messages(chat_id=message.chat.id, message_ids=nextmsg.id)
-        if len(folder_name) > 0:
+            nextmsg = await sendMessage(nextmsg, " ".join(msg))
+        nextmsg = await client.get_messages(chat_id=message.chat.id, message_ids=nextmsg.id)
+        if folder_name:
             sameDir['tasks'].add(nextmsg.id)
         nextmsg.from_user = message.from_user
-        if message.sender_chat:
-            nextmsg.sender_chat = message.sender_chat
-        await sleep(1)
-        _ytdl(client, nextmsg, isZip, isLeech, sameDir, bulk)
+        await sleep(5)
+        _ytdl(client, nextmsg, isLeech, sameDir, bulk)
 
     path = f'{DOWNLOAD_DIR}{message.id}{folder_name}'
 
-    name = mssg.split(' n: ', 1)
-    name = re_split(' pswd: | opt: | up: | rcf: | index: | id: ', name[1])[
-        0].strip() if len(name) > 1 else ''
-
-    pswd = mssg.split(' pswd: ', 1)
-    pswd = re_split(' n: | opt: | up: | rcf: | index: | id: ', pswd[1])[
-        0] if len(pswd) > 1 else None
-
-    opt = mssg.split(' opt: ', 1)
-    opt = re_split(' n: | pswd: | up: | rcf: | index: | id: ', opt[1])[
-        0].strip() if len(opt) > 1 else ''
-
-    rcf = mssg.split(' rcf: ', 1)
-    rcf = re_split(' n: | pswd: | up: | opt: | index: | id: ', rcf[1])[
-        0].strip() if len(rcf) > 1 else None
-
-    up = mssg.split(' up: ', 1)
-    up = re_split(' n: | pswd: | rcf: | opt: | index: | id: ', up[1])[
-        0].strip() if len(up) > 1 else None
-
-    drive_id = mssg.split(' id: ', 1)
-    drive_id = re_split(' n: | pswd: | rcf: | opt: | index: ', drive_id[1])[
-        0].strip() if len(drive_id) > 1 else None
-    if drive_id and is_gdrive_link(drive_id):
-        drive_id = GoogleDriveHelper.getIdFromUrl(drive_id)
-
-    index_link = mssg.split(' index: ', 1)
-    index_link = re_split(' n: | pswd: | rcf: | opt: | id: ', index_link[1])[
-        0].strip() if len(index_link) > 1 else None
-    if index_link and not index_link.startswith(('http://', 'https://')):
-        index_link = None
-    if index_link and not index_link.endswith('/'):
-        index_link += '/'
-
     opt = opt or config_dict['YT_DLP_OPTIONS']
 
-    if sender_chat := message.sender_chat:
+    if len(text) > 1 and text[1].startswith('Tag: '):
+        tag, id_ = text[1].split('Tag: ')[1].split()
+        message.from_user = await client.get_users(id_)
+        try:
+            await message.unpin()
+        except:
+            pass
+    elif sender_chat := message.sender_chat:
         tag = sender_chat.title
-    elif username := message.from_user.username:
+    if username := message.from_user.username:
         tag = f'@{username}'
     else:
         tag = message.from_user.mention
 
-    if len(link) == 0 and (reply_to := message.reply_to_message):
+    if not link and (reply_to := message.reply_to_message):
         link = reply_to.text.split('\n', 1)[0].strip()
 
     if not is_url(link):
-        reply_message = await sendMessage(message, YT_HELP_MESSAGE.format_map({'cmd': message.command[0], 'fmg': '{"ffmpeg": ["-threads", "4"]}'}))
-        await auto_delete_message(message, reply_message)
-        await delete_links(message)
+        reply_message = await sendMessage(message, YT_HELP_MESSAGE)
+        await deleteMessage(message)
+        await one_minute_del(reply_message)
         return
-    if not message.from_user:
-        message.from_user = await anno_checker(message)
-    if not message.from_user:
-        await delete_links(message)
-        return
-    user_id = message.from_user.id
+
     error_msg = []
     error_button = None
     if not await isAdmin(message):
-        if await request_limiter(message):
-            await delete_links(message)
-            return
-        raw_url = await stop_duplicate_tasks(message, link)
-        if raw_url == 'duplicate_tasks':
-            await delete_links(message)
-            return
-        none_admin_msg, error_button = await none_admin_utils(message, isLeech)
-        if none_admin_msg:
-            error_msg.extend(none_admin_msg)
-    if (dmMode := config_dict['DM_MODE']) and message.chat.type == message.chat.type.SUPERGROUP:
-        if isLeech and IS_PREMIUM_USER and not config_dict['DUMP_CHAT_ID']:
-            error_msg.append('DM_MODE and User Session need DUMP_CHAT_ID')
-        dmMessage, error_button = await isBot_canDm(message, dmMode, isLeech, error_button)
-        if dmMessage is not None and dmMessage != 'BotStarted':
-            error_msg.append(dmMessage)
-    else:
-        dmMessage = None
+        task_utilis_msg, error_button = await task_utils(message)
+        if task_utilis_msg:
+            error_msg.extend(task_utilis_msg)
     if error_msg:
-        final_msg = f'Hey, <b>{tag}</b>,\n'
+        final_msg = f'Hey, <b>{tag}</b>!\n'
         for __i, __msg in enumerate(error_msg, 1):
             final_msg += f'\n<b>{__i}</b>: {__msg}\n'
         if error_button is not None:
             error_button = error_button.build_menu(2)
         await delete_links(message)
-        await sendMessage(message, final_msg, error_button)
+        force_m = await sendMessage(message, final_msg, error_button)
+        await five_minute_del(force_m)
         return
-    logMessage = await sendLogMessage(message, link, tag)
 
     if not isLeech:
-        if config_dict['DEFAULT_UPLOAD'] == 'rc' and up is None or up == 'rc':
+        if config_dict['DEFAULT_UPLOAD'] == 'rc' and not up or up == 'rc':
             up = config_dict['RCLONE_PATH']
-        if up is None and config_dict['DEFAULT_UPLOAD'] == 'gd':
+        if not up and config_dict['DEFAULT_UPLOAD'] == 'gd':
             up = 'gd'
-            if not drive_id and len(categories_dict) > 1:
-                drive_id, index_link = await open_category_btns(message)
+            user_tds = await fetch_user_tds(message.from_user.id)
+            if not drive_id and len(user_tds) == 1:
+                drive_id, index_link = next(iter(user_tds.values())).values()
             if drive_id and not await sync_to_async(GoogleDriveHelper().getFolderData, drive_id):
-                return await sendMessage(message, "Google Drive id validation failed!!")
+                return await sendMessage(message, "Google Drive ID validation failed!!")
         if up == 'gd' and not config_dict['GDRIVE_ID'] and not drive_id:
             await sendMessage(message, 'GDRIVE_ID not Provided!')
+            await delete_links(message)
             return
         elif not up:
             await sendMessage(message, 'No Rclone Destination!')
+            await delete_links(message)
             return
         elif up not in ['rcl', 'gd']:
             if up.startswith('mrcc:'):
-                config_path = f'rclone/{message.from_user.id}.conf'
+                config_path = f'tanha/{message.from_user.id}.conf'
             else:
-                config_path = 'rclone.conf'
+                config_path = 'rcl.conf'
             if not await aiopath.exists(config_path):
                 await sendMessage(message, f'Rclone Config: {config_path} not Exists!')
+                await delete_links(message)
                 return
         if up != 'gd' and not is_rclone_path(up):
             await sendMessage(message, 'Wrong Rclone Upload Destination!')
+            await delete_links(message)
             return
+
     if up == 'rcl' and not isLeech:
         up = await RcloneList(client, message).get_rclone_path('rcu')
         if not is_rclone_path(up):
             await sendMessage(message, up)
+            await delete_links(message)
             return
 
-    listener = MirrorLeechListener(message, isZip, isLeech=isLeech, pswd=pswd,
-                                   tag=tag, sameDir=sameDir, rcFlags=rcf, upPath=up,
-                                   raw_url=raw_url, drive_id=drive_id,
-                                   index_link=index_link, dmMessage=dmMessage, logMessage=logMessage)
+    listener = MirrorLeechListener(message, compress, isLeech=isLeech, tag=tag, sameDir=sameDir, rcFlags=rcf, upPath=up, drive_id=drive_id, index_link=index_link, isYtdlp=True, source_url=link)
+
     if 'mdisk.me' in link:
         name, link = await _mdisk(link, name)
 
@@ -505,13 +449,16 @@ async def _ytdl(client, message, isZip=False, isLeech=False, sameDir=None, bulk=
         result = await sync_to_async(extract_info, link, options)
     except Exception as e:
         msg = str(e).replace('<', ' ').replace('>', ' ')
-        await sendMessage(message, f'{tag} {msg}')
+        x = await sendMessage(message, f'{tag} {msg}')
         __run_multi()
+        await delete_links(message)
+        await five_minute_del(x)
         return
 
     __run_multi()
 
     if not select:
+        user_id = message.from_user.id
         user_dict = user_data.get(user_id, {})
         if 'format' in options:
             qual = options['format']
@@ -522,32 +469,23 @@ async def _ytdl(client, message, isZip=False, isLeech=False, sameDir=None, bulk=
         qual = await YtSelection(client, message).get_quality(result)
         if qual is None:
             return
-    LOGGER.info(f"Downloading with YT-DLP: {link} added by : {user_id}")
+    await delete_links(message)
+    LOGGER.info(f'Downloading with YT-DLP: {link}')
     playlist = 'entries' in result
     ydl = YoutubeDLHelper(listener)
     await ydl.add_download(link, path, name, qual, playlist, opt)
+    
 
 
 async def ytdl(client, message):
     _ytdl(client, message)
 
 
-async def ytdlZip(client, message):
-    _ytdl(client, message, True)
-
-
 async def ytdlleech(client, message):
     _ytdl(client, message, isLeech=True)
 
 
-async def ytdlZipleech(client, message):
-    _ytdl(client, message, True, True)
-
 bot.add_handler(MessageHandler(ytdl, filters=command(
     BotCommands.YtdlCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(ytdlZip, filters=command(
-    BotCommands.YtdlZipCommand) & CustomFilters.authorized))
 bot.add_handler(MessageHandler(ytdlleech, filters=command(
     BotCommands.YtdlLeechCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(ytdlZipleech, filters=command(
-    BotCommands.YtdlZipLeechCommand) & CustomFilters.authorized))

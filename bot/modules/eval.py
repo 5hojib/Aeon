@@ -11,10 +11,9 @@ from bot import LOGGER, bot
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.message_utils import sendFile, sendMessage
-from bot.helper.ext_utils.bot_utils import sync_to_async, new_task
+from bot.helper.ext_utils.bot_utils import new_task
 
 namespaces = {}
-
 
 def namespace_of(message):
     if message.chat.id not in namespaces:
@@ -40,17 +39,17 @@ async def send(msg, message):
             await sendFile(message, out_file)
     else:
         LOGGER.info(f"OUT: '{msg}'")
-        await sendMessage(message, f"<code>{msg}</code>")
+        await sendMessage(message, f"{msg}")
 
 
 @new_task
-async def evaluate(_, message):
-    await send(await sync_to_async(do, eval, message), message)
+async def evaluate(client, message):
+    await send(await do(eval, message), message)
 
 
 @new_task
-async def execute(_, message):
-    await send(await sync_to_async(do, exec, message), message)
+async def execute(client, message):
+    await send(await do(exec, message), message)
 
 
 def cleanup_code(code):
@@ -59,7 +58,7 @@ def cleanup_code(code):
     return code.strip('` \n')
 
 
-def do(func, message):
+async def do(func, message):
     log_input(message)
     content = message.text.split(maxsplit=1)[-1]
     body = cleanup_code(content)
@@ -71,7 +70,7 @@ def do(func, message):
 
     stdout = StringIO()
 
-    to_compile = f'def func():\n{indent(body, "  ")}'
+    to_compile = f'async def func():\n{indent(body, "  ")}'
 
     try:
         exec(to_compile, env)
@@ -82,7 +81,7 @@ def do(func, message):
 
     try:
         with redirect_stdout(stdout):
-            func_return = func()
+            func_return = await func()
     except Exception as e:
         value = stdout.getvalue()
         return f'{value}{format_exc()}'
@@ -103,7 +102,7 @@ def do(func, message):
             return result
 
 
-async def clear(_, message):
+async def clear(client, message):
     log_input(message)
     global namespaces
     if message.chat.id in namespaces:
@@ -112,8 +111,8 @@ async def clear(_, message):
 
 
 bot.add_handler(MessageHandler(evaluate, filters=command(
-    BotCommands.EvalCommand) & CustomFilters.owner))
+    BotCommands.EvalCommand) & CustomFilters.sudo))
 bot.add_handler(MessageHandler(execute, filters=command(
-    BotCommands.ExecCommand) & CustomFilters.owner))
+    BotCommands.ExecCommand) & CustomFilters.sudo))
 bot.add_handler(MessageHandler(clear, filters=command(
-    BotCommands.ClearLocalsCommand) & CustomFilters.owner))
+    BotCommands.ClearLocalsCommand) & CustomFilters.sudo))
