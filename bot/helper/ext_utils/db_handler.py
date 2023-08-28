@@ -198,7 +198,7 @@ class DbManger:
                     notifier_dict[row['cid']] = {row['tag']: [row['_id']]}
         await self.__db.tasks[bot_id].drop()
         self.__conn.close
-        return notifier_dict  # return a dict ==> {cid: {tag: [_id, _id, ...]}}
+        return notifier_dict
 
     async def trunc_table(self, name):
         if self.__err:
