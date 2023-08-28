@@ -4,9 +4,13 @@ from aiofiles import open as aiopen
 from aiofiles.os import remove
 
 async def extract_links_from_text(text):
-    pattern = r'(https?://\S+)'
-    links = re.findall(pattern, text)
-    return links
+    url_pattern = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+    magnet_pattern = r'magnet:\?xt=urn:(btih|btmh):[a-zA-Z0-9]*'
+    
+    urls = re.findall(url_pattern, text)
+    magnets = re.findall(magnet_pattern, text)
+    
+    return urls + magnets
 
 async def get_links_from_message(text, bulk_start, bulk_end):
     links_list = await extract_links_from_text(text)
