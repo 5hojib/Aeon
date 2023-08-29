@@ -71,7 +71,7 @@ async def drive_list(_, message):
     user_id = message.from_user.id
     if not await isAdmin(message, user_id):
         if message.chat.type != message.chat.type.PRIVATE:
-            msg, btn = checking_access(user_id)
+            msg, btn = await checking_access(user_id)
             if msg is not None:
                 reply_message = await sendMessage(message, msg, btn.build_menu(1))
                 await delete_links(message)

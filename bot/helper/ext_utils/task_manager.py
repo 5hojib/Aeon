@@ -174,7 +174,7 @@ async def task_utils(message):
     msg = []
     button = None
 
-    token_msg, button = checking_access(message.from_user.id, button)
+    token_msg, button = await checking_access(message.from_user.id, button)
     if token_msg is not None:
         msg.append(token_msg)
     if message.chat.type != message.chat.type.BOT:
