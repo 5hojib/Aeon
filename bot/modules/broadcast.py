@@ -6,7 +6,7 @@ from pyrogram.filters import command
 from pyrogram.errors import FloodWait, UserIsBlocked, InputUserDeactivated
 
 from bot import bot, LOGGER, DATABASE_URL
-from bot.helper.ext_utils.db_handler import DbManger
+from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.telegram_helper.message_utils import sendMessage, editMessage
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
@@ -29,7 +29,7 @@ async def broadcast(_, message):
 <b>• Unsuccess Attempt:</b> {u}'''
     updater = time()
     pls_wait = await sendMessage(message, status.format(**locals()))
-    for uid in (await DbManger().get_pm_uids()):
+    for uid in (await DbManager().get_pm_uids()):
         try:
             await message.reply_to_message.copy(uid)
             s += 1
@@ -38,10 +38,10 @@ async def broadcast(_, message):
             await message.reply_to_message.copy(uid)
             s += 1
         except UserIsBlocked:
-            await DbManger().rm_pm_user(uid)
+            await DbManager().rm_pm_user(uid)
             b += 1
         except InputUserDeactivated:
-            await DbManger().rm_pm_user(uid)
+            await DbManager().rm_pm_user(uid)
             d += 1
         except:
             u += 1

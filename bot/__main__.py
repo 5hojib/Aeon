@@ -25,7 +25,7 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from bot import bot, config_dict, user_data, botStartTime, LOGGER, Interval, DATABASE_URL, QbInterval, INCOMPLETE_TASK_NOTIFIER, scheduler, bot_name
 from .helper.ext_utils.fs_utils import start_cleanup, clean_all, exit_clean_up
 from .helper.ext_utils.bot_utils import get_progress_bar_string, get_readable_file_size, get_readable_time, cmd_exec, sync_to_async, set_commands, update_user_ldata, new_thread, format_validity_time, new_task
-from .helper.ext_utils.db_handler import DbManger
+from .helper.ext_utils.db_handler import DbManager
 from .helper.telegram_helper.bot_commands import BotCommands
 from .helper.telegram_helper.message_utils import sendMessage, editMessage, sendFile, deleteMessage, one_minute_del
 from .helper.telegram_helper.filters import CustomFilters
@@ -82,20 +82,30 @@ async def start(client, message):
     reply_markup = buttons.build_menu(2)
     if len(message.command) > 1 and message.command[1] == "wzmlx":
         await deleteMessage(message)
-    elif len(message.command) > 1 and config_dict['TOKEN_TIMEOUT']:
+    elif len(message.command) > 1 and len(message.command[1]) == 36 and config_dict['TOKEN_TIMEOUT']:
         userid = message.from_user.id
-        encrypted_url = message.command[1]
-        input_token, pre_uid = (b64decode(encrypted_url.encode()).decode()).split('&&')
-        if int(pre_uid) != userid:
-            return await sendMessage(message, '<b>This token is not for you!</b>\n\nPlease generate your own.')
-        data = user_data.get(userid, {})
+        input_token = message.command[1]
+        if DATABASE_URL:
+            stored_token = await DbManager().get_user_token(userid)
+            if stored_token is None:
+                return await sendMessage(message, '<b>This token is not for you!</b>\n\nPlease generate your own.')
+            if input_token != stored_token:
+                return await sendMessage(message, 'Invalid token.\n\nPlease generate a new one.')
+        if userid not in user_data:
+            return await sendMessage(message, 'This token is not yours!\n\nKindly generate your own.')
+        data = user_data[userid]
         if 'token' not in data or data['token'] != input_token:
             return await sendMessage(message, '<b>This token has already been used!</b>\n\nPlease get a new one.')
-        buttons.ibutton('Activate token', f'pass {input_token}', 'header')
-        reply_markup = buttons.build_menu(2)
+        token = str(uuid4())
+        ttime = time()
+        data['token'] = token
+        data['time'] = ttime
+        user_data[userid].update(data)
+        if DATABASE_URL:
+            await DbManager().update_user_tdata(userid, token, ttime)
         msg = 'Your token has been successfully generated!\n\n'
         msg += f'It will be valid for {format_validity_time(int(config_dict["TOKEN_TIMEOUT"]))}'
-        return await sendMessage(message, msg, reply_markup)
+        return await sendMessage(message, msg)
     elif await CustomFilters.authorized(client, message):
         help_command = f"/{BotCommands.HelpCommand}"
         start_string = f'This bot can mirror all your links|files|torrents to Google Drive or any rclone cloud or to telegram.\n<b>Type {help_command} to get a list of available commands</b>'
@@ -104,8 +114,9 @@ async def start(client, message):
         await sendMessage(message, 'Now, This bot will send all your files and links here. Start Using ...', photo='IMAGES')
     else:
         await sendMessage(message, 'You Are not authorized user!', photo='IMAGES')
-    await DbManger().update_pm_users(message.from_user.id)
+    await DbManager().update_pm_users(message.from_user.id)
 
+'''
 async def token_callback(_, query):
     user_id = query.from_user.id
     input_token = query.data.split()[1]
@@ -118,7 +129,8 @@ async def token_callback(_, query):
     kb = query.message.reply_markup.inline_keyboard[1:]
     kb.insert(0, [InlineKeyboardButton('Activated', callback_data='pass activated')])
     await query.edit_message_reply_markup(InlineKeyboardMarkup(kb))
-    
+'''
+
 async def restart(client, message):
     restart_message = await sendMessage(message, 'Restarting...')
     if scheduler.running:
@@ -221,7 +233,7 @@ async def search_images():
                     if img_url not in config_dict['IMAGES']:
                         config_dict['IMAGES'].append(img_url)
             if DATABASE_URL:
-                await DbManger().update_config({'IMAGES': config_dict['IMAGES']})
+                await DbManager().update_config({'IMAGES': config_dict['IMAGES']})
     except Exception as e:
         LOGGER.error(f"An error occurred: {e}")
 
@@ -290,7 +302,7 @@ async def restart_notification():
             LOGGER.error(e)
 
     if INCOMPLETE_TASK_NOTIFIER and DATABASE_URL:
-        if notifier_dict := await DbManger().get_incomplete_tasks():
+        if notifier_dict := await DbManager().get_incomplete_tasks():
             for cid, data in notifier_dict.items():
                 msg = rmsg if cid == chat_id else 'Bot restarted!'
                 for tag, links in data.items():
@@ -317,8 +329,7 @@ async def main():
     
     bot.add_handler(MessageHandler(
         start, filters=command(BotCommands.StartCommand) & private))
-    bot.add_handler(CallbackQueryHandler(
-        token_callback, filters=regex(r'^pass')))
+    #bot.add_handler(CallbackQueryHandler(token_callback, filters=regex(r'^pass')))
     bot.add_handler(MessageHandler(log, filters=command(
         BotCommands.LogCommand) & CustomFilters.sudo))
     bot.add_handler(MessageHandler(restart, filters=command(

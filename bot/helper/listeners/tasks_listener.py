@@ -33,7 +33,7 @@ from bot.helper.mirror_utils.upload_utils.pyrogramEngine import TgUploader
 from bot.helper.mirror_utils.rclone_utils.transfer import RcloneTransferHelper
 from bot.helper.telegram_helper.message_utils import sendCustomMsg, sendMessage, editMessage, delete_all_messages, delete_links, sendMultiMessage, update_all_messages, deleteMessage, five_minute_del
 from bot.helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.ext_utils.db_handler import DbManger
+from bot.helper.ext_utils.db_handler import DbManager
 
 
 class MirrorLeechListener:
@@ -145,7 +145,7 @@ class MirrorLeechListener:
         if config_dict['BOT_PM'] or user_dict.get('bot_pm'):
             self.botpmmsg = await sendCustomMsg(self.message.from_user.id, '<b>Task started</b>')
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
-            await DbManger().add_incomplete_task(self.message.chat.id, self.message.link, self.tag)
+            await DbManager().add_incomplete_task(self.message.chat.id, self.message.link, self.tag)
 
     async def onDownloadComplete(self):
         multi_links = False
@@ -409,7 +409,7 @@ class MirrorLeechListener:
 
     async def onUploadComplete(self, link, size, files, folders, mime_type, name, rclonePath=''):
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
-            await DbManger().rm_complete_task(self.message.link)
+            await DbManager().rm_complete_task(self.message.link)
         user_id = self.message.from_user.id
         name, _ = await format_filename(name, user_id, isMirror=not self.isLeech)
         user_dict = user_data.get(user_id, {})
@@ -609,7 +609,7 @@ Your download has been stopped!
         if self.isSuperGroup and self.botpmmsg:
             await sendMessage(self.botpmmsg, msg, button)
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
-            await DbManger().rm_complete_task(self.message.link)
+            await DbManager().rm_complete_task(self.message.link)
         await five_minute_del(x)
         
         async with queue_dict_lock:
@@ -652,7 +652,7 @@ Your upload has been stopped!
         if self.isSuperGroup and self.botpmmsg:
             await sendMessage(self.botpmmsg, msg)
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
-            await DbManger().rm_complete_task(self.message.link)
+            await DbManager().rm_complete_task(self.message.link)
         await five_minute_del(x)
         
         async with queue_dict_lock:

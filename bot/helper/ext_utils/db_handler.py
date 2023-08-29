@@ -5,10 +5,10 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import PyMongoError
 from dotenv import dotenv_values
 
-from bot import DATABASE_URL, user_data, rss_dict, LOGGER, bot_id, config_dict, aria2_options, qbit_options, bot_loop
+from bot import DATABASE_URL, user_data, rss_dict, LOGGER, bot_id, config_dict, aria2_options, qbit_options, bot_loop, bot_name
 
 
-class DbManger:
+class DbManager:
     def __init__(self):
         self.__err = False
         self.__db = None
@@ -116,6 +116,10 @@ class DbManger:
             del data['thumb']
         if data.get('rclone'):
             del data['rclone']
+        if data.get('token'):
+            del data['token']
+        if data.get('time'):
+            del data['time']
         await self.__db.users.replace_one({'_id': user_id}, data, upsert=True)
         self.__conn.close
 
@@ -206,6 +210,69 @@ class DbManger:
         await self.__db[name][bot_id].drop()
         self.__conn.close
 
+    async def add_download_url(self, url: str, tag: str):
+        if self.__err:
+            return
+        download = {'_id': url, 'tag': tag, 'botname': bot_name}
+        await self.__db.download_links.update_one({'_id': url}, {'$set': download}, upsert=True)
+        self.__conn.close
+
+    async def check_download(self, url: str):
+        if self.__err:
+            return
+        exist = await self.__db.download_links.find_one({'_id': url})
+        self.__conn.close
+        return exist
+
+    async def clear_download_links(self, botName=None):
+        if self.__err:
+            return
+        if not botName:
+            botName = bot_name
+        await self.__db.download_links.delete_many({'botname': botName})
+        self.__conn.close
+
+    async def remove_download(self, url: str):
+        if self.__err:
+            return
+        await self.__db.download_links.delete_one({'_id': url})
+        self.__conn.close
+
+    async def update_user_tdata(self, user_id, token, time):
+        if self.__err:
+            return
+        await self.__db.access_token.update_one({'_id': user_id}, {'$set': {'token': token, 'time': time}}, upsert=True)
+        self.__conn.close
+
+    async def update_user_token(self, user_id, token):
+        if self.__err:
+            return
+        await self.__db.access_token.update_one({'_id': user_id}, {'$set': {'token': token}}, upsert=True)
+        self.__conn.close
+
+    async def get_token_expire_time(self, user_id):
+        if self.__err:
+            return None
+        user_data = await self.__db.access_token.find_one({'_id': user_id})
+        if user_data:
+            return user_data.get('time')
+        self.__conn.close
+        return None
+
+    async def get_user_token(self, user_id):
+        if self.__err:
+            return None
+        user_data = await self.__db.access_token.find_one({'_id': user_id})
+        if user_data:
+            return user_data.get('token')
+        self.__conn.close
+        return None
+
+    async def delete_all_access_tokens(self):
+        if self.__err:
+            return
+        await self.__db.access_token.delete_many({})
+        self.__conn.close
 
 if DATABASE_URL:
-    bot_loop.run_until_complete(DbManger().db_load())
+    bot_loop.run_until_complete(DbManager().db_load())

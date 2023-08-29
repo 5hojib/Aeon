@@ -20,7 +20,7 @@ from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.bot_utils import setInterval, sync_to_async, new_thread
-from bot.helper.ext_utils.db_handler import DbManger
+from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.ext_utils.task_manager import start_from_queued
 from bot.helper.ext_utils.help_messages import default_desp
 from bot.helper.mirror_utils.rclone_utils.serve import rclone_serve_booter
@@ -200,7 +200,7 @@ async def load_config():
                     LOGGER.error(e)
         aria2_options['bt-stop-timeout'] = '0'
         if DATABASE_URL:
-            await DbManger().update_aria2('bt-stop-timeout', '0')
+            await DbManager().update_aria2('bt-stop-timeout', '0')
         TORRENT_TIMEOUT = ''
     else:
         for download in downloads:
@@ -211,7 +211,7 @@ async def load_config():
                     LOGGER.error(e)
         aria2_options['bt-stop-timeout'] = TORRENT_TIMEOUT
         if DATABASE_URL:
-            await DbManger().update_aria2('bt-stop-timeout', TORRENT_TIMEOUT)
+            await DbManager().update_aria2('bt-stop-timeout', TORRENT_TIMEOUT)
         TORRENT_TIMEOUT = int(TORRENT_TIMEOUT)
 
     QUEUE_ALL = environ.get('QUEUE_ALL', '')
@@ -226,7 +226,7 @@ async def load_config():
     INCOMPLETE_TASK_NOTIFIER = environ.get('INCOMPLETE_TASK_NOTIFIER', '')
     INCOMPLETE_TASK_NOTIFIER = INCOMPLETE_TASK_NOTIFIER.lower() == 'true'
     if not INCOMPLETE_TASK_NOTIFIER and DATABASE_URL:
-        await DbManger().trunc_table('tasks')
+        await DbManager().trunc_table('tasks')
 
     STOP_DUPLICATE = environ.get('STOP_DUPLICATE', '')
     STOP_DUPLICATE = STOP_DUPLICATE.lower() == 'true'
@@ -456,7 +456,7 @@ async def load_config():
                         'YT_DLP_OPTIONS': YT_DLP_OPTIONS})
 
     if DATABASE_URL:
-        await DbManger().update_config(config_dict)
+        await DbManager().update_config(config_dict)
     await initiate_search_tools()
     await start_from_queued()
     await rclone_serve_booter()
@@ -577,7 +577,7 @@ async def edit_variable(_, message, pre_message, key):
     await update_buttons(pre_message, key, 'editvar', False)
     await message.delete()
     if DATABASE_URL:
-        await DbManger().update_config({key: value})
+        await DbManager().update_config({key: value})
     if key in ['SEARCH_PLUGINS', 'SEARCH_API_LINK']:
         await initiate_search_tools()
     elif key in ['QUEUE_ALL', 'QUEUE_DOWNLOAD', 'QUEUE_UPLOAD']:
@@ -599,7 +599,7 @@ async def update_private_file(_, message, pre_message):
                 await aiormtree('rclone_sa')
             config_dict['USE_SERVICE_ACCOUNTS'] = False
             if DATABASE_URL:
-                await DbManger().update_config({'USE_SERVICE_ACCOUNTS': False})
+                await DbManager().update_config({'USE_SERVICE_ACCOUNTS': False})
         elif file_name in ['.netrc', 'netrc']:
             await (await create_subprocess_exec("touch", ".netrc")).wait()
             await (await create_subprocess_exec("chmod", "600", ".netrc")).wait()
@@ -660,7 +660,7 @@ async def update_private_file(_, message, pre_message):
         await rclone_serve_booter()
     await update_buttons(pre_message)
     if DATABASE_URL:
-        await DbManger().update_private_file(file_name)
+        await DbManager().update_private_file(file_name)
     if await aiopath.exists('accounts.zip'):
         await remove('accounts.zip')
 
@@ -721,7 +721,7 @@ async def edit_bot_settings(client, query):
                         LOGGER.error(e)
             aria2_options['bt-stop-timeout'] = '0'
             if DATABASE_URL:
-                await DbManger().update_aria2('bt-stop-timeout', '0')
+                await DbManager().update_aria2('bt-stop-timeout', '0')
         elif data[2] == 'BASE_URL':
             await (await create_subprocess_exec("pkill", "-9", "-f", "gunicorn")).wait()
         elif data[2] == 'BASE_URL_PORT':
@@ -738,11 +738,11 @@ async def edit_bot_settings(client, query):
             if DRIVES_NAMES and DRIVES_NAMES[0] == 'Main':
                 INDEX_URLS[0] = ''
         elif data[2] == 'INCOMPLETE_TASK_NOTIFIER' and DATABASE_URL:
-            await DbManger().trunc_table('tasks')
+            await DbManager().trunc_table('tasks')
         config_dict[data[2]] = value
         await update_buttons(message, data[2], 'editvar', False)
         if DATABASE_URL:
-            await DbManger().update_config({data[2]: value})
+            await DbManager().update_config({data[2]: value})
         if data[2] in ['SEARCH_PLUGINS', 'SEARCH_API_LINK']:
             await initiate_search_tools()
         elif data[2] in ['QUEUE_ALL', 'QUEUE_DOWNLOAD', 'QUEUE_UPLOAD']:
@@ -762,10 +762,10 @@ async def edit_bot_settings(client, query):
         await query.answer(f'Successfully Var changed to {value}!', show_alert=True)
         config_dict[data[2]] = value
         if not value and data[2] == 'INCOMPLETE_TASK_NOTIFIER' and DATABASE_URL:
-            await DbManger().trunc_table('tasks')
+            await DbManager().trunc_table('tasks')
         await update_buttons(message, data[2], 'editvar', False)
         if DATABASE_URL:
-            await DbManger().update_config({data[2]: value})
+            await DbManager().update_config({data[2]: value})
     elif data[1] == 'editvar':
         handler_dict[message.chat.id] = False
         await query.answer()
