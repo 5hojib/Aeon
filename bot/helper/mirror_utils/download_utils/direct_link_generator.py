@@ -96,7 +96,7 @@ def direct_link_generator(link: str):
         raise DirectDownloadLinkException(f'No Direct link function found for {link}')
 
 
-def gofile(url):
+def gofile(url: str) -> str:
     try:
         if "::" in url:
             _password = url.split("::")[-1]
@@ -569,7 +569,7 @@ def uploadee(url: str) -> str:
             f"ERROR: Failed to acquire download URL from upload.ee for : {url}")
 
 
-def terabox(url) -> str:
+def terabox(url: str) -> str:
     if not path.isfile('terabox.txt'):
         raise DirectDownloadLinkException("ERROR: terabox.txt not uploaded.")
     try:
