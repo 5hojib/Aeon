@@ -28,7 +28,7 @@ from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, g
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
 from bot.helper.ext_utils.help_messages import MIRROR_HELP_MESSAGE
 from bot.helper.ext_utils.bulk_links import extract_bulk_links
-
+from bot.helper.mirror_utils.download_utils.direct_downloader import add_direct_download
 
 @new_task
 async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=None, bulk=[]):
@@ -225,8 +225,8 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             process_msg = await sendMessage(message, f"<b>Processing:</b> <code>{link}</code>")
             try:
                 link = await sync_to_async(direct_link_generator, link)
-                LOGGER.info(f"Generated link: {link}")
-                await editMessage(process_msg, f"<b>Generated link:</b> <code>{link}</code>")
+                if not isinstance(link, dict):
+                    LOGGER.info(f"Generated link: {link}")
             except DirectDownloadLinkException as e:
                 LOGGER.info(str(e))
                 if str(e).startswith('ERROR:'):
@@ -285,6 +285,8 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     if file_ is not None:
         await delete_links(message)
         await TelegramDownloadHelper(listener).add_download(reply_to, f'{path}/', name, session)
+    elif isinstance(link, dict):
+        await add_direct_download(link, path, listener, name)
     elif is_rclone_path(link):
         if link.startswith('mrcc:'):
             link = link.split('mrcc:', 1)[1]

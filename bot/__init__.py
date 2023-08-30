@@ -531,9 +531,7 @@ def aria2c_init():
 Thread(target=aria2c_init).start()
 sleep(1.5)
 
-aria2c_global = ['bt-max-open-files', 'download-result', 'keep-unfinished-download-result', 'log', 'log-level',
-                 'max-concurrent-downloads', 'max-download-result', 'max-overall-download-limit', 'save-session',
-                 'max-overall-upload-limit', 'optimize-concurrent-downloads', 'save-cookies', 'server-stat-of']
+aria2c_global = ['bt-max-open-files', 'download-result', 'keep-unfinished-download-result', 'log', 'log-level', 'max-concurrent-downloads', 'max-download-result', 'max-overall-download-limit', 'save-session', 'max-overall-upload-limit', 'optimize-concurrent-downloads', 'save-cookies', 'server-stat-of']
 
 if not aria2_options:
     aria2_options = aria2.client.get_global_option()
@@ -557,9 +555,7 @@ else:
     qb_client.app_set_preferences(qb_opt)
 
 log_info("Creating client from BOT_TOKEN")
-bot = tgClient('bot', TELEGRAM_API, TELEGRAM_HASH, bot_token=BOT_TOKEN, workers=1000,
-               parse_mode=enums.ParseMode.HTML).start()
+bot = tgClient('bot', TELEGRAM_API, TELEGRAM_HASH, bot_token=BOT_TOKEN, workers=1000, parse_mode=enums.ParseMode.HTML).start()
 bot_loop = bot.loop
 bot_name = bot.me.username
-scheduler = AsyncIOScheduler(timezone=str(
-    get_localzone()), event_loop=bot_loop)
+scheduler = AsyncIOScheduler(timezone = str(get_localzone()), event_loop = bot_loop)
