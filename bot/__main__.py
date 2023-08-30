@@ -77,7 +77,7 @@ async def stats(_, message):
     await one_minute_del(reply_message)
 
 @new_thread
-async def start(client, message):
+async def start(_, message):
     buttons = ButtonMaker()
     reply_markup = buttons.build_menu(2)
     if len(message.command) > 1 and message.command[1] == "wzmlx":
