@@ -43,22 +43,22 @@ async def stats(_, message):
     cpuUsage = cpu_percent(interval=0.5)
     quote = Quote.print().split('―', 1)[0].strip().replace("“", "").replace("”", "")
     limit_mapping = {
-        'Torrent': config_dict.get('TORRENT_LIMIT', '∞'),
-        'Gdrive': config_dict.get('GDRIVE_LIMIT', '∞'),
-        'Ytdlp': config_dict.get('YTDLP_LIMIT', '∞'),
-        'Direct': config_dict.get('DIRECT_LIMIT', '∞'),
-        'Leech': config_dict.get('LEECH_LIMIT', '∞'),
-        'Clone': config_dict.get('CLONE_LIMIT', '∞'),
-        'Mega': config_dict.get('MEGA_LIMIT', '∞'),
+        'Torrent':    config_dict.get('TORRENT_LIMIT', '∞'),
+        'Gdrive':     config_dict.get('GDRIVE_LIMIT', '∞'),
+        'Ytdlp':      config_dict.get('YTDLP_LIMIT', '∞'),
+        'Direct':     config_dict.get('DIRECT_LIMIT', '∞'),
+        'Leech':      config_dict.get('LEECH_LIMIT', '∞'),
+        'Clone':      config_dict.get('CLONE_LIMIT', '∞'),
+        'Mega':       config_dict.get('MEGA_LIMIT', '∞'),
         'User tasks': config_dict.get('USER_MAX_TASKS', '∞'),
     }
     system_info = f'<b>{quote}</b>\n\n'\
-            f'<code>• Bot uptime :</code> {currentTime}\n'\
-            f'<code>• Sys uptime :</code> {osUptime}\n'\
-            f'<code>• CPU usage  :</code> {cpuUsage}%\n'\
-            f'<code>• RAM usage  :</code> {memory.percent}%\n'\
-            f'<code>• Disk usage :</code> {disk}%\n'\
-            f'<code>• Disk space :</code> {get_readable_file_size(free)}/{get_readable_file_size(total)}\n\n'
+        f'<code>• Bot uptime :</code> {currentTime}\n'\
+        f'<code>• Sys uptime :</code> {osUptime}\n'\
+        f'<code>• CPU usage  :</code> {cpuUsage}%\n'\
+        f'<code>• RAM usage  :</code> {memory.percent}%\n'\
+        f'<code>• Disk usage :</code> {disk}%\n'\
+        f'<code>• Disk space :</code> {get_readable_file_size(free)}/{get_readable_file_size(total)}\n\n'
             
     limitations = f'<b>LIMITATIONS</b>\n\n'
     
@@ -97,12 +97,12 @@ async def start(_, message):
         if 'token' not in data or data['token'] != input_token:
             return await sendMessage(message, '<b>This token has already been used!</b>\n\nPlease get a new one.')
         token = str(uuid4())
-        ttime = time()
+        token_time = time()
         data['token'] = token
-        data['time'] = ttime
+        data['time'] = token_time
         user_data[userid].update(data)
         if DATABASE_URL:
-            await DbManager().update_user_tdata(userid, token, ttime)
+            await DbManager().update_user_tdata(userid, token, token_time)
         msg = 'Your token has been successfully generated!\n\n'
         msg += f'It will be valid for {format_validity_time(int(config_dict["TOKEN_TIMEOUT"]))}'
         return await sendMessage(message, msg)
@@ -116,20 +116,6 @@ async def start(_, message):
         await sendMessage(message, 'You Are not authorized user!', photo='IMAGES')
     await DbManager().update_pm_users(message.from_user.id)
 
-'''
-async def token_callback(_, query):
-    user_id = query.from_user.id
-    input_token = query.data.split()[1]
-    data = user_data.get(user_id, {})
-    if 'token' not in data or data['token'] != input_token:
-        return await query.answer('Already used, collect new one', show_alert=True)
-    update_user_ldata(user_id, 'token', str(uuid4()))
-    update_user_ldata(user_id, 'time', time())
-    await query.answer('Token activated!', show_alert=True)
-    kb = query.message.reply_markup.inline_keyboard[1:]
-    kb.insert(0, [InlineKeyboardButton('Activated', callback_data='pass activated')])
-    await query.edit_message_reply_markup(InlineKeyboardMarkup(kb))
-'''
 
 async def restart(client, message):
     restart_message = await sendMessage(message, 'Restarting...')
