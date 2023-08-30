@@ -140,12 +140,6 @@ DEFAULT_UPLOAD = environ.get('DEFAULT_UPLOAD', '')
 if DEFAULT_UPLOAD != 'rc':
     DEFAULT_UPLOAD = 'gd'
 
-DOWNLOAD_DIR = environ.get('DOWNLOAD_DIR', '')
-if len(DOWNLOAD_DIR) == 0:
-    DOWNLOAD_DIR = '/usr/src/app/downloads/'
-elif not DOWNLOAD_DIR.endswith("/"):
-    DOWNLOAD_DIR = f'{DOWNLOAD_DIR}/'
-
 AUTHORIZED_CHATS = environ.get('AUTHORIZED_CHATS', '')
 if len(AUTHORIZED_CHATS) != 0:
     aid = AUTHORIZED_CHATS.split()
@@ -386,7 +380,6 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'CMD_SUFFIX': CMD_SUFFIX,
                'DATABASE_URL': DATABASE_URL,
                'DEFAULT_UPLOAD': DEFAULT_UPLOAD,
-               'DOWNLOAD_DIR': DOWNLOAD_DIR,
                'GDTOT_CRYPT': GDTOT_CRYPT,
                'STORAGE_THRESHOLD': STORAGE_THRESHOLD,
                'TORRENT_LIMIT': TORRENT_LIMIT,
@@ -518,7 +511,7 @@ def aria2c_init():
     try:
         log_info("Initializing Aria2c")
         link = "https://linuxmint.com/torrents/lmde-5-cinnamon-64bit.iso.torrent"
-        dire = DOWNLOAD_DIR.rstrip("/")
+        dire = '/usr/src/app/downloads/'.rstrip("/")
         aria2.add_uris([link], {'dir': dire})
         sleep(3)
         downloads = aria2.get_downloads()

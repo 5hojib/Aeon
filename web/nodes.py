@@ -2,13 +2,6 @@ from anytree import NodeMixin
 from re import findall as re_findall
 from os import environ
 
-DOWNLOAD_DIR = environ.get('DOWNLOAD_DIR', '')
-if len(DOWNLOAD_DIR) == 0:
-    DOWNLOAD_DIR = '/usr/src/app/downloads/'
-elif not DOWNLOAD_DIR.endswith("/"):
-    DOWNLOAD_DIR += '/'
-
-
 class TorNode(NodeMixin):
     def __init__(self, name, is_folder=False, is_file=False, parent=None, size=None, priority=None, file_id=None, progress=None):
         super().__init__()
@@ -32,7 +25,7 @@ def qb_get_folders(path):
     return path.split("/")
 
 def get_folders(path):
-    fs = re_findall(f'{DOWNLOAD_DIR}[0-9]+/(.+)', path)[0]
+    fs = re_findall(f'/usr/src/app/downloads/[0-9]+/(.+)', path)[0]
     return fs.split('/')
 
 def make_tree(res, aria2=False):

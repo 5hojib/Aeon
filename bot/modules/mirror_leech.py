@@ -9,7 +9,7 @@ from aiofiles import open as aiopen
 from aiofiles.os import path as aiopath
 from cloudscraper import create_scraper
 
-from bot import bot, DOWNLOAD_DIR, LOGGER, config_dict, bot_name, user_data
+from bot import bot, LOGGER, config_dict, bot_name, user_data
 from bot.helper.ext_utils.bot_utils import is_url, is_magnet, is_mega_link, is_gdrive_link, get_content_type, new_task, sync_to_async, is_rclone_path, is_telegram_link, arg_parser, fetch_user_tds
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.task_manager import task_utils
@@ -151,7 +151,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
 
     __run_multi()
 
-    path = f'{DOWNLOAD_DIR}{message.id}{folder_name}'
+    path = f'/usr/src/app/downloads/{message.id}{folder_name}'
 
     if len(text) > 1 and text[1].startswith('Tag: '):
         tag, id_ = text[1].split('Tag: ')[1].split()

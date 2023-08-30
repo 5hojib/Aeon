@@ -9,13 +9,10 @@ from subprocess import run as srun
 from sys import exit as sexit
 
 from .exceptions import NotSupportedExtractionArchive
-from bot import aria2, LOGGER, DOWNLOAD_DIR, get_client, GLOBAL_EXTENSION_FILTER
+from bot import aria2, LOGGER, get_client, GLOBAL_EXTENSION_FILTER
 from bot.helper.ext_utils.bot_utils import sync_to_async, cmd_exec
 
-ARCH_EXT = [".tar.bz2", ".tar.gz", ".bz2", ".gz", ".tar.xz", ".tar", ".tbz2", ".tgz", ".lzma2",
-            ".zip", ".7z", ".z", ".rar", ".iso", ".wim", ".cab", ".apm", ".arj", ".chm",
-            ".cpio", ".cramfs", ".deb", ".dmg", ".fat", ".hfs", ".lzh", ".lzma", ".mbr",
-            ".msi", ".mslz", ".nsis", ".ntfs", ".rpm", ".squashfs", ".udf", ".vhd", ".xar"]
+ARCH_EXT = [".tar.bz2", ".tar.gz", ".bz2", ".gz", ".tar.xz", ".tar", ".tbz2", ".tgz", ".lzma2", ".zip", ".7z", ".z", ".rar", ".iso", ".wim", ".cab", ".apm", ".arj", ".chm", ".cpio", ".cramfs", ".deb", ".dmg", ".fat", ".hfs", ".lzh", ".lzma", ".mbr", ".msi", ".mslz", ".nsis", ".ntfs", ".rpm", ".squashfs", ".udf", ".vhd", ".xar"]
 
 FIRST_SPLIT_REGEX = r'(\.|_)part0*1\.rar$|(\.|_)7z\.0*1$|(\.|_)zip\.0*1$|^(?!.*(\.|_)part\d+\.rar$).*\.rar$'
 
@@ -61,17 +58,17 @@ async def clean_download(path):
 async def start_cleanup():
     get_client().torrents_delete(torrent_hashes="all")
     try:
-        await aiormtree(DOWNLOAD_DIR)
+        await aiormtree('/usr/src/app/downloads/')
     except:
         pass
-    await makedirs(DOWNLOAD_DIR)
+    await makedirs('/usr/src/app/downloads/')
 
 
 def clean_all():
     aria2.remove_all(True)
     get_client().torrents_delete(torrent_hashes="all")
     try:
-        rmtree(DOWNLOAD_DIR)
+        rmtree('/usr/src/app/downloads/')
     except:
         pass
 
@@ -143,7 +140,7 @@ def get_mime_type(file_path):
 
 
 def check_storage_threshold(size, threshold, arch=False, alloc=False):
-    free = disk_usage(DOWNLOAD_DIR).free
+    free = disk_usage('/usr/src/app/downloads/').free
     if not alloc:
         if (not arch and free - size < threshold or arch and free - (size * 2) < threshold):
             return False

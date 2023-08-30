@@ -29,18 +29,13 @@ class DbManager:
     async def db_load(self):
         if self.__err:
             return
-        # Save bot settings
         await self.__db.settings.config.update_one({'_id': bot_id}, {'$set': config_dict}, upsert=True)
-        # Save Aria2c options
         if await self.__db.settings.aria2c.find_one({'_id': bot_id}) is None:
             await self.__db.settings.aria2c.update_one({'_id': bot_id}, {'$set': aria2_options}, upsert=True)
-        # Save qbittorrent options
         if await self.__db.settings.qbittorrent.find_one({'_id': bot_id}) is None:
             await self.__db.settings.qbittorrent.update_one({'_id': bot_id}, {'$set': qbit_options}, upsert=True)
-        # User Data
         if await self.__db.users[bot_id].find_one():
             rows = self.__db.users[bot_id].find({})
-            # return a dict ==> {_id, is_sudo, is_auth, as_doc, thumb, yt_opt, media_group, equal_splits, split_size, rclone}
             async for row in rows:
                 uid = row['_id']
                 del row['_id']
@@ -60,7 +55,6 @@ class DbManager:
                     row['rclone'] = rclone_path
                 user_data[uid] = row
             LOGGER.info("Users data has been imported from Database")
-        # Rss Data
         if await self.__db.rss[bot_id].find_one():
             rows = self.__db.rss[bot_id].find({})
             async for row in rows:
@@ -75,21 +69,6 @@ class DbManager:
             return
         await self.__db.settings.config.update_one({'_id': bot_id}, {'$set': dict_}, upsert=True)
         self.__conn.close
-
-    async def load_configs(self):
-        if self.__err:
-            return
-        if db_dict := await self.__db.settings.config.find_one({'_id': bot_id}):
-            del db_dict['_id']
-            for key, value in db_dict.items():
-                environ[key] = str(value)
-        if pf_dict := await self.__db.settings.files.find_one({'_id': bot_id}):
-            del pf_dict['_id']
-            for key, value in pf_dict.items():
-                if value:
-                    file_ = key.replace('__', '.')
-                    with open(file_, 'wb+') as f:
-                        f.write(value)
 
     async def update_aria2(self, key, value):
         if self.__err:
@@ -196,7 +175,6 @@ class DbManager:
         if self.__err:
             return notifier_dict
         if await self.__db.tasks[bot_id].find_one():
-            # return a dict ==> {_id, cid, tag}
             rows = self.__db.tasks[bot_id].find({})
             async for row in rows:
                 if row['cid'] in list(notifier_dict.keys()):

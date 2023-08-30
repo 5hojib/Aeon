@@ -31,7 +31,6 @@ START = 0
 STATE = 'view'
 handler_dict = {}
 default_values = {'DEFAULT_UPLOAD': 'gd',
-                  'DOWNLOAD_DIR': '/usr/src/app/downloads/',
                   'LEECH_SPLIT_SIZE': MAX_SPLIT_SIZE,
                   'RSS_DELAY': 900,
                   'STATUS_UPDATE_INTERVAL': 10,
@@ -78,12 +77,6 @@ async def load_config():
     DATABASE_URL = environ.get('DATABASE_URL', '')
     if len(DATABASE_URL) == 0:
         DATABASE_URL = ''
-
-    DOWNLOAD_DIR = environ.get('DOWNLOAD_DIR', '')
-    if len(DOWNLOAD_DIR) == 0:
-        DOWNLOAD_DIR = '/usr/src/app/downloads/'
-    elif not DOWNLOAD_DIR.endswith("/"):
-        DOWNLOAD_DIR = f'{DOWNLOAD_DIR}/'
 
     GDRIVE_ID = environ.get('GDRIVE_ID', '')
     if len(GDRIVE_ID) == 0:
@@ -392,7 +385,6 @@ async def load_config():
                         'CMD_SUFFIX': CMD_SUFFIX,
                         'DATABASE_URL': DATABASE_URL,
                         'DEFAULT_UPLOAD': DEFAULT_UPLOAD,
-                        'DOWNLOAD_DIR': DOWNLOAD_DIR,
                         'GDTOT_CRYPT': GDTOT_CRYPT,
                         'STORAGE_THRESHOLD': STORAGE_THRESHOLD,
                         'TORRENT_LIMIT': TORRENT_LIMIT,
@@ -502,7 +494,7 @@ Timeout: 60 sec'''
             buttons.ibutton('Reset', f"botset resetvar {key}")
         buttons.ibutton('Close', "botset close", position="footer")
         if edit_mode and key in ['SUDO_USERS', 'CMD_SUFFIX', 'OWNER_ID', 'USER_SESSION_STRING', 'TELEGRAM_HASH',
-                                 'TELEGRAM_API', 'AUTHORIZED_CHATS', 'DATABASE_URL', 'BOT_TOKEN', 'DOWNLOAD_DIR']:
+                                 'TELEGRAM_API', 'AUTHORIZED_CHATS', 'DATABASE_URL', 'BOT_TOKEN']:
             msg += '<b>Note:</b> Restart required for this edit to take effect!\n\n'
         if edit_mode and key not in bool_vars:
             msg += 'Send a valid value for the above Var. <b>Timeout:</b> 60 sec'
@@ -525,9 +517,6 @@ async def edit_variable(_, message, pre_message, key):
     if key == 'RSS_DELAY':
         value = int(value)
         addJob(value)
-    elif key == 'DOWNLOAD_DIR':
-        if not value.endswith('/'):
-            value += '/'
     elif key in ['LEECH_LOG_ID', 'RSS_CHAT_ID']:
         value = int(value)
     elif key == 'STATUS_UPDATE_INTERVAL':
