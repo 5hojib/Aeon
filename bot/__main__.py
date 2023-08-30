@@ -82,7 +82,7 @@ async def start(client, message):
     reply_markup = buttons.build_menu(2)
     if len(message.command) > 1 and message.command[1] == "wzmlx":
         await deleteMessage(message)
-    elif len(message.command) > 1 and len(message.command[1]) == 36 and config_dict['TOKEN_TIMEOUT']:
+    elif len(message.command) > 1 and len(message.command[1]) == 36:
         userid = message.from_user.id
         input_token = message.command[1]
         if DATABASE_URL:

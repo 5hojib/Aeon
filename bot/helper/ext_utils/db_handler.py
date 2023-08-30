@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 from os import environ
-from time import time
 
 from aiofiles import open as aiopen
 from aiofiles.os import makedirs
 from aiofiles.os import path as aiopath
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import PyMongoError
+from time import time
 from dotenv import dotenv_values
 
-from bot import DATABASE_URL, user_data, rss_dict, LOGGER, bot_id, config_dict, aria2_options, qbit_options, bot_loop, bot_name
-
+from bot import DATABASE_URL, LOGGER, aria2_options, bot_id, bot_loop, bot_name, config_dict, qbit_options, rss_dict, user_data
 
 class DbManager:
     def __init__(self):
@@ -63,7 +62,6 @@ class DbManager:
             LOGGER.info("Users data has been imported from Database")
         # Rss Data
         if await self.__db.rss[bot_id].find_one():
-            # return a dict ==> {_id, title: {link, last_feed, last_name, inf, exf, command, paused}
             rows = self.__db.rss[bot_id].find({})
             async for row in rows:
                 user_id = row['_id']
@@ -72,18 +70,26 @@ class DbManager:
             LOGGER.info("Rss data has been imported from Database.")
         self.__conn.close
 
-    async def update_deploy_config(self):
-        if self.__err:
-            return
-        current_config = dict(dotenv_values('config.env'))
-        await self.__db.settings.deployConfig.replace_one({'_id': bot_id}, current_config, upsert=True)
-        self.__conn.close
-
     async def update_config(self, dict_):
         if self.__err:
             return
         await self.__db.settings.config.update_one({'_id': bot_id}, {'$set': dict_}, upsert=True)
         self.__conn.close
+
+    async def load_configs(self):
+        if self.__err:
+            return
+        if db_dict := await self.__db.settings.config.find_one({'_id': bot_id}):
+            del db_dict['_id']
+            for key, value in db_dict.items():
+                environ[key] = str(value)
+        if pf_dict := await self.__db.settings.files.find_one({'_id': bot_id}):
+            del pf_dict['_id']
+            for key, value in pf_dict.items():
+                if value:
+                    file_ = key.replace('__', '.')
+                    with open(file_, 'wb+') as f:
+                        f.write(value)
 
     async def update_aria2(self, key, value):
         if self.__err:
@@ -107,10 +113,7 @@ class DbManager:
             pf_bin = ''
         path = path.replace('.', '__')
         await self.__db.settings.files.update_one({'_id': bot_id}, {'$set': {path: pf_bin}}, upsert=True)
-        if path == 'config.env':
-            await self.update_deploy_config()
-        else:
-            self.__conn.close
+        self.__conn.close
 
     async def update_user_data(self, user_id):
         if self.__err:

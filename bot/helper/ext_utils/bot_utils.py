@@ -416,7 +416,7 @@ def new_thread(func):
 
 async def checking_access(user_id, button=None):
     token_timeout = config_dict['TOKEN_TIMEOUT']
-    if not token_timeout or bool(user_id == OWNER_ID or user_id in user_data and user_data[user_id].get('is_sudo')):
+    if not token_timeout:
         return None, button
     user_data.setdefault(user_id, {})
     data = user_data[user_id]
