@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-from random import SystemRandom
-from string import ascii_letters, digits
+from secrets import token_urlsafe
 from aiofiles.os import makedirs
 from asyncio import Event
 from mega import MegaApi, MegaListener, MegaRequest, MegaTransfer, MegaError
@@ -91,8 +90,6 @@ class MegaAppListener(MegaListener):
         LOGGER.error(
             f'Mega download error in file {transfer} {filen}: {error}')
         if state in [1, 4]:
-            # Sometimes MEGA (offical client) can't stream a node either and raises a temp failed error.
-            # Don't break the transfer queue if transfer's in queued (1) or retrying (4) state [causes seg fault]
             return
 
         self.error = errStr
@@ -156,7 +153,7 @@ async def add_mega_download(mega_link, path, listener, name):
             await executor.do(folder_api.logout, ())
         return
 
-    gid = ''.join(SystemRandom().choices(ascii_letters + digits, k=8))
+    gid = token_urlsafe(8)
     size = api.getSize(node)
     if limit_exceeded := await limit_checker(size, listener, isMega=True):
         await listener.onDownloadError(limit_exceeded)

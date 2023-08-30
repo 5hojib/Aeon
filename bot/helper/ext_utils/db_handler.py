@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
-from aiofiles.os import path as aiopath, makedirs
+from os import environ
+from time import time
+
 from aiofiles import open as aiopen
+from aiofiles.os import makedirs
+from aiofiles.os import path as aiopath
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import PyMongoError
 from dotenv import dotenv_values
@@ -35,8 +39,8 @@ class DbManager:
         if await self.__db.settings.qbittorrent.find_one({'_id': bot_id}) is None:
             await self.__db.settings.qbittorrent.update_one({'_id': bot_id}, {'$set': qbit_options}, upsert=True)
         # User Data
-        if await self.__db.users.find_one():
-            rows = self.__db.users.find({})
+        if await self.__db.users[bot_id].find_one():
+            rows = self.__db.users[bot_id].find({})
             # return a dict ==> {_id, is_sudo, is_auth, as_doc, thumb, yt_opt, media_group, equal_splits, split_size, rclone}
             async for row in rows:
                 uid = row['_id']
@@ -120,7 +124,7 @@ class DbManager:
             del data['token']
         if data.get('time'):
             del data['time']
-        await self.__db.users.replace_one({'_id': user_id}, data, upsert=True)
+        await self.__db.users[bot_id].replace_one({'_id': user_id}, data, upsert=True)
         self.__conn.close
 
     async def update_user_doc(self, user_id, key, path=''):
@@ -131,7 +135,7 @@ class DbManager:
                 doc_bin = await doc.read()
         else:
             doc_bin = ''
-        await self.__db.users.update_one({'_id': user_id}, {'$set': {key: doc_bin}}, upsert=True)
+        await self.__db.users[bot_id].update_one({'_id': user_id}, {'$set': {key: doc_bin}}, upsert=True)
         self.__conn.close
 
     async def get_pm_uids(self):

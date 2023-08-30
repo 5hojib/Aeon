@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 from pyrogram.handlers import MessageHandler
 from pyrogram.filters import command
-from random import SystemRandom
-from string import ascii_letters, digits
+from secrets import token_urlsafe
 from asyncio import sleep, gather
 from aiofiles.os import path as aiopath
 from json import loads
@@ -85,7 +84,7 @@ async def rcloneNode(client, message, link, dst_path, rcf, tag):
 
     RCTransfer = RcloneTransferHelper(listener, name)
     LOGGER.info(f'Clone Started: Name: {name} - Source: {link} - Destination: {dst_path}')
-    gid = ''.join(SystemRandom().choices(ascii_letters + digits, k=12))
+    gid = token_urlsafe(8)
     async with download_dict_lock:
         download_dict[message.id] = RcloneStatus(
             RCTransfer, message, gid, 'cl', listener.upload_details)
@@ -157,7 +156,7 @@ async def gdcloneNode(message, link, listen_up):
             link, size, mime_type, files, folders = await sync_to_async(drive.clone, link, listener.drive_id)
             await deleteMessage(msg)
         else:
-            gid = ''.join(SystemRandom().choices(ascii_letters + digits, k=12))
+            gid = token_urlsafe(8)
             async with download_dict_lock:
                 download_dict[message.id] = GdriveStatus(
                     drive, size, message, gid, 'cl', listener.upload_details)
