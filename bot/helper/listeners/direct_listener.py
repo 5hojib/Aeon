@@ -31,7 +31,7 @@ class DirectListener:
             download = download.live
             self.speed += download.download_speed
             self.proc_bytes += download.completed_length
-            if error_message:= download.error_message:
+            if error_message := download.error_message:
                 self.failed += 1
                 LOGGER.error(f'Unable to download {download.name} due to: {error_message}')
                 download.remove(True, True)
@@ -40,9 +40,10 @@ class DirectListener:
                 self.file_processed_bytes += download.completed_length
                 download.remove(True)
                 should_remove.append(i)
-        if should_remove:
-            for i in should_remove:
-                del self.__downloads[i]
+        
+        for i in reversed(should_remove):
+            del self.__downloads[i]
+        
         if not self.__downloads:
             self.is_finished = True
 
