@@ -109,7 +109,7 @@ class MirrorLeechListener:
             if file is not None and file.media is not None:
                 mtype = file.media.value
                 media = getattr(file, mtype)
-                self.source_msg = f'<b>• Name:</b> <i>{media.file_name if hasattr(media, "file_name") else mtype+"_"+media.file_unique_id}</i>\n' \
+                self.source_msg = f'<b>• Name:</b> {media.file_name if hasattr(media, "file_name") else mtype+"_"+media.file_unique_id}\n' \
                                   f'<b>• Type:</b> {media.mime_type if hasattr(media, "mime_type") else "image/jpeg" if mtype == "photo" else "text/plain"}\n' \
                                   f'<b>• Size:</b> {get_readable_file_size(media.file_size)}\n' \
                                   f'<b>• Created Date:</b> {media.date}\n' \
@@ -129,7 +129,7 @@ class MirrorLeechListener:
                     else:
                         name += ('&' if amper else '') + check.replace('dn=', '').replace('+', '')
                         amper = True
-                self.source_msg = f"<b>• Name:</b> <i>{name}</i>\n<b>• Magnet Hash:</b> <code>{hashh}</code>\n<b>• Total Trackers:</b> {tracCount} \n<b>• Share:</b> <a href='https://t.me/share/url?url={quote(msg)}'>Share To Telegram</a>"
+                self.source_msg = f"<b>• Name:</b> {name}\n<b>• Magnet Hash:</b> <code>{hashh}</code>\n<b>• Total Trackers:</b> {tracCount} \n<b>• Share:</b> <a href='https://t.me/share/url?url={quote(msg)}'>Share To Telegram</a>"
             else:
                 self.source_msg = f"<code>{msg}</code>"
         else:
@@ -449,7 +449,7 @@ class MirrorLeechListener:
                             else:
                                 await editMessage(self.linkslogmsg, totalmsg)
                                 await sendMessage(self.botpmmsg,  totalmsg)
-                            self.linkslogmsg = await sendMessage(self.linkslogmsg, "<i>Fetching Details...</i>")
+                            self.linkslogmsg = await sendMessage(self.linkslogmsg, "Fetching Details...")
                         elif not (config_dict['BOT_PM'] or user_dict.get('bot_pm')):
                             await sendMessage(self.message, msg + lmsg + fmsg)
                         attachmsg = False
