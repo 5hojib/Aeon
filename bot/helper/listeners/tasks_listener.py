@@ -109,11 +109,7 @@ class MirrorLeechListener:
             if file is not None and file.media is not None:
                 mtype = file.media.value
                 media = getattr(file, mtype)
-                self.source_msg = f'<b>• Name:</b> {media.file_name if hasattr(media, "file_name") else mtype+"_"+media.file_unique_id}\n' \
-                                  f'<b>• Type:</b> {media.mime_type if hasattr(media, "mime_type") else "image/jpeg" if mtype == "photo" else "text/plain"}\n' \
-                                  f'<b>• Size:</b> {get_readable_file_size(media.file_size)}\n' \
-                                  f'<b>• Created Date:</b> {media.date}\n' \
-                                  f'<b>• Media Type:</b> {mtype.capitalize()}'
+                self.source_msg = f'<b>• Name:</b> {media.file_name if hasattr(media, "file_name") else f"{mtype}_{media.file_unique_id}"}\n<b>• Type:</b> {media.mime_type if hasattr(media, "mime_type") else "image/jpeg" if mtype == "photo" else "text/plain"}\n<b>• Size:</b> {get_readable_file_size(media.file_size)}\n<b>• Created Date:</b> {media.date}\n<b>• Media Type:</b> {mtype.capitalize()}'
             else:
                 self.source_msg = f"<code>{self.message.reply_to_message.text}</code>"
         elif self.source_url.startswith('https://t.me/share/url?url='):
