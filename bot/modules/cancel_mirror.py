@@ -89,8 +89,8 @@ async def cancel_all_update(_, query):
     reply_to = message.reply_to_message
     await query.answer()
     if data[1] == 'close':
-        await reply_to.delete()
-        await message.delete()
+        await deleteMessage(reply_to)
+        await deleteMessage(message)
     else:
         res = await cancel_all(data[1])
         if not res:

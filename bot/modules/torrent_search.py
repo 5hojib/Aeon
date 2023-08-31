@@ -216,7 +216,7 @@ async def torrentSearch(_, message):
     SEARCH_PLUGINS = config_dict['SEARCH_PLUGINS']
     if not await isAdmin(message, user_id):
         if message.chat.type != message.chat.type.PRIVATE:
-            msg, buttons = checking_access(user_id, buttons)
+            msg, buttons = await checking_access(user_id, buttons)
             if msg is not None:
                 reply_message = await sendMessage(message, msg, buttons.build_menu(1))
                 await delete_links(message)

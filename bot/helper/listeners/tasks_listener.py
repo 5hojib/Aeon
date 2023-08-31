@@ -12,7 +12,7 @@ from aioshutil import move
 from asyncio import create_subprocess_exec, sleep, Event
 from pyrogram.enums import ChatType
 
-from bot import OWNER_ID, Interval, aria2, DOWNLOAD_DIR, download_dict, download_dict_lock, LOGGER, bot_name, DATABASE_URL, \
+from bot import OWNER_ID, Interval, aria2, download_dict, download_dict_lock, LOGGER, bot_name, DATABASE_URL, \
     MAX_SPLIT_SIZE, config_dict, status_reply_dict_lock, user_data, non_queued_up, non_queued_dl, queued_up, \
     queued_dl, queue_dict_lock, bot, GLOBAL_EXTENSION_FILTER
 from bot.helper.ext_utils.bot_utils import extra_btns, sync_to_async, get_readable_file_size, get_readable_time, is_mega_link, is_gdrive_link, new_thread
@@ -33,7 +33,7 @@ from bot.helper.mirror_utils.upload_utils.pyrogramEngine import TgUploader
 from bot.helper.mirror_utils.rclone_utils.transfer import RcloneTransferHelper
 from bot.helper.telegram_helper.message_utils import sendCustomMsg, sendMessage, editMessage, delete_all_messages, delete_links, sendMultiMessage, update_all_messages, deleteMessage, five_minute_del
 from bot.helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.ext_utils.db_handler import DbManger
+from bot.helper.ext_utils.db_handler import DbManager
 
 
 class MirrorLeechListener:
@@ -53,7 +53,7 @@ class MirrorLeechListener:
         self.tag = tag
         self.seed = seed
         self.newDir = ""
-        self.dir = f"{DOWNLOAD_DIR}{self.uid}"
+        self.dir = f"/usr/src/app/downloads/{self.uid}"
         self.select = select
         self.isSuperGroup = message.chat.type in [ChatType.SUPERGROUP, ChatType.CHANNEL]
         self.isPrivate = message.chat.type == ChatType.BOT
@@ -67,8 +67,11 @@ class MirrorLeechListener:
         self.botpmmsg = None
         self.upload_details = {}
         self.source_url = (
-            source_url if (source_url and (source_url.startswith('http')))
-            else (f"https://t.me/share/url?url={source_url}" if source_url else '')
+            source_url if (isinstance(source_url, str) and source_url.startswith('http'))
+            else (
+                f"https://t.me/share/url?url={source_url}" if isinstance(source_url, str) and source_url
+                else ''
+            )
         )
         self.source_msg = ''
         self.__setModeEng()
@@ -106,7 +109,7 @@ class MirrorLeechListener:
             if file is not None and file.media is not None:
                 mtype = file.media.value
                 media = getattr(file, mtype)
-                self.source_msg = f'<b>• Name:</b> <i>{media.file_name if hasattr(media, "file_name") else mtype+"_"+media.file_unique_id}</i>\n' \
+                self.source_msg = f'<b>• Name:</b> {media.file_name if hasattr(media, "file_name") else mtype+"_"+media.file_unique_id}\n' \
                                   f'<b>• Type:</b> {media.mime_type if hasattr(media, "mime_type") else "image/jpeg" if mtype == "photo" else "text/plain"}\n' \
                                   f'<b>• Size:</b> {get_readable_file_size(media.file_size)}\n' \
                                   f'<b>• Created Date:</b> {media.date}\n' \
@@ -126,7 +129,7 @@ class MirrorLeechListener:
                     else:
                         name += ('&' if amper else '') + check.replace('dn=', '').replace('+', '')
                         amper = True
-                self.source_msg = f"<b>• Name:</b> <i>{name}</i>\n<b>• Magnet Hash:</b> <code>{hashh}</code>\n<b>• Total Trackers:</b> {tracCount} \n<b>• Share:</b> <a href='https://t.me/share/url?url={quote(msg)}'>Share To Telegram</a>"
+                self.source_msg = f"<b>• Name:</b> {name}\n<b>• Magnet Hash:</b> <code>{hashh}</code>\n<b>• Total Trackers:</b> {tracCount} \n<b>• Share:</b> <a href='https://t.me/share/url?url={quote(msg)}'>Share To Telegram</a>"
             else:
                 self.source_msg = f"<code>{msg}</code>"
         else:
@@ -145,7 +148,7 @@ class MirrorLeechListener:
         if config_dict['BOT_PM'] or user_dict.get('bot_pm'):
             self.botpmmsg = await sendCustomMsg(self.message.from_user.id, '<b>Task started</b>')
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
-            await DbManger().add_incomplete_task(self.message.chat.id, self.message.link, self.tag)
+            await DbManager().add_incomplete_task(self.message.chat.id, self.message.link, self.tag)
 
     async def onDownloadComplete(self):
         multi_links = False
@@ -162,7 +165,7 @@ class MirrorLeechListener:
                 self.sameDir['total'] -= 1
                 folder_name = self.sameDir['name']
                 spath = f"{self.dir}/{folder_name}"
-                des_path = f"{DOWNLOAD_DIR}{list(self.sameDir['tasks'])[0]}/{folder_name}"
+                des_path = f"/usr/src/app/downloads/{list(self.sameDir['tasks'])[0]}/{folder_name}"
                 await makedirs(des_path, exist_ok=True)
                 for item in await listdir(spath):
                     if item.endswith(('.aria2', '.!qB')):
@@ -409,7 +412,7 @@ class MirrorLeechListener:
 
     async def onUploadComplete(self, link, size, files, folders, mime_type, name, rclonePath=''):
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
-            await DbManger().rm_complete_task(self.message.link)
+            await DbManager().rm_complete_task(self.message.link)
         user_id = self.message.from_user.id
         name, _ = await format_filename(name, user_id, isMirror=not self.isLeech)
         user_dict = user_data.get(user_id, {})
@@ -446,7 +449,7 @@ class MirrorLeechListener:
                             else:
                                 await editMessage(self.linkslogmsg, totalmsg)
                                 await sendMessage(self.botpmmsg,  totalmsg)
-                            self.linkslogmsg = await sendMessage(self.linkslogmsg, "<i>Fetching Details...</i>")
+                            self.linkslogmsg = await sendMessage(self.linkslogmsg, "Fetching Details...")
                         elif not (config_dict['BOT_PM'] or user_dict.get('bot_pm')):
                             await sendMessage(self.message, msg + lmsg + fmsg)
                         attachmsg = False
@@ -609,7 +612,7 @@ Your download has been stopped!
         if self.isSuperGroup and self.botpmmsg:
             await sendMessage(self.botpmmsg, msg, button)
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
-            await DbManger().rm_complete_task(self.message.link)
+            await DbManager().rm_complete_task(self.message.link)
         await five_minute_del(x)
         
         async with queue_dict_lock:
@@ -652,7 +655,7 @@ Your upload has been stopped!
         if self.isSuperGroup and self.botpmmsg:
             await sendMessage(self.botpmmsg, msg)
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
-            await DbManger().rm_complete_task(self.message.link)
+            await DbManager().rm_complete_task(self.message.link)
         await five_minute_del(x)
         
         async with queue_dict_lock:

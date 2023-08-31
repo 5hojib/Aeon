@@ -18,7 +18,7 @@ from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.ext_utils.db_handler import DbManger
+from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.ext_utils.bot_utils import update_user_ldata, get_readable_file_size, sync_to_async, new_thread, is_gdrive_link
 
 handler_dict = {}
@@ -31,7 +31,7 @@ desp_dict = {'rcc': ['RClone is a command-line program to sync files and directo
             'thumb': ['Custom Thumbnail to appear on the Leeched files uploaded by the bot', 'Send a photo to save it as custom thumbnail. Timeout: 60 sec'],
             'yt_opt': ['YT-DLP Options is the Custom Quality for the extraction of videos from the yt-dlp supported sites.', 'Send YT-DLP Options. Timeout: 60 sec\nFormat: key:value|key:value|key:value.\nExample: format:bv*+mergeall[vcodec=none]|nocheckcertificate:True\nCheck all yt-dlp api options from this <a href="https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/YoutubeDL.py#L184">FILE</a> or use this <a href="https://t.me/mltb_official/177">script</a> to convert cli arguments to api options.'],
             'split_size': ['Leech Splits Size is the size to split the Leeched File before uploading', f'Send Leech split size in bytes. IS_PREMIUM_USER: {IS_PREMIUM_USER}. Timeout: 60 sec'],
-            'user_tds': [f'UserTD helps to upload files via Bot to your Custom Drive Destination through Global SA Mail.\n\n<b>SA Mail:</b> {SA if (SA := config_dict["USER_TD_SA"]) else "Not Specified"}','Send User TD details for use while Mirror/Clone.\n<b>Format:</b> \nname drive_id/link index(optional)\n\n<b>NOTE:</b> \n<i>1. Must add our sa mail in your drive with write permission\n2. Names can have spaces.\n3. Drive ID must be valid for acceptance.</i>\n\n<b>Timeout:</b> 60 sec.'],
+            'user_tds': [f'UserTD helps to upload files via Bot to your Custom Drive Destination through Global SA Mail.\n\n<b>SA Mail:</b> {SA if (SA := config_dict["USER_TD_SA"]) else "Not Specified"}','Send User TD details for use while Mirror/Clone.\n<b>Format:</b> \nname drive_id/link index(optional)\n\n<b>NOTE:</b> \n1. Must add our sa mail in your drive with write permission\n2. Names can have spaces.\n3. Drive ID must be valid for acceptance.\n\n<b>Timeout:</b> 60 sec.'],
             }
 fname_dict = {'rcc': 'RClone',
              'prefix': 'Prefix',
@@ -79,13 +79,12 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         remname = user_dict.get('remname', 'Not Exists')
 
         
-        text = f'''<b>Universal Settings for {name}</b>
-        
-        <b>• YT-DLP Options:</b> <b><code>{ytopt}</code></b>
-        <b>• User Bot PM:</b> <code>{bot_pm}</code>
-        <b>• Prefix:</b> <code>{prefix}</code>
-        <b>• Suffix:</b> <code>{suffix}</code>
-        <b>• Remname:</b> <code>{remname}</code>'''
+        text = f'<b>Universal Settings for {name}</b>\n\n'
+        text += f'<b>• YT-DLP Options:</b> <b><code>{ytopt}</code></b>\n'
+        text += f'<b>• User Bot PM:</b> <code>{bot_pm}</code>\n'
+        text += f'<b>• Prefix:</b> <code>{prefix}</code>\n'
+        text += f'<b>• Suffix:</b> <code>{suffix}</code>\n'
+        text += f'<b>• Remname:</b> <code>{remname}</code>'
         buttons.ibutton("Back", f"userset {user_id} back", "footer")
         buttons.ibutton("Close", f"userset {user_id} close", "footer")
         button = buttons.build_menu(2)
@@ -96,10 +95,9 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         user_tds = len(val) if (val := user_dict.get('user_tds', False)) else 0
         buttons.ibutton("User TDs", f"userset {user_id} user_tds")
 
-        text = f'''<b>Mirror Settings for {name}</b>
-        
-        <b>• Rclone Config:</b> {rccmsg}
-        <b>• User TD Mode:</b> {tds_mode}'''
+        text = f'<b>Mirror Settings for {name}</b>\n\n'
+        text += f'<b>• Rclone Config:</b> {rccmsg}\n'
+        text += f'<b>• User TD Mode:</b> {tds_mode}'
         
         buttons.ibutton("Back", f"userset {user_id} back", "footer")
         buttons.ibutton("Close", f"userset {user_id} close", "footer")
@@ -130,16 +128,15 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         buttons.ibutton("Leech Dump", f"userset {user_id} ldump")
         ldump = 'Not Exists' if (val:=user_dict.get('ldump', '')) == '' else val
 
-        text = f'''<b>Leech Settings for {name}</b>
-                
-                <b>• Leech Type:</b> {ltype}
-                <b>• Custom Thumbnail:</b> {thumbmsg}
-                <b>• Leech Split Size:</b> <code>{split_size}</code>
-                <b>• Equal Splits:</b> {equal_splits}
-                <b>• Media Group:</b> {media_group}
-                <b>• Leech Caption:</b> <code>{escape(lcaption)}</code>
-                <b>• Leech Dump:</b> <code>{ldump}</code>
-                <b>• MediaInfo Mode:</b> <code>{mediainfo}</code>'''
+        text = f'<b>Leech Settings for {name}</b>\n\n'
+        text += f'<b>• Leech Type:</b> {ltype}\n'
+        text += f'<b>• Custom Thumbnail:</b> {thumbmsg}\n'
+        text += f'<b>• Leech Split Size:</b> <code>{split_size}</code>\n'
+        text += f'<b>• Equal Splits:</b> {equal_splits}\n'
+        text += f'<b>• Media Group:</b> {media_group}\n'
+        text += f'<b>• Leech Caption:</b> <code>{escape(lcaption)}</code>\n'
+        text += f'<b>• Leech Dump:</b> <code>{ldump}</code>\n'
+        text += f'<b>• MediaInfo Mode:</b> <code>{mediainfo}</code>'
 
         buttons.ibutton("Back", f"userset {user_id} back", "footer")
         buttons.ibutton("Close", f"userset {user_id} close", "footer")
@@ -214,7 +211,7 @@ async def set_yt_options(client, message, pre_event):
     await message.delete()
     await update_user_settings(pre_event, 'yt_opt', 'universal')
     if DATABASE_URL:
-        await DbManger().update_user_data(user_id)
+        await DbManager().update_user_data(user_id)
 
 
 async def set_custom(client, message, pre_event, key, direct=False):
@@ -245,7 +242,7 @@ async def set_custom(client, message, pre_event, key, direct=False):
     await message.delete()
     await update_user_settings(pre_event, key, return_key, msg=message, sdirect=direct)
     if DATABASE_URL:
-        await DbManger().update_user_data(user_id)
+        await DbManager().update_user_data(user_id)
 
 
 async def set_thumb(client, message, pre_event, key, direct=False):
@@ -262,7 +259,7 @@ async def set_thumb(client, message, pre_event, key, direct=False):
     await message.delete()
     await update_user_settings(pre_event, key, 'leech', msg=message, sdirect=direct)
     if DATABASE_URL:
-        await DbManger().update_user_doc(user_id, 'thumb', des_dir)
+        await DbManager().update_user_doc(user_id, 'thumb', des_dir)
 
 
 async def add_rclone(client, message, pre_event):
@@ -277,7 +274,7 @@ async def add_rclone(client, message, pre_event):
     await message.delete()
     await update_user_settings(pre_event, 'rcc', 'mirror')
     if DATABASE_URL:
-        await DbManger().update_user_doc(user_id, 'rclone', des_dir)
+        await DbManager().update_user_doc(user_id, 'rclone', des_dir)
 
 
 async def leech_split_size(client, message, pre_event):
@@ -293,7 +290,7 @@ async def leech_split_size(client, message, pre_event):
     await message.delete()
     await update_user_settings(pre_event, 'split_size', 'leech')
     if DATABASE_URL:
-        await DbManger().update_user_data(user_id)
+        await DbManager().update_user_data(user_id)
 
 
 async def event_handler(client, query, pfunc, rfunc, photo=False, document=False):
@@ -340,7 +337,7 @@ async def edit_user_settings(client, query):
         await query.answer()
         await update_user_settings(query, 'leech')
         if DATABASE_URL:
-            await DbManger().update_user_data(user_id)
+            await DbManager().update_user_data(user_id)
     elif data[2] == 'vthumb':
         handler_dict[user_id] = False
         await query.answer()
@@ -368,7 +365,7 @@ async def edit_user_settings(client, query):
             update_user_ldata(user_id, 'thumb', '')
             await update_user_settings(query, 'thumb', 'leech')
             if DATABASE_URL:
-                await DbManger().update_user_doc(user_id, 'thumb')
+                await DbManager().update_user_doc(user_id, 'thumb')
         else:
             await query.answer("Old Settings", show_alert=True)
             await update_user_settings(query, 'leech')
@@ -394,7 +391,7 @@ async def edit_user_settings(client, query):
         update_user_ldata(user_id, 'yt_opt', '')
         await update_user_settings(query, 'yt_opt', 'universal')
         if DATABASE_URL:
-            await DbManger().update_user_data(user_id)
+            await DbManager().update_user_data(user_id)
     elif data[2] in ['bot_pm', 'td_mode'] :
         handler_dict[user_id] = False
         if data[2] == 'td_mode' and not user_dict.get('user_tds', False):
@@ -406,7 +403,7 @@ async def edit_user_settings(client, query):
         else:
             await update_user_settings(query, 'universal')
         if DATABASE_URL:
-            await DbManger().update_user_data(user_id)
+            await DbManager().update_user_data(user_id)
     elif data[2] == 'mediainfo':
         handler_dict[user_id] = False
         if data[2] == 'mediainfo' and config_dict['SHOW_MEDIAINFO']:
@@ -415,7 +412,7 @@ async def edit_user_settings(client, query):
         update_user_ldata(user_id, data[2], not user_dict.get(data[2], False))
         await update_user_settings(query, 'leech')
         if DATABASE_URL:
-            await DbManger().update_user_data(user_id)
+            await DbManager().update_user_data(user_id)
     elif data[2] == 'split_size':
         await query.answer()
         edit_mode = len(data) == 4
@@ -430,21 +427,21 @@ async def edit_user_settings(client, query):
         update_user_ldata(user_id, 'split_size', '')
         await update_user_settings(query, 'split_size', 'leech')
         if DATABASE_URL:
-            await DbManger().update_user_data(user_id)
+            await DbManager().update_user_data(user_id)
     elif data[2] == 'esplits':
         handler_dict[user_id] = False
         await query.answer()
         update_user_ldata(user_id, 'equal_splits', not user_dict.get('equal_splits', False))
         await update_user_settings(query, 'leech')
         if DATABASE_URL:
-            await DbManger().update_user_data(user_id)
+            await DbManager().update_user_data(user_id)
     elif data[2] == 'mgroup':
         handler_dict[user_id] = False
         await query.answer()
         update_user_ldata(user_id, 'media_group', not user_dict.get('media_group', False))
         await update_user_settings(query, 'leech')
         if DATABASE_URL:
-            await DbManger().update_user_data(user_id)
+            await DbManager().update_user_data(user_id)
     elif data[2] == 'rcc':
         await query.answer()
         edit_mode = len(data) == 4
@@ -461,7 +458,7 @@ async def edit_user_settings(client, query):
             update_user_ldata(user_id, 'rclone', '')
             await update_user_settings(query, 'rcc', 'mirror')
             if DATABASE_URL:
-                await DbManger().update_user_doc(user_id, 'rclone')
+                await DbManager().update_user_doc(user_id, 'rclone')
         else:
             await query.answer("Old Settings", show_alert=True)
             await update_user_settings(query)
@@ -498,14 +495,14 @@ async def edit_user_settings(client, query):
         update_user_ldata(user_id, data[2][1:], '')
         await update_user_settings(query, data[2][1:], 'leech')
         if DATABASE_URL:
-            await DbManger().update_user_data(user_id)
+            await DbManager().update_user_data(user_id)
     elif data[2] in ['dprefix', 'dsuffix', 'dremname']:
         handler_dict[user_id] = False
         await query.answer()
         update_user_ldata(user_id, data[2][1:], '')
         await update_user_settings(query, data[2][1:], 'universal')
         if DATABASE_URL:
-            await DbManger().update_user_data(user_id)
+            await DbManager().update_user_data(user_id)
     elif data[2] == 'duser_tds':
         handler_dict[user_id] = False
         await query.answer()
@@ -514,7 +511,7 @@ async def edit_user_settings(client, query):
             update_user_ldata(user_id, 'td_mode', False)
         await update_user_settings(query, data[2][1:], 'mirror')
         if DATABASE_URL:
-            await DbManger().update_user_data(user_id)
+            await DbManager().update_user_data(user_id)
     elif data[2] == 'back':
         handler_dict[user_id] = False
         await query.answer()
@@ -540,9 +537,9 @@ async def edit_user_settings(client, query):
         update_user_ldata(user_id, None, None)
         await update_user_settings(query)
         if DATABASE_URL:
-            await DbManger().update_user_data(user_id)
-            await DbManger().update_user_doc(user_id, 'thumb')
-            await DbManger().update_user_doc(user_id, 'rclone')
+            await DbManager().update_user_data(user_id)
+            await DbManager().update_user_doc(user_id, 'thumb')
+            await DbManager().update_user_doc(user_id, 'rclone')
     elif data[2] == 'user_del':
         user_id = int(data[3])
         await query.answer()
@@ -554,9 +551,9 @@ async def edit_user_settings(client, query):
             await aioremove(rclone_path)
         update_user_ldata(user_id, None, None)
         if DATABASE_URL:
-            await DbManger().update_user_data(user_id)
-            await DbManger().update_user_doc(user_id, 'thumb')
-            await DbManger().update_user_doc(user_id, 'rclone')
+            await DbManager().update_user_data(user_id)
+            await DbManager().update_user_doc(user_id, 'thumb')
+            await DbManager().update_user_doc(user_id, 'rclone')
         await editMessage(message, f'Data Reset for {user_id}')
     else:
         handler_dict[user_id] = False

@@ -14,7 +14,8 @@
    * `HEROKU_APP_NAME`
    * `HEROKU_EMAIL`
    * `HEROKU_API_KEY`
-7. After the deployment is complete, finalize the remaining variables and upload sensitive files like `token.pickle` using the `bsetting` command.
+7. Run workflow.
+8. After the deployment is complete, finalize the remaining variables and upload sensitive files like `token.pickle` using the `bsetting` command.
 
 ### Donations
 

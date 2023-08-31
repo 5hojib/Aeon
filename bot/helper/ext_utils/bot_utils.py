@@ -24,21 +24,17 @@ from pyrogram.enums import ChatType
 from pyrogram.types import BotCommand
 from pyrogram.errors import PeerIdInvalid
 
-from bot.helper.ext_utils.db_handler import DbManger
+from bot.helper.ext_utils.db_handler import DbManager
 from bot import OWNER_ID, bot_name, DATABASE_URL, LOGGER, get_client, aria2, download_dict, download_dict_lock, botStartTime, user_data, config_dict, bot_loop, extra_buttons, user
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.telegraph_helper import telegraph
 from bot.helper.ext_utils.shortners import short_url
 
-THREADPOOL = ThreadPoolExecutor(max_workers=1000)
-
+THREADPOOL = ThreadPoolExecutor(max_workers = 1000)
 MAGNET_REGEX = r'magnet:\?xt=urn:(btih|btmh):[a-zA-Z0-9]*\s*'
-
 URL_REGEX = r'^(?!\/)(rtmps?:\/\/|mms:\/\/|rtsp:\/\/|https?:\/\/|ftp:\/\/)?([^\/:]+:[^\/@]+@)?(www\.)?(?=[^\/:\s]+\.[^\/:\s]+)([^\/:\s]+\.[^\/:\s]+)(:\d+)?(\/[^#\s]*[\s\S]*)?(\?[^#\s]*)?(#.*)?$'
-
 SIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
-
 STATUS_START = 0
 PAGES = 1
 PAGE_NO = 1
@@ -158,11 +154,6 @@ def source(self):
         source = sender_chat.title
     else:
         source = self.message.from_user.username or self.message.from_user.id
-   # if reply_to := self.message.reply_to_message:
-    #    if sender_chat := reply_to.sender_chat:
-     #       source = reply_to.sender_chat.title
-      #  elif not reply_to.from_user.is_bot:
-       #     source = reply_to.from_user.username or reply_to.from_user.id
     return source
 
 def get_readable_message():
@@ -235,7 +226,7 @@ def get_readable_message():
         button = buttons.build_menu(3)
     msg += f"<b>• Tasks</b>: {tasks}{bmax_task}"
     msg += f"\n<b>• Bot uptime</b>: {currentTime}"
-    msg += f"\n<b>• Free disk space</b>: {get_readable_file_size(disk_usage(config_dict['DOWNLOAD_DIR']).free)}"
+    msg += f"\n<b>• Free disk space</b>: {get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}"
     msg += f"\n<b>• Uploading speed</b>: {get_readable_file_size(up_speed)}/s"
     msg += f"\n<b>• Downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
     return msg, button
@@ -419,12 +410,14 @@ def new_thread(func):
     return wrapper
 
 
-def checking_access(user_id, button=None):
+async def checking_access(user_id, button=None):
     token_timeout = config_dict['TOKEN_TIMEOUT']
-    if not token_timeout or bool(user_id == OWNER_ID or user_id in user_data and user_data[user_id].get('is_sudo')):
+    if not token_timeout:
         return None, button
     user_data.setdefault(user_id, {})
     data = user_data[user_id]
+    if DATABASE_URL:
+        data['time'] = await DbManager().get_token_expire_time(user_id)
     expire = data.get('time')
     isExpired = (expire is None or expire is not None and (time() - expire) > token_timeout)
     if isExpired:
@@ -432,12 +425,13 @@ def checking_access(user_id, button=None):
         if expire is not None:
             del data['time']
         data['token'] = token
+        if DATABASE_URL:
+            await DbManager().update_user_token(user_id, token)
         user_data[user_id].update(data)
         time_str = format_validity_time(token_timeout)
         if button is None:
             button = ButtonMaker()
-        encrypt_url = b64encode(f"{token}&&{user_id}".encode()).decode()
-        button.ubutton('Collect token', tiny(short_url(f'https://t.me/{bot_name}?start={encrypt_url}')))
+        button.ubutton('Collect token', tiny(short_url(f'https://telegram.me/{bot_name}?start={token}')))
         return f'Your token has expired, please collect a new token.\n<b>It will expire after {time_str}</b>!', button
     return None, button
 

@@ -6,7 +6,7 @@ from bot import user_data, DATABASE_URL, bot
 from bot.helper.telegram_helper.message_utils import sendMessage
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
-from bot.helper.ext_utils.db_handler import DbManger
+from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.ext_utils.bot_utils import update_user_ldata
 
 
@@ -23,7 +23,7 @@ async def authorize(client, message):
     else:
         update_user_ldata(id_, 'is_auth', True)
         if DATABASE_URL:
-            await DbManger().update_user_data(id_)
+            await DbManager().update_user_data(id_)
         msg = 'Authorized'
     await sendMessage(message, msg)
 
@@ -39,7 +39,7 @@ async def unauthorize(client, message):
     if id_ not in user_data or user_data[id_].get('is_auth'):
         update_user_ldata(id_, 'is_auth', False)
         if DATABASE_URL:
-            await DbManger().update_user_data(id_)
+            await DbManager().update_user_data(id_)
         msg = 'Unauthorized'
     else:
         msg = 'Already Unauthorized!'
@@ -59,7 +59,7 @@ async def addSudo(client, message):
         else:
             update_user_ldata(id_, 'is_sudo', True)
             if DATABASE_URL:
-                await DbManger().update_user_data(id_)
+                await DbManager().update_user_data(id_)
             msg = 'Promoted as Sudo'
     else:
         msg = "Give ID or Reply To message of whom you want to Promote."
@@ -76,7 +76,7 @@ async def removeSudo(client, message):
     if id_ and id_ not in user_data or user_data[id_].get('is_sudo'):
         update_user_ldata(id_, 'is_sudo', False)
         if DATABASE_URL:
-            await DbManger().update_user_data(id_)
+            await DbManager().update_user_data(id_)
         msg = 'Demoted'
     else:
         msg = "Give ID or Reply To message of whom you want to remove from Sudo"

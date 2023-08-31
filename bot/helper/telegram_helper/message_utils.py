@@ -21,8 +21,7 @@ async def sendMessage(message, text, buttons=None, photo=None):
             try:
                 if photo == 'IMAGES':
                     photo = rchoice(config_dict['IMAGES'])
-                return await message.reply_photo(photo=photo, reply_to_message_id=message.id,
-                                                 caption=text, reply_markup=buttons, disable_notification=True)
+                return await message.reply_photo(photo=photo, reply_to_message_id=message.id, caption=text, reply_markup=buttons, disable_notification=True)
             except IndexError:
                 pass
             except (PhotoInvalidDimensions, WebpageCurlFailed, MediaEmpty):
@@ -32,8 +31,7 @@ async def sendMessage(message, text, buttons=None, photo=None):
                 return
             except Exception as e:
                 LOGGER.error(format_exc())
-        return await message.reply(text=text, quote=True, disable_web_page_preview=True,
-                                   disable_notification=True, reply_markup=buttons)
+        return await message.reply(text=text, quote=True, disable_web_page_preview=True, disable_notification=True, reply_markup=buttons)
     except FloodWait as f:
         LOGGER.warning(str(f))
         await sleep(f.value * 1.2)
@@ -51,8 +49,7 @@ async def sendCustomMsg(chat_id, text, buttons=None, photo=None):
             try:
                 if photo == 'IMAGES':
                     photo = rchoice(config_dict['IMAGES'])
-                return await bot.send_photo(chat_id=chat_id, photo=photo, caption=text,
-                                                        reply_markup=buttons, disable_notification=True)
+                return await bot.send_photo(chat_id=chat_id, photo=photo, caption=text, reply_markup=buttons, disable_notification=True)
             except IndexError:
                 pass
             except (PhotoInvalidDimensions, WebpageCurlFailed, MediaEmpty):
@@ -62,8 +59,7 @@ async def sendCustomMsg(chat_id, text, buttons=None, photo=None):
                 return
             except Exception as e:
                 LOGGER.error(format_exc())
-        return await bot.send_message(chat_id=chat_id, text=text, disable_web_page_preview=True,
-                                                  disable_notification=True, reply_markup=buttons)
+        return await bot.send_message(chat_id=chat_id, text=text, disable_web_page_preview=True, disable_notification=True, reply_markup=buttons)
     except FloodWait as f:
         LOGGER.warning(str(f))
         await sleep(f.value * 1.2)
@@ -106,8 +102,7 @@ async def sendMultiMessage(chat_ids, text, buttons=None, photo=None):
                 try:
                     if photo == 'IMAGES':
                         photo = rchoice(config_dict['IMAGES'])
-                    sent = await bot.send_photo(chat_id=chat.id, photo=photo, caption=text,
-                                                     reply_markup=buttons, disable_notification=True)
+                    sent = await bot.send_photo(chat_id=chat.id, photo=photo, caption=text, reply_markup=buttons, disable_notification=True)
                     msg_dict[chat.id] = sent
                     continue
                 except IndexError:
@@ -119,8 +114,7 @@ async def sendMultiMessage(chat_ids, text, buttons=None, photo=None):
                     return
                 except Exception as e:
                     LOGGER.error(str(e))
-            sent = await bot.send_message(chat_id=chat.id, text=text, disable_web_page_preview=True,
-                                               disable_notification=True, reply_markup=buttons)
+            sent = await bot.send_message(chat_id=chat.id, text=text, disable_web_page_preview=True, disable_notification=True, reply_markup=buttons)
             msg_dict[chat.id] = sent
         except FloodWait as f:
             LOGGER.warning(str(f))
@@ -165,11 +159,9 @@ async def sendFile(message, file, caption=None, buttons=None):
 async def sendRss(text):
     try:
         if user:
-            return await user.send_message(chat_id=config_dict['RSS_CHAT_ID'], text=text, disable_web_page_preview=True,
-                                           disable_notification=True)
+            return await user.send_message(chat_id=config_dict['RSS_CHAT_ID'], text=text, disable_web_page_preview=True, disable_notification=True)
         else:
-            return await bot.send_message(chat_id=config_dict['RSS_CHAT_ID'], text=text, disable_web_page_preview=True,
-                                          disable_notification=True)
+            return await bot.send_message(chat_id=config_dict['RSS_CHAT_ID'], text=text, disable_web_page_preview=True, disable_notification=True)
     except FloodWait as f:
         LOGGER.warning(str(f))
         await sleep(f.value * 1.2)

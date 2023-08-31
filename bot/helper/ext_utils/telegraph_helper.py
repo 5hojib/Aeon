@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-from string import ascii_letters
-from random import SystemRandom
+from secrets import token_urlsafe
 from asyncio import sleep
 from telegraph.aio import Telegraph
 from telegraph.exceptions import RetryAfterError
@@ -11,7 +10,7 @@ from bot import LOGGER, bot_loop, config_dict
 class TelegraphHelper:
     def __init__(self, author_name=None, author_url=None):
         self.telegraph = Telegraph(domain='graph.org')
-        self.short_name = ''.join(SystemRandom().choices(ascii_letters, k=8))
+        self.short_name = token_urlsafe(8)
         self.access_token = None
         self.author_name = author_name
         self.author_url = author_url

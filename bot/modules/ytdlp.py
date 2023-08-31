@@ -8,7 +8,7 @@ from yt_dlp import YoutubeDL
 from functools import partial
 from time import time
 
-from bot import DOWNLOAD_DIR, bot, config_dict, user_data, LOGGER
+from bot import bot, config_dict, user_data, LOGGER
 from bot.helper.ext_utils.task_manager import task_utils
 from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, delete_links, deleteMessage, one_minute_del, five_minute_del, isAdmin
 from bot.helper.telegram_helper.button_build import ButtonMaker
@@ -337,7 +337,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
         await sleep(5)
         _ytdl(client, nextmsg, isLeech, sameDir, bulk)
 
-    path = f'{DOWNLOAD_DIR}{message.id}{folder_name}'
+    path = f'/usr/src/app/downloads/{message.id}{folder_name}'
 
     opt = opt or config_dict['YT_DLP_OPTIONS']
 

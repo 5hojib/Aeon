@@ -15,7 +15,7 @@ from aioshutil import copy
 
 from bot import config_dict, user_data, GLOBAL_EXTENSION_FILTER, bot, user, IS_PREMIUM_USER
 from bot.helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.telegram_helper.message_utils import sendCustomMsg, sendMultiMessage, chat_info
+from bot.helper.telegram_helper.message_utils import sendCustomMsg, sendMultiMessage, chat_info, deleteMessage
 from bot.helper.ext_utils.fs_utils import clean_unwanted, is_archive, get_base_name
 from bot.helper.ext_utils.bot_utils import get_readable_file_size, sync_to_async
 from bot.helper.ext_utils.leech_utils import get_media_info, get_document_type, take_ss, get_mediainfo_link, format_filename
@@ -277,7 +277,7 @@ class TgUploader:
                     await self.__switching_client()
                     await self.__upload_file(cap_mono, file_)
                     if not isDeleted:
-                        await list(self.__leechmsg.values())[0].delete()
+                        await deleteMessage(list(self.__leechmsg.values())[0])
                         isDeleted = True
                     if self.__is_cancelled:
                         return
@@ -349,7 +349,7 @@ class TgUploader:
                 if self.__prm_media and (self.__has_buttons or not self.__leechmsg):
                     try:
                         self.__sent_msg = await bot.copy_message(nrml_media.chat.id, nrml_media.chat.id, nrml_media.id, reply_to_message_id=self.__sent_msg.id, reply_markup=await self.__buttons(self.__up_path))
-                        if self.__sent_msg: await nrml_media.delete()
+                        if self.__sent_msg: await deleteMessage(nrml_media)
                     except:
                         self.__sent_msg = nrml_media
                 else:
@@ -394,7 +394,7 @@ class TgUploader:
                 if self.__prm_media and (self.__has_buttons or not self.__leechmsg):
                     try:
                         self.__sent_msg = await bot.copy_message(nrml_media.chat.id, nrml_media.chat.id, nrml_media.id, reply_to_message_id=self.__sent_msg.id, reply_markup=await self.__buttons(self.__up_path))
-                        if self.__sent_msg: await nrml_media.delete()
+                        if self.__sent_msg: await deleteMessage(nrml_media)
                     except:
                         self.__sent_msg = nrml_media
                 else:

@@ -10,7 +10,7 @@ from json import loads
 from time import time
 
 from bot import LOGGER, config_dict
-from bot.helper.ext_utils.db_handler import DbManger
+from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import sendMessage, editMessage
 from bot.helper.ext_utils.bot_utils import cmd_exec, new_thread, get_readable_file_size, new_task, get_readable_time
@@ -77,7 +77,7 @@ async def path_updates(client, query, obj):
             config_dict['RCLONE_PATH'] = path
             await obj.get_path_buttons()
             if config_dict['DATABASE_URL']:
-                await DbManger().update_config({'RCLONE_PATH': path})
+                await DbManager().update_config({'RCLONE_PATH': path})
     elif data[1] == 'owner':
         obj.config_path = 'rcl.conf'
         obj.path = ''

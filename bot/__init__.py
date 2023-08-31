@@ -140,12 +140,6 @@ DEFAULT_UPLOAD = environ.get('DEFAULT_UPLOAD', '')
 if DEFAULT_UPLOAD != 'rc':
     DEFAULT_UPLOAD = 'gd'
 
-DOWNLOAD_DIR = environ.get('DOWNLOAD_DIR', '')
-if len(DOWNLOAD_DIR) == 0:
-    DOWNLOAD_DIR = '/usr/src/app/downloads/'
-elif not DOWNLOAD_DIR.endswith("/"):
-    DOWNLOAD_DIR = f'{DOWNLOAD_DIR}/'
-
 AUTHORIZED_CHATS = environ.get('AUTHORIZED_CHATS', '')
 if len(AUTHORIZED_CHATS) != 0:
     aid = AUTHORIZED_CHATS.split()
@@ -171,8 +165,7 @@ USER_SESSION_STRING = environ.get('USER_SESSION_STRING', '')
 if len(USER_SESSION_STRING) != 0:
     log_info("Creating client from USER_SESSION_STRING")
     try:
-        user = tgClient('user', TELEGRAM_API, TELEGRAM_HASH, session_string=USER_SESSION_STRING,
-                        parse_mode=enums.ParseMode.HTML).start()
+        user = tgClient('user', TELEGRAM_API, TELEGRAM_HASH, session_string = USER_SESSION_STRING, worker = 1000, parse_mode = enums.ParseMode.HTML).start()
         IS_PREMIUM_USER = user.me.is_premium
     except Exception as e:
         log_error(f"Failed making client from USER_SESSION_STRING : {e}")
@@ -386,7 +379,6 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'CMD_SUFFIX': CMD_SUFFIX,
                'DATABASE_URL': DATABASE_URL,
                'DEFAULT_UPLOAD': DEFAULT_UPLOAD,
-               'DOWNLOAD_DIR': DOWNLOAD_DIR,
                'GDTOT_CRYPT': GDTOT_CRYPT,
                'STORAGE_THRESHOLD': STORAGE_THRESHOLD,
                'TORRENT_LIMIT': TORRENT_LIMIT,
@@ -518,7 +510,7 @@ def aria2c_init():
     try:
         log_info("Initializing Aria2c")
         link = "https://linuxmint.com/torrents/lmde-5-cinnamon-64bit.iso.torrent"
-        dire = DOWNLOAD_DIR.rstrip("/")
+        dire = '/usr/src/app/downloads/'.rstrip("/")
         aria2.add_uris([link], {'dir': dire})
         sleep(3)
         downloads = aria2.get_downloads()
@@ -531,9 +523,7 @@ def aria2c_init():
 Thread(target=aria2c_init).start()
 sleep(1.5)
 
-aria2c_global = ['bt-max-open-files', 'download-result', 'keep-unfinished-download-result', 'log', 'log-level',
-                 'max-concurrent-downloads', 'max-download-result', 'max-overall-download-limit', 'save-session',
-                 'max-overall-upload-limit', 'optimize-concurrent-downloads', 'save-cookies', 'server-stat-of']
+aria2c_global = ['bt-max-open-files', 'download-result', 'keep-unfinished-download-result', 'log', 'log-level', 'max-concurrent-downloads', 'max-download-result', 'max-overall-download-limit', 'save-session', 'max-overall-upload-limit', 'optimize-concurrent-downloads', 'save-cookies', 'server-stat-of']
 
 if not aria2_options:
     aria2_options = aria2.client.get_global_option()
@@ -557,9 +547,7 @@ else:
     qb_client.app_set_preferences(qb_opt)
 
 log_info("Creating client from BOT_TOKEN")
-bot = tgClient('bot', TELEGRAM_API, TELEGRAM_HASH, bot_token=BOT_TOKEN, workers=1000,
-               parse_mode=enums.ParseMode.HTML).start()
+bot = tgClient('bot', TELEGRAM_API, TELEGRAM_HASH, bot_token = BOT_TOKEN, workers = 1000, parse_mode = enums.ParseMode.HTML).start()
 bot_loop = bot.loop
 bot_name = bot.me.username
-scheduler = AsyncIOScheduler(timezone=str(
-    get_localzone()), event_loop=bot_loop)
+scheduler = AsyncIOScheduler(timezone = str(get_localzone()), event_loop = bot_loop)
