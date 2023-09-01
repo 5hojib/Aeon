@@ -24,6 +24,9 @@ async def add_direct_download(details, path, listener, foldername):
         path = f'{path}/{foldername}'
     if not foldername:
         foldername = details['title']
+    if not foldername:
+        await sendMessage(listener.message, 'There is no any title use -n New Name')
+        return
     if config_dict['STOP_DUPLICATE']:
         msg, button = await stop_duplicate_check(foldername, listener)
         if msg:
