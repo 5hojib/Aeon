@@ -495,11 +495,6 @@ async def set_commands(client):
                     f'{BotCommands.StatsCommand}', 'Check Bot & System stats'
                 ),
                 BotCommand(
-                    f'{BotCommands.BtSelectCommand}',
-                    'Select files to download only torrents',
-                ),
-                BotCommand(f'{BotCommands.CancelMirror}', 'Cancel a Task'),
-                BotCommand(
                     f'{BotCommands.CancelAllCommand[0]}',
                     'Cancel all tasks which added by you to in bots.',
                 ),

@@ -77,7 +77,7 @@ async def stats(_, message):
     await one_minute_del(reply_message)
 
 @new_thread
-async def start(_, message):
+async def start(client, message):
     buttons = ButtonMaker()
     reply_markup = buttons.build_menu(2)
     if len(message.command) > 1 and message.command[1] == "wzmlx":
@@ -313,9 +313,8 @@ async def main():
     await gather(start_cleanup(), torrent_search.initiate_search_tools(), restart_notification(), search_images(), set_commands(bot))
     await sync_to_async(start_aria2_listener, wait=False)
     
-    bot.add_handler(MessageHandler(
-        start, filters=command(BotCommands.StartCommand) & private))
-    #bot.add_handler(CallbackQueryHandler(token_callback, filters=regex(r'^pass')))
+    bot.add_handler(MessageHandler(start, filters=command(
+        BotCommands.StartCommand)))
     bot.add_handler(MessageHandler(log, filters=command(
         BotCommands.LogCommand) & CustomFilters.sudo))
     bot.add_handler(MessageHandler(restart, filters=command(
