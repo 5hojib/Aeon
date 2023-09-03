@@ -50,7 +50,6 @@ class TgUploader:
         self.__mediainfo = False
         self.__as_doc = False
         self.__media_group = False
-        self.__bot_pm = False
         self.__user_id = listener.message.from_user.id
         self.__leechmsg = {}
 
@@ -65,7 +64,7 @@ class TgUploader:
 
     async def __copy_file(self):
         try:
-            if self.__bot_pm and (self.__leechmsg or self.__listener.isSuperGroup):
+            if self.__leechmsg or self.__listener.isSuperGroup:
                 destination = 'Bot PM'
                 copied = await bot.copy_message(chat_id=self.__user_id, from_chat_id=self.__sent_msg.chat.id, message_id=self.__sent_msg.id, reply_to_message_id=self.__listener.botpmmsg.id) 
                 if self.__has_buttons:
@@ -119,7 +118,6 @@ class TgUploader:
         user_dict = user_data.get(self.__user_id, {})
         self.__as_doc = user_dict.get('as_doc') or config_dict['AS_DOCUMENT']
         self.__media_group = user_dict.get('media_group') or config_dict['MEDIA_GROUP']
-        self.__bot_pm = True
         self.__mediainfo = config_dict['SHOW_MEDIAINFO'] or user_dict.get('mediainfo')
         self.__ldump = user_dict.get('ldump', '') or ''
         self.__has_buttons = bool(self.__mediainfo)
@@ -221,7 +219,7 @@ class TgUploader:
                 self.__msgs_dict[m.link] = m.caption
         self.__sent_msg = msgs_list[-1]
         try:
-            if self.__bot_pm and (self.__leechmsg or self.__listener.isSuperGroup):
+            if self.__leechmsg or self.__listener.isSuperGroup:
                 destination = 'Bot PM'
                 await bot.copy_media_group(chat_id=self.__user_id, from_chat_id=self.__sent_msg.chat.id, message_id=self.__sent_msg.id)
             if self.__ldump:

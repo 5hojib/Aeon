@@ -56,7 +56,7 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         buttons.ibutton("Universal", f"userset {user_id} universal")
         buttons.ibutton("Mirror", f"userset {user_id} mirror")
         buttons.ibutton("Leech", f"userset {user_id} leech")
-        if user_dict and any(key in user_dict for key in ['prefix', 'suffix', 'remname', 'ldump', 'yt_opt', 'bot_pm', 'media_group', 'equal_splits', 'split_size', 'rclone', 'thumb', 'as_doc']):
+        if user_dict and any(key in user_dict for key in ['prefix', 'suffix', 'remname', 'ldump', 'yt_opt', 'media_group', 'equal_splits', 'split_size', 'rclone', 'thumb', 'as_doc']):
             buttons.ibutton("Reset Setting", f"userset {user_id} reset_all")
         buttons.ibutton("Close", f"userset {user_id} close")
         text = f'<b>User Settings for {name}</b>'
@@ -65,8 +65,6 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
     elif key == 'universal':
         buttons.ibutton("YT-DLP Options", f"userset {user_id} yt_opt")
         ytopt = 'Not Exists' if (val:=user_dict.get('yt_opt', config_dict.get('YT_DLP_OPTIONS', ''))) == '' else val
-        bot_pm = "Enabled" if user_dict.get('bot_pm') else "Disabled"
-        buttons.ibutton('Disable Bot PM' if bot_pm == 'Enabled' else 'Enable Bot PM', f"userset {user_id} bot_pm")
         buttons.ibutton("Prefix", f"userset {user_id} prefix")
         prefix = user_dict.get('prefix', 'Not Exists')
 
@@ -79,7 +77,6 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         
         text = f'<b>Universal Settings for {name}</b>\n\n'
         text += f'<b>• YT-DLP Options:</b> <b><code>{ytopt}</code></b>\n'
-        text += f'<b>• User Bot PM:</b> <code>{bot_pm}</code>\n'
         text += f'<b>• Prefix:</b> <code>{prefix}</code>\n'
         text += f'<b>• Suffix:</b> <code>{suffix}</code>\n'
         text += f'<b>• Remname:</b> <code>{remname}</code>'
@@ -390,16 +387,13 @@ async def edit_user_settings(client, query):
         await update_user_settings(query, 'yt_opt', 'universal')
         if DATABASE_URL:
             await DbManager().update_user_data(user_id)
-    elif data[2] in ['bot_pm', 'td_mode'] :
+    elif data[2] == 'td_mode':
         handler_dict[user_id] = False
         if data[2] == 'td_mode' and not user_dict.get('user_tds', False):
             return await query.answer("Set UserTD first to Enable User TD Mode !", show_alert=True)
         await query.answer()
         update_user_ldata(user_id, data[2], not user_dict.get(data[2], False))
-        if data[2] in ['td_mode']:
-            await update_user_settings(query, 'user_tds', 'mirror')
-        else:
-            await update_user_settings(query, 'universal')
+        await update_user_settings(query, 'user_tds', 'mirror')
         if DATABASE_URL:
             await DbManager().update_user_data(user_id)
     elif data[2] == 'mediainfo':
