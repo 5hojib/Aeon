@@ -673,43 +673,28 @@ def filepress(url):
 def gdtot(url):
     cget = create_scraper().request
     try:
-        res = cget('GET', f'https://gdtot.pro/file/{url.split("/")[-1]}')
+        url = cget('GET', url).url
+        p_url = urlparse(url)
+        res = cget("POST", f"{p_url.scheme}://{p_url.hostname}/ddl", data={'dl': str(url.split('/')[-1])})
     except Exception as e:
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
-    token_url = etree.HTML(res.content).xpath("//a[contains(@class,'inline-flex items-center justify-center')]/@href")
-    if not token_url:
+        raise DirectDownloadLinkException(f'{e.__class__.__name__}')
+    if (drive_link := findall(r"myDl\('(.*?)'\)", res.text)) and "drive.google.com" in drive_link[0]:
+        d_link = drive_link[0]
+    elif config_dict['GDTOT_CRYPT']:
+        cget('GET', url, cookies={'crypt': config_dict['GDTOT_CRYPT']})
+        p_url = urlparse(url)
+        js_script = cget('POST', f"{p_url.scheme}://{p_url.hostname}/dld", data={'dwnld': url.split('/')[-1]})
+        g_id = findall('gd=(.*?)&', js_script.text)
         try:
-            url = cget('GET', url).url
-            p_url = urlparse(url)
-            res = cget("GET", f"{p_url.scheme}://{p_url.hostname}/ddl/{url.split('/')[-1]}")
-        except Exception as e:
-            raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
-        if (drive_link := findall(r"myDl\('(.*?)'\)", res.text)) and "drive.google.com" in drive_link[0]:
-            return drive_link[0]
-        elif config_dict['GDTOT_CRYPT']:
-            cget('GET', url, cookies={'crypt': config_dict['GDTOT_CRYPT']})
-            p_url = urlparse(url)
-            js_script = cget('GET', f"{p_url.scheme}://{p_url.hostname}/dld?id={url.split('/')[-1]}")
-            g_id = findall('gd=(.*?)&', js_script.text)
-            try:
-                decoded_id = b64decode(str(g_id[0])).decode('utf-8')
-            except:
-                raise DirectDownloadLinkException("ERROR: Try in your browser, mostly file not found or user limit exceeded!")
-            return f'https://drive.google.com/open?id={decoded_id}'
-        else:
-            raise DirectDownloadLinkException('ERROR: Drive Link not found, Try in your broswer! GDTOT_CRYPT not Provided, it increases efficiency!')
-    token_url = token_url[0]
-    try:
-        token_page = cget('GET', token_url)
-    except Exception as e:
-        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__} with {token_url}')
-    path = findall('\("(.*?)"\)', token_page.text)
-    if not path:
-        raise DirectDownloadLinkException('ERROR: Cannot bypass this')
-    path = path[0]
-    raw = urlparse(token_url)
-    final_url = f'{raw.scheme}://{raw.hostname}{path}'
-    return sharer_scraper(final_url)
+            decoded_id = b64decode(str(g_id[0])).decode('utf-8')
+        except:
+            raise DirectDownloadLinkException("Try in your browser, mostly file not found or user limit exceeded!")
+        d_link = f'https://drive.google.com/open?id={decoded_id}'
+    else:
+        raise DirectDownloadLinkException('Drive Link not found, Try in your broswer! GDTOT_CRYPT not Provided!')
+    soup = BeautifulSoup(cget('GET', url).content, "html.parser")
+    parse_data = (soup.select('meta[property^="og:description"]')[0]['content']).replace('Download ' , '').rsplit('-', maxsplit=1)
+    return d_link
 
 
 def sharer_scraper(url):
