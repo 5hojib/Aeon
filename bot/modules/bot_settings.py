@@ -40,7 +40,7 @@ default_values = {'DEFAULT_UPLOAD': 'gd',
                   'IMG_PAGE': 1,
                   'TORRENT_TIMEOUT': 3000
                   }
-bool_vars = ['AS_DOCUMENT', 'BOT_PM', 'STOP_DUPLICATE', 'SET_COMMANDS', 'SHOW_MEDIAINFO', 'SOURCE_LINK',
+bool_vars = ['AS_DOCUMENT', 'STOP_DUPLICATE', 'SET_COMMANDS', 'SHOW_MEDIAINFO', 'SOURCE_LINK',
              'IS_TEAM_DRIVE', 'USE_SERVICE_ACCOUNTS', 'WEB_PINCODE', 'EQUAL_SPLITS']
 
 
@@ -321,9 +321,6 @@ async def load_config():
     PLAYLIST_LIMIT = environ.get('PLAYLIST_LIMIT', '')
     PLAYLIST_LIMIT = '' if len(PLAYLIST_LIMIT) == 0 else int(PLAYLIST_LIMIT)
 
-    BOT_PM = environ.get('BOT_PM', '')
-    BOT_PM = BOT_PM.lower() == 'true'
-
     IMG_SEARCH = environ.get('IMG_SEARCH', '')
     IMG_SEARCH = (IMG_SEARCH.replace("'", '').replace('"', '').replace(
         '[', '').replace(']', '').replace(",", "")).split()
@@ -399,7 +396,6 @@ async def load_config():
                         'PLAYLIST_LIMIT': PLAYLIST_LIMIT,
                         'MIRROR_LOG_ID': MIRROR_LOG_ID,
                         'LEECH_DUMP_ID': LEECH_DUMP_ID,
-                        'BOT_PM': BOT_PM,
                         'IMAGES': IMAGES,
                         'IMG_SEARCH': IMG_SEARCH,
                         'IMG_PAGE': IMG_PAGE,

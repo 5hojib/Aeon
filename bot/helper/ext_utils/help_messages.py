@@ -131,7 +131,6 @@ default_desp = {'AS_DOCUMENT': 'Default type of Telegram file upload. Default is
                 'GDRIVE_LIMIT': 'To limit the size of Google Drive folder/file link for leech, Zip, Unzip. the default unit is GB. Int',
                 'USER_TASKS_LIMIT': 'The maximum limit on every users for all tasks. Int',
                 'FSUB_IDS': 'Fill chat_id(-100xxxxxx) of groups/channel you want to force subscribe. Separate them by space. Int\n\nNote: Bot should be added in the filled chat_id as admin',
-                'BOT_PM': 'File/links send to the BOT PM also. Default is False',
                 'BOT_TOKEN': 'The Telegram Bot Token that you got from @BotFather',
                 'CMD_SUFFIX': 'commands index number. This number will added at the end all commands.',
                 'DATABASE_URL': "Your Mongo Database URL (Connection string). Follow this Generate Database to generate database. Data will be saved in Database: auth and sudo users, users settings including thumbnails for each user, rss data and incomplete tasks.\n\n <b>NOTE:</b> You can always edit all settings that saved in database from the official site -> (Browse collections)",

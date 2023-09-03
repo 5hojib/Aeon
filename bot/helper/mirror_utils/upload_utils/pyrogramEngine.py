@@ -119,7 +119,7 @@ class TgUploader:
         user_dict = user_data.get(self.__user_id, {})
         self.__as_doc = user_dict.get('as_doc') or config_dict['AS_DOCUMENT']
         self.__media_group = user_dict.get('media_group') or config_dict['MEDIA_GROUP']
-        self.__bot_pm = config_dict['BOT_PM'] or user_dict.get('bot_pm')
+        self.__bot_pm = True
         self.__mediainfo = config_dict['SHOW_MEDIAINFO'] or user_dict.get('mediainfo')
         self.__ldump = user_dict.get('ldump', '') or ''
         self.__has_buttons = bool(self.__mediainfo)

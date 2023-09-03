@@ -65,10 +65,8 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
     elif key == 'universal':
         buttons.ibutton("YT-DLP Options", f"userset {user_id} yt_opt")
         ytopt = 'Not Exists' if (val:=user_dict.get('yt_opt', config_dict.get('YT_DLP_OPTIONS', ''))) == '' else val
-        bot_pm = "Enabled" if user_dict.get('bot_pm', config_dict['BOT_PM']) else "Disabled"
+        bot_pm = "Enabled" if user_dict.get('bot_pm') else "Disabled"
         buttons.ibutton('Disable Bot PM' if bot_pm == 'Enabled' else 'Enable Bot PM', f"userset {user_id} bot_pm")
-        if config_dict['BOT_PM']:
-            bot_pm = "Force Enabled"
         buttons.ibutton("Prefix", f"userset {user_id} prefix")
         prefix = user_dict.get('prefix', 'Not Exists')
 
