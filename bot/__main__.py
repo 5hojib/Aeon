@@ -58,7 +58,7 @@ async def stats(_, message):
         f'<code>• CPU usage  :</code> {cpuUsage}%\n'\
         f'<code>• RAM usage  :</code> {memory.percent}%\n'\
         f'<code>• Disk usage :</code> {disk}%\n'\
-        f'<code>• Free space :</code> {get_readable_file_size(free)}'\
+        f'<code>• Free space :</code> {get_readable_file_size(free)}\n'\
         f'<code>• Total space :</code> {get_readable_file_size(total)}\n\n'
             
     limitations = f'<b>LIMITATIONS</b>\n\n'
