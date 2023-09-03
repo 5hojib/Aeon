@@ -40,8 +40,15 @@ default_values = {'DEFAULT_UPLOAD': 'gd',
                   'IMG_PAGE': 1,
                   'TORRENT_TIMEOUT': 3000
                   }
-bool_vars = ['AS_DOCUMENT', 'STOP_DUPLICATE', 'SET_COMMANDS', 'SHOW_MEDIAINFO', 'SOURCE_LINK',
-             'IS_TEAM_DRIVE', 'USE_SERVICE_ACCOUNTS', 'WEB_PINCODE', 'EQUAL_SPLITS']
+bool_vars = ['AS_DOCUMENT',
+             'STOP_DUPLICATE',
+             'SET_COMMANDS',
+             'SHOW_MEDIAINFO',
+             'SOURCE_LINK',
+             'IS_TEAM_DRIVE',
+             'USE_SERVICE_ACCOUNTS',
+             'WEB_PINCODE',
+             'EQUAL_SPLITS']
 
 
 async def load_config():
@@ -714,14 +721,14 @@ async def edit_bot_settings(client, query):
             if config_dict['BASE_URL']:
                 await (await create_subprocess_exec("pkill", "-9", "-f", "gunicorn")).wait()
                 await create_subprocess_shell("gunicorn web.wserver:app --bind 0.0.0.0:80 --worker-class gevent")
-        elif data[2] == 'GDRIVE_ID':
+        '''elif data[2] == 'GDRIVE_ID':
             if DRIVES_NAMES and DRIVES_NAMES[0] == 'Main':
-                DRIVES_NAMES.clear()
-                DRIVES_IDS.clear()
-                INDEX_URLS.clear()
+                DRIVES_NAMES.pop(0)
+                DRIVES_IDS.pop(0)
+                INDEX_URLS.pop(0)
         elif data[2] == 'INDEX_URL':
             if DRIVES_NAMES and DRIVES_NAMES[0] == 'Main':
-                INDEX_URLS.clear()
+                INDEX_URLS[0] = '''
         elif data[2] == 'INCOMPLETE_TASK_NOTIFIER' and DATABASE_URL:
             await DbManager().trunc_table('tasks')
         config_dict[data[2]] = value
