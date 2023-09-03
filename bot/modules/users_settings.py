@@ -69,11 +69,11 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
 
         buttons.ibutton("Suffix", f"userset {user_id} suffix")
         suffix = user_dict.get('suffix', 'Not Exists')
-            
+
         buttons.ibutton("Remname", f"userset {user_id} remname")
         remname = user_dict.get('remname', 'Not Exists')
 
-        
+
         text = f'<b>Universal Settings for {name}</b>\n\n'
         text += f'<b>• YT-DLP Options:</b> <b><code>{ytopt}</code></b>\n'
         text += f'<b>• Prefix:</b> <code>{prefix}</code>\n'
@@ -92,7 +92,7 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         text = f'<b>Mirror Settings for {name}</b>\n\n'
         text += f'<b>• Rclone Config:</b> {rccmsg}\n'
         text += f'<b>• User TD Mode:</b> {tds_mode}'
-        
+
         buttons.ibutton("Back", f"userset {user_id} back", "footer")
         buttons.ibutton("Close", f"userset {user_id} close", "footer")
         button = buttons.build_menu(2)
@@ -110,7 +110,7 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
             mediainfo = "Force Enabled"
         buttons.ibutton("Thumbnail", f"userset {user_id} thumb")
         thumbmsg = "Exists" if await aiopath.exists(thumbpath) else "Not Exists"
-            
+
         buttons.ibutton("Leech Splits", f"userset {user_id} split_size")
         split_size = get_readable_file_size(config_dict['LEECH_SPLIT_SIZE']) + ' (Default)' if user_dict.get('split_size', '') == '' else get_readable_file_size(user_dict['split_size'])
         equal_splits = 'Enabled' if user_dict.get('equal_splits', config_dict.get('EQUAL_SPLITS')) else 'Disabled'
@@ -168,12 +168,11 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         else: 
             return
         text += f"<b>Description :</b> {desp_dict[key][0]}"
-        if not edit_mode:
-            if not (key == 'user_tds' and set_exist != 'Not Exists'):
-                buttons.ibutton(f"Change {fname_dict[key]}" if set_exist and set_exist != 'Not Exists' and (set_exist != get_readable_file_size(config_dict['LEECH_SPLIT_SIZE']) + ' (Default)') else f"Set {fname_dict[key]}", f"userset {user_id} {key} edit")
-        else:
+        if edit_mode:
             text += '\n\n' + desp_dict[key][1]
             buttons.ibutton("Stop Change", f"userset {user_id} {key}")
+        elif key != 'user_tds' or set_exist == 'Not Exists':
+            buttons.ibutton(f"Change {fname_dict[key]}" if set_exist and set_exist != 'Not Exists' and (set_exist != get_readable_file_size(config_dict['LEECH_SPLIT_SIZE']) + ' (Default)') else f"Set {fname_dict[key]}", f"userset {user_id} {key} edit")
         if set_exist and set_exist != 'Not Exists' and (set_exist != get_readable_file_size(config_dict['LEECH_SPLIT_SIZE']) + ' (Default)'):
             if key == 'thumb':
                 buttons.ibutton("View Thumbnail", f"userset {user_id} vthumb", "header")
