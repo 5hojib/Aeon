@@ -61,7 +61,6 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         buttons.ibutton("Close", f"userset {user_id} close")
         text = f'<b>User Settings for {name}</b>'
         button = buttons.build_menu(2)
-        
     elif key == 'universal':
         buttons.ibutton("YT-DLP Options", f"userset {user_id} yt_opt")
         ytopt = 'Not Exists' if (val:=user_dict.get('yt_opt', config_dict.get('YT_DLP_OPTIONS', ''))) == '' else val
@@ -398,7 +397,7 @@ async def edit_user_settings(client, query):
             await DbManager().update_user_data(user_id)
     elif data[2] == 'mediainfo':
         handler_dict[user_id] = False
-        if data[2] == 'mediainfo' and config_dict['SHOW_MEDIAINFO']:
+        if config_dict['SHOW_MEDIAINFO']:
             return await query.answer("Force Enabled! Can't Alter Settings", show_alert=True)
         await query.answer()
         update_user_ldata(user_id, data[2], not user_dict.get(data[2], False))

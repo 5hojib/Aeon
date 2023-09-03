@@ -150,11 +150,7 @@ def get_progress_bar_string(pct):
     return p_str
     
 def source(self):
-    if sender_chat := self.message.sender_chat:
-        source = sender_chat.title
-    else:
-        source = self.message.from_user.username or self.message.from_user.id
-    return source
+    return (sender_chat.title if (sender_chat := self.message.sender_chat) else self.message.from_user.username or self.message.from_user.id)
 
 def get_readable_message():
     msg = '<b>Powered by Aeon</b>\n\n'
