@@ -25,7 +25,7 @@ def qb_get_folders(path):
     return path.split("/")
 
 def get_folders(path):
-    fs = re_findall(f'/usr/src/app/downloads/[0-9]+/(.+)', path)[0]
+    fs = re_findall('/usr/src/app/downloads/[0-9]+/(.+)', path)[0]
     return fs.split('/')
 
 def make_tree(res, aria2=False):

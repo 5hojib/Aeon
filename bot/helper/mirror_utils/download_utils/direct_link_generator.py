@@ -195,7 +195,7 @@ def nURL_resolver(url: str):
     cget = create_scraper().request
     resp = cget('GET', f"https://nurlresolver.netlify.app/.netlify/functions/server/resolve?q={url}&m=&r=false").json()
     if len(resp) == 0:
-        raise DirectDownloadLinkException(f'ERROR: Failed to extract Direct Link!')
+        raise DirectDownloadLinkException('ERROR: Failed to extract Direct Link!')
     headers = ""
     for header, value in (resp[0].get("headers", {})).items():
         headers = f"{header}: {value}"
