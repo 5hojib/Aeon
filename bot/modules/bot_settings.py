@@ -721,14 +721,6 @@ async def edit_bot_settings(client, query):
             if config_dict['BASE_URL']:
                 await (await create_subprocess_exec("pkill", "-9", "-f", "gunicorn")).wait()
                 await create_subprocess_shell("gunicorn web.wserver:app --bind 0.0.0.0:80 --worker-class gevent")
-        '''elif data[2] == 'GDRIVE_ID':
-            if DRIVES_NAMES and DRIVES_NAMES[0] == 'Main':
-                DRIVES_NAMES.pop(0)
-                DRIVES_IDS.pop(0)
-                INDEX_URLS.pop(0)
-        elif data[2] == 'INDEX_URL':
-            if DRIVES_NAMES and DRIVES_NAMES[0] == 'Main':
-                INDEX_URLS[0] = '''
         elif data[2] == 'INCOMPLETE_TASK_NOTIFIER' and DATABASE_URL:
             await DbManager().trunc_table('tasks')
         config_dict[data[2]] = value
