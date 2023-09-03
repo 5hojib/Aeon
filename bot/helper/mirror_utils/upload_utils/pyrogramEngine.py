@@ -50,6 +50,7 @@ class TgUploader:
         self.__mediainfo = False
         self.__as_doc = False
         self.__media_group = False
+        self.__bot_pm = False
         self.__user_id = listener.message.from_user.id
         self.__leechmsg = {}
 
@@ -64,7 +65,7 @@ class TgUploader:
 
     async def __copy_file(self):
         try:
-            '''if self.__leechmsg or self.__listener.isSuperGroup:
+            if self.__bot_pm and (self.__leechmsg or self.__listener.isSuperGroup):
                 destination = 'Bot PM'
                 copied = await bot.copy_message(chat_id=self.__user_id, from_chat_id=self.__sent_msg.chat.id, message_id=self.__sent_msg.id, reply_to_message_id=self.__listener.botpmmsg.id) 
                 if self.__has_buttons:
@@ -72,7 +73,7 @@ class TgUploader:
                     try:
                         await copied.edit_reply_markup(rply)
                     except MessageNotModified:
-                        pass'''
+                        pass
             if len(self.__leechmsg) > 1:
                 for chat_id, msg in list(self.__leechmsg.items())[1:]:
                     destination = f'Leech Log: {chat_id}'
@@ -117,6 +118,7 @@ class TgUploader:
         user_dict = user_data.get(self.__user_id, {})
         self.__as_doc = user_dict.get('as_doc') or config_dict['AS_DOCUMENT']
         self.__media_group = user_dict.get('media_group') or config_dict['MEDIA_GROUP']
+        self.__bot_pm = True
         self.__mediainfo = config_dict['SHOW_MEDIAINFO'] or user_dict.get('mediainfo')
         self.__ldump = user_dict.get('ldump', '') or ''
         self.__has_buttons = bool(self.__mediainfo)
@@ -203,7 +205,7 @@ class TgUploader:
 
     async def __switching_client(self):
         LOGGER.info(f'Uploading Media {">" if self.__prm_media else "<"} 2GB by {"User" if self.__prm_media else "Bot"} Client')
-        self.__client = user #if (self.__prm_media and IS_PREMIUM_USER) else bot
+        self.__client = user if (self.__prm_media and IS_PREMIUM_USER) else bot
 
     async def __send_media_group(self, subkey, key, msgs):
         msgs_list = await msgs[0].reply_to_message.reply_media_group(media=self.__get_input_media(subkey, key), quote=True, disable_notification=True)
@@ -217,7 +219,7 @@ class TgUploader:
                 self.__msgs_dict[m.link] = m.caption
         self.__sent_msg = msgs_list[-1]
         try:
-            if self.__leechmsg or self.__listener.isSuperGroup:
+            if self.__bot_pm and (self.__leechmsg or self.__listener.isSuperGroup):
                 destination = 'Bot PM'
                 await bot.copy_media_group(chat_id=self.__user_id, from_chat_id=self.__sent_msg.chat.id, message_id=self.__sent_msg.id)
             if self.__ldump:
