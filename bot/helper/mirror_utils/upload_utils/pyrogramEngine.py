@@ -64,7 +64,7 @@ class TgUploader:
 
     async def __copy_file(self):
         try:
-            if self.__leechmsg or self.__listener.isSuperGroup:
+            '''if self.__leechmsg or self.__listener.isSuperGroup:
                 destination = 'Bot PM'
                 copied = await bot.copy_message(chat_id=self.__user_id, from_chat_id=self.__sent_msg.chat.id, message_id=self.__sent_msg.id, reply_to_message_id=self.__listener.botpmmsg.id) 
                 if self.__has_buttons:
@@ -72,8 +72,7 @@ class TgUploader:
                     try:
                         await copied.edit_reply_markup(rply)
                     except MessageNotModified:
-                        pass
-
+                        pass'''
             if len(self.__leechmsg) > 1:
                 for chat_id, msg in list(self.__leechmsg.items())[1:]:
                     destination = f'Leech Log: {chat_id}'
