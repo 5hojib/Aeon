@@ -244,18 +244,18 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
     text = message.text.split('\n')
     input_list = text[0].split(' ')
     qual = ''
-    arg_base = {'link': '', 
-                '-i': 0, 
-                '-m': '', '-sd': '', '-samedir': '',
-                '-s': False, '-select': False,
-                '-opt': '', '-options': '',
-                '-b': False, '-bulk': False,
-                '-n': '', '-name': '',
-                '-z': False, '-zip': False,
-                '-up': '', '-upload': False,
-                '-rcf': '',
-                '-id': '',
-                '-index': '',
+    arg_base = {'link'   : '', 
+                '-i'     : 0, 
+                '-m'     : '',
+                '-s'     : False,
+                '-opt'   : '',
+                '-b'     : False,
+                '-n'     : '',
+                '-z'     : False,
+                '-up'    : '',
+                '-rcf'   : '',
+                '-id'    : '',
+                '-index' : '',
     }
 
     args = arg_parser(input_list[1:], arg_base)
@@ -265,15 +265,15 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
     except:
         multi = 0
 
-    select      = args['-s'] or args['-select']
-    isBulk      = args['-b'] or args['-bulk']
-    opt         = args['-opt'] or args['-options']
-    folder_name = args['-m'] or args['-sd'] or args['-samedir']
-    name        = args['-n'] or args['-name']
-    up          = args['-up'] or args['-upload']
+    select      = args['-s']
+    isBulk      = args['-b']
+    opt         = args['-opt']
+    folder_name = args['-m']
+    name        = args['-n']
+    up          = args['-up']
     rcf         = args['-rcf']
     link        = args['link']
-    compress    = args['-z'] or args['-zip'] or 'z' in input_list[0] or 'zip' in input_list[0]
+    compress    = args['-z']
     drive_id    = args['-id']
     index_link  = args['-index']
     bulk_start  = 0

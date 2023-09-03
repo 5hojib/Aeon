@@ -61,7 +61,7 @@ async def start_cleanup():
         await aiormtree('/usr/src/app/downloads/')
     except:
         pass
-    await makedirs('/usr/src/app/downloads/')
+    await makedirs('/usr/src/app/downloads/', exist_ok = True)
 
 
 def clean_all():
@@ -75,8 +75,7 @@ def clean_all():
 
 def exit_clean_up(signal, frame):
     try:
-        LOGGER.info(
-            "Please wait, while we clean up and stop the running downloads")
+        LOGGER.info("Please wait, while we clean up and stop the running downloads")
         clean_all()
         srun(['pkill', '-9', '-f', '-e','gunicorn|buffet|openstack|render|zcl'])
         sexit(0)

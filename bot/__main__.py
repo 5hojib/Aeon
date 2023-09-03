@@ -58,7 +58,8 @@ async def stats(_, message):
         f'<code>• CPU usage  :</code> {cpuUsage}%\n'\
         f'<code>• RAM usage  :</code> {memory.percent}%\n'\
         f'<code>• Disk usage :</code> {disk}%\n'\
-        f'<code>• Disk space :</code> {get_readable_file_size(free)}/{get_readable_file_size(total)}\n\n'
+        f'<code>• Free space :</code> {get_readable_file_size(free)}\n'\
+        f'<code>• Total space :</code> {get_readable_file_size(total)}\n\n'
             
     limitations = f'<b>LIMITATIONS</b>\n\n'
     
@@ -77,7 +78,7 @@ async def stats(_, message):
     await one_minute_del(reply_message)
 
 @new_thread
-async def start(_, message):
+async def start(client, message):
     buttons = ButtonMaker()
     reply_markup = buttons.build_menu(2)
     if len(message.command) > 1 and message.command[1] == "wzmlx":
@@ -110,8 +111,6 @@ async def start(_, message):
         help_command = f"/{BotCommands.HelpCommand}"
         start_string = f'This bot can mirror all your links|files|torrents to Google Drive or any rclone cloud or to telegram.\n<b>Type {help_command} to get a list of available commands</b>'
         await sendMessage(message, start_string, photo='IMAGES')
-    elif config_dict['BOT_PM']:
-        await sendMessage(message, 'Now, This bot will send all your files and links here. Start Using ...', photo='IMAGES')
     else:
         await sendMessage(message, 'You Are not authorized user!', photo='IMAGES')
     await DbManager().update_pm_users(message.from_user.id)
@@ -313,9 +312,8 @@ async def main():
     await gather(start_cleanup(), torrent_search.initiate_search_tools(), restart_notification(), search_images(), set_commands(bot))
     await sync_to_async(start_aria2_listener, wait=False)
     
-    bot.add_handler(MessageHandler(
-        start, filters=command(BotCommands.StartCommand) & private))
-    #bot.add_handler(CallbackQueryHandler(token_callback, filters=regex(r'^pass')))
+    bot.add_handler(MessageHandler(start, filters=command(
+        BotCommands.StartCommand)))
     bot.add_handler(MessageHandler(log, filters=command(
         BotCommands.LogCommand) & CustomFilters.sudo))
     bot.add_handler(MessageHandler(restart, filters=command(

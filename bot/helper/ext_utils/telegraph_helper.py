@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from secrets import token_urlsafe
+from secrets import token_hex
 from asyncio import sleep
 from telegraph.aio import Telegraph
 from telegraph.exceptions import RetryAfterError
@@ -10,7 +10,7 @@ from bot import LOGGER, bot_loop, config_dict
 class TelegraphHelper:
     def __init__(self, author_name=None, author_url=None):
         self.telegraph = Telegraph(domain='graph.org')
-        self.short_name = token_urlsafe(8)
+        self.short_name = token_hex(4)
         self.access_token = None
         self.author_name = author_name
         self.author_url = author_url

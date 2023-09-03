@@ -6,6 +6,7 @@
 4. Set the deploy branch as the default branch.
 5. Remove all other branches.
 6. Populate these secret variables in GitHub:
+   
    * `BOT_TOKEN`
    * `OWNER_ID`
    * `DATABASE_URL`
@@ -14,6 +15,7 @@
    * `HEROKU_APP_NAME`
    * `HEROKU_EMAIL`
    * `HEROKU_API_KEY`
+
 7. Run workflow.
 8. After the deployment is complete, finalize the remaining variables and upload sensitive files like `token.pickle` using the `bsetting` command.
 

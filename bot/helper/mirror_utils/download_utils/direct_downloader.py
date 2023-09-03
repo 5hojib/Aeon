@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from asyncio import sleep
-from secrets import token_urlsafe
+from secrets import token_hex
 
 from bot import config_dict, LOGGER, aria2_options, aria2c_global, download_dict, download_dict_lock, non_queued_dl, queue_dict_lock
 from bot.helper.ext_utils.bot_utils import sync_to_async
@@ -24,6 +24,9 @@ async def add_direct_download(details, path, listener, foldername):
         path = f'{path}/{foldername}'
     if not foldername:
         foldername = details['title']
+    if not foldername:
+        await sendMessage(listener.message, 'There is no any title use -n New Name')
+        return
     if config_dict['STOP_DUPLICATE']:
         msg, button = await stop_duplicate_check(foldername, listener)
         if msg:
@@ -43,7 +46,7 @@ async def add_direct_download(details, path, listener, foldername):
             return
 
 
-    gid = token_urlsafe(10)
+    gid = token_hex(4)
     added_to_queue, event = await is_queued(listener.uid)
     if added_to_queue:
         LOGGER.info(f"Added to Queue/Download: {foldername}")

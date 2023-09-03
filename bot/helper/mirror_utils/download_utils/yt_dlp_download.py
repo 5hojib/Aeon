@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from os import path as ospath, listdir
-from secrets import token_urlsafe
+from secrets import token_hex
 from logging import getLogger
 from yt_dlp import YoutubeDL, DownloadError
 from re import search as re_search
@@ -194,7 +194,7 @@ class YoutubeDLHelper:
             self.opts['ignoreerrors'] = True
             self.is_playlist = True
 
-        self.__gid = token_urlsafe(8)
+        self.__gid = token_hex(4)
 
         await self.__onDownloadStart()
 

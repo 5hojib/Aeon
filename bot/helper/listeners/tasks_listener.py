@@ -109,11 +109,7 @@ class MirrorLeechListener:
             if file is not None and file.media is not None:
                 mtype = file.media.value
                 media = getattr(file, mtype)
-                self.source_msg = f'<b>• Name:</b> {media.file_name if hasattr(media, "file_name") else mtype+"_"+media.file_unique_id}\n' \
-                                  f'<b>• Type:</b> {media.mime_type if hasattr(media, "mime_type") else "image/jpeg" if mtype == "photo" else "text/plain"}\n' \
-                                  f'<b>• Size:</b> {get_readable_file_size(media.file_size)}\n' \
-                                  f'<b>• Created Date:</b> {media.date}\n' \
-                                  f'<b>• Media Type:</b> {mtype.capitalize()}'
+                self.source_msg = f'<b>• Name:</b> {media.file_name if hasattr(media, "file_name") else f"{mtype}_{media.file_unique_id}"}\n<b>• Type:</b> {media.mime_type if hasattr(media, "mime_type") else "image/jpeg" if mtype == "photo" else "text/plain"}\n<b>• Size:</b> {get_readable_file_size(media.file_size)}\n<b>• Created Date:</b> {media.date}\n<b>• Media Type:</b> {mtype.capitalize()}'
             else:
                 self.source_msg = f"<code>{self.message.reply_to_message.text}</code>"
         elif self.source_url.startswith('https://t.me/share/url?url='):
@@ -145,8 +141,7 @@ class MirrorLeechListener:
 <b>• User ID: </b><code>{self.message.from_user.id}</code>"""
             self.linkslogmsg = await sendCustomMsg(config_dict['LEECH_LOG_ID'], msg + source)
         user_dict = user_data.get(self.message.from_user.id, {})
-        if config_dict['BOT_PM'] or user_dict.get('bot_pm'):
-            self.botpmmsg = await sendCustomMsg(self.message.from_user.id, '<b>Task started</b>')
+        self.botpmmsg = await sendCustomMsg(self.message.from_user.id, '<b>Task started</b>')
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
             await DbManager().add_incomplete_task(self.message.chat.id, self.message.link, self.tag)
 
@@ -450,8 +445,6 @@ class MirrorLeechListener:
                                 await editMessage(self.linkslogmsg, totalmsg)
                                 await sendMessage(self.botpmmsg,  totalmsg)
                             self.linkslogmsg = await sendMessage(self.linkslogmsg, "Fetching Details...")
-                        elif not (config_dict['BOT_PM'] or user_dict.get('bot_pm')):
-                            await sendMessage(self.message, msg + lmsg + fmsg)
                         attachmsg = False
                         await sleep(1)
                         fmsg = '\n\n'
@@ -465,31 +458,22 @@ class MirrorLeechListener:
                         else:
                             await sendMessage(self.linkslogmsg, msg + lmsg + fmsg)
                             await deleteMessage(self.linkslogmsg)
-                    elif not (config_dict['BOT_PM'] or user_dict.get('bot_pm')):
-                        await sendMessage(self.message, msg + lmsg + fmsg, buttons.build_menu(1))
                 btn = ButtonMaker()
-                if config_dict['BOT_PM'] or user_dict.get('bot_pm'):
-                    sbtn = ButtonMaker()
+                sbtn = ButtonMaker()
+                if self.source_url and config_dict['SOURCE_LINK']:
+                    sbtn.ubutton('Source link', self.source_url)
+                    await sendMessage(self.botpmmsg, msg + lmsg + fmsg, sbtn.build_menu(1))
+                else:
+                    await sendMessage(self.botpmmsg, msg + lmsg + fmsg)
+                await deleteMessage(self.botpmmsg)
+                if self.isSuperGroup:
+                    btn.ibutton('View in inbox', f"wzmlx {user_id} botpm", 'header')
                     if self.source_url and config_dict['SOURCE_LINK']:
-                        sbtn.ubutton('Source link', self.source_url)
-                        await sendMessage(self.botpmmsg, msg + lmsg + fmsg, sbtn.build_menu(1))
-                    else:
-                        await sendMessage(self.botpmmsg, msg + lmsg + fmsg)
-                    await deleteMessage(self.botpmmsg)
-                    if self.isSuperGroup:
-                        btn.ibutton('View in inbox', f"wzmlx {user_id} botpm", 'header')
-                        if self.source_url and config_dict['SOURCE_LINK']:
-                            btn.ubutton('Source link', self.source_url)
-                        btn = extra_btns(btn)
-                        await sendMessage(self.message, msg + '<b>Files has been sent to your inbox</b>', btn.build_menu(1))
-                    else:
-                        await deleteMessage(self.botpmmsg)
-                elif self.linkslogmsg:
-                    if self.source_url:
                         btn.ubutton('Source link', self.source_url)
                     btn = extra_btns(btn)
-                    await sendMessage(self.message, msg + lmsg, btn.build_menu(1), self.random_pic)
-                    
+                    await sendMessage(self.message, msg + '<b>Files has been sent to your inbox</b>', btn.build_menu(1))
+                else:
+                    await deleteMessage(self.botpmmsg)
             if self.seed:
                 if self.newDir:
                     await clean_target(self.newDir)
@@ -542,23 +526,16 @@ class MirrorLeechListener:
                     await deleteMessage(self.linkslogmsg)
             
             buttons = ButtonMaker()
-            if config_dict['BOT_PM'] or user_dict.get('bot_pm'):
-                await sendMessage(self.botpmmsg, msg, button, self.random_pic)
-                await deleteMessage(self.botpmmsg)
-                if self.isSuperGroup:
-                    buttons.ibutton('View in inbox', f"wzmlx {user_id} botpm", 'header')
-                    if self.source_url and config_dict['SOURCE_LINK']:
-                        buttons.ubutton('Source link', self.source_url)
-                    buttons = extra_btns(buttons)
-                    await sendMessage(self.message, msg + '<b>Links has been sent to your inbox</b>', buttons.build_menu(1))
-                else:
-                    await deleteMessage(self.botpmmsg)
-            elif self.linkslogmsg:
+            await sendMessage(self.botpmmsg, msg, button, self.random_pic)
+            await deleteMessage(self.botpmmsg)
+            if self.isSuperGroup:
+                buttons.ibutton('View in inbox', f"wzmlx {user_id} botpm", 'header')
                 if self.source_url and config_dict['SOURCE_LINK']:
                     buttons.ubutton('Source link', self.source_url)
                 buttons = extra_btns(buttons)
-                await sendMessage(self.message, msg, buttons.build_menu(1), self.random_pic)
-
+                await sendMessage(self.message, msg + '<b>Links has been sent to your inbox</b>', buttons.build_menu(1))
+            else:
+                await deleteMessage(self.botpmmsg)
             if self.seed:
                 if self.newDir:
                     await clean_target(self.newDir)
@@ -675,4 +652,3 @@ Your upload has been stopped!
         await clean_download(self.dir)
         if self.newDir:
             await clean_download(self.newDir)
-        

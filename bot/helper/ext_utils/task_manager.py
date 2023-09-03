@@ -186,10 +186,9 @@ async def task_utils(message):
         user_dict = user_data.get(user_id, {})
         user = await user_info(message._client, message.from_user.id)
         if not config_dict['TOKEN_TIMEOUT']:
-            if config_dict['BOT_PM'] or user_dict.get('bot_pm'):
-                _msg, button = await BotPm_check(message, button)
-                if _msg:
-                    msg.append(_msg)
+            _msg, button = await BotPm_check(message, button)
+            if _msg:
+                msg.append(_msg)
     if (bmax_tasks := config_dict['BOT_MAX_TASKS']) and len(download_dict) >= bmax_tasks:
         msg.append(f"Bot Max Tasks limit exceeded.\nBot max tasks limit is {bmax_tasks}.\nPlease wait for the completion of other tasks.")
     if (maxtask := config_dict['USER_MAX_TASKS']) and await get_user_tasks(message.from_user.id, maxtask):

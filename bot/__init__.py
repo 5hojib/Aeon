@@ -348,9 +348,6 @@ MIRROR_LOG_ID = environ.get('MIRROR_LOG_ID', '')
 if len(MIRROR_LOG_ID) == 0:
     MIRROR_LOG_ID = ''
 
-BOT_PM = environ.get('BOT_PM', '')
-BOT_PM = BOT_PM.lower() == 'true'
-
 IMAGES = environ.get('IMAGES', '')
 IMAGES = (IMAGES.replace("'", '').replace('"', '').replace(
     '[', '').replace(']', '').replace(",", "")).split()
@@ -393,7 +390,6 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'PLAYLIST_LIMIT': PLAYLIST_LIMIT,
                'MIRROR_LOG_ID': MIRROR_LOG_ID,
                'LEECH_DUMP_ID': LEECH_DUMP_ID,
-               'BOT_PM': BOT_PM,
                'IMAGES': IMAGES,
                'IMG_SEARCH': IMG_SEARCH,
                'IMG_PAGE': IMG_PAGE,

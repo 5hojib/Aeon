@@ -35,23 +35,22 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     text = message.text.split('\n')
     input_list = text[0].split(' ')
 
-    arg_base = {'link': '', 
-                '-i': 0,
-                '-m': '', '-sd': '', '-samedir': '',
-                '-d': False, '-seed': False,
-                '-j': False, '-join': False,
-                '-s': False, '-select': False,
-                '-b': False, '-bulk': False,
-                '-n': '', '-name': '',
-                '-e': False, '-extract': False,
-                '-uz': False, '-unzip': False,
-                '-z': False, '-zip': False,
-                '-up': '', '-upload': '',
-                '-rcf': '', 
-                '-u': '', '-user': '',
-                '-p': '', '-pass': '',
-                '-id': '',
-                '-index': '',
+    arg_base = {'link'    : '', 
+                '-i'      : 0,
+                '-m'      : '',
+                '-d'      : False,
+                '-j'      : False,
+                '-s'      : False,
+                '-b'      : False,
+                '-n'      : '',
+                '-e'      : False,
+                '-z'      : False,
+                '-up'     : '',
+                '-rcf'    : '', 
+                '-u'      : '',
+                '-p'      : '',
+                '-id'     : '',
+                '-index'  : '',
     }
 
     args = arg_parser(input_list[1:], arg_base)
@@ -62,15 +61,15 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         multi = 0
     
     link          = args['link']
-    folder_name   = args['-m'] or args['-sd'] or args['-samedir']
-    seed          = args['-d'] or args['-seed']
-    join          = args['-j'] or args['-join']
-    select        = args['-s'] or args['-select']
-    isBulk        = args['-b'] or args['-bulk']
-    name          = args['-n'] or args['-name']
-    extract       = args['-e'] or args['-extract'] or args['-uz'] or args['-unzip'] or 'uz' in input_list[0] or 'unzip' in input_list[0]
-    compress      = args['-z'] or args['-zip'] or (not extract and ('z' in input_list[0] or 'zip' in input_list[0]))
-    up            = args['-up'] or args['-upload']
+    folder_name   = args['-m']
+    seed          = args['-d']
+    join          = args['-j']
+    select        = args['-s']
+    isBulk        = args['-b']
+    name          = args['-n']
+    extract       = args['-e']
+    compress      = args['-z']
+    up            = args['-up']
     rcf           = args['-rcf']
     drive_id      = args['-id']
     index_link    = args['-index']
@@ -306,8 +305,8 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     elif isQbit:
         await add_qb_torrent(link, path, listener, ratio, seed_time)
     else:
-        ussr = args['-u'] or args['-user']
-        pssw = args['-p'] or args['-pass']
+        ussr = args['-u']
+        pssw = args['-p']
         if ussr or pssw:
             auth = f"{ussr}:{pssw}"
             auth = "Basic " + b64encode(auth.encode()).decode('ascii')

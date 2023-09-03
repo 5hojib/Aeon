@@ -40,8 +40,15 @@ default_values = {'DEFAULT_UPLOAD': 'gd',
                   'IMG_PAGE': 1,
                   'TORRENT_TIMEOUT': 3000
                   }
-bool_vars = ['AS_DOCUMENT', 'BOT_PM', 'STOP_DUPLICATE', 'SET_COMMANDS', 'SHOW_MEDIAINFO', 'SOURCE_LINK',
-             'IS_TEAM_DRIVE', 'USE_SERVICE_ACCOUNTS', 'WEB_PINCODE', 'EQUAL_SPLITS']
+bool_vars = ['AS_DOCUMENT',
+             'STOP_DUPLICATE',
+             'SET_COMMANDS',
+             'SHOW_MEDIAINFO',
+             'SOURCE_LINK',
+             'IS_TEAM_DRIVE',
+             'USE_SERVICE_ACCOUNTS',
+             'WEB_PINCODE',
+             'EQUAL_SPLITS']
 
 
 async def load_config():
@@ -321,9 +328,6 @@ async def load_config():
     PLAYLIST_LIMIT = environ.get('PLAYLIST_LIMIT', '')
     PLAYLIST_LIMIT = '' if len(PLAYLIST_LIMIT) == 0 else int(PLAYLIST_LIMIT)
 
-    BOT_PM = environ.get('BOT_PM', '')
-    BOT_PM = BOT_PM.lower() == 'true'
-
     IMG_SEARCH = environ.get('IMG_SEARCH', '')
     IMG_SEARCH = (IMG_SEARCH.replace("'", '').replace('"', '').replace(
         '[', '').replace(']', '').replace(",", "")).split()
@@ -399,7 +403,6 @@ async def load_config():
                         'PLAYLIST_LIMIT': PLAYLIST_LIMIT,
                         'MIRROR_LOG_ID': MIRROR_LOG_ID,
                         'LEECH_DUMP_ID': LEECH_DUMP_ID,
-                        'BOT_PM': BOT_PM,
                         'IMAGES': IMAGES,
                         'IMG_SEARCH': IMG_SEARCH,
                         'IMG_PAGE': IMG_PAGE,
@@ -718,14 +721,6 @@ async def edit_bot_settings(client, query):
             if config_dict['BASE_URL']:
                 await (await create_subprocess_exec("pkill", "-9", "-f", "gunicorn")).wait()
                 await create_subprocess_shell("gunicorn web.wserver:app --bind 0.0.0.0:80 --worker-class gevent")
-        elif data[2] == 'GDRIVE_ID':
-            if DRIVES_NAMES and DRIVES_NAMES[0] == 'Main':
-                DRIVES_NAMES.pop(0)
-                DRIVES_IDS.pop(0)
-                INDEX_URLS.pop(0)
-        elif data[2] == 'INDEX_URL':
-            if DRIVES_NAMES and DRIVES_NAMES[0] == 'Main':
-                INDEX_URLS[0] = ''
         elif data[2] == 'INCOMPLETE_TASK_NOTIFIER' and DATABASE_URL:
             await DbManager().trunc_table('tasks')
         config_dict[data[2]] = value

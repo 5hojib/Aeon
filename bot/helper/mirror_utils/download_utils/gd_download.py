@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from secrets import token_urlsafe
+from secrets import token_hex
 
 from bot import download_dict, download_dict_lock, LOGGER, non_queued_dl, queue_dict_lock
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
@@ -19,7 +19,7 @@ async def add_gd_download(link, path, listener, newname):
         return
 
     name = newname or name
-    gid = token_urlsafe(8)
+    gid = token_hex(4)
 
     msg, button = await stop_duplicate_check(name, listener)
     if msg:

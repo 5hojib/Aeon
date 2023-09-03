@@ -74,7 +74,6 @@ class TgUploader:
                         await copied.edit_reply_markup(rply)
                     except MessageNotModified:
                         pass
-
             if len(self.__leechmsg) > 1:
                 for chat_id, msg in list(self.__leechmsg.items())[1:]:
                     destination = f'Leech Log: {chat_id}'
@@ -119,7 +118,7 @@ class TgUploader:
         user_dict = user_data.get(self.__user_id, {})
         self.__as_doc = user_dict.get('as_doc') or config_dict['AS_DOCUMENT']
         self.__media_group = user_dict.get('media_group') or config_dict['MEDIA_GROUP']
-        self.__bot_pm = config_dict['BOT_PM'] or user_dict.get('bot_pm')
+        self.__bot_pm = True
         self.__mediainfo = config_dict['SHOW_MEDIAINFO'] or user_dict.get('mediainfo')
         self.__ldump = user_dict.get('ldump', '') or ''
         self.__has_buttons = bool(self.__mediainfo)
@@ -209,8 +208,7 @@ class TgUploader:
         self.__client = user if (self.__prm_media and IS_PREMIUM_USER) else bot
 
     async def __send_media_group(self, subkey, key, msgs):
-        msgs_list = await msgs[0].reply_to_message.reply_media_group(media=self.__get_input_media(subkey, key),
-                                                                    quote=True, disable_notification=True)
+        msgs_list = await msgs[0].reply_to_message.reply_media_group(media=self.__get_input_media(subkey, key), quote=True, disable_notification=True)
         for msg in msgs:
             if msg.link in self.__msgs_dict:
                 del self.__msgs_dict[msg.link]
