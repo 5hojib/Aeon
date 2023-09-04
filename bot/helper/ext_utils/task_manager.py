@@ -119,7 +119,7 @@ async def limit_checker(size, listener, isTorrent=False, isMega=False, isDriveLi
     user_id = listener.message.from_user.id
     if user_id == OWNER_ID or user_id in user_data and user_data[user_id].get('is_sudo'):
         return
-    if await isAdmin(message):
+    if await isAdmin(listener.message):
         return
     limit_exceeded = ''
     if listener.isClone:
