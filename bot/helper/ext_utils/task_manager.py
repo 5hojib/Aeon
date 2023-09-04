@@ -6,7 +6,7 @@ from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.ext_utils.fs_utils import get_base_name, check_storage_threshold
 from bot.helper.ext_utils.bot_utils import get_user_tasks, sync_to_async, get_telegraph_list, get_readable_file_size, checking_access
 from bot.helper.telegram_helper.message_utils import forcesub, BotPm_check, user_info
-
+from bot.helper.telegram_helper.message_utils import isAdmin
 
 async def stop_duplicate_check(name, listener):
     if (
@@ -115,9 +115,11 @@ async def start_from_queued():
 
 
 async def limit_checker(size, listener, isTorrent=False, isMega=False, isDriveLink=False, isYtdlp=False):
-    LOGGER.info('Checking Size Limit of link/file/folder/tasks...')
+    LOGGER.info('Checking limit')
     user_id = listener.message.from_user.id
     if user_id == OWNER_ID or user_id in user_data and user_data[user_id].get('is_sudo'):
+        return
+    if await isAdmin(message):
         return
     limit_exceeded = ''
     if listener.isClone:
@@ -173,7 +175,11 @@ async def task_utils(message):
     LOGGER.info('Checking Task Utilities ...')
     msg = []
     button = None
-
+    user_id = message.from_user.id
+    if user_id == OWNER_ID or user_id in user_data and user_data[user_id].get('is_sudo'):
+        return msg, button
+    if await isAdmin(message):
+        return msg, button
     token_msg, button = await checking_access(message.from_user.id, button)
     if token_msg is not None:
         msg.append(token_msg)
