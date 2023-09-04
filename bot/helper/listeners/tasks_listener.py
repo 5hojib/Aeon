@@ -467,7 +467,7 @@ class MirrorLeechListener:
                     await sendMessage(self.botpmmsg, msg + lmsg + fmsg)
                 await deleteMessage(self.botpmmsg)
                 if self.isSuperGroup:
-                    btn.ibutton('View in inbox', f"wzmlx {user_id} botpm", 'header')
+                    btn.ibutton('View in inbox', f"aeon {user_id} botpm", 'header')
                     if self.source_url and config_dict['SOURCE_LINK']:
                         btn.ubutton('Source link', self.source_url)
                     btn = extra_btns(btn)
@@ -529,7 +529,7 @@ class MirrorLeechListener:
             await sendMessage(self.botpmmsg, msg, button, self.random_pic)
             await deleteMessage(self.botpmmsg)
             if self.isSuperGroup:
-                buttons.ibutton('View in inbox', f"wzmlx {user_id} botpm", 'header')
+                buttons.ibutton('View in inbox', f"aeon {user_id} botpm", 'header')
                 if self.source_url and config_dict['SOURCE_LINK']:
                     buttons.ubutton('Source link', self.source_url)
                 buttons = extra_btns(buttons)
