@@ -44,6 +44,9 @@ MIRROR_HELP_MESSAGE = """
 
 <b>-s:</b> Select a torrent file.
 
+<b>-h Direct link custom headers:</b> -h
+<code>/cmd</code> link -h Key: value Key1: value1.
+
 <b>-d ratio:seed_time:</b> Set the seeding ratio and time for a torrent.
 
 <b>-i number of links/files:</b> Process multiple links or files.

@@ -37,18 +37,19 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
 
     arg_base = {'link'    : '', 
                 '-i'      : 0,
-                '-m'      : '',
                 '-d'      : False,
                 '-j'      : False,
                 '-s'      : False,
                 '-b'      : False,
-                '-n'      : '',
                 '-e'      : False,
                 '-z'      : False,
-                '-up'     : '',
-                '-rcf'    : '', 
+                '-m'      : '',
+                '-n'      : '',
+                '-h'      : '',
                 '-u'      : '',
                 '-p'      : '',
+                '-up'     : '',
+                '-rcf'    : '', 
                 '-id'     : '',
                 '-index'  : '',
     }
@@ -61,6 +62,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         multi = 0
     
     link          = args['link']
+    headers       = args['-h']
     folder_name   = args['-m']
     seed          = args['-d']
     join          = args['-j']
@@ -224,7 +226,9 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             process_msg = await sendMessage(message, f"<b>Processing:</b> <code>{link}</code>")
             try:
                 link = await sync_to_async(direct_link_generator, link)
-                if not isinstance(link, dict):
+                if isinstance(link, tuple):
+                    link, headers = link
+                if isinstance(link, str):
                     LOGGER.info(f"Generated link: {link}")
             except DirectDownloadLinkException as e:
                 LOGGER.info(str(e))
@@ -309,9 +313,11 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         pssw = args['-p']
         if ussr or pssw:
             auth = f"{ussr}:{pssw}"
-            auth = "Basic " + b64encode(auth.encode()).decode('ascii')
+            auth = f"authorization: Basic {b64encode(auth.encode()).decode('ascii')}"
         else:
             auth = ''
+        if headers:
+            auth += f'{auth} {headers}'
         await add_aria2c_download(link, path, listener, name, auth, ratio, seed_time)
     await delete_links(message)
 
