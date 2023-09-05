@@ -194,6 +194,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         elif reply_to.document and (file_.mime_type == 'application/x-bittorrent' or file_.file_name.endswith('.torrent')):
             link = await reply_to.download()
             file_ = None
+            dottorrent = True
 
     if not is_url(link) and not is_magnet(link) and not await aiopath.exists(link) and not is_rclone_path(link) and file_ is None:
         reply_message = await sendMessage(message, MIRROR_HELP_MESSAGE)
@@ -201,7 +202,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         await one_minute_del(reply_message)
         return
 
-    if link:
+    if link and not dottorrent:
         olink = link
     else:
         olink = ''
