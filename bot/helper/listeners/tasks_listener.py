@@ -138,7 +138,8 @@ class MirrorLeechListener:
 
 <b>• Mode:</b> {self.upload_details['mode']}
 <b>• Task by:</b> {self.tag}
-<b>• User ID: </b><code>{self.message.from_user.id}</code>"""
+<b>• User ID: </b><code>{self.message.from_user.id}</code>
+"""
             self.linkslogmsg = await sendCustomMsg(config_dict['LEECH_LOG_ID'], msg + source)
         user_dict = user_data.get(self.message.from_user.id, {})
         self.botpmmsg = await sendCustomMsg(self.message.from_user.id, '<b>Task started</b>')

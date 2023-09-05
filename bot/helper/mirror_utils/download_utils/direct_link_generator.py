@@ -22,8 +22,6 @@ from bot import config_dict, LOGGER
 from bot.helper.ext_utils.bot_utils import get_readable_time, is_share_link, text_size_to_bytes
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 
-fmed_list = ['fembed.net', 'fembed.com', 'femax20.com', 'fcdn.stream', 'feurl.com', 'layarkacaxxi.icu', 'naniplay.nanime.in', 'naniplay.nanime.biz', 'naniplay.com', 'mm9842.com']
-anonfilesBaseSites = ['anonfiles.com', 'hotfile.io', 'bayfiles.com', 'megaupload.nz', 'letsupload.cc', 'filechan.org', 'myfile.is', 'vshare.is', 'rapidshare.nu', 'lolabits.se', 'openload.cc', 'share-online.is', 'upvid.cc']
 terabox_domain = ['terabox', 'nephobox', '4funbox', 'mirrobox', 'momerybox', 'teraboxapp', '1024tera']
 streamtape_domain = ['streamtape.com', 'streamtape.co', 'streamtape.cc', 'streamtape.to', 'streamtape.net', 'streamta.pe', 'streamtape.xyz']
 _caches = {}
@@ -82,14 +80,8 @@ def direct_link_generator(link: str):
         return doods(link)
     elif any(x in domain for x in ['wetransfer.com', 'we.tl']):
         return wetransfer(link)
-    elif any(x in domain for x in anonfilesBaseSites):
-        return anonfilesBased(link)
     elif any(x in domain for x in terabox_domain):
         return terabox(link)
-    elif any(x in domain for x in fmed_list):
-        return fembed(link)
-    elif any(x in domain for x in ['sbembed.com', 'watchsb.com', 'streamsb.net', 'sbplay.org']):
-        return sbembed(link)
     elif is_share_link(link):
         if 'gdtot' in domain:
             return gdtot(link)
@@ -216,37 +208,6 @@ def letsupload(url: str) -> str:
         return direct_link[0]
     else:
         raise DirectDownloadLinkException('ERROR: Direct Link not found')
-
-
-def anonfilesBased(url: str) -> str:
-    cget = create_scraper().request
-    try:
-        soup = BeautifulSoup(cget('get', url).content, 'lxml')
-    except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
-    if sa := soup.find(id="download-url"):
-        return sa['href']
-    raise DirectDownloadLinkException("ERROR: File not found!")
-
-
-def fembed(link: str) -> str:
-    try:
-        dl_url = Bypass().bypass_fembed(link)
-        count = len(dl_url)
-        lst_link = [dl_url[i] for i in dl_url]
-        return lst_link[count-1]
-    except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
-
-
-def sbembed(link: str) -> str:
-    try:
-        dl_url = Bypass().bypass_sbembed(link)
-        count = len(dl_url)
-        lst_link = [dl_url[i] for i in dl_url]
-        return lst_link[count-1]
-    except Exception as e:
-        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
 
 
 def onedrive(link: str) -> str:
