@@ -34,7 +34,7 @@ from bot.helper.mirror_utils.download_utils.direct_downloader import add_direct_
 async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=None, bulk=[]):
     text = message.text.split('\n')
     input_list = text[0].split(' ')
-    dottorrent False 
+    dottorrent = False 
     arg_base = {'link'    : '', 
                 '-i'      : 0,
                 '-d'      : False,
