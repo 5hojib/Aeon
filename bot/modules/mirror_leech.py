@@ -167,7 +167,6 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         tag = f"@{username}"
     else:
         tag = message.from_user.mention
-
     if link and is_telegram_link(link):
         try:
             reply_to, session = await get_tg_link_content(link)
@@ -202,6 +201,10 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         await one_minute_del(reply_message)
         return
 
+    if link:
+        olink = link
+    else:
+        olink = ''
     error_msg = []
     error_button = None
     if not await isAdmin(message):
@@ -282,8 +285,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             await delete_links(message)
             return
 
-    listener = MirrorLeechListener(message, compress, extract, isQbit, isLeech, tag, select, seed, 
-                                    sameDir, rcf, up, join, drive_id=drive_id, index_link=index_link, source_url=link)
+    listener = MirrorLeechListener(message, compress, extract, isQbit, isLeech, tag, select, seed, sameDir, rcf, up, join, drive_id=drive_id, index_link=index_link, source_url=olink)
 
     if file_ is not None:
         await delete_links(message)
