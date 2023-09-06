@@ -1063,23 +1063,18 @@ def doods(url):
 
 
 def hubdrive(url):
-    rs = Session()
-    resp = rs.get(url)
-    title = findall(r'>(.*?)<\/h4>', resp.text)[0]
-    size = findall(r'>(.*?)<\/td>', resp.text)[1]
-    p_url = urlparse(url)
-    dlink = ''
     try:
+        rs = Session()
+        resp = rs.get(url)
+        title = findall(r'>(.*?)<\/h4>', resp.text)[0]
+        size = findall(r'>(.*?)<\/td>', resp.text)[1]
+        p_url = urlparse(url)
         js_query = rs.post(f"{p_url.scheme}://{p_url.hostname}/ajax.php?ajax=direct-download", data={'id': str(url.split('/')[-1])}, headers={'x-requested-with': 'XMLHttpRequest'}).json()
         if str(js_query['code']) == '200':
             dlink = f"{p_url.scheme}://{p_url.hostname}{js_query['file']}"
+            res = rs.get(dlink)
+            soup = BeautifulSoup(res.text, 'html.parser')
+            gd_data = soup.select('a[class="btn btn-primary btn-user"]')
+            return gd_data[0]['href']
     except Exception as e:
-        raise DDLException(f'{e.__class__.__name__}')
-
-    if dlink:    
-        res = rs.get(dlink)
-        soup = BeautifulSoup(res.text, 'html.parser')
-        gd_data = soup.select('a[class="btn btn-primary btn-user"]')
-        return gd_data[0]['href']
-    else:
-        raise DirectDownloadLinkException(f'{js_query["file"]}')
+        raise DirectDownloadLinkException('error')
