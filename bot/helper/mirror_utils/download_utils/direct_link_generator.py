@@ -1064,8 +1064,7 @@ def doods(url):
 
 def hubdrive(url):
     try:
-        rs = Session()
-        resp = rs.get(url)
+        resp = Session().get(url)
         title = findall(r'>(.*?)<\/h4>', resp.text)[0]
         size = findall(r'>(.*?)<\/td>', resp.text)[1]
         p_url = urlparse(url)
@@ -1075,7 +1074,8 @@ def hubdrive(url):
             res = rs.get(dlink)
             soup = BeautifulSoup(res.text, 'html.parser')
             gd_data = soup.select('a[class="btn btn-primary btn-user"]')
-            gd_link = gd_data[0]['href']
     except Exception as e:
-        raise DirectDownloadLinkException('ERROR: s')
-    return gd_link
+        raise DirectDownloadLinkException('ERROR: Download link not found try again')
+    return gd_data[0]['href']
+
+
