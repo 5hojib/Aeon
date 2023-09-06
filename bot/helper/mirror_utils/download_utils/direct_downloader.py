@@ -15,35 +15,22 @@ async def add_direct_download(details, path, listener, foldername):
         await sendMessage(listener.message, 'There is nothing to download!')
         return
     size = details['total_size']
-    if len(contents) == 1:
-        if foldername:
-            contents[0]['filename'] = foldername
-        foldername = contents[0]['filename']
-        contents[0]['path'] = ''
-    elif foldername:
+    if foldername:
         path = f'{path}/{foldername}'
     if not foldername:
         foldername = details['title']
-    if not foldername:
-        await sendMessage(listener.message, 'There is no any title use -n New Name')
+    msg, button = await stop_duplicate_check(foldername, listener)
+    if msg:
+        msg = await sendMessage(listener.message, msg, button)
+        await delete_links(listener.message)
+        await one_minute_del(msg)
         return
-    if config_dict['STOP_DUPLICATE']:
-        msg, button = await stop_duplicate_check(foldername, listener)
-        if msg:
-            dmsg = await sendMessage(listener.message, msg, button)
-            await delete_links(listener.message)
-            await one_minute_del(dmsg)
-            return
-    if any([config_dict['DIRECT_LIMIT'],
-            config_dict['LEECH_LIMIT'],
-            config_dict['STORAGE_THRESHOLD']]):
-        await sleep(1)
-        if limit_exceeded := await limit_checker(size, listener):
-            LOGGER.info(f"Limit Exceeded: {foldername} | {size}")
-            amsg = await sendMessage(listener.message, limit_exceeded)
-            await delete_links(listener.message)
-            await one_minute_del(amsg)
-            return
+    if limit_exceeded := await limit_checker(size, listener):
+        LOGGER.info(f"Limit Exceeded: {foldername} | {size}")
+        msg = await sendMessage(listener.message, limit_exceeded)
+        await delete_links(listener.message)
+        await one_minute_del(msg)
+        return
 
 
     gid = token_hex(4)
@@ -84,3 +71,4 @@ async def add_direct_download(details, path, listener, foldername):
         await sendStatusMessage(listener.message)
 
     await sync_to_async(directListener.download, contents)
+    await delete_links(listener.message)
