@@ -1077,6 +1077,5 @@ def hubdrive(url):
             gd_data = soup.select('a[class="btn btn-primary btn-user"]')
             gd_link = gd_data[0]['href']
     except Exception as e:
-        raise DirectDownloadLinkException('error')
-        return None
+        raise DirectDownloadLinkException('ERROR: s')
     return gd_link
