@@ -1075,6 +1075,10 @@ def hubdrive(url):
             res = rs.get(dlink)
             soup = BeautifulSoup(res.text, 'html.parser')
             gd_data = soup.select('a[class="btn btn-primary btn-user"]')
-            return gd_data[0]['href']
+            gd_link = gd_data[0]['href']
+            if "drive.google.com" in gd_link:
+                return gd_link
+            else:
+                raise DirectDownloadLinkException('Not a Google Drive link')
     except Exception as e:
         raise DirectDownloadLinkException('error')
