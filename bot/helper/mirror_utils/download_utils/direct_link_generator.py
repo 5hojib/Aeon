@@ -1078,4 +1078,5 @@ def hubdrive(url):
             gd_link = gd_data[0]['href']
     except Exception as e:
         raise DirectDownloadLinkException('error')
+        return None
     return gd_link
