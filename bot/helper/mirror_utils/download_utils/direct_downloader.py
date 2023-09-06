@@ -70,5 +70,5 @@ async def add_direct_download(details, path, listener, foldername):
         await listener.onDownloadStart()
         await sendStatusMessage(listener.message)
 
-    await sync_to_async(directListener.download, contents)
     await delete_links(listener.message)
+    await sync_to_async(directListener.download, contents)
