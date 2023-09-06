@@ -22,7 +22,7 @@ setdefaulttimeout(600)
 
 botStartTime = time()
 
-basicConfig(format="[%(asctime)s] [%(levelname)s] - %(message)s", #  [%(filename)s:%(lineno)d]
+basicConfig(format="[%(asctime)s] [%(levelname)s] - %(message)s",
             datefmt="%d-%b-%y %I:%M:%S %p",
             handlers=[FileHandler('log.txt'), StreamHandler()],
             level=INFO)
@@ -190,10 +190,6 @@ SEARCH_API_LINK = environ.get('SEARCH_API_LINK', '').rstrip("/")
 if len(SEARCH_API_LINK) == 0:
     SEARCH_API_LINK = ''
 
-CAP_FONT = environ.get('CAP_FONT', '').lower()
-if CAP_FONT.strip() not in ['', 'b', 'i', 'u', 's', 'spoiler', 'code']:
-    CAP_FONT = 'code'
-
 SEARCH_PLUGINS = environ.get('SEARCH_PLUGINS', '')
 if len(SEARCH_PLUGINS) == 0:
     SEARCH_PLUGINS = ''
@@ -249,9 +245,6 @@ INCOMPLETE_TASK_NOTIFIER = INCOMPLETE_TASK_NOTIFIER.lower() == 'true'
 STOP_DUPLICATE = environ.get('STOP_DUPLICATE', '')
 STOP_DUPLICATE = STOP_DUPLICATE.lower() == 'true'
 
-IS_TEAM_DRIVE = environ.get('IS_TEAM_DRIVE', '')
-IS_TEAM_DRIVE = IS_TEAM_DRIVE.lower() == 'true'
-
 USE_SERVICE_ACCOUNTS = environ.get('USE_SERVICE_ACCOUNTS', '')
 USE_SERVICE_ACCOUNTS = USE_SERVICE_ACCOUNTS.lower() == 'true'
 
@@ -263,9 +256,6 @@ AS_DOCUMENT = AS_DOCUMENT.lower() == 'true'
 
 SHOW_MEDIAINFO = environ.get('SHOW_MEDIAINFO', '')
 SHOW_MEDIAINFO = SHOW_MEDIAINFO.lower() == 'true'
-
-SOURCE_LINK = environ.get('SOURCE_LINK', '')
-SOURCE_LINK = SOURCE_LINK.lower() == 'true'
 
 EQUAL_SPLITS = environ.get('EQUAL_SPLITS', '')
 EQUAL_SPLITS = EQUAL_SPLITS.lower() == 'true'
@@ -372,7 +362,6 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'BASE_URL_PORT': BASE_URL_PORT,
                'BOT_TOKEN': BOT_TOKEN,
                'BOT_MAX_TASKS': BOT_MAX_TASKS,
-               'CAP_FONT': CAP_FONT,
                'CMD_SUFFIX': CMD_SUFFIX,
                'DATABASE_URL': DATABASE_URL,
                'DEFAULT_UPLOAD': DEFAULT_UPLOAD,
@@ -398,7 +387,6 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'GDRIVE_ID': GDRIVE_ID,
                'INCOMPLETE_TASK_NOTIFIER': INCOMPLETE_TASK_NOTIFIER,
                'INDEX_URL': INDEX_URL,
-               'IS_TEAM_DRIVE': IS_TEAM_DRIVE,
                'LEECH_LOG_ID': LEECH_LOG_ID,
                'LEECH_SPLIT_SIZE': LEECH_SPLIT_SIZE,
                'TOKEN_TIMEOUT': TOKEN_TIMEOUT,
@@ -422,7 +410,6 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'SEARCH_PLUGINS': SEARCH_PLUGINS,
                'SET_COMMANDS': SET_COMMANDS,
                'SHOW_MEDIAINFO': SHOW_MEDIAINFO,
-               'SOURCE_LINK': SOURCE_LINK,
                'STOP_DUPLICATE': STOP_DUPLICATE,
                'SUDO_USERS': SUDO_USERS,
                'TELEGRAM_API': TELEGRAM_API,

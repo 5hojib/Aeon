@@ -427,8 +427,8 @@ class MirrorLeechListener:
             msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n\n'
             if not files:
                 if self.isPrivate:
-                    msg += '<b>Files are send above</b>'
-                await sendMessage(self.message, msg, photo=self.random_pic)
+                    msg += '<b>Files are not sent for unknown reason</b>'
+                await sendMessage(self.message, msg)
             else:
                 attachmsg = True
                 fmsg, totalmsg = '\n\n', ''
@@ -461,7 +461,7 @@ class MirrorLeechListener:
                             await deleteMessage(self.linkslogmsg)
                 btn = ButtonMaker()
                 sbtn = ButtonMaker()
-                if self.source_url and config_dict['SOURCE_LINK']:
+                if self.source_url:
                     sbtn.ubutton('Source link', self.source_url)
                     await sendMessage(self.botpmmsg, msg + lmsg + fmsg, sbtn.build_menu(1))
                 else:
@@ -469,8 +469,6 @@ class MirrorLeechListener:
                 await deleteMessage(self.botpmmsg)
                 if self.isSuperGroup:
                     btn.ibutton('View in inbox', f"aeon {user_id} botpm", 'header')
-                    if self.source_url and config_dict['SOURCE_LINK']:
-                        btn.ubutton('Source link', self.source_url)
                     btn = extra_btns(btn)
                     await sendMessage(self.message, msg + '<b>Files has been sent to your inbox</b>', btn.build_menu(1))
                 else:
@@ -511,7 +509,8 @@ class MirrorLeechListener:
                             buttons.ubutton('Index link', share_url)
                         else:
                             buttons.ubutton('Index link', share_url)
-
+                if self.source_url:
+                    buttons.ubutton('Source link', self.source_url)
                 buttons = extra_btns(buttons)
                 button = buttons.build_menu(2)
             else:
@@ -531,8 +530,6 @@ class MirrorLeechListener:
             await deleteMessage(self.botpmmsg)
             if self.isSuperGroup:
                 buttons.ibutton('View in inbox', f"aeon {user_id} botpm", 'header')
-                if self.source_url and config_dict['SOURCE_LINK']:
-                    buttons.ubutton('Source link', self.source_url)
                 buttons = extra_btns(buttons)
                 await sendMessage(self.message, msg + '<b>Links has been sent to your inbox</b>', buttons.build_menu(1))
             else:

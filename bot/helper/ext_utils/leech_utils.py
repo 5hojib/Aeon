@@ -259,7 +259,7 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
         file_ = f"{ospath.splitext(file_)[0]}{suffix}{ospath.splitext(file_)[1]}" if '.' in file_ else f"{file_}{suffix}"
 
 
-    cap_mono =  f"<{config_dict['CAP_FONT']}>{nfile_}</{config_dict['CAP_FONT']}>" if config_dict['CAP_FONT'] else nfile_
+    cap_mono = nfile_
     if lcaption and dirpath and not isMirror:
         lcaption = lcaption.replace('\|', '%%').replace('\s', ' ')
         slit = lcaption.split("|")

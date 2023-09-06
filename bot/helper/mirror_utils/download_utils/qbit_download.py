@@ -10,26 +10,6 @@ from bot.helper.listeners.qbit_listener import onDownloadStart
 from bot.helper.ext_utils.task_manager import is_queued
 
 
-"""
-Only v1 torrents
-#from hashlib import sha1
-#from base64 import b16encode, b32decode
-#from bencoding import bencode, bdecode
-#from re import search as re_search
-def __get_hash_magnet(mgt: str):
-    hash_ = re_search(r'(?<=xt=urn:btih:)[a-zA-Z0-9]+', mgt).group(0)
-    if len(hash_) == 32:
-        hash_ = b16encode(b32decode(hash_.upper())).decode()
-    return str(hash_)
-
-def __get_hash_file(path):
-    with open(path, "rb") as f:
-        decodedDict = bdecode(f.read())
-        hash_ = sha1(bencode(decodedDict[b'info'])).hexdigest()
-    return str(hash_)
-"""
-
-
 async def add_qb_torrent(link, path, listener, ratio, seed_time):
     client = await sync_to_async(get_client)
     ADD_TIME = time()
