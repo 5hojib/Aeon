@@ -19,7 +19,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from bot import config_dict, LOGGER
-from bot.helper.ext_utils.bot_utils import get_readable_time, is_share_link, text_size_to_bytes
+from bot.helper.ext_utils.bot_utils import get_readable_time, is_share_link, text_size_to_bytes, is_gdrive_link
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 
 terabox_domain = ['terabox', 'nephobox', '4funbox', 'mirrobox', 'momerybox', 'teraboxapp', '1024tera']
@@ -1076,7 +1076,7 @@ def hubdrive(url):
             soup = BeautifulSoup(res.text, 'html.parser')
             gd_data = soup.select('a[class="btn btn-primary btn-user"]')
             gd_link = gd_data[0]['href']
-            if "drive.google.com" in gd_link:
+            if is_gdrive_link(gd_link):
                 return gd_link
             else:
                 raise DirectDownloadLinkException('Not a Google Drive link')
