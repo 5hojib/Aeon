@@ -77,6 +77,8 @@ def direct_link_generator(link: str):
         return gofile(link)
     elif 'send.cm' in domain:
         return send_cm(link)
+    elif 'hubdrive' in domain:
+        return hubdrive(link)   
     elif any(x in domain for x in doods_domain):
         return doods(link)
     elif any(x in domain for x in ['wetransfer.com', 'we.tl']):
@@ -1058,3 +1060,26 @@ def doods(url):
     if not (link := search(r"window\.open\('(\S+)'", _res.text)):
         raise DirectDownloadLinkException("ERROR: Download link not found try again")
     return (link.group(1), f'Referer: {parsed_url.scheme}://{parsed_url.hostname}/')
+
+
+def hubdrive(url):
+    rs = Session()
+    resp = rs.get(url)
+    title = findall(r'>(.*?)<\/h4>', resp.text)[0]
+    size = findall(r'>(.*?)<\/td>', resp.text)[1]
+    p_url = urlparse(url)
+    dlink = ''
+    try:
+        js_query = rs.post(f"{p_url.scheme}://{p_url.hostname}/ajax.php?ajax=direct-download", data={'id': str(url.split('/')[-1])}, headers={'x-requested-with': 'XMLHttpRequest'}).json()
+        if str(js_query['code']) == '200':
+            dlink = f"{p_url.scheme}://{p_url.hostname}{js_query['file']}"
+    except Exception as e:
+        raise DDLException(f'{e.__class__.__name__}')
+
+    if dlink:    
+        res = rs.get(dlink)
+        soup = BeautifulSoup(res.text, 'html.parser')
+        gd_data = soup.select('a[class="btn btn-primary btn-user"]')
+        return gd_data[0]['href']
+    else:
+        raise DirectDownloadLinkException(f'{js_query["file"]}')
