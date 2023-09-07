@@ -256,7 +256,6 @@ class GoogleDriveHelper:
             elif not item.lower().endswith(tuple(GLOBAL_EXTENSION_FILTER)):
                 mime_type = get_mime_type(current_file_name)
                 file_name = current_file_name.split("/")[-1]
-                # current_file_name will have the full path
                 self.__upload_file(current_file_name,
                                    file_name, mime_type, dest_id)
                 self.__total_files += 1
@@ -282,17 +281,14 @@ class GoogleDriveHelper:
         file = self.__service.files().create(
             body=file_metadata, supportsAllDrives=True).execute()
         file_id = file.get("id")
-        if not config_dict['IS_TEAM_DRIVE']:
-            self.__set_permission(file_id)
-        LOGGER.info(
-            f'Created G-Drive Folder:\nName: {file.get("name")}\nID: {file_id}')
+        self.__set_permission(file_id)
+        LOGGER.info(f'Created G-Drive Folder:\nName: {file.get("name")}\nID: {file_id}')
         return file_id
 
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(3),
            retry=(retry_if_exception_type(Exception)))
     def __upload_file(self, file_path, file_name, mime_type, dest_id, is_dir=True):
         file_name, _ = async_to_sync(format_filename, file_name, self.__user_id, isMirror=True)
-        # File body description
         file_metadata = {
             'name': file_name,
             'description': 'Uploaded by Aeon',
@@ -305,11 +301,8 @@ class GoogleDriveHelper:
             media_body = MediaFileUpload(file_path,
                                          mimetype=mime_type,
                                          resumable=False)
-            response = self.__service.files().create(body=file_metadata, media_body=media_body,
-                                                     supportsAllDrives=True).execute()
-            if not config_dict['IS_TEAM_DRIVE']:
-                self.__set_permission(response['id'])
-
+            response = self.__service.files().create(body=file_metadata, media_body=media_body, supportsAllDrives=True).execute()
+            self.__set_permission(response['id'])
             drive_file = self.__service.files().get(
                 fileId=response['id'], supportsAllDrives=True).execute()
             return self.__G_DRIVE_BASE_DOWNLOAD_URL.format(drive_file.get('id'))
@@ -318,7 +311,6 @@ class GoogleDriveHelper:
                                      resumable=True,
                                      chunksize=100 * 1024 * 1024)
 
-        # Insert a file
         drive_file = self.__service.files().create(
             body=file_metadata, media_body=media_body, supportsAllDrives=True)
         response = None
@@ -360,10 +352,7 @@ class GoogleDriveHelper:
             except:
                 pass
         self.__file_processed_bytes = 0
-        # Insert new permissions
-        if not config_dict['IS_TEAM_DRIVE']:
-            self.__set_permission(response['id'])
-        # Define file instance and get url for download
+        self.__set_permission(response['id'])
         if not is_dir:
             drive_file = self.__service.files().get(
                 fileId=response['id'], supportsAllDrives=True).execute()
@@ -482,8 +471,6 @@ class GoogleDriveHelper:
 
     def __get_recursive_list(self, file, rootid):
         rtnlist = []
-        # if not rootid:
-        #    rootid = file.get('teamDriveId')
         if rootid == "root":
             rootid = self.__service.files().get(
                 fileId='root', fields='id').execute().get('id')

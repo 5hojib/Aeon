@@ -44,6 +44,9 @@ MIRROR_HELP_MESSAGE = """
 
 <b>-s:</b> Select a torrent file.
 
+<b>-h Direct link custom headers:</b> -h
+<code>/cmd</code> link -h Key: value Key1: value1.
+
 <b>-d ratio:seed_time:</b> Set the seeding ratio and time for a torrent.
 
 <b>-i number of links/files:</b> Process multiple links or files.
@@ -142,9 +145,7 @@ default_desp = {'AS_DOCUMENT': 'Default type of Telegram file upload. Default is
                 'GDRIVE_ID': 'This is the Folder/TeamDrive ID of the Google Drive OR root to which you want to upload all the mirrors using google-api-python-client.',
                 'INCOMPLETE_TASK_NOTIFIER': 'Get incomplete task messages after restart. Require database and superGroup. Default is False',
                 'INDEX_URL': 'Refer to https://gitlab.com/ParveenBhadooOfficial/Google-Drive-Index.',
-                'IS_TEAM_DRIVE': 'Set True if uploading to TeamDrive using google-api-python-client. Default is False',
                 'SHOW_MEDIAINFO': 'Add Button to Show MediaInfo in Leeched file. Bool',
-                'CAP_FONT': 'Add Custom Caption Font to Leeched Files, Available Values : b, i, u, s, code, spoiler. Reset Var to use Regular ( No Format )',
                 'TOKEN_TIMEOUT': 'Token timeout for each group member in sec. Int',
                 'LEECH_SPLIT_SIZE': 'Size of split in bytes. Default is 2GB. Default is 4GB if your account is premium.',
                 'MEDIA_GROUP': 'View Uploaded splitted file parts in media group. Default is False.',

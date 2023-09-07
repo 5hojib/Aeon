@@ -314,6 +314,7 @@ async def user_info(client, userId):
 
 
 async def BotPm_check(message, button=None):
+    user_id = message.from_user.id
     try:
         temp_msg = await message._client.send_message(chat_id=message.from_user.id, text='<b>Checking Access...</b>')
         await temp_msg.delete()
@@ -322,5 +323,5 @@ async def BotPm_check(message, button=None):
         if button is None:
             button = ButtonMaker()
         _msg = "You haven't initiated the bot in a private message!"
-        button.ubutton("Start Bot Now", f"https://t.me/{bot_name}?start=start", 'header')
+        button.ibutton("Start", f"aeon {user_id} pmc", 'header')
         return _msg, button

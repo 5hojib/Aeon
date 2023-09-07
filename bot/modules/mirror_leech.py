@@ -34,21 +34,22 @@ from bot.helper.mirror_utils.download_utils.direct_downloader import add_direct_
 async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=None, bulk=[]):
     text = message.text.split('\n')
     input_list = text[0].split(' ')
-
+    dottorrent = False
     arg_base = {'link'    : '', 
                 '-i'      : 0,
-                '-m'      : '',
                 '-d'      : False,
                 '-j'      : False,
                 '-s'      : False,
                 '-b'      : False,
-                '-n'      : '',
                 '-e'      : False,
                 '-z'      : False,
-                '-up'     : '',
-                '-rcf'    : '', 
+                '-m'      : '',
+                '-n'      : '',
+                '-h'      : '',
                 '-u'      : '',
                 '-p'      : '',
+                '-up'     : '',
+                '-rcf'    : '', 
                 '-id'     : '',
                 '-index'  : '',
     }
@@ -59,8 +60,9 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         multi = int(args['-i'])
     except:
         multi = 0
-    
+
     link          = args['link']
+    headers       = args['-h']
     folder_name   = args['-m']
     seed          = args['-d']
     join          = args['-j']
@@ -80,7 +82,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     reply_to      = None
     file_         = None
     session       = ''
-    
+
     if not isinstance(seed, bool):
         dargs = seed.split(':')
         ratio = dargs[0] or None
@@ -94,7 +96,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         if len(dargs) == 2:
             bulk_end = dargs[1] or None
         isBulk = True
-        
+
     if drive_id and is_gdrive_link(drive_id):
         drive_id = GoogleDriveHelper.getIdFromUrl(drive_id)
 
@@ -165,7 +167,6 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         tag = f"@{username}"
     else:
         tag = message.from_user.mention
-
     if link and is_telegram_link(link):
         try:
             reply_to, session = await get_tg_link_content(link)
@@ -193,6 +194,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         elif reply_to.document and (file_.mime_type == 'application/x-bittorrent' or file_.file_name.endswith('.torrent')):
             link = await reply_to.download()
             file_ = None
+            dottorrent = True
 
     if not is_url(link) and not is_magnet(link) and not await aiopath.exists(link) and not is_rclone_path(link) and file_ is None:
         reply_message = await sendMessage(message, MIRROR_HELP_MESSAGE)
@@ -200,6 +202,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         await one_minute_del(reply_message)
         return
 
+    olink = link if link and not dottorrent else ''
     error_msg = []
     error_button = None
     if not await isAdmin(message):
@@ -224,7 +227,9 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             process_msg = await sendMessage(message, f"<b>Processing:</b> <code>{link}</code>")
             try:
                 link = await sync_to_async(direct_link_generator, link)
-                if not isinstance(link, dict):
+                if isinstance(link, tuple):
+                    link, headers = link
+                if isinstance(link, str):
                     LOGGER.info(f"Generated link: {link}")
             except DirectDownloadLinkException as e:
                 LOGGER.info(str(e))
@@ -278,8 +283,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             await delete_links(message)
             return
 
-    listener = MirrorLeechListener(message, compress, extract, isQbit, isLeech, tag, select, seed, 
-                                    sameDir, rcf, up, join, drive_id=drive_id, index_link=index_link, source_url=link)
+    listener = MirrorLeechListener(message, compress, extract, isQbit, isLeech, tag, select, seed, sameDir, rcf, up, join, drive_id=drive_id, index_link=index_link, source_url=olink)
 
     if file_ is not None:
         await delete_links(message)
@@ -309,9 +313,11 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         pssw = args['-p']
         if ussr or pssw:
             auth = f"{ussr}:{pssw}"
-            auth = "Basic " + b64encode(auth.encode()).decode('ascii')
+            auth = f"authorization: Basic {b64encode(auth.encode()).decode('ascii')}"
         else:
             auth = ''
+        if headers:
+            auth += f'{auth} {headers}'
         await add_aria2c_download(link, path, listener, name, auth, ratio, seed_time)
     await delete_links(message)
 

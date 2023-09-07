@@ -15,7 +15,7 @@ jobs:
       - name: Checkout deploy branch
         uses: actions/checkout@v2
         with:
-          ref: 'refs/heads/deploy' # Specify the deploy branch
+          ref: 'refs/heads/deploy'
 
       - name: Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.12.12
@@ -33,3 +33,4 @@ jobs:
           HD_TELEGRAM_HASH: ${{secrets.TELEGRAM_HASH}}
           HD_DATABASE_URL: ${{secrets.DATABASE_URL}}
           HD_BOT_TOKEN: ${{secrets.BOT_TOKEN}}
+          HD_CONFIG_FILE_URL: ${{secrets.CONFIG_FILE_URL}}

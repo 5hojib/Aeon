@@ -44,8 +44,6 @@ bool_vars = ['AS_DOCUMENT',
              'STOP_DUPLICATE',
              'SET_COMMANDS',
              'SHOW_MEDIAINFO',
-             'SOURCE_LINK',
-             'IS_TEAM_DRIVE',
              'USE_SERVICE_ACCOUNTS',
              'WEB_PINCODE',
              'EQUAL_SPLITS']
@@ -141,10 +139,6 @@ async def load_config():
     if len(SEARCH_API_LINK) == 0:
         SEARCH_API_LINK = ''
 
-    CAP_FONT = environ.get('CAP_FONT', '').lower()
-    if CAP_FONT.strip() not in ['', 'b', 'i', 'u', 's', 'spoiler', 'code']:
-        CAP_FONT = 'code'
-        
     LEECH_LOG_ID = environ.get('LEECH_LOG_ID', '')
     LEECH_LOG_ID = '' if len(LEECH_LOG_ID) == 0 else int(LEECH_LOG_ID)
     
@@ -231,9 +225,6 @@ async def load_config():
     STOP_DUPLICATE = environ.get('STOP_DUPLICATE', '')
     STOP_DUPLICATE = STOP_DUPLICATE.lower() == 'true'
 
-    IS_TEAM_DRIVE = environ.get('IS_TEAM_DRIVE', '')
-    IS_TEAM_DRIVE = IS_TEAM_DRIVE.lower() == 'true'
-
     USE_SERVICE_ACCOUNTS = environ.get('USE_SERVICE_ACCOUNTS', '')
     USE_SERVICE_ACCOUNTS = USE_SERVICE_ACCOUNTS.lower() == 'true'
 
@@ -246,9 +237,6 @@ async def load_config():
     SHOW_MEDIAINFO = environ.get('SHOW_MEDIAINFO', '')
     SHOW_MEDIAINFO = SHOW_MEDIAINFO.lower() == 'true'
     
-    SOURCE_LINK = environ.get('SOURCE_LINK', '')
-    SOURCE_LINK = SOURCE_LINK.lower() == 'true'
-
     EQUAL_SPLITS = environ.get('EQUAL_SPLITS', '')
     EQUAL_SPLITS = EQUAL_SPLITS.lower() == 'true'
 
@@ -385,7 +373,6 @@ async def load_config():
                         'BASE_URL_PORT': BASE_URL_PORT,
                         'BOT_TOKEN': BOT_TOKEN,
                         'BOT_MAX_TASKS': BOT_MAX_TASKS,
-                        'CAP_FONT': CAP_FONT,
                         'CMD_SUFFIX': CMD_SUFFIX,
                         'DATABASE_URL': DATABASE_URL,
                         'DEFAULT_UPLOAD': DEFAULT_UPLOAD,
@@ -411,7 +398,6 @@ async def load_config():
                         'GDRIVE_ID': GDRIVE_ID,
                         'INCOMPLETE_TASK_NOTIFIER': INCOMPLETE_TASK_NOTIFIER,
                         'INDEX_URL': INDEX_URL,
-                        'IS_TEAM_DRIVE': IS_TEAM_DRIVE,
                         'LEECH_LOG_ID': LEECH_LOG_ID,
                         'LEECH_SPLIT_SIZE': LEECH_SPLIT_SIZE,
                         'TOKEN_TIMEOUT': TOKEN_TIMEOUT,
@@ -435,7 +421,6 @@ async def load_config():
                         'SEARCH_PLUGINS': SEARCH_PLUGINS,
                         'SET_COMMANDS': SET_COMMANDS,
                         'SHOW_MEDIAINFO': SHOW_MEDIAINFO,
-                        'SOURCE_LINK': SOURCE_LINK,
                         'STOP_DUPLICATE': STOP_DUPLICATE,
                         'SUDO_USERS': SUDO_USERS,
                         'TELEGRAM_API': TELEGRAM_API,
@@ -542,10 +527,6 @@ async def edit_variable(_, message, pre_message, key):
         aria2_options['bt-stop-timeout'] = f'{value}'
     elif key == 'LEECH_SPLIT_SIZE':
         value = min(int(value), MAX_SPLIT_SIZE)
-    elif key == 'CAP_FONT':
-        value = value.strip().lower()
-        if value not in ['b', 'i', 'u', 's', 'spoiler', 'code']:
-            value = 'code'
     elif key == 'BASE_URL_PORT':
         value = int(value)
         if config_dict['BASE_URL']:

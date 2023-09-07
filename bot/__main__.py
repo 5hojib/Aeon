@@ -59,7 +59,7 @@ async def stats(_, message):
         f'<code>• RAM usage  :</code> {memory.percent}%\n'\
         f'<code>• Disk usage :</code> {disk}%\n'\
         f'<code>• Free space :</code> {get_readable_file_size(free)}\n'\
-        f'<code>• Total space :</code> {get_readable_file_size(total)}\n\n'
+        f'<code>• Total space:</code> {get_readable_file_size(total)}\n\n'
             
     limitations = f'<b>LIMITATIONS</b>\n\n'
     
@@ -81,7 +81,10 @@ async def stats(_, message):
 async def start(client, message):
     buttons = ButtonMaker()
     reply_markup = buttons.build_menu(2)
-    if len(message.command) > 1 and message.command[1] == "wzmlx":
+    if len(message.command) > 1 and message.command[1] == "aeon":
+        await deleteMessage(message)
+    elif len(message.command) > 1 and message.command[1] == "pmc":
+        await sendMessage(message, 'Bot started')
         await deleteMessage(message)
     elif len(message.command) > 1 and len(message.command[1]) == 36:
         userid = message.from_user.id
@@ -141,7 +144,7 @@ async def ping(_, message):
 
 
 @new_task
-async def wzmlxcb(_, query):
+async def aeoncb(_, query):
     message = query.message
     user_id = query.from_user.id
     data = query.data.split()
@@ -166,7 +169,7 @@ async def wzmlxcb(_, query):
             startLine = f"<b>Showing Last {ind} Lines from log.txt:</b> \n\n----------<b>START LOG</b>----------\n\n"
             endLine = "\n----------<b>END LOG</b>----------"
             btn = ButtonMaker()
-            btn.ibutton('Close', f'wzmlx {user_id} close')
+            btn.ibutton('Close', f'aeon {user_id} close')
             reply_message = await sendMessage(message, startLine + escape(Loglines) + endLine, btn.build_menu(1))
             await query.edit_message_reply_markup(None)
             await deleteMessage(message)
@@ -184,7 +187,9 @@ async def wzmlxcb(_, query):
             btn.ubutton('Web Paste', f"http://stashbin.xyz/{resp['data']['key']}")
             await query.edit_message_reply_markup(btn.build_menu(1))
     elif data[2] == "botpm":
-        await query.answer(url=f"https://t.me/{bot_name}?start=wzmlx")
+        await query.answer(url=f"https://t.me/{bot_name}?start=aeon")
+    elif data[2] == "pmc":
+        await query.answer(url=f"https://t.me/{bot_name}?start=pmc")
     else:
         await query.answer()
         await deleteMessage(message)
@@ -192,8 +197,8 @@ async def wzmlxcb(_, query):
 @new_task
 async def log(_, message):
     buttons = ButtonMaker()
-    buttons.ibutton('Log Display', f'wzmlx {message.from_user.id} logdisplay')
-    buttons.ibutton('Web Paste', f'wzmlx {message.from_user.id} webpaste')
+    buttons.ibutton('Log Display', f'aeon {message.from_user.id} logdisplay')
+    buttons.ibutton('Web Paste', f'aeon {message.from_user.id} webpaste')
     reply_message = await sendFile(message, 'log.txt', buttons=buttons.build_menu(1))
     await deleteMessage(message)
     await one_minute_del(reply_message)
@@ -324,7 +329,7 @@ async def main():
         BotCommands.HelpCommand) & CustomFilters.authorized))
     bot.add_handler(MessageHandler(stats, filters=command(
         BotCommands.StatsCommand) & CustomFilters.authorized))
-    bot.add_handler(CallbackQueryHandler(wzmlxcb, filters=regex(r'^wzmlx')))
+    bot.add_handler(CallbackQueryHandler(aeoncb, filters=regex(r'^aeon')))
     LOGGER.info("Bot Started!")
     signal(SIGINT, exit_clean_up)
 
