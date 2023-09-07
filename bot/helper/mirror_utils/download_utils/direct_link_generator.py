@@ -73,12 +73,10 @@ def direct_link_generator(link: str):
         return shrdsk(link)
     elif 'letsupload.io' in domain:
         return letsupload(link)
-    elif 'gofile.io' in domain:
-        return gofile(link)
     elif 'send.cm' in domain:
         return send_cm(link)
     elif 'hubdrive' in domain:
-        return hubdrive(link)   
+        return hubdrive(link)
     elif any(x in domain for x in doods_domain):
         return doods(link)
     elif any(x in domain for x in ['wetransfer.com', 'we.tl']):
