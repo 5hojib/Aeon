@@ -34,7 +34,7 @@ from bot.helper.mirror_utils.download_utils.direct_downloader import add_direct_
 async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=None, bulk=[]):
     text = message.text.split('\n')
     input_list = text[0].split(' ')
-    dottorrent = False 
+    dottorrent = False
     arg_base = {'link'    : '', 
                 '-i'      : 0,
                 '-d'      : False,
@@ -60,7 +60,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         multi = int(args['-i'])
     except:
         multi = 0
-    
+
     link          = args['link']
     headers       = args['-h']
     folder_name   = args['-m']
@@ -82,7 +82,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     reply_to      = None
     file_         = None
     session       = ''
-    
+
     if not isinstance(seed, bool):
         dargs = seed.split(':')
         ratio = dargs[0] or None
@@ -96,7 +96,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         if len(dargs) == 2:
             bulk_end = dargs[1] or None
         isBulk = True
-        
+
     if drive_id and is_gdrive_link(drive_id):
         drive_id = GoogleDriveHelper.getIdFromUrl(drive_id)
 
@@ -202,10 +202,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         await one_minute_del(reply_message)
         return
 
-    if link and not dottorrent:
-        olink = link
-    else:
-        olink = ''
+    olink = link if link and not dottorrent else ''
     error_msg = []
     error_button = None
     if not await isAdmin(message):
