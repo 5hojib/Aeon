@@ -180,7 +180,7 @@ async def task_utils(message):
             _msg, button = await BotPm_check(message, button)
             if _msg:
                 msg.append(_msg)
-        if config_dict(['TOKEN_TIMEOUT']) and (await isAdmin(message) or user_id == OWNER_ID or user_id in user_data and user_data[user_id].get('is_sudo')):
+        if config_dict['TOKEN_TIMEOUT'] and (await isAdmin(message) or user_id == OWNER_ID or user_id in user_data and user_data[user_id].get('is_sudo')):
             _msg, button = await BotPm_check(message, button)
             if _msg:
                 msg.append(_msg)
