@@ -1096,7 +1096,7 @@ def hubdrive(url):
             gd_link = gd_data[0]['href']
         return gd_link
     except Exception as e:
-        raise DirectDownloadLinkException('ERROR: ERROR: Download link not found try again')
+        raise DirectDownloadLinkException('ERROR: Download link not found try again')
 
 
 def easyupload(url):
