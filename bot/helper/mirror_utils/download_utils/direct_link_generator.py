@@ -1,3 +1,4 @@
+import requests
 from base64 import b64decode
 from hashlib import sha256
 from http.cookiejar import MozillaCookieJar
@@ -15,7 +16,8 @@ from lk21 import Bypass
 from lxml.etree import HTML
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
-from requests import Session, post, session as req_session, get as rget
+from requests import Session, post
+from requests import session as req_session
 
 from bot import config_dict, LOGGER
 from bot.helper.ext_utils.bot_utils import get_readable_time, is_share_link, text_size_to_bytes, is_gdrive_link
@@ -164,9 +166,10 @@ def mediafire(url: str) -> str:
         return mediafireFolder(url)
     if final_link := findall(r'https?:\/\/download\d+\.mediafire\.com\/\S+\/\S+\/\S+', url):
         return final_link[0]
+    cget = create_scraper().request
     try:
-        with Session() as scraper:
-            page = scraper.get(url).text
+        url = cget('get', url).url
+        page = cget('get', url).text
     except Exception as e:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     if not (final_link := findall(r"\'(https?:\/\/download\d+\.mediafire\.com\/\S+\/\S+\/\S+)\'", page)):
@@ -536,7 +539,7 @@ def terabox(url) -> str:
 
 def filepress(url):
     try:
-        cget = rget(url, allow_redirects=False)
+        cget = requests.get(url, allow_redirects=False)
         if 'location' in cget.headers:
             url = cget.headers['location']
         raw = urlparse(url)
@@ -548,7 +551,7 @@ def filepress(url):
         d_id = resp.json()
         if d_id.get('data', False):
             dl_link = f"https://drive.google.com/uc?id={d_id['data']}&export=download"
-            dl_resp = rget(dl_link)
+            dl_resp = requests.get(dl_link)
             parsed = BeautifulSoup(dl_resp.content, 'html.parser').find('span')
             combined = str(parsed).rsplit('(', maxsplit=1)
             name, size = combined[0], combined[1].replace(')', '') + 'B'
