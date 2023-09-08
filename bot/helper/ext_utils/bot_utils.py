@@ -506,6 +506,7 @@ async def set_commands(client):
                 BotCommand(f'{BotCommands.BotSetCommand}', 'Open Bot settings'),
                 BotCommand(f'{BotCommands.LogCommand}', 'View log'),
                 BotCommand(f'{BotCommands.RestartCommand[0]}', 'Restart bot')
+                BotCommand(f'{BotCommands.MediaInfoCommand}', 'Get MediaInfo')
             ]
         )
 
