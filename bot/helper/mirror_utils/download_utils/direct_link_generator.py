@@ -1,3 +1,4 @@
+import requests
 from base64 import b64decode
 from hashlib import sha256
 from http.cookiejar import MozillaCookieJar
@@ -518,7 +519,7 @@ def terabox(url) -> str:
         return details['contents'][0]['url']
     return details
 
-def filepress(url: str):
+def filepress(url):
     try:
         cget = requests.get(url, allow_redirects=False)
         if 'location' in cget.headers:
