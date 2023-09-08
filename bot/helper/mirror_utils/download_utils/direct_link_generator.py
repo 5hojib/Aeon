@@ -1,4 +1,3 @@
-import requests
 from base64 import b64decode
 from hashlib import sha256
 from http.cookiejar import MozillaCookieJar
@@ -14,10 +13,10 @@ from bs4 import BeautifulSoup
 from cloudscraper import create_scraper
 from lk21 import Bypass
 from lxml.etree import HTML
-from requests import Session, post
-from requests import session as req_session
+from requests import 
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+from requests import Session, post, session as req_session, get as rget
 
 from bot import config_dict, LOGGER
 from bot.helper.ext_utils.bot_utils import get_readable_time, is_share_link, text_size_to_bytes, is_gdrive_link
@@ -521,7 +520,7 @@ def terabox(url) -> str:
 
 def filepress(url):
     try:
-        cget = requests.get(url, allow_redirects=False)
+        cget = rget(url, allow_redirects=False)
         if 'location' in cget.headers:
             url = cget.headers['location']
         raw = urlparse(url)
@@ -533,7 +532,7 @@ def filepress(url):
         d_id = resp.json()
         if d_id.get('data', False):
             dl_link = f"https://drive.google.com/uc?id={d_id['data']}&export=download"
-            dl_resp = requests.get(dl_link)
+            dl_resp = rget(dl_link)
             parsed = BeautifulSoup(dl_resp.content, 'html.parser').find('span')
             combined = str(parsed).rsplit('(', maxsplit=1)
             name, size = combined[0], combined[1].replace(')', '') + 'B'
@@ -1079,6 +1078,7 @@ def hubdrive(url):
             soup = BeautifulSoup(res.text, 'html.parser')
             gd_data = soup.select('a[class="btn btn-primary btn-user"]')
             gd_link = gd_data[0]['href']
+        return gd_link
     except Exception as e:
         raise DirectDownloadLinkException('ERROR: ERROR: Download link not found try again')
-    return gd_link
+  #  return gd_link
