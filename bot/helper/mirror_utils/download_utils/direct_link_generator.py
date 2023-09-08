@@ -13,19 +13,21 @@ from bs4 import BeautifulSoup
 from cloudscraper import create_scraper
 from lk21 import Bypass
 from lxml.etree import HTML
-from requests import Session, post
-from requests import session as req_session
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+from requests import Session, post, session as req_session, get as rget
 
 from bot import config_dict, LOGGER
 from bot.helper.ext_utils.bot_utils import get_readable_time, is_share_link, text_size_to_bytes, is_gdrive_link
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
+from bot.helper.ext_utils.help_messages import PASSWORD_ERROR_MESSAGE
+
 
 terabox_domain = ['terabox', 'nephobox', '4funbox', 'mirrobox', 'momerybox', 'teraboxapp', '1024tera']
 streamtape_domain = ['streamtape.com', 'streamtape.co', 'streamtape.cc', 'streamtape.to', 'streamtape.net', 'streamta.pe', 'streamtape.xyz']
 doods_domain = ['dood.watch', 'doodstream.com', 'dood.to', 'dood.so', 'dood.cx', 'dood.la', 'dood.ws', 'dood.sh', 'doodstream.co', 'dood.pm', 'dood.wf', 'dood.re', 'dood.video', 'dooood.com', 'dood.yt', 'dood.stream', 'doods.pro']
 _caches = {}
+
 
 def direct_link_generator(link: str):
     domain = urlparse(link).hostname
@@ -75,6 +77,8 @@ def direct_link_generator(link: str):
         return letsupload(link)
     elif 'send.cm' in domain:
         return send_cm(link)
+    elif 'easyupload.io' in domain:
+        return easyupload(link)
     elif 'hubdrive' in domain:
         return hubdrive(link)
     elif any(x in domain for x in doods_domain):
@@ -92,6 +96,19 @@ def direct_link_generator(link: str):
             return sharer_scraper(link)
     else:
         raise DirectDownloadLinkException(f'No Direct link function found for {link}')
+
+
+def get_captcha_token(session, params):
+    recaptcha_api = 'https://www.google.com/recaptcha/api2'
+    res = session.get(f'{recaptcha_api}/anchor', params=params)
+    anchor_html = HTML(res.text)
+    if not (anchor_token:= anchor_html.xpath('//input[@id="recaptcha-token"]/@value')):
+        return
+    params['c'] = anchor_token[0]
+    params['reason'] = 'q'
+    res = session.post(f'{recaptcha_api}/reload', params=params)
+    if token := findall(r'"rresp","(.*?)"', res.text):
+        return token[0]
 
 
 def yandex_disk(url: str) -> str:
@@ -346,8 +363,7 @@ def fichier(link):
                 raise DirectDownloadLinkException(
                     "ERROR: 1fichier is on a limit. Please wait a few minutes/hour.")
         elif "protect access" in str(str_2).lower():
-            raise DirectDownloadLinkException(
-                "ERROR: This link requires a password!\n\n<b>This link requires a password!</b>\n- Insert sign <b>::</b> after the link and write the password after the sign.\n\n<b>Example:</b> https://1fichier.com/?smmtd8twfpm66awbqz04::love you\n\n* No spaces between the signs <b>::</b>\n* For the password, you can use a space!")
+            raise DirectDownloadLinkException(f"ERROR:\n{PASSWORD_ERROR_MESSAGE.format(url)}")
         else:
             raise DirectDownloadLinkException(
                 "ERROR: Failed to generate Direct Link from 1fichier!")
@@ -519,23 +535,27 @@ def terabox(url) -> str:
     return details
 
 def filepress(url):
-    cget = create_scraper().request
     try:
-        url = cget('GET', url).url
+        cget = rget(url, allow_redirects=False)
+        if 'location' in cget.headers:
+            url = cget.headers['location']
         raw = urlparse(url)
         json_data = {
             'id': raw.path.split('/')[-1],
-            'method': 'publicDownlaod',
-        }
-        api = f'{raw.scheme}://{raw.hostname}/api/file/downlaod/'
-        res = cget('POST', api, headers={
-                   'Referer': f'{raw.scheme}://{raw.hostname}'}, json=json_data).json()
+            'method': 'publicDownlaod',}
+        headers = {'Referer': f'{raw.scheme}://{raw.hostname}'}
+        resp = requests.post(f'{raw.scheme}://{raw.hostname}/api/file/downlaod/', headers=headers, json=json_data)
+        d_id = resp.json()
+        if d_id.get('data', False):
+            dl_link = f"https://drive.google.com/uc?id={d_id['data']}&export=download"
+            dl_resp = rget(dl_link)
+            parsed = BeautifulSoup(dl_resp.content, 'html.parser').find('span')
+            combined = str(parsed).rsplit('(', maxsplit=1)
+            name, size = combined[0], combined[1].replace(')', '') + 'B'
+        del json_data['method']
     except Exception as e:
         raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
-    if 'data' not in res:
-        raise DirectDownloadLinkException(f'ERROR: {res["statusText"]}')
-    return f'https://drive.google.com/uc?id={res["data"]}&export=download'
-
+    return dl_link
 
 def gdtot(url):
     cget = create_scraper().request
@@ -558,7 +578,7 @@ def gdtot(url):
             raise DirectDownloadLinkException("Try in your browser, mostly file not found or user limit exceeded!")
         d_link = f'https://drive.google.com/open?id={decoded_id}'
     else:
-        raise DirectDownloadLinkException('Drive Link not found, Try in your broswer! GDTOT_CRYPT not Provided!')
+        raise DirectDownloadLinkException('ERROR: Drive Link not found, Try in your broswer! GDTOT_CRYPT not Provided!')
     soup = BeautifulSoup(cget('GET', url).content, "html.parser")
     parse_data = (soup.select('meta[property^="og:description"]')[0]['content']).replace('Download ' , '').rsplit('-', maxsplit=1)
     return d_link
@@ -740,7 +760,7 @@ def gofile(url):
         except Exception as e:
             raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
         if _json['status'] in 'error-passwordRequired':
-            raise DirectDownloadLinkException(f'ERROR: This link requires a password!\n\n<b>This link requires a password!</b>\n- Insert sign <b>::</b> after the link and write the password after the sign.\n\n<b>Example:</b> {url}::love you\n\n* No spaces between the signs <b>::</b>\n* For the password, you can use a space!')
+            raise DirectDownloadLinkException(f"ERROR:\n{PASSWORD_ERROR_MESSAGE.format(url)}")
         if _json['status'] in 'error-passwordWrong':
             raise DirectDownloadLinkException('ERROR: This password is wrong !')
         if _json['status'] in 'error-notFound':
@@ -948,7 +968,7 @@ def send_cm_file(url, file_id=None):
         except Exception as e:
             raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
         if _passwordNeed:
-            raise DirectDownloadLinkException(f'ERROR: This link requires or wrong password!\n\n<b>This link requires a password!</b>\n- Insert sign <b>::</b> after the link and write the password after the sign.\n\n<b>Example:</b> {url}::love you\n\n* No spaces between the signs <b>::</b>\n* For the password, you can use a space!')
+            raise DirectDownloadLinkException(f"ERROR:\n{PASSWORD_ERROR_MESSAGE.format(url)}")
         raise DirectDownloadLinkException("ERROR: Direct link not found")
 
 def send_cm(url: str):
@@ -1074,6 +1094,54 @@ def hubdrive(url):
             soup = BeautifulSoup(res.text, 'html.parser')
             gd_data = soup.select('a[class="btn btn-primary btn-user"]')
             gd_link = gd_data[0]['href']
+        return gd_link
     except Exception as e:
-        raise DirectDownloadLinkException('ERROR: ERROR: Download link not found try again')
-    return gd_link
+        raise DirectDownloadLinkException('ERROR: Download link not found try again')
+
+
+def easyupload(url):
+    if "::" in url:
+        _password = url.split("::")[-1]
+        url = url.split("::")[-2]
+    else:
+        _password = ''
+    file_id = url.split("/")[-1]
+    with create_scraper() as session:
+        try:
+            _res = session.get(url)
+        except Exception as e:
+            raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        first_page_html = HTML(_res.text)
+        if first_page_html.xpath("//h6[contains(text(),'Password Protected')]") and not _password:
+            raise DirectDownloadLinkException(f"ERROR:\n{PASSWORD_ERROR_MESSAGE.format(url)}")
+        if not (match := search(r'https://eu(?:[1-9][0-9]?|100)\.easyupload\.io/action\.php', _res.text)):
+            raise DirectDownloadLinkException("ERROR: Failed to get server for EasyUpload Link")
+        action_url = match.group()
+        session.headers.update({'referer': 'https://easyupload.io/'})
+        recaptcha_params = {
+            'k': '6LfWajMdAAAAAGLXz_nxz2tHnuqa-abQqC97DIZ3',
+            'ar': '1',
+            'co': 'aHR0cHM6Ly9lYXN5dXBsb2FkLmlvOjQ0Mw..',
+            'hl': 'en',
+            'v': '0hCdE87LyjzAkFO5Ff-v7Hj1',
+            'size': 'invisible',
+            'cb': 'c3o1vbaxbmwe'
+        }
+        if not (captcha_token :=get_captcha_token(session, recaptcha_params)):
+            raise DirectDownloadLinkException('ERROR: Captcha token not found')
+        try:
+            data = {'type': 'download-token',
+                    'url': file_id,
+                    'value': _password,
+                    'captchatoken': captcha_token,
+                    'method': 'regular'}
+            json_resp = session.post(url=action_url, data=data).json()
+        except Exception as e:
+            raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+    if 'download_link' in json_resp:
+        return json_resp['download_link']
+    elif 'data' in json_resp:
+        raise DirectDownloadLinkException(
+            f"ERROR: Failed to generate direct link due to {json_resp['data']}")
+    raise DirectDownloadLinkException(
+        "ERROR: Failed to generate direct link from EasyUpload.")

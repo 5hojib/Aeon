@@ -277,7 +277,7 @@ def is_telegram_link(url):
 
 
 def is_share_link(url):
-    return bool(re_match(r'https?:\/\/.+\.gdtot\.\S+|https?:\/\/(filepress|hubdrive|filebee|appdrive|gdflix)\.\S+', url))
+    return bool(re_match(r'https?://(new\.filepress\.store|.+\.gdtot\.\S+|filepress|hubdrive|filebee|appdrive|gdflix)\b', url))
 
 
 def is_mega_link(url):
@@ -506,6 +506,7 @@ async def set_commands(client):
                 BotCommand(f'{BotCommands.BotSetCommand}', 'Open Bot settings'),
                 BotCommand(f'{BotCommands.LogCommand}', 'View log'),
                 BotCommand(f'{BotCommands.RestartCommand[0]}', 'Restart bot')
+                BotCommand(f'{BotCommands.MediaInfoCommand}', 'Get MediaInfo')
             ]
         )
 

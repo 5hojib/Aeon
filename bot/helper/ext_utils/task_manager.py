@@ -9,12 +9,10 @@ from bot.helper.telegram_helper.message_utils import forcesub, BotPm_check, user
 from bot.helper.telegram_helper.message_utils import isAdmin
 
 async def stop_duplicate_check(name, listener):
-    if (
-        not config_dict['STOP_DUPLICATE']
+    if (not config_dict['STOP_DUPLICATE']
         or listener.isLeech
         or listener.upPath != 'gd'
-        or listener.select
-    ):
+        or listener.select):
         return False, None
     LOGGER.info(f'Checking File/Folder if already in Drive: {name}')
     if listener.compress:
@@ -156,17 +154,14 @@ async def limit_checker(size, listener, isTorrent=False, isMega=False, isDriveLi
             limit = LEECH_LIMIT * 1024**3
             if size > limit:
                 limit_exceeded = f'Leech limit is {get_readable_file_size(limit)}'
-        
         if (STORAGE_THRESHOLD := config_dict['STORAGE_THRESHOLD']) and not listener.isClone:
             arch = any([listener.compress, listener.extract])
             limit = STORAGE_THRESHOLD * 1024**3
             acpt = await sync_to_async(check_storage_threshold, size, limit, arch)
             if not acpt:
                 limit_exceeded = f'You must leave {get_readable_file_size(limit)} free storage.'
-        
         if (PLAYLIST_LIMIT := config_dict['PLAYLIST_LIMIT']):
             limit_exceeded = f'Playlist limit is {PLAYLIST_LIMIT}'
-
     if limit_exceeded:
         return f"{limit_exceeded}.\nYour file or folder size is {get_readable_file_size(size)}"
 
@@ -176,6 +171,19 @@ async def task_utils(message):
     msg = []
     button = None
     user_id = message.from_user.id
+    if message.chat.type != message.chat.type.BOT:
+        if ids := config_dict['FSUB_IDS']:
+            _msg, button = await forcesub(message, ids, button)
+            if _msg:
+                msg.append(_msg)
+        if not config_dict['TOKEN_TIMEOUT']:
+            _msg, button = await BotPm_check(message, button)
+            if _msg:
+                msg.append(_msg)
+        if config_dict(['TOKEN_TIMEOUT']) and (await isAdmin(message) or user_id == OWNER_ID or user_id in user_data and user_data[user_id].get('is_sudo')):
+            _msg, button = await BotPm_check(message, button)
+            if _msg:
+                msg.append(_msg)
     if user_id == OWNER_ID or user_id in user_data and user_data[user_id].get('is_sudo'):
         return msg, button
     if await isAdmin(message):
@@ -183,18 +191,6 @@ async def task_utils(message):
     token_msg, button = await checking_access(message.from_user.id, button)
     if token_msg is not None:
         msg.append(token_msg)
-    if message.chat.type != message.chat.type.BOT:
-        if ids := config_dict['FSUB_IDS']:
-            _msg, button = await forcesub(message, ids, button)
-            if _msg:
-                msg.append(_msg)
-        user_id = message.from_user.id
-        user_dict = user_data.get(user_id, {})
-        user = await user_info(message._client, message.from_user.id)
-        if not config_dict['TOKEN_TIMEOUT']:
-            _msg, button = await BotPm_check(message, button)
-            if _msg:
-                msg.append(_msg)
     if (bmax_tasks := config_dict['BOT_MAX_TASKS']) and len(download_dict) >= bmax_tasks:
         msg.append(f"Bot Max Tasks limit exceeded.\nBot max tasks limit is {bmax_tasks}.\nPlease wait for the completion of other tasks.")
     if (maxtask := config_dict['USER_MAX_TASKS']) and await get_user_tasks(message.from_user.id, maxtask):

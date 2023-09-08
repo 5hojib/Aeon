@@ -114,6 +114,13 @@ drive_id must be a folder ID, and index must be a URL, otherwise it will not acc
 Note: If -up is not specified, the rclone destination will be the RCLONE_PATH from config.env.
 """
 
+PASSWORD_ERROR_MESSAGE = """
+<b>This link requires a password!</b>
+- Insert sign <b>::</b> after the link and write the password after the sign.
+<b>Example:</b> {}::love you
+Note: No spaces between the signs <b>::</b>
+For the password, you can use a space!
+"""
 
 default_desp = {'AS_DOCUMENT': 'Default type of Telegram file upload. Default is False mean as media.',
                 'AUTHORIZED_CHATS': 'Fill user_id and chat_id of groups/users you want to authorize. Separate them by space.',
