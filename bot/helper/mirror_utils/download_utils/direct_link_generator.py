@@ -13,7 +13,6 @@ from bs4 import BeautifulSoup
 from cloudscraper import create_scraper
 from lk21 import Bypass
 from lxml.etree import HTML
-from requests import 
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from requests import Session, post, session as req_session, get as rget
