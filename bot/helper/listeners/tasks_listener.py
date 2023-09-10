@@ -37,7 +37,7 @@ from bot.helper.ext_utils.db_handler import DbManager
 
 
 class MirrorLeechListener:
-    def __init__(self, message, compress=False, extract=False, isQbit=False, isLeech=False, tag=None, select=False, seed=False, sameDir=None, rcFlags=None, upPath=None, isClone=False, join=False, isYtdlp=False, source_url=None, drive_id=None, index_link=None):
+    def __init__(self, message, compress=False, extract=False, isQbit=False, isLeech=False, tag=None, select=False, seed=False, sameDir=None, rcFlags=None, upPath=None, isClone=False, join=False, isYtdlp=False, drive_id=None, index_link=None):
         if sameDir is None:
             sameDir = {}
         self.message = message
@@ -47,8 +47,6 @@ class MirrorLeechListener:
         self.isQbit = isQbit
         self.isLeech = isLeech
         self.isClone = isClone
-        self.isMega = is_mega_link(source_url) if source_url else False
-        self.isGdrive = is_gdrive_link(source_url) if source_url else False
         self.isYtdlp = isYtdlp
         self.tag = tag
         self.seed = seed
@@ -66,13 +64,6 @@ class MirrorLeechListener:
         self.linkslogmsg = None
         self.botpmmsg = None
         self.upload_details = {}
-        self.source_url = (
-            source_url if (isinstance(source_url, str) and source_url.startswith('http'))
-            else (
-                f"https://t.me/share/url?url={source_url}" if isinstance(source_url, str) and source_url
-                else ''
-            )
-        )
         self.__setModeEng()
         self.drive_id = drive_id
         self.index_link = index_link
@@ -96,10 +87,9 @@ class MirrorLeechListener:
             if self.isClone
             else 'rclone'
             if self.upPath != 'gd'
-            else 'gdrive'
+            else 'mirror'
         ) + (' as zip' if self.compress else ' as unzip' if self.extract else '')
-        mode += f" | {'qbit' if self.isQbit else 'ytdlp' if self.isYtdlp else 'gdrive' if (self.isClone or self.isGdrive) else 'mega' if self.isMega else 'aria2' if self.source_url and self.source_url != self.message.link else 'tgram'}"
-        self.upload_details['mode'] = mode
+        self.upload_details['mode'] = mod
         
     async def onDownloadStart(self):
         if config_dict['LEECH_LOG_ID']:
@@ -405,35 +395,18 @@ class MirrorLeechListener:
                     totalmsg = (msg + lmsg + fmsg) if attachmsg else fmsg
                     if len(totalmsg.encode()) > 3900:
                         if self.linkslogmsg:
-                            sbtn = ButtonMaker()
-                            if self.source_url:
-                                sbtn.ubutton('Source link', self.source_url)
-                                await editMessage(self.linkslogmsg, totalmsg, sbtn.build_menu(1))
-                                await sendMessage(self.botpmmsg,  totalmsg, sbtn.build_menu(1))
-                            else:
-                                await editMessage(self.linkslogmsg, totalmsg)
-                                await sendMessage(self.botpmmsg,  totalmsg)
+                            await editMessage(self.linkslogmsg, totalmsg)
+                            await sendMessage(self.botpmmsg,  totalmsg)
                             self.linkslogmsg = await sendMessage(self.linkslogmsg, "Fetching Details...")
                         attachmsg = False
                         await sleep(1)
                         fmsg = '\n\n'
                 if fmsg != '\n\n':
                     if self.linkslogmsg:
-                        sbtn = ButtonMaker()
-                        if self.source_url:
-                            sbtn.ubutton('Source link', self.source_url)
-                            await sendMessage(self.linkslogmsg, msg + lmsg + fmsg, sbtn.build_menu(1))
-                            await deleteMessage(self.linkslogmsg)
-                        else:
-                            await sendMessage(self.linkslogmsg, msg + lmsg + fmsg)
-                            await deleteMessage(self.linkslogmsg)
+                        await sendMessage(self.linkslogmsg, msg + lmsg + fmsg)
+                        await deleteMessage(self.linkslogmsg)
                 btn = ButtonMaker()
-                sbtn = ButtonMaker()
-                if self.source_url:
-                    sbtn.ubutton('Source link', self.source_url)
-                    await sendMessage(self.botpmmsg, msg + lmsg + fmsg, sbtn.build_menu(1))
-                else:
-                    await sendMessage(self.botpmmsg, msg + lmsg + fmsg)
+                await sendMessage(self.botpmmsg, msg + lmsg + fmsg)
                 await deleteMessage(self.botpmmsg)
                 if self.isSuperGroup:
                     btn.ibutton('View in inbox', f"aeon {user_id} botpm", 'header')
@@ -477,8 +450,6 @@ class MirrorLeechListener:
                             buttons.ubutton('Index link', share_url)
                         else:
                             buttons.ubutton('Index link', share_url)
-                if self.source_url:
-                    buttons.ubutton('Source link', self.source_url)
                 buttons = extra_btns(buttons)
                 button = buttons.build_menu(2)
             else:

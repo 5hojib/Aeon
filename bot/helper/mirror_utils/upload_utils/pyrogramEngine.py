@@ -132,12 +132,7 @@ class TgUploader:
                 mention = msg_user.mention(style='HTML')
                 uid = msg_user.id
                 msg = f"<b>Task started</b>\n\n<b>• User:</b> {mention}\n<b>• ID:</b> <code>{uid}</code>"
-                if self.__listener.source_url:
-                    sbtn = ButtonMaker()
-                    sbtn.ubutton('Source', self.__listener.source_url)
-                    self.__leechmsg = await sendMultiMessage(config_dict['LEECH_DUMP_ID'], msg, sbtn.build_menu(1))
-                else:
-                    self.__leechmsg = await sendMultiMessage(config_dict['LEECH_DUMP_ID'], msg)
+                self.__leechmsg = await sendMultiMessage(config_dict['LEECH_DUMP_ID'], msg)
             except Exception as er:
                 await self.__listener.onUploadError(str(er))
                 return False
