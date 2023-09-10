@@ -78,7 +78,7 @@ async def drive_list(_, message):
                 return
     buttons = await list_buttons(user_id)
     reply_message = await sendMessage(message, 'Choose list options:', buttons)
-    if message.chat.type != message.chat.type.BOT;
+    if message.chat.type != message.chat.type.BOT:
         await delete_links(message)
         await five_minute_del(reply_message)
     else:
