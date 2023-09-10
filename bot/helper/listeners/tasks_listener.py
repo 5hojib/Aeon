@@ -89,7 +89,7 @@ class MirrorLeechListener:
             if self.upPath != 'gd'
             else 'mirror'
         ) + (' as zip' if self.compress else ' as unzip' if self.extract else '')
-        self.upload_details['mode'] = mod
+        self.upload_details['mode'] = mode
         
     async def onDownloadStart(self):
         if config_dict['LEECH_LOG_ID']:
