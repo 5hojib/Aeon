@@ -567,7 +567,7 @@ def gdtot(url):
         p_url = urlparse(url)
         res = cget("POST", f"{p_url.scheme}://{p_url.hostname}/ddl", data={'dl': str(url.split('/')[-1])})
     except Exception as e:
-        raise DirectDownloadLinkException(f'{e.__class__.__name__}')
+        raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
     if (drive_link := findall(r"myDl\('(.*?)'\)", res.text)) and "drive.google.com" in drive_link[0]:
         d_link = drive_link[0]
     elif config_dict['GDTOT_CRYPT']:
@@ -578,7 +578,7 @@ def gdtot(url):
         try:
             decoded_id = b64decode(str(g_id[0])).decode('utf-8')
         except:
-            raise DirectDownloadLinkException("Try in your browser, mostly file not found or user limit exceeded!")
+            raise DirectDownloadLinkException("ERROR: Try in your browser, mostly file not found or user limit exceeded!")
         d_link = f'https://drive.google.com/open?id={decoded_id}'
     else:
         raise DirectDownloadLinkException('ERROR: Drive Link not found, Try in your broswer! GDTOT_CRYPT not Provided!')
@@ -602,8 +602,7 @@ def sharer_scraper(url):
         raise DirectDownloadLinkException("ERROR: Key not found!")
     key = key[0]
     if not HTML(res.text).xpath("//button[@id='drc']"):
-        raise DirectDownloadLinkException(
-            "ERROR: This link don't have direct download button")
+        raise DirectDownloadLinkException("ERROR: This link don't have direct download button")
     boundary = uuid4()
     headers = {
         'Content-Type': f'multipart/form-data; boundary=----WebKitFormBoundary{boundary}',
@@ -632,8 +631,7 @@ def sharer_scraper(url):
     if (drive_link := HTML(res.text).xpath("//a[contains(@class,'btn')]/@href")) and "drive.google.com" in drive_link[0]:
         return drive_link[0]
     else:
-        raise DirectDownloadLinkException(
-            'ERROR: Drive Link not found, Try in your broswer')
+        raise DirectDownloadLinkException('ERROR: Drive Link not found, Try in your broswer')
 
 
 def wetransfer(url):

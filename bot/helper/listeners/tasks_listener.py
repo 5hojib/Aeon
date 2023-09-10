@@ -73,9 +73,7 @@ class MirrorLeechListener:
                 else ''
             )
         )
-        self.source_msg = ''
         self.__setModeEng()
-        self.__parseSource()
         self.drive_id = drive_id
         self.index_link = index_link
 
@@ -103,44 +101,14 @@ class MirrorLeechListener:
         mode += f" | {'qbit' if self.isQbit else 'ytdlp' if self.isYtdlp else 'gdrive' if (self.isClone or self.isGdrive) else 'mega' if self.isMega else 'aria2' if self.source_url and self.source_url != self.message.link else 'tgram'}"
         self.upload_details['mode'] = mode
         
-    def __parseSource(self):
-        if self.source_url == self.message.link:
-            file = self.message.reply_to_message
-            if file is not None and file.media is not None:
-                mtype = file.media.value
-                media = getattr(file, mtype)
-                self.source_msg = f'<b>• Name:</b> {media.file_name if hasattr(media, "file_name") else f"{mtype}_{media.file_unique_id}"}\n<b>• Type:</b> {media.mime_type if hasattr(media, "mime_type") else "image/jpeg" if mtype == "photo" else "text/plain"}\n<b>• Size:</b> {get_readable_file_size(media.file_size)}\n<b>• Created Date:</b> {media.date}\n<b>• Media Type:</b> {mtype.capitalize()}'
-            else:
-                self.source_msg = f"<code>{self.message.reply_to_message.text}</code>"
-        elif self.source_url.startswith('https://t.me/share/url?url='):
-            msg = self.source_url.replace('https://t.me/share/url?url=', '')
-            if msg.startswith('magnet'):
-                mag = unquote(msg).split('&')
-                tracCount, name, amper = 0, '', False
-                for check in mag:
-                    if check.startswith('tr='):
-                        tracCount += 1
-                    elif check.startswith('magnet:?xt=urn:btih:'):
-                        hashh = check.replace('magnet:?xt=urn:btih:', '')
-                    else:
-                        name += ('&' if amper else '') + check.replace('dn=', '').replace('+', '')
-                        amper = True
-                self.source_msg = f"<b>• Name:</b> {name}\n<b>• Magnet Hash:</b> <code>{hashh}</code>\n<b>• Total Trackers:</b> {tracCount} \n<b>• Share:</b> <a href='https://t.me/share/url?url={quote(msg)}'>Share To Telegram</a>"
-            else:
-                self.source_msg = f"<code>{msg}</code>"
-        else:
-            self.source_msg = f"<code>{self.source_url}</code>"
-        
     async def onDownloadStart(self):
         if config_dict['LEECH_LOG_ID']:
-            source = self.source_msg
             msg = f"""<b>Task Started</b>
 
 <b>• Mode:</b> {self.upload_details['mode']}
 <b>• Task by:</b> {self.tag}
-<b>• User ID: </b><code>{self.message.from_user.id}</code>
-"""
-            self.linkslogmsg = await sendCustomMsg(config_dict['LEECH_LOG_ID'], msg + source)
+<b>• User ID: </b><code>{self.message.from_user.id}</code>"""
+            self.linkslogmsg = await sendCustomMsg(config_dict['LEECH_LOG_ID'], msg)
         user_dict = user_data.get(self.message.from_user.id, {})
         self.botpmmsg = await sendCustomMsg(self.message.from_user.id, '<b>Task started</b>')
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
