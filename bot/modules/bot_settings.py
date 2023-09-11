@@ -139,6 +139,10 @@ async def load_config():
     if len(SEARCH_API_LINK) == 0:
         SEARCH_API_LINK = ''
 
+    FILELION_API = environ.get('FILELION_API', '')
+    if len(FILELION_API) == 0:
+        FILELION_API = ''
+
     LEECH_LOG_ID = environ.get('LEECH_LOG_ID', '')
     LEECH_LOG_ID = '' if len(LEECH_LOG_ID) == 0 else int(LEECH_LOG_ID)
     
@@ -386,6 +390,7 @@ async def load_config():
                         'MEGA_LIMIT': MEGA_LIMIT,
                         'LEECH_LIMIT': LEECH_LIMIT,
                         'FSUB_IDS': FSUB_IDS,
+                        'FILELION_API': FILELION_API,
                         'USER_MAX_TASKS': USER_MAX_TASKS,
                         'PLAYLIST_LIMIT': PLAYLIST_LIMIT,
                         'MIRROR_LOG_ID': MIRROR_LOG_ID,
