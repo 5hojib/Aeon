@@ -184,19 +184,14 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         button = buttons.build_menu(2)
     return text, button
 
-'''
-async def update_user_settings(query):
-    msg, button = await get_user_settings(query.from_user)
-    user_id = query.from_user.id
-    tpath = f"Thumbnails/{user_id}.jpg"
-    if not ospath.exists(tpath):
-        tpath = "https://graph.org/file/25545597de34c640b31d6.jpg"
-    await query.message.edit_media(media=InputMediaPhoto(media=tpath, caption=msg), reply_markup=button)
-'''
 
-async def update_user_settings(query, key=None, edit_type=None, edit_mode=None, msg=None, sdirect=False):
-    msg, button = await get_user_settings(msg.from_user if sdirect else query.from_user, key, edit_type, edit_mode)
-    await editMessage(query if sdirect else query.message, msg, button)
+async def update_user_settings(query, key=None, edit_type=None, edit_mode=None, msg=None):
+    msg, button = await get_user_settings(msg.from_user, key, edit_type, edit_mode)
+    user_id = query.from_user.id
+    thumbnail = f"Thumbnails/{user_id}.jpg"
+    if not ospath.exists(thumbnail):
+        thumbnail = "https://graph.org/file/25545597de34c640b31d6.jpg"
+    await query.message.edit_media(media=InputMediaPhoto(media=thumbnail, caption=msg), reply_markup=button)
 
 
 @new_thread
