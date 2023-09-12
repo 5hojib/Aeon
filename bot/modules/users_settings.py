@@ -183,13 +183,13 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
     return text, button
 
 
-async def update_user_settings(query, key=None, edit_type=None, edit_mode=None, msg=None, sdirect=False):
+async def update_user_settings(query, key=None, edit_type=None, edit_mode=None, msg=None):
     msg, button = await get_user_settings(msg.from_user if sdirect else query.from_user, key, edit_type, edit_mode)
     user_id = query.from_user.id
     thumbnail = f"Thumbnails/{user_id}.jpg"
     if not ospath.exists(thumbnail):
         thumbnail = "https://graph.org/file/25545597de34c640b31d6.jpg"
-    await editMessage(query if sdirect else query.message, msg, button, photo=thumbnail)
+    await editMessage(query.message, msg, button, photo=thumbnail)
 
 
 @new_thread
