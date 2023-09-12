@@ -12,12 +12,9 @@ from aioshutil import move
 from asyncio import create_subprocess_exec, sleep, Event
 from pyrogram.enums import ChatType
 
-from bot import OWNER_ID, Interval, aria2, download_dict, download_dict_lock, LOGGER, bot_name, DATABASE_URL, \
-    MAX_SPLIT_SIZE, config_dict, status_reply_dict_lock, user_data, non_queued_up, non_queued_dl, queued_up, \
-    queued_dl, queue_dict_lock, bot, GLOBAL_EXTENSION_FILTER
+from bot import OWNER_ID, Interval, aria2, download_dict, download_dict_lock, LOGGER, bot_name, DATABASE_URL, MAX_SPLIT_SIZE, config_dict, status_reply_dict_lock, user_data, non_queued_up, non_queued_dl, queued_up, queued_dl, queue_dict_lock, bot, GLOBAL_EXTENSION_FILTER
 from bot.helper.ext_utils.bot_utils import extra_btns, sync_to_async, get_readable_file_size, get_readable_time, is_mega_link, is_gdrive_link, new_thread
-from bot.helper.ext_utils.fs_utils import get_base_name, get_path_size, clean_download, clean_target, \
-    is_first_archive_split, is_archive, is_archive_split, join_files
+from bot.helper.ext_utils.fs_utils import get_base_name, get_path_size, clean_download, clean_target, is_first_archive_split, is_archive, is_archive_split, join_files
 from bot.helper.ext_utils.leech_utils import split_file, format_filename
 from bot.helper.ext_utils.exceptions import NotSupportedExtractionArchive
 from bot.helper.ext_utils.task_manager import start_from_queued
@@ -428,7 +425,6 @@ class MirrorLeechListener:
                 msg += f'<b>• SubFolders: </b>{folders}\n'
                 msg += f'<b>• Files: </b>{files}\n'
             if link or rclonePath and config_dict['RCLONE_SERVE_URL']:
-
                 if link:
                     buttons.ubutton('Cloud link', link)
                 else:
@@ -453,7 +449,7 @@ class MirrorLeechListener:
                 buttons = extra_btns(buttons)
                 button = buttons.build_menu(2)
             else:
-                msg += f'<b>• Path: </b><code>{rclonePath}</code>/n'
+                msg += f'<b>• Path: </b><code>{rclonePath}</code>\n'
                 button = None
             msg += f'<b>• Uploaded by: </b>{self.tag}\n'
             msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n\n'

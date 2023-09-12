@@ -125,6 +125,7 @@ async def get_telegraph_list(telegraph_content):
     buttons = extra_btns(buttons)
     return buttons.build_menu(1)
 
+
 def handleIndex(index, dic):
     while True:
         if abs(index) < len(dic):
@@ -133,24 +134,27 @@ def handleIndex(index, dic):
         elif index > 0: index = index - len(dic)
     return index
 
+
 async def fetch_user_tds(user_id, force=False):
     user_dict = user_data.get(user_id, {})
     if user_dict.get('td_mode', False) or force:
         return user_dict.get('user_tds', {})
     return {}
-    
-    
-def get_progress_bar_string(pct):
+
+
+def progress_bar(pct):
     if isinstance(pct, str):
         pct = float(pct.strip('%'))
     p = min(max(pct, 0), 100)
-    cFull = int(p // 10)
+    cFull = int((p + 5)// 10)
     p_str = '●' * cFull
     p_str += '○' * (10 - cFull)
     return p_str
-    
+
+
 def source(self):
     return (sender_chat.title if (sender_chat := self.message.sender_chat) else self.message.from_user.username or self.message.from_user.id)
+
 
 def get_readable_message():
     msg = '<b>Powered by Aeon</b>\n\n'
@@ -170,7 +174,7 @@ def get_readable_message():
         msg += f"by {source(download)}\n\n"
         msg += f"<b>{download.status()}...</b>"
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
-            msg += f"\n{get_progress_bar_string(download.progress())} {download.progress()}"
+            msg += f"\n<code>{progress_bar(download.progress())} {download.progress()}</code>"
             msg += f"\n{download.processed_bytes()} of {download.size()}"
             msg += f"\nSpeed: {download.speed()}"
             msg += f'\nEstimated: {download.eta()}'
@@ -229,6 +233,7 @@ def text_size_to_bytes(size_text):
         size += float(size_text.split('t')[0]) *1099511627776
     return size
 
+
 async def turn_page(data):
     global STATUS_START, PAGE_NO
     async with download_dict_lock:
@@ -259,6 +264,7 @@ def get_readable_time(seconds):
             if len(result.split()) == 2:
                 break
     return result.strip()
+
 
 def is_magnet(url):
     return bool(re_match(MAGNET_REGEX, url))
@@ -443,11 +449,13 @@ def format_validity_time(seconds):
             result += f'{int(period_value)} {period_name}{plural_suffix} '
     return result
 
+
 def extra_btns(buttons):
     if extra_buttons:
         for btn_name, btn_url in extra_buttons.items():
             buttons.ubutton(btn_name, btn_url)
     return buttons
+
 
 async def set_commands(client):
     if config_dict['SET_COMMANDS']:
@@ -509,6 +517,7 @@ async def set_commands(client):
                 BotCommand(f'{BotCommands.MediaInfoCommand}', 'Get MediaInfo')
             ]
         )
+
 
 def tiny(long_url):
     s = pyshorteners.Shortener()

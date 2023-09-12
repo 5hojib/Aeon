@@ -1,7 +1,7 @@
-from os
-from requests
-from logging
-from time
+import os
+import time
+import logging
+import requests
 
 BASE_URL = os.environ.get('BASE_URL', None)
 try:
@@ -18,5 +18,5 @@ if PORT is not None and BASE_URL is not None:
             time.sleep(400)
         except Exception as e:
             logging.error(f"alive.py: {e}")
-            timw.sleep(2)
+            time.sleep(2)
             continue
