@@ -371,7 +371,7 @@ class MirrorLeechListener:
         msg += f'<b>• Size: </b>{get_readable_file_size(size)}\n'
         msg += f'<b>• Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n'
         msg += f'<b>• Mode: </b>{self.upload_details["mode"]}\n'
-        lmsg = '<b>Files are sent. Access via links</b>'
+        lmsg = '<b>Files have been sent. Access them via the provided links.</b>'
         LOGGER.info(f'Task Done: {name}')
         buttons = ButtonMaker()
         if self.isLeech:
@@ -382,7 +382,7 @@ class MirrorLeechListener:
             msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n\n'
             if not files:
                 if self.isPrivate:
-                    msg += '<b>Files are not sent for unknown reason</b>'
+                    msg += '<b>Files have not been sent for an unspecified reason</b>'
                 await sendMessage(self.message, msg)
             else:
                 attachmsg = True
