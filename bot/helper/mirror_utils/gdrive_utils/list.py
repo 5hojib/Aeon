@@ -78,12 +78,8 @@ async def drive_list(_, message):
                 return
     buttons = await list_buttons(user_id)
     reply_message = await sendMessage(message, 'Choose list options:', buttons)
-    if message.chat.type != message.chat.type.BOT:
-        await delete_links(message)
-        await five_minute_del(reply_message)
-    else:
-        await five_minute_del(reply_message)
-        await delete_links(message)
+    await five_minute_del(reply_message)
+    await delete_links(message)
 
 bot.add_handler(MessageHandler(drive_list, filters=command(
     BotCommands.ListCommand) & CustomFilters.authorized))
