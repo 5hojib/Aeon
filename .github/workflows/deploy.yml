@@ -22,3 +22,4 @@ jobs:
           HD_TELEGRAM_HASH: ${{secrets.TELEGRAM_HASH}}
           HD_DATABASE_URL: ${{secrets.DATABASE_URL}}
           HD_BOT_TOKEN: ${{secrets.BOT_TOKEN}}
+          HD_CONFIG_FILE_URL: ${{secrets.CONFIG_FILE_URL}}
