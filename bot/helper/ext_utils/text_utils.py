@@ -1,3 +1,5 @@
+from bot import config_dict, IS_PREMIUM_USER
+
 bset_display_dict = {
                 'AS_DOCUMENT': 'Default type of Telegram file upload. Default is False mean as media.',
                 'AUTHORIZED_CHATS': 'Fill user_id and chat_id of groups/users you want to authorize. Separate them by space.',
