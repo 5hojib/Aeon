@@ -38,7 +38,7 @@ SIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
 STATUS_START = 0
 PAGES = 1
 PAGE_NO = 1
-STATUS_LIMIT = 4
+STATUS_LIMIT = 2
 
 class MirrorStatus:
     STATUS_UPLOADING = "Uploading"
@@ -174,7 +174,7 @@ def get_readable_message():
         msg += f"by {source(download)}\n\n"
         msg += f"<b>{download.status()}...</b>"
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
-            msg += f"\n<code>{progress_bar(download.progress())} {download.progress()}</code>"
+            msg += f"\n<code>{progress_bar(download.progress())}</code> {download.progress()}"
             msg += f"\n{download.processed_bytes()} of {download.size()}"
             msg += f"\nSpeed: {download.speed()}"
             msg += f'\nEstimated: {download.eta()}'
@@ -228,29 +228,38 @@ def text_size_to_bytes(size_text):
     elif 'm' in size_text:
         size += float(size_text.split('m')[0]) * 1048576
     elif 'g' in size_text:
-        size += float(size_text.split('g')[0]) *1073741824
+        size += float(size_text.split('g')[0]) * 1073741824
     elif 't' in size_text:
-        size += float(size_text.split('t')[0]) *1099511627776
+        size += float(size_text.split('t')[0]) * 1099511627776
     return size
+
+'''
+async def turn_page(data):
+    try:
+        global STATUS_START, PAGE_NO, PAGES
+        async with download_dict_lock:
+            if data[1] == "nex" and PAGE_NO == PAGES:
+                PAGE_NO = 1
+            elif data[1] == "nex" and PAGE_NO < PAGES:
+                PAGE_NO += 1
+            elif data[1] == "pre" and PAGE_NO == 1:
+                PAGE_NO = PAGES
+            elif data[1] == "pre" and PAGE_NO > 1:
+                PAGE_NO -= 1
+        return True
+    except:
+        return False
+'''
 
 
 async def turn_page(data):
-    global STATUS_START, PAGE_NO
+    global STATUS_START, PAGE_NO, PAGES
     async with download_dict_lock:
         if data[1] == "nex":
-            if PAGE_NO == PAGES:
-                STATUS_START = 0
-                PAGE_NO = 1
-            else:
-                STATUS_START += STATUS_LIMIT
-                PAGE_NO += 1
+            PAGE_NO = (PAGE_NO % PAGES) + 1
         elif data[1] == "pre":
-            if PAGE_NO == 1:
-                STATUS_START = STATUS_LIMIT * (PAGES - 1)
-                PAGE_NO = PAGES
-            else:
-                STATUS_START -= STATUS_LIMIT
-                PAGE_NO -= 1
+            PAGE_NO = PAGE_NO - 1 if PAGE_NO > 1 else PAGES
+    return True
 
 
 def get_readable_time(seconds):
