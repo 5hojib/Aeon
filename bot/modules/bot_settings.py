@@ -22,7 +22,7 @@ from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.bot_utils import setInterval, sync_to_async, new_thread
 from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.ext_utils.task_manager import start_from_queued
-from bot.helper.ext_utils.help_messages import default_desp
+from bot.helper.ext_utils.text_utils import bset_display_dict
 from bot.helper.mirror_utils.rclone_utils.serve import rclone_serve_booter
 from bot.modules.torrent_search import initiate_search_tools
 from bot.modules.rss import addJob
@@ -471,7 +471,7 @@ Note: Changing .netrc will not take effect for aria2c until restart.
 Timeout: 60 sec'''
     elif edit_type == 'editvar':
         msg = f'<b>Variable:</b> <code>{key}</code>\n\n'
-        msg += f'<b>Description:</b> {default_desp.get(key, "No Description Provided")}\n\n'
+        msg += f'<b>Description:</b> {bset_display_dict.get(key, "No Description Provided")}\n\n'
         if mess.chat.type == ChatType.PRIVATE:
             msg += f'<b>Value:</b> {config_dict.get(key, "None")}\n\n'
         else:

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-import pyshorteners
 from base64 import b64encode
 from datetime import datetime
 from os import path as ospath
@@ -30,6 +28,7 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.telegraph_helper import telegraph
 from bot.helper.ext_utils.shortners import short_url
+from bot.helper.ext_utils.aeon_utils import tinyfy
 
 THREADPOOL = ThreadPoolExecutor(max_workers = 1000)
 MAGNET_REGEX = r'magnet:\?xt=urn:(btih|btmh):[a-zA-Z0-9]*\s*'
@@ -423,7 +422,7 @@ async def checking_access(user_id, button=None):
         time_str = format_validity_time(token_timeout)
         if button is None:
             button = ButtonMaker()
-        button.ubutton('Collect token', tiny(short_url(f'https://telegram.me/{bot_name}?start={token}')))
+        button.ubutton('Collect token', tinyfy(short_url(f'https://telegram.me/{bot_name}?start={token}')))
         return f'Your token has expired, please collect a new token.\n<b>It will expire after {time_str}</b>!', button
     return None, button
 
@@ -506,14 +505,3 @@ async def set_commands(client):
                 BotCommand(f'{BotCommands.MediaInfoCommand}', 'Get MediaInfo')
             ]
         )
-
-
-def tiny(long_url):
-    s = pyshorteners.Shortener()
-    try:
-        short_url = s.tinyurl.short(long_url)
-        LOGGER.info(f'tinyfied {long_url} to {short_url}')
-        return short_url
-    except Exception:
-        LOGGER.error(f'Failed to shorten URL: {long_url}')
-        return long_url
