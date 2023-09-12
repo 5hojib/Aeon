@@ -80,7 +80,7 @@ async def rcloneNode(client, message, link, dst_path, rcf, tag):
         name = src_path.rsplit('/', 1)[-1]
         mime_type = rstat['MimeType']
 
-    listener = MirrorLeechListener(message, tag=tag, source_url=link)
+    listener = MirrorLeechListener(message, tag=tag)
     await listener.onDownloadStart()
 
     RCTransfer = RcloneTransferHelper(listener, name)
@@ -145,7 +145,7 @@ async def gdcloneNode(message, link, listen_up):
                 button = await get_telegraph_list(telegraph_content)
                 await sendMessage(message, msg, button)
                 return
-        listener = MirrorLeechListener(message, tag=listen_up[0], isClone=True, drive_id=listen_up[1], index_link=listen_up[2], source_url=link)
+        listener = MirrorLeechListener(message, tag=listen_up[0], isClone=True, drive_id=listen_up[1], index_link=listen_up[2])
         if limit_exceeded := await limit_checker(size, listener):
             await listener.onUploadError(limit_exceeded)
             return

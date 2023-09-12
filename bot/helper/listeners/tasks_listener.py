@@ -12,12 +12,9 @@ from aioshutil import move
 from asyncio import create_subprocess_exec, sleep, Event
 from pyrogram.enums import ChatType
 
-from bot import OWNER_ID, Interval, aria2, download_dict, download_dict_lock, LOGGER, bot_name, DATABASE_URL, \
-    MAX_SPLIT_SIZE, config_dict, status_reply_dict_lock, user_data, non_queued_up, non_queued_dl, queued_up, \
-    queued_dl, queue_dict_lock, bot, GLOBAL_EXTENSION_FILTER
+from bot import OWNER_ID, Interval, aria2, download_dict, download_dict_lock, LOGGER, bot_name, DATABASE_URL, MAX_SPLIT_SIZE, config_dict, status_reply_dict_lock, user_data, non_queued_up, non_queued_dl, queued_up, queued_dl, queue_dict_lock, bot, GLOBAL_EXTENSION_FILTER
 from bot.helper.ext_utils.bot_utils import extra_btns, sync_to_async, get_readable_file_size, get_readable_time, is_mega_link, is_gdrive_link, new_thread
-from bot.helper.ext_utils.fs_utils import get_base_name, get_path_size, clean_download, clean_target, \
-    is_first_archive_split, is_archive, is_archive_split, join_files
+from bot.helper.ext_utils.fs_utils import get_base_name, get_path_size, clean_download, clean_target, is_first_archive_split, is_archive, is_archive_split, join_files
 from bot.helper.ext_utils.leech_utils import split_file, format_filename
 from bot.helper.ext_utils.exceptions import NotSupportedExtractionArchive
 from bot.helper.ext_utils.task_manager import start_from_queued
@@ -37,7 +34,7 @@ from bot.helper.ext_utils.db_handler import DbManager
 
 
 class MirrorLeechListener:
-    def __init__(self, message, compress=False, extract=False, isQbit=False, isLeech=False, tag=None, select=False, seed=False, sameDir=None, rcFlags=None, upPath=None, isClone=False, join=False, isYtdlp=False, source_url=None, drive_id=None, index_link=None):
+    def __init__(self, message, compress=False, extract=False, isQbit=False, isLeech=False, tag=None, select=False, seed=False, sameDir=None, rcFlags=None, upPath=None, isClone=False, join=False, isYtdlp=False, drive_id=None, index_link=None):
         if sameDir is None:
             sameDir = {}
         self.message = message
@@ -47,8 +44,6 @@ class MirrorLeechListener:
         self.isQbit = isQbit
         self.isLeech = isLeech
         self.isClone = isClone
-        self.isMega = is_mega_link(source_url) if source_url else False
-        self.isGdrive = is_gdrive_link(source_url) if source_url else False
         self.isYtdlp = isYtdlp
         self.tag = tag
         self.seed = seed
@@ -66,16 +61,7 @@ class MirrorLeechListener:
         self.linkslogmsg = None
         self.botpmmsg = None
         self.upload_details = {}
-        self.source_url = (
-            source_url if (isinstance(source_url, str) and source_url.startswith('http'))
-            else (
-                f"https://t.me/share/url?url={source_url}" if isinstance(source_url, str) and source_url
-                else ''
-            )
-        )
-        self.source_msg = ''
         self.__setModeEng()
-        self.__parseSource()
         self.drive_id = drive_id
         self.index_link = index_link
 
@@ -98,49 +84,18 @@ class MirrorLeechListener:
             if self.isClone
             else 'rclone'
             if self.upPath != 'gd'
-            else 'gdrive'
+            else 'mirror'
         ) + (' as zip' if self.compress else ' as unzip' if self.extract else '')
-        mode += f" | {'qbit' if self.isQbit else 'ytdlp' if self.isYtdlp else 'gdrive' if (self.isClone or self.isGdrive) else 'mega' if self.isMega else 'aria2' if self.source_url and self.source_url != self.message.link else 'tgram'}"
         self.upload_details['mode'] = mode
-        
-    def __parseSource(self):
-        if self.source_url == self.message.link:
-            file = self.message.reply_to_message
-            if file is not None and file.media is not None:
-                mtype = file.media.value
-                media = getattr(file, mtype)
-                self.source_msg = f'<b>• Name:</b> {media.file_name if hasattr(media, "file_name") else f"{mtype}_{media.file_unique_id}"}\n<b>• Type:</b> {media.mime_type if hasattr(media, "mime_type") else "image/jpeg" if mtype == "photo" else "text/plain"}\n<b>• Size:</b> {get_readable_file_size(media.file_size)}\n<b>• Created Date:</b> {media.date}\n<b>• Media Type:</b> {mtype.capitalize()}'
-            else:
-                self.source_msg = f"<code>{self.message.reply_to_message.text}</code>"
-        elif self.source_url.startswith('https://t.me/share/url?url='):
-            msg = self.source_url.replace('https://t.me/share/url?url=', '')
-            if msg.startswith('magnet'):
-                mag = unquote(msg).split('&')
-                tracCount, name, amper = 0, '', False
-                for check in mag:
-                    if check.startswith('tr='):
-                        tracCount += 1
-                    elif check.startswith('magnet:?xt=urn:btih:'):
-                        hashh = check.replace('magnet:?xt=urn:btih:', '')
-                    else:
-                        name += ('&' if amper else '') + check.replace('dn=', '').replace('+', '')
-                        amper = True
-                self.source_msg = f"<b>• Name:</b> {name}\n<b>• Magnet Hash:</b> <code>{hashh}</code>\n<b>• Total Trackers:</b> {tracCount} \n<b>• Share:</b> <a href='https://t.me/share/url?url={quote(msg)}'>Share To Telegram</a>"
-            else:
-                self.source_msg = f"<code>{msg}</code>"
-        else:
-            self.source_msg = f"<code>{self.source_url}</code>"
         
     async def onDownloadStart(self):
         if config_dict['LEECH_LOG_ID']:
-            source = self.source_msg
             msg = f"""<b>Task Started</b>
 
 <b>• Mode:</b> {self.upload_details['mode']}
 <b>• Task by:</b> {self.tag}
-<b>• User ID: </b><code>{self.message.from_user.id}</code>
-"""
-            self.linkslogmsg = await sendCustomMsg(config_dict['LEECH_LOG_ID'], msg + source)
+<b>• User ID: </b><code>{self.message.from_user.id}</code>"""
+            self.linkslogmsg = await sendCustomMsg(config_dict['LEECH_LOG_ID'], msg)
         user_dict = user_data.get(self.message.from_user.id, {})
         self.botpmmsg = await sendCustomMsg(self.message.from_user.id, '<b>Task started</b>')
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
@@ -416,7 +371,7 @@ class MirrorLeechListener:
         msg += f'<b>• Size: </b>{get_readable_file_size(size)}\n'
         msg += f'<b>• Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n'
         msg += f'<b>• Mode: </b>{self.upload_details["mode"]}\n'
-        lmsg = '<b>Files are sent. Access via links</b>'
+        lmsg = '<b>Files have been sent. Access them via the provided links.</b>'
         LOGGER.info(f'Task Done: {name}')
         buttons = ButtonMaker()
         if self.isLeech:
@@ -427,7 +382,7 @@ class MirrorLeechListener:
             msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n\n'
             if not files:
                 if self.isPrivate:
-                    msg += '<b>Files are not sent for unknown reason</b>'
+                    msg += '<b>Files have not been sent for an unspecified reason</b>'
                 await sendMessage(self.message, msg)
             else:
                 attachmsg = True
@@ -437,35 +392,18 @@ class MirrorLeechListener:
                     totalmsg = (msg + lmsg + fmsg) if attachmsg else fmsg
                     if len(totalmsg.encode()) > 3900:
                         if self.linkslogmsg:
-                            sbtn = ButtonMaker()
-                            if self.source_url:
-                                sbtn.ubutton('Source link', self.source_url)
-                                await editMessage(self.linkslogmsg, totalmsg, sbtn.build_menu(1))
-                                await sendMessage(self.botpmmsg,  totalmsg, sbtn.build_menu(1))
-                            else:
-                                await editMessage(self.linkslogmsg, totalmsg)
-                                await sendMessage(self.botpmmsg,  totalmsg)
+                            await editMessage(self.linkslogmsg, totalmsg)
+                            await sendMessage(self.botpmmsg,  totalmsg)
                             self.linkslogmsg = await sendMessage(self.linkslogmsg, "Fetching Details...")
                         attachmsg = False
                         await sleep(1)
                         fmsg = '\n\n'
                 if fmsg != '\n\n':
                     if self.linkslogmsg:
-                        sbtn = ButtonMaker()
-                        if self.source_url:
-                            sbtn.ubutton('Source link', self.source_url)
-                            await sendMessage(self.linkslogmsg, msg + lmsg + fmsg, sbtn.build_menu(1))
-                            await deleteMessage(self.linkslogmsg)
-                        else:
-                            await sendMessage(self.linkslogmsg, msg + lmsg + fmsg)
-                            await deleteMessage(self.linkslogmsg)
+                        await sendMessage(self.linkslogmsg, msg + lmsg + fmsg)
+                        await deleteMessage(self.linkslogmsg)
                 btn = ButtonMaker()
-                sbtn = ButtonMaker()
-                if self.source_url:
-                    sbtn.ubutton('Source link', self.source_url)
-                    await sendMessage(self.botpmmsg, msg + lmsg + fmsg, sbtn.build_menu(1))
-                else:
-                    await sendMessage(self.botpmmsg, msg + lmsg + fmsg)
+                await sendMessage(self.botpmmsg, msg + lmsg + fmsg)
                 await deleteMessage(self.botpmmsg)
                 if self.isSuperGroup:
                     btn.ibutton('View in inbox', f"aeon {user_id} botpm", 'header')
@@ -487,7 +425,6 @@ class MirrorLeechListener:
                 msg += f'<b>• SubFolders: </b>{folders}\n'
                 msg += f'<b>• Files: </b>{files}\n'
             if link or rclonePath and config_dict['RCLONE_SERVE_URL']:
-
                 if link:
                     buttons.ubutton('Cloud link', link)
                 else:
@@ -509,12 +446,10 @@ class MirrorLeechListener:
                             buttons.ubutton('Index link', share_url)
                         else:
                             buttons.ubutton('Index link', share_url)
-                if self.source_url:
-                    buttons.ubutton('Source link', self.source_url)
                 buttons = extra_btns(buttons)
                 button = buttons.build_menu(2)
             else:
-                msg += f'<b>• Path: </b><code>{rclonePath}</code>/n'
+                msg += f'<b>• Path: </b><code>{rclonePath}</code>\n'
                 button = None
             msg += f'<b>• Uploaded by: </b>{self.tag}\n'
             msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n\n'

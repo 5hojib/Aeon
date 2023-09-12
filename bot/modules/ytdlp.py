@@ -339,7 +339,11 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
 
     path = f'/usr/src/app/downloads/{message.id}{folder_name}'
 
-    opt = opt or config_dict['YT_DLP_OPTIONS']
+    user_id = message.from_user.id
+
+    user_dict = user_data.get(user_id, {})
+
+    opt = opt or user_dict.get('yt_opt') or config_dict['YT_DLP_OPTIONS']
 
     if len(text) > 1 and text[1].startswith('Tag: '):
         tag, id_ = text[1].split('Tag: ')[1].split()
@@ -420,7 +424,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
             await delete_links(message)
             return
 
-    listener = MirrorLeechListener(message, compress, isLeech=isLeech, tag=tag, sameDir=sameDir, rcFlags=rcf, upPath=up, drive_id=drive_id, index_link=index_link, isYtdlp=True, source_url=link)
+    listener = MirrorLeechListener(message, compress, isLeech=isLeech, tag=tag, sameDir=sameDir, rcFlags=rcf, upPath=up, drive_id=drive_id, index_link=index_link, isYtdlp=True)
 
     if 'mdisk.me' in link:
         name, link = await _mdisk(link, name)
@@ -430,6 +434,9 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
         yt_opt = opt.split('|')
         for ytopt in yt_opt:
             key, value = map(str.strip, ytopt.split(':', 1))
+            if key == 'format' and value.startswith('ba/b-'):
+                qual = value
+                continue
             if value.startswith('^'):
                 if '.' in value or value == '^inf':
                     value = float(value.split('^')[1])
@@ -458,12 +465,8 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
     __run_multi()
 
     if not select:
-        user_id = message.from_user.id
-        user_dict = user_data.get(user_id, {})
-        if 'format' in options:
+        if not qual and 'format' in options:
             qual = options['format']
-        elif user_dict.get('yt_opt'):
-            qual = user_dict['yt_opt']
 
     if not qual:
         qual = await YtSelection(client, message).get_quality(result)
@@ -474,7 +477,6 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
     playlist = 'entries' in result
     ydl = YoutubeDLHelper(listener)
     await ydl.add_download(link, path, name, qual, playlist, opt)
-    
 
 
 async def ytdl(client, message):

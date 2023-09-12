@@ -22,7 +22,7 @@ from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.bot_utils import setInterval, sync_to_async, new_thread
 from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.ext_utils.task_manager import start_from_queued
-from bot.helper.ext_utils.help_messages import default_desp
+from bot.helper.ext_utils.text_utils import bset_display_dict
 from bot.helper.mirror_utils.rclone_utils.serve import rclone_serve_booter
 from bot.modules.torrent_search import initiate_search_tools
 from bot.modules.rss import addJob
@@ -138,6 +138,10 @@ async def load_config():
     SEARCH_API_LINK = environ.get('SEARCH_API_LINK', '').rstrip("/")
     if len(SEARCH_API_LINK) == 0:
         SEARCH_API_LINK = ''
+
+    FILELION_API = environ.get('FILELION_API', '')
+    if len(FILELION_API) == 0:
+        FILELION_API = ''
 
     LEECH_LOG_ID = environ.get('LEECH_LOG_ID', '')
     LEECH_LOG_ID = '' if len(LEECH_LOG_ID) == 0 else int(LEECH_LOG_ID)
@@ -386,6 +390,7 @@ async def load_config():
                         'MEGA_LIMIT': MEGA_LIMIT,
                         'LEECH_LIMIT': LEECH_LIMIT,
                         'FSUB_IDS': FSUB_IDS,
+                        'FILELION_API': FILELION_API,
                         'USER_MAX_TASKS': USER_MAX_TASKS,
                         'PLAYLIST_LIMIT': PLAYLIST_LIMIT,
                         'MIRROR_LOG_ID': MIRROR_LOG_ID,
@@ -466,7 +471,7 @@ Note: Changing .netrc will not take effect for aria2c until restart.
 Timeout: 60 sec'''
     elif edit_type == 'editvar':
         msg = f'<b>Variable:</b> <code>{key}</code>\n\n'
-        msg += f'<b>Description:</b> {default_desp.get(key, "No Description Provided")}\n\n'
+        msg += f'<b>Description:</b> {bset_display_dict.get(key, "No Description Provided")}\n\n'
         if mess.chat.type == ChatType.PRIVATE:
             msg += f'<b>Value:</b> {config_dict.get(key, "None")}\n\n'
         else:

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-import pyshorteners
 from base64 import b64encode
 from datetime import datetime
 from os import path as ospath
@@ -30,6 +28,7 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.telegraph_helper import telegraph
 from bot.helper.ext_utils.shortners import short_url
+from bot.helper.ext_utils.aeon_utils import tinyfy
 
 THREADPOOL = ThreadPoolExecutor(max_workers = 1000)
 MAGNET_REGEX = r'magnet:\?xt=urn:(btih|btmh):[a-zA-Z0-9]*\s*'
@@ -125,6 +124,7 @@ async def get_telegraph_list(telegraph_content):
     buttons = extra_btns(buttons)
     return buttons.build_menu(1)
 
+
 def handleIndex(index, dic):
     while True:
         if abs(index) < len(dic):
@@ -133,24 +133,27 @@ def handleIndex(index, dic):
         elif index > 0: index = index - len(dic)
     return index
 
+
 async def fetch_user_tds(user_id, force=False):
     user_dict = user_data.get(user_id, {})
     if user_dict.get('td_mode', False) or force:
         return user_dict.get('user_tds', {})
     return {}
-    
-    
-def get_progress_bar_string(pct):
+
+
+def progress_bar(pct):
     if isinstance(pct, str):
         pct = float(pct.strip('%'))
     p = min(max(pct, 0), 100)
-    cFull = int(p // 10)
+    cFull = int((p + 5)// 10)
     p_str = '●' * cFull
     p_str += '○' * (10 - cFull)
     return p_str
-    
+
+
 def source(self):
     return (sender_chat.title if (sender_chat := self.message.sender_chat) else self.message.from_user.username or self.message.from_user.id)
+
 
 def get_readable_message():
     msg = '<b>Powered by Aeon</b>\n\n'
@@ -170,7 +173,7 @@ def get_readable_message():
         msg += f"by {source(download)}\n\n"
         msg += f"<b>{download.status()}...</b>"
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
-            msg += f"\n{get_progress_bar_string(download.progress())} {download.progress()}"
+            msg += f"\n<code>{progress_bar(download.progress())}</code> {download.progress()}"
             msg += f"\n{download.processed_bytes()} of {download.size()}"
             msg += f"\nSpeed: {download.speed()}"
             msg += f'\nEstimated: {download.eta()}'
@@ -224,28 +227,20 @@ def text_size_to_bytes(size_text):
     elif 'm' in size_text:
         size += float(size_text.split('m')[0]) * 1048576
     elif 'g' in size_text:
-        size += float(size_text.split('g')[0]) *1073741824 
+        size += float(size_text.split('g')[0]) * 1073741824
     elif 't' in size_text:
-        size += float(size_text.split('t')[0]) *1099511627776 
+        size += float(size_text.split('t')[0]) * 1099511627776
     return size
 
+
 async def turn_page(data):
-    global STATUS_START, PAGE_NO
+    global STATUS_START, PAGE_NO, PAGES
     async with download_dict_lock:
         if data[1] == "nex":
-            if PAGE_NO == PAGES:
-                STATUS_START = 0
-                PAGE_NO = 1
-            else:
-                STATUS_START += STATUS_LIMIT
-                PAGE_NO += 1
+            PAGE_NO = (PAGE_NO % PAGES) + 1
         elif data[1] == "pre":
-            if PAGE_NO == 1:
-                STATUS_START = STATUS_LIMIT * (PAGES - 1)
-                PAGE_NO = PAGES
-            else:
-                STATUS_START -= STATUS_LIMIT
-                PAGE_NO -= 1
+            PAGE_NO = PAGE_NO - 1 if PAGE_NO > 1 else PAGES
+    return True
 
 
 def get_readable_time(seconds):
@@ -259,6 +254,7 @@ def get_readable_time(seconds):
             if len(result.split()) == 2:
                 break
     return result.strip()
+
 
 def is_magnet(url):
     return bool(re_match(MAGNET_REGEX, url))
@@ -299,7 +295,6 @@ def arg_parser(items, arg_base):
     t = len(items)
     i = 0
     arg_start = -1
-
     while i + 1 <= t:
         part = items[i].strip()
         if part in arg_base:
@@ -320,7 +315,6 @@ def arg_parser(items, arg_base):
                 if sub_list:
                     arg_base[part] = " ".join(sub_list)
         i += 1
-
     link = []
     if items[0].strip() not in arg_base:
         if arg_start == -1:
@@ -428,7 +422,7 @@ async def checking_access(user_id, button=None):
         time_str = format_validity_time(token_timeout)
         if button is None:
             button = ButtonMaker()
-        button.ubutton('Collect token', tiny(short_url(f'https://telegram.me/{bot_name}?start={token}')))
+        button.ubutton('Collect token', tinyfy(short_url(f'https://telegram.me/{bot_name}?start={token}')))
         return f'Your token has expired, please collect a new token.\n<b>It will expire after {time_str}</b>!', button
     return None, button
 
@@ -443,11 +437,13 @@ def format_validity_time(seconds):
             result += f'{int(period_value)} {period_name}{plural_suffix} '
     return result
 
+
 def extra_btns(buttons):
     if extra_buttons:
         for btn_name, btn_url in extra_buttons.items():
             buttons.ubutton(btn_name, btn_url)
     return buttons
+
 
 async def set_commands(client):
     if config_dict['SET_COMMANDS']:
@@ -509,13 +505,3 @@ async def set_commands(client):
                 BotCommand(f'{BotCommands.MediaInfoCommand}', 'Get MediaInfo')
             ]
         )
-
-def tiny(long_url):
-    s = pyshorteners.Shortener()
-    try:
-        short_url = s.tinyurl.short(long_url)
-        LOGGER.info(f'tinyfied {long_url} to {short_url}')
-        return short_url
-    except Exception:
-        LOGGER.error(f'Failed to shorten URL: {long_url}')
-        return long_url

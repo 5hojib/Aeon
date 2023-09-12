@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from random import choice
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.filters import command, regex
@@ -79,8 +78,8 @@ async def drive_list(_, message):
                 return
     buttons = await list_buttons(user_id)
     reply_message = await sendMessage(message, 'Choose list options:', buttons)
-    await delete_links(message)
     await five_minute_del(reply_message)
+    await delete_links(message)
 
 bot.add_handler(MessageHandler(drive_list, filters=command(
     BotCommands.ListCommand) & CustomFilters.authorized))

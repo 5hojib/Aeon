@@ -178,6 +178,10 @@ if len(MEGA_EMAIL) == 0 or len(MEGA_PASSWORD) == 0:
     MEGA_EMAIL = ''
     MEGA_PASSWORD = ''
 
+FILELION_API = environ.get('FILELION_API', '')
+if len(FILELION_API) == 0:
+    FILELION_API = ''
+
 UPTOBOX_TOKEN = environ.get('UPTOBOX_TOKEN', '')
 if len(UPTOBOX_TOKEN) == 0:
     UPTOBOX_TOKEN = ''
@@ -365,6 +369,7 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'CMD_SUFFIX': CMD_SUFFIX,
                'DATABASE_URL': DATABASE_URL,
                'DEFAULT_UPLOAD': DEFAULT_UPLOAD,
+               'FILELION_API': FILELION_API,
                'GDTOT_CRYPT': GDTOT_CRYPT,
                'STORAGE_THRESHOLD': STORAGE_THRESHOLD,
                'TORRENT_LIMIT': TORRENT_LIMIT,
@@ -480,6 +485,7 @@ if ospath.exists('accounts.zip'):
     osremove('accounts.zip')
 if not ospath.exists('accounts'):
     config_dict['USE_SERVICE_ACCOUNTS'] = False
+alive = Popen(['python3', 'alive.py'])
 sleep(0.5)
 
 aria2 = ariaAPI(ariaClient(host="http://localhost", port=6800, secret=""))

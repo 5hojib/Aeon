@@ -202,7 +202,6 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         await one_minute_del(reply_message)
         return
 
-    olink = link if link and not dottorrent else ''
     error_msg = []
     error_button = None
     if not await isAdmin(message):
@@ -283,7 +282,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             await delete_links(message)
             return
 
-    listener = MirrorLeechListener(message, compress, extract, isQbit, isLeech, tag, select, seed, sameDir, rcf, up, join, drive_id=drive_id, index_link=index_link, source_url=olink)
+    listener = MirrorLeechListener(message, compress, extract, isQbit, isLeech, tag, select, seed, sameDir, rcf, up, join, drive_id=drive_id, index_link=index_link)
 
     if file_ is not None:
         await delete_links(message)

@@ -19,20 +19,10 @@ from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.db_handler import DbManager
+from bot.helper.ext_utils.text_utils import uset_display_dict
 from bot.helper.ext_utils.bot_utils import update_user_ldata, get_readable_file_size, sync_to_async, new_thread, is_gdrive_link
 
 handler_dict = {}
-desp_dict = {'rcc': ['RClone is a command-line program to sync files and directories to and from different cloud storage providers like GDrive, OneDrive...', 'Send rcl.conf. Timeout: 60 sec'],
-            'prefix': ['Filename Prefix is the Front Part attacted with the Filename of the Leech Files.', 'Send Leech Filename Prefix. Timeout: 60 sec'],
-            'suffix': ['Filename Suffix is the End Part attached with the Filename of the Leech Files', 'Send Leech Filename Suffix. Timeout: 60 sec'],
-            'remname': ['Filename Remname is combination of Regex(s) used for removing or manipulating Filename of the Leech Files', 'Send Leech Filename Remname. Timeout: 60 sec'],
-            'lcaption': ['Leech Caption is the Custom Caption on the Leech Files Uploaded by the bot', 'Send Leech Caption. You can add HTML tags Timeout: 60 sec'],
-            'ldump': ['Leech Files User Dump for Personal Use as a Storage.', 'Send Leech Dump Channel ID. Timeout: 60 sec'],
-            'thumb': ['Custom Thumbnail to appear on the Leeched files uploaded by the bot', 'Send a photo to save it as custom thumbnail. Timeout: 60 sec'],
-            'yt_opt': ['YT-DLP Options is the Custom Quality for the extraction of videos from the yt-dlp supported sites.', 'Send YT-DLP Options. Timeout: 60 sec\nFormat: key:value|key:value|key:value.\nExample: format:bv*+mergeall[vcodec=none]|nocheckcertificate:True\nCheck all yt-dlp api options from this <a href="https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/YoutubeDL.py#L184">FILE</a> or use this <a href="https://t.me/mltb_official/177">script</a> to convert cli arguments to api options.'],
-            'split_size': ['Leech Splits Size is the size to split the Leeched File before uploading', f'Send Leech split size in bytes. IS_PREMIUM_USER: {IS_PREMIUM_USER}. Timeout: 60 sec'],
-            'user_tds': [f'UserTD helps to upload files via Bot to your Custom Drive Destination through Global SA Mail.\n\n<b>SA Mail:</b> {SA if (SA := config_dict["USER_TD_SA"]) else "Not Specified"}','Send User TD details for use while Mirror/Clone.\n<b>Format:</b> \nname drive_id/link index(optional)\n\n<b>NOTE:</b> \n1. Must add our sa mail in your drive with write permission\n2. Names can have spaces.\n3. Drive ID must be valid for acceptance.\n\n<b>Timeout:</b> 60 sec.'],
-            }
 fname_dict = {'rcc': 'RClone',
              'prefix': 'Prefix',
              'suffix': 'Suffix',
@@ -167,16 +157,14 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
             text += f"<b>User TD Mode:</b> {tds_mode}\n"
         else: 
             return
-        text += f"<b>Description :</b> {desp_dict[key][0]}"
+        text += f"<b>Description :</b> {uset_display_dict[key][0]}"
         if edit_mode:
-            text += '\n\n' + desp_dict[key][1]
+            text += '\n\n' + uset_display_dict[key][1]
             buttons.ibutton("Stop Change", f"userset {user_id} {key}")
         elif key != 'user_tds' or set_exist == 'Not Exists':
             buttons.ibutton(f"Change {fname_dict[key]}" if set_exist and set_exist != 'Not Exists' and (set_exist != get_readable_file_size(config_dict['LEECH_SPLIT_SIZE']) + ' (Default)') else f"Set {fname_dict[key]}", f"userset {user_id} {key} edit")
         if set_exist and set_exist != 'Not Exists' and (set_exist != get_readable_file_size(config_dict['LEECH_SPLIT_SIZE']) + ' (Default)'):
-            if key == 'thumb':
-                buttons.ibutton("View Thumbnail", f"userset {user_id} vthumb", "header")
-            elif key == 'user_tds':
+            if key == 'user_tds':
                 buttons.ibutton('Show UserTDs', f"userset {user_id} show_tds", "header")
             buttons.ibutton("Delete", f"userset {user_id} d{key}")
         buttons.ibutton("Back", f"userset {user_id} back {edit_type}", "footer")
@@ -185,16 +173,26 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
     return text, button
 
 
-async def update_user_settings(query, key=None, edit_type=None, edit_mode=None, msg=None, sdirect=False):
-    msg, button = await get_user_settings(msg.from_user if sdirect else query.from_user, key, edit_type, edit_mode)
-    await editMessage(query if sdirect else query.message, msg, button)
+async def update_user_settings(query, key=None, edit_type=None, edit_mode=None, msg=None):
+    msg, button = await get_user_settings(query.from_user, key, edit_type, edit_mode)
+    user_id = query.from_user.id
+    thumbnail = f"Thumbnails/{user_id}.jpg"
+    if not ospath.exists(thumbnail):
+        thumbnail = 'https://graph.org/file/73ae908d18c6b38038071.jpg'
+    await editMessage(query.message, msg, button, photo=thumbnail)
+
 
 @new_thread
 async def user_settings(client, message):
     msg, button = await get_user_settings(message.from_user)
-    x = await sendMessage(message, msg, button)
+    user_id = message.from_user.id
+    thumbnail = f"Thumbnails/{user_id}.jpg"
+    if not ospath.exists(thumbnail):
+        thumbnail = 'https://graph.org/file/73ae908d18c6b38038071.jpg'
+    x = await message.reply_photo(thumbnail, caption=msg, reply_markup=button)
     await five_minute_del(message)
     await deleteMessage(x)
+
 
 async def set_yt_options(client, message, pre_event):
     user_id = message.from_user.id
@@ -207,7 +205,7 @@ async def set_yt_options(client, message, pre_event):
         await DbManager().update_user_data(user_id)
 
 
-async def set_custom(client, message, pre_event, key, direct=False):
+async def set_custom(client, message, pre_event, key):
     user_id = message.from_user.id
     handler_dict[user_id] = False
     value = message.text
@@ -233,12 +231,12 @@ async def set_custom(client, message, pre_event, key, direct=False):
         return_key = 'mirror'
     update_user_ldata(user_id, n_key, value)
     await message.delete()
-    await update_user_settings(pre_event, key, return_key, msg=message, sdirect=direct)
+    await update_user_settings(pre_event, key, return_key, msg=message)
     if DATABASE_URL:
         await DbManager().update_user_data(user_id)
 
 
-async def set_thumb(client, message, pre_event, key, direct=False):
+async def set_thumb(client, message, pre_event, key):
     user_id = message.from_user.id
     handler_dict[user_id] = False
     path = "Thumbnails/"
@@ -250,7 +248,7 @@ async def set_thumb(client, message, pre_event, key, direct=False):
     await aioremove(photo_dir)
     update_user_ldata(user_id, 'thumb', des_dir)
     await message.delete()
-    await update_user_settings(pre_event, key, 'leech', msg=message, sdirect=direct)
+    await update_user_settings(pre_event, key, 'leech', msg=message)
     if DATABASE_URL:
         await DbManager().update_user_doc(user_id, 'thumb', des_dir)
 
@@ -331,11 +329,6 @@ async def edit_user_settings(client, query):
         await update_user_settings(query, 'leech')
         if DATABASE_URL:
             await DbManager().update_user_data(user_id)
-    elif data[2] == 'vthumb':
-        handler_dict[user_id] = False
-        await query.answer()
-        await sendFile(message, thumb_path, from_user.mention)
-        await update_user_settings(query, 'thumb', 'leech')
     elif data[2] == 'show_tds':
         handler_dict[user_id] = False
         user_tds = user_dict.get('user_tds', {})
