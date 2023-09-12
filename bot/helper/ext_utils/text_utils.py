@@ -58,7 +58,7 @@ bset_display_dict = {
                 'TELEGRAM_HASH': 'This is to authenticate your Telegram account for downloading Telegram files. You can get this from https://my.telegram.org.',
                 'TORRENT_TIMEOUT': 'Timeout of dead torrents downloading with qBittorrent and Aria2c in seconds. Int',
                 'UPSTREAM_REPO': "Your github repository link, if your repo is private add https://username:{githubtoken}@github.com/{username}/{reponame} format. Get token from Github settings. So you can update your bot from filled repository on each restart.",
-                'UPSTREAM_BRANCH': 'Upstream branch for update. Default is master.',
+                'UPSTREAM_BRANCH': 'Upstream branch for update. Default is main.',
                 'SET_COMMANDS': 'Set bot command automatically. Bool',
                 'UPTOBOX_TOKEN': 'Uptobox token to mirror uptobox links. Get it from <a href="https://uptobox.com/my_account">Uptobox Premium Account</a>.',
                 'USER_SESSION_STRING': "To download/upload from your telegram account and to send rss. To generate session string use this command <code>python3 generate_string_session.py</code> after mounting repo folder for sure.\n\n<b>NOTE:</b> You can't use bot with private message. Use it with superGroup.",
