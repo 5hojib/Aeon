@@ -38,7 +38,7 @@ SIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
 STATUS_START = 0
 PAGES = 1
 PAGE_NO = 1
-STATUS_LIMIT = 2
+STATUS_LIMIT = 4
 
 class MirrorStatus:
     STATUS_UPLOADING = "Uploading"
@@ -233,24 +233,6 @@ def text_size_to_bytes(size_text):
         size += float(size_text.split('t')[0]) * 1099511627776
     return size
 
-'''
-async def turn_page(data):
-    try:
-        global STATUS_START, PAGE_NO, PAGES
-        async with download_dict_lock:
-            if data[1] == "nex" and PAGE_NO == PAGES:
-                PAGE_NO = 1
-            elif data[1] == "nex" and PAGE_NO < PAGES:
-                PAGE_NO += 1
-            elif data[1] == "pre" and PAGE_NO == 1:
-                PAGE_NO = PAGES
-            elif data[1] == "pre" and PAGE_NO > 1:
-                PAGE_NO -= 1
-        return True
-    except:
-        return False
-'''
-
 
 async def turn_page(data):
     global STATUS_START, PAGE_NO, PAGES
@@ -314,7 +296,6 @@ def arg_parser(items, arg_base):
     t = len(items)
     i = 0
     arg_start = -1
-
     while i + 1 <= t:
         part = items[i].strip()
         if part in arg_base:
@@ -335,7 +316,6 @@ def arg_parser(items, arg_base):
                 if sub_list:
                     arg_base[part] = " ".join(sub_list)
         i += 1
-
     link = []
     if items[0].strip() not in arg_base:
         if arg_start == -1:
