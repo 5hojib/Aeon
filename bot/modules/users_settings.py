@@ -174,9 +174,7 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         elif key != 'user_tds' or set_exist == 'Not Exists':
             buttons.ibutton(f"Change {fname_dict[key]}" if set_exist and set_exist != 'Not Exists' and (set_exist != get_readable_file_size(config_dict['LEECH_SPLIT_SIZE']) + ' (Default)') else f"Set {fname_dict[key]}", f"userset {user_id} {key} edit")
         if set_exist and set_exist != 'Not Exists' and (set_exist != get_readable_file_size(config_dict['LEECH_SPLIT_SIZE']) + ' (Default)'):
-            if key == 'thumb':
-                buttons.ibutton("View Thumbnail", f"userset {user_id} vthumb", "header")
-            elif key == 'user_tds':
+            if key == 'user_tds':
                 buttons.ibutton('Show UserTDs', f"userset {user_id} show_tds", "header")
             buttons.ibutton("Delete", f"userset {user_id} d{key}")
         buttons.ibutton("Back", f"userset {user_id} back {edit_type}", "footer")
@@ -187,7 +185,11 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
 
 async def update_user_settings(query, key=None, edit_type=None, edit_mode=None, msg=None, sdirect=False):
     msg, button = await get_user_settings(msg.from_user if sdirect else query.from_user, key, edit_type, edit_mode)
-    await editMessage(query if sdirect else query.message, msg, button)
+    user_id = query.from_user.id
+    thumbnail = f"Thumbnails/{user_id}.jpg"
+    if not ospath.exists(thumbnail):
+        thumbnail = "https://graph.org/file/25545597de34c640b31d6.jpg"
+    await editMessage(query if sdirect else query.message, msg, button, photo=thumbnail)
 
 
 @new_thread
@@ -337,11 +339,6 @@ async def edit_user_settings(client, query):
         await update_user_settings(query, 'leech')
         if DATABASE_URL:
             await DbManager().update_user_data(user_id)
-    elif data[2] == 'vthumb':
-        handler_dict[user_id] = False
-        await query.answer()
-        await sendFile(message, thumb_path, from_user.mention)
-        await update_user_settings(query, 'thumb', 'leech')
     elif data[2] == 'show_tds':
         handler_dict[user_id] = False
         user_tds = user_dict.get('user_tds', {})
