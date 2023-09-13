@@ -35,7 +35,7 @@ def is_hnsfw_content(message):
 def is_nsfw_content(message):
     msg = []
     for keyword in nsfw_keywords:
-        pattern = rf'(?i)\b{re.escape(keyword)}\b'
-        if re.compile(pattern, message):
-            msg.append('Hello')
-    return msg
+        pattern = re.compile(rf'\b{re.escape(keyword)}\b', re.IGNORECASE)
+        if pattern.search(message):
+            return True
+    return False
