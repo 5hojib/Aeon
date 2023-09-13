@@ -339,12 +339,6 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
 
     path = f'/usr/src/app/downloads/{message.id}{folder_name}'
 
-    user_id = message.from_user.id
-
-    user_dict = user_data.get(user_id, {})
-
-    opt = opt or user_dict.get('yt_opt') or config_dict['YT_DLP_OPTIONS']
-
     if len(text) > 1 and text[1].startswith('Tag: '):
         tag, id_ = text[1].split('Tag: ')[1].split()
         message.from_user = await client.get_users(id_)
@@ -352,6 +346,12 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
             await message.unpin()
         except:
             pass
+    user_id = message.from_user.id
+
+    user_dict = user_data.get(user_id, {})
+
+    opt = opt or user_dict.get('yt_opt') or config_dict['YT_DLP_OPTIONS']
+    
     elif sender_chat := message.sender_chat:
         tag = sender_chat.title
     if username := message.from_user.username:
@@ -435,8 +435,11 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
         for ytopt in yt_opt:
             key, value = map(str.strip, ytopt.split(':', 1))
             if key == 'format' and value.startswith('ba/b-'):
-                qual = value
-                continue
+                if select:
+                    qual = ''
+                elif value.startswith('ba/b-'):
+                    qual = value
+                    continue
             if value.startswith('^'):
                 if '.' in value or value == '^inf':
                     value = float(value.split('^')[1])
@@ -464,9 +467,8 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
 
     __run_multi()
 
-    if not select:
-        if not qual and 'format' in options:
-            qual = options['format']
+    if not select and (not qual and 'format' in options):
+        qual = options['format']
 
     if not qual:
         qual = await YtSelection(client, message).get_quality(result)
@@ -487,7 +489,5 @@ async def ytdlleech(client, message):
     _ytdl(client, message, isLeech=True)
 
 
-bot.add_handler(MessageHandler(ytdl, filters=command(
-    BotCommands.YtdlCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(ytdlleech, filters=command(
-    BotCommands.YtdlLeechCommand) & CustomFilters.authorized))
+bot.add_handler(MessageHandler(ytdl, filters=command(BotCommands.YtdlCommand) & CustomFilters.authorized))
+bot.add_handler(MessageHandler(ytdlleech, filters=command(BotCommands.YtdlLeechCommand) & CustomFilters.authorized))
