@@ -25,8 +25,17 @@ def tinyfy(long_url):
         return long_url
 
 
-def is_nsfw_content(message):
+def is_hnsfw_content(message):
     for keyword in nsfw_keywords:
         if re.search(rf'\b{re.escape(keyword)}\b', message, re.IGNORECASE):
             return True
     return False
+
+
+def is_nsfw_content(message):
+    msg = []
+    for keyword in nsfw_keywords:
+        pattern = rf'(?i)\b{re.escape(keyword)}\b'
+        if re.search(pattern, message):
+            msg.append('Hello')
+    return msg
