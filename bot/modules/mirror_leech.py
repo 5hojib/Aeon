@@ -205,10 +205,15 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
 
     error_msg = []
     error_button = None
+    nsfw = ['NSFW detected']
     nsfw_check = is_nsfw_content(message.text)
     if nsfw_check:
-    	n = 'Hello'
-    	error_msg.append(n)
+    	error_msg.extend(n)
+    if message.reply_to_message:
+        if message.reply_to_message.caption:
+            nsfw_chec = is_nsfw_content(message.reply_to_message.caption)
+            if nsfw_chec:
+            	error_msg.extend(nsfw)
     if not await isAdmin(message):
         task_utilis_msg, error_button = await task_utils(message)
         if task_utilis_msg:

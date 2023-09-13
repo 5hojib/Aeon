@@ -11,6 +11,7 @@ nsfw_keywords = [
     "adult",
     "xnxx",
     "xvideos",
+    "Carry"
 ]
 
 
