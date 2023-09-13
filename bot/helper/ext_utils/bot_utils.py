@@ -237,9 +237,19 @@ async def turn_page(data):
     global STATUS_START, PAGE_NO
     async with download_dict_lock:
         if data[1] == "nex":
-            STATUS_START, PAGE_NO = STATUS_START + STATUS_LIMIT, PAGE_NO + 1 if PAGE_NO < PAGES else (0, 1)
+            if PAGE_NO == PAGES:
+                STATUS_START = 0
+                PAGE_NO = 1
+            else:
+                STATUS_START += STATUS_LIMIT
+                PAGE_NO += 1
         elif data[1] == "pre":
-            STATUS_START, PAGE_NO = STATUS_START - STATUS_LIMIT, PAGE_NO - 1 if PAGE_NO > 1 else (STATUS_LIMIT * (PAGES - 1), PAGES)
+            if PAGE_NO == 1:
+                STATUS_START = STATUS_LIMIT * (PAGES - 1)
+                PAGE_NO = PAGES
+            else:
+                STATUS_START -= STATUS_LIMIT
+                PAGE_NO -= 1
 
 
 def get_readable_time(seconds):
