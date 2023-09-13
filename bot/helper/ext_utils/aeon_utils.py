@@ -36,6 +36,6 @@ def is_nsfw_content(message):
     msg = []
     for keyword in nsfw_keywords:
         pattern = rf'(?i)\b{re.escape(keyword)}\b'
-        if re.search(pattern, message):
+        if re.compile(pattern, message):
             msg.append('Hello')
     return msg
