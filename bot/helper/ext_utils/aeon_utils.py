@@ -20,12 +20,27 @@ def is_nsfw_content(text):
 
 
 async def check_nsfw(message, error_msg):
-    if is_nsfw_content(message.text):
-        error_msg.extend(['NSFW detected'])
+    nsfw = ['NSFW detected']
+    nsfw_check = is_nsfw_content(message.text)
+    if nsfw_check:
+        error_msg.extend(nsfw)
     elif message.reply_to_message:
-        content = message.reply_to_message.caption or message.reply_to_message.document.file_name or message.reply_to_message.video.file_name or message.reply_to_message.text
-        if content and is_nsfw_content(content):
-            error_msg.extend(['NSFW detected'])
+        if message.reply_to_message.caption:
+            nsfw_check = is_nsfw_content(message.reply_to_message.caption)
+            if nsfw_check:
+                return error_msg.extend(nsfw)
+        if message.reply_to_message.document:
+            nsfw_check = is_nsfw_content(message.reply_to_message.document.file_name)
+            if nsfw_check:
+                return error_msg.extend(nsfw)
+        if message.reply_to_message.video:
+            nsfw_check = is_nsfw_content(message.reply_to_message.video.file_name)
+            if nsfw_check:
+                return error_msg.extend(nsfw)
+        if message.reply_to_message.text:
+        	nsfw_check = is_nsfw_content(message.reply_to_message.text)
+        	if nsfw_check:
+        		error_msg.extend(nsfw)
 
 
 def tinyfy(long_url):
