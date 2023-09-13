@@ -205,6 +205,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
 
     error_msg = []
     error_button = None
+    LOGGER.info(f'{message}')
     nsfw_check = is_nsfw_content(message)
     if nsfw_check:
     	error_msg.extend('Hello')
