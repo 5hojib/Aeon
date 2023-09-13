@@ -346,14 +346,11 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
             await message.unpin()
         except:
             pass
+    
     user_id = message.from_user.id
-
     user_dict = user_data.get(user_id, {})
-
     opt = opt or user_dict.get('yt_opt') or config_dict['YT_DLP_OPTIONS']
     
-    elif sender_chat := message.sender_chat:
-        tag = sender_chat.title
     if username := message.from_user.username:
         tag = f'@{username}'
     else:
