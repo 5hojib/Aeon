@@ -4,13 +4,13 @@ from bot import LOGGER
 
 nsfw_keywords = [
     "xxx",
-    "explicit_word2",
-    "offensive_term",
-    "adult_theme_keyword",
-    "custom_slang",
-    "drug_term",
-    "alcohol_term",
-    "gambling_word",
+    "porn",
+    "onlyfans",
+    "nsfw",
+    "Brazzers",
+    "adult",
+    "xnxx",
+    "xvideos",
 ]
 
 
