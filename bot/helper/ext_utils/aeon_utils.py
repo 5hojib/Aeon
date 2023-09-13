@@ -1,5 +1,18 @@
+import re
 import pyshorteners
 from bot import LOGGER
+
+nsfw_keywords = [
+    "xxx",
+    "explicit_word2",
+    "offensive_term",
+    "adult_theme_keyword",
+    "custom_slang",
+    "drug_term",
+    "alcohol_term",
+    "gambling_word",
+]
+
 
 def tinyfy(long_url):
     s = pyshorteners.Shortener()
@@ -10,3 +23,11 @@ def tinyfy(long_url):
     except Exception:
         LOGGER.error(f'Failed to shorten URL: {long_url}')
         return long_url
+
+
+def is_nsfw_content(message):
+    msg = []
+    for keyword in nsfw_keywords:
+        if re.search(rf'\b{re.escape(keyword)}\b', message, re.IGNORECASE):
+            return msg.append('Hello')
+    return msg
