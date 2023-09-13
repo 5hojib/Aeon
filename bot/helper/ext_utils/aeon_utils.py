@@ -14,32 +14,18 @@ nsfw_keywords = [
     "Carry"
 ]
 
+
 def is_nsfw_content(text):
-    for keyword in nsfw_keywords:
-        pattern = re.compile(rf'\b{re.escape(keyword)}\b', re.IGNORECASE)
-        if pattern.search(text):
-            return True
-    return False
+    return any(re.search(rf'\b{re.escape(keyword)}\b', text, re.IGNORECASE) for keyword in nsfw_keywords)
 
 
 async def check_nsfw(message, error_msg):
-    nsfw = ['NSFW detected']
-    nsfw_check = is_nsfw_content(message.text)
-    if nsfw_check:
-        error_msg.extend(nsfw)
+    if is_nsfw_content(message.text):
+        error_msg.extend['NSFW detected']
     elif message.reply_to_message:
-        if message.reply_to_message.caption:
-            nsfw_check = is_nsfw_content(message.reply_to_message.caption)
-            if nsfw_check:
-                error_msg.extend(nsfw)
-        elif message.reply_to_message.document:
-            nsfw_check = is_nsfw_content(message.reply_to_message.document.file_name)
-            if nsfw_check:
-                error_msg.extend(nsfw)
-        elif message.reply_to_message.video:
-            nsfw_check = is_nsfw_content(message.reply_to_message.video.file_name)
-            if nsfw_check:
-                error_msg.extend(nsfw)
+        content = message.reply_to_message.caption or message.reply_to_message.document.file_name or message.reply_to_message.video.file_name or message.reply_to_message.text
+        if content and is_nsfw_content(content):
+            error_msg.extend['NSFW detected']
 
 
 def tinyfy(long_url):
