@@ -21,11 +21,11 @@ def is_nsfw_content(text):
 
 async def check_nsfw(message, error_msg):
     if is_nsfw_content(message.text):
-        error_msg.extend['NSFW detected']
+        error_msg.extend(['NSFW detected'])
     elif message.reply_to_message:
         content = message.reply_to_message.caption or message.reply_to_message.document.file_name or message.reply_to_message.video.file_name or message.reply_to_message.text
         if content and is_nsfw_content(content):
-            error_msg.extend['NSFW detected']
+            error_msg.extend(['NSFW detected'])
 
 
 def tinyfy(long_url):
