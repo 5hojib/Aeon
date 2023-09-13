@@ -1,5 +1,5 @@
 import pyshorteners
-
+from bot import LOGGER
 
 def tinyfy(long_url):
     s = pyshorteners.Shortener()
