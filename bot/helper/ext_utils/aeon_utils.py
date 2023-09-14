@@ -12,7 +12,7 @@ def is_nsfw(text):
     return False
 
 
-async def check_nsfw(message, error_msg):
+async def check_nsfw_tg(message, error_msg):
     nsfw_msg = ['NSFW detected']
     if nsfw := is_nsfw(message.text):
         error_msg.extend(nsfw_msg)
@@ -29,6 +29,17 @@ async def check_nsfw(message, error_msg):
         if message.reply_to_message.text:
             if nsfw := is_nsfw(message.reply_to_message.text):
                 error_msg.extend(nsfw_msg)
+
+
+def check_nsfw_details(data):
+    if 'contents' in data:
+        contents = data['contents']
+        for item in contents:
+            if 'filename' in item:
+                filename = item['filename']
+                if is_nsfw(filename):
+                    return True
+    return False
 
 
 def tinyfy(long_url):

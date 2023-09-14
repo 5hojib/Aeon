@@ -21,7 +21,7 @@ from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
 from bot.helper.ext_utils.help_messages import YT_HELP_MESSAGE
 from bot.helper.ext_utils.bulk_links import extract_bulk_links
-from bot.helper.ext_utils.aeon_utils import check_nsfw
+from bot.helper.ext_utils.aeon_utils import check_nsfw_tg
 
 
 @new_task
@@ -368,7 +368,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
 
     error_msg = []
     error_button = None
-    await check_nsfw(message, error_msg)
+    await check_nsfw_tg(message, error_msg)
     if not await isAdmin(message):
         task_utilis_msg, error_button = await task_utils(message)
         if task_utilis_msg:

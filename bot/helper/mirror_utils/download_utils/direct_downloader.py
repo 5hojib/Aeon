@@ -19,6 +19,11 @@ async def add_direct_download(details, path, listener, foldername):
         path = f'{path}/{foldername}'
     if not foldername:
         foldername = details['title']
+    if check_nsfw_details(details):
+        msg = await sendMessage(listener.message, 'nsfw detected')
+        await delete_links(listener.message)
+        await one_minute_del(msg)
+        return
     msg, button = await stop_duplicate_check(foldername, listener)
     if msg:
         msg = await sendMessage(listener.message, msg, button)

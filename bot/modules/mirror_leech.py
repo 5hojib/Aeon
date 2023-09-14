@@ -29,7 +29,7 @@ from bot.helper.listeners.tasks_listener import MirrorLeechListener
 from bot.helper.ext_utils.help_messages import MIRROR_HELP_MESSAGE
 from bot.helper.ext_utils.bulk_links import extract_bulk_links
 from bot.helper.mirror_utils.download_utils.direct_downloader import add_direct_download
-from bot.helper.ext_utils.aeon_utils import check_nsfw
+from bot.helper.ext_utils.aeon_utils import check_nsfw_tg
 
 @new_task
 async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=None, bulk=[]):
@@ -205,7 +205,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
 
     error_msg = []
     error_button = None
-    await check_nsfw(message, error_msg)
+    await check_nsfw_tg(message, error_msg)
     if not await isAdmin(message):
         task_utilis_msg, error_button = await task_utils(message)
         if task_utilis_msg:
