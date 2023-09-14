@@ -234,13 +234,22 @@ def text_size_to_bytes(size_text):
 
 
 async def turn_page(data):
-    global STATUS_START, PAGE_NO, PAGES
+    global STATUS_START, PAGE_NO
     async with download_dict_lock:
         if data[1] == "nex":
-            PAGE_NO = (PAGE_NO % PAGES) + 1
+            if PAGE_NO == PAGES:
+                STATUS_START = 0
+                PAGE_NO = 1
+            else:
+                STATUS_START += STATUS_LIMIT
+                PAGE_NO += 1
         elif data[1] == "pre":
-            PAGE_NO = PAGE_NO - 1 if PAGE_NO > 1 else PAGES
-    return True
+            if PAGE_NO == 1:
+                STATUS_START = STATUS_LIMIT * (PAGES - 1)
+                PAGE_NO = PAGES
+            else:
+                STATUS_START -= STATUS_LIMIT
+                PAGE_NO -= 1
 
 
 def get_readable_time(seconds):
@@ -449,55 +458,20 @@ async def set_commands(client):
     if config_dict['SET_COMMANDS']:
         await client.set_bot_commands(
             [
-                BotCommand(
-                    f'{BotCommands.MirrorCommand[0]}',
-                    f'or /{BotCommands.MirrorCommand[1]} Mirror',
-                ),
-                BotCommand(
-                    f'{BotCommands.LeechCommand[0]}',
-                    f'or /{BotCommands.LeechCommand[1]} Leech',
-                ),
-                BotCommand(
-                    f'{BotCommands.QbMirrorCommand[0]}',
-                    f'or /{BotCommands.QbMirrorCommand[1]} Mirror torrent using qBittorrent',
-                ),
-                BotCommand(
-                    f'{BotCommands.QbLeechCommand[0]}',
-                    f'or /{BotCommands.QbLeechCommand[1]} Leech torrent using qBittorrent',
-                ),
-                BotCommand(
-                    f'{BotCommands.YtdlCommand[0]}',
-                    f'or /{BotCommands.YtdlCommand[1]} Mirror yt-dlp supported link',
-                ),
-                BotCommand(
-                    f'{BotCommands.YtdlLeechCommand[0]}',
-                    f'or /{BotCommands.YtdlLeechCommand[1]} Leech through yt-dlp supported link',
-                ),
-                BotCommand(
-                    f'{BotCommands.CloneCommand}', 'Copy file/folder to Drive'
-                ),
-                BotCommand(
-                    f'{BotCommands.CountCommand}',
-                    '[drive_url]: Count file/folder of Google Drive.',
-                ),
-                BotCommand(
-                    f'{BotCommands.StatusCommand[0]}',
-                    f'or /{BotCommands.StatusCommand[1]} Get mirror status message',
-                ),
-                BotCommand(
-                    f'{BotCommands.StatsCommand}', 'Check Bot & System stats'
-                ),
-                BotCommand(
-                    f'{BotCommands.CancelAllCommand[0]}',
-                    'Cancel all tasks which added by you to in bots.',
-                ),
+                BotCommand(f'{BotCommands.MirrorCommand[0]}', f'or /{BotCommands.MirrorCommand[1]} Mirror'),
+                BotCommand(f'{BotCommands.LeechCommand[0]}', f'or /{BotCommands.LeechCommand[1]} Leech'),
+                BotCommand(f'{BotCommands.QbMirrorCommand[0]}', f'or /{BotCommands.QbMirrorCommand[1]} Mirror torrent using qBittorrent'),
+                BotCommand(f'{BotCommands.QbLeechCommand[0]}', f'or /{BotCommands.QbLeechCommand[1]} Leech torrent using qBittorrent'),
+                BotCommand(f'{BotCommands.YtdlCommand[0]}', f'or /{BotCommands.YtdlCommand[1]} Mirror yt-dlp supported link'),
+                BotCommand(f'{BotCommands.YtdlLeechCommand[0]}', f'or /{BotCommands.YtdlLeechCommand[1]} Leech through yt-dlp supported link'),
+                BotCommand(f'{BotCommands.CloneCommand}', 'Copy file/folder to Drive'),
+                BotCommand(f'{BotCommands.CountCommand}', '[drive_url]: Count file/folder of Google Drive.'),
+                BotCommand(f'{BotCommands.StatusCommand[0]}', f'or /{BotCommands.StatusCommand[1]} Get mirror status message'),
+                BotCommand(f'{BotCommands.StatsCommand}', 'Check Bot & System stats'),
+                BotCommand(f'{BotCommands.CancelAllCommand[0]}', 'Cancel all tasks which added by you to in bots.'),
                 BotCommand(f'{BotCommands.ListCommand}', 'Search in Drive'),
-                BotCommand(
-                    f'{BotCommands.SearchCommand}', 'Search in Torrent'
-                ),
-                BotCommand(
-                    f'{BotCommands.UserSetCommand[0]}', 'Users settings'
-                ),
+                BotCommand(f'{BotCommands.SearchCommand}', 'Search in Torrent'),
+                BotCommand(f'{BotCommands.UserSetCommand[0]}', 'Users settings'),
                 BotCommand(f'{BotCommands.HelpCommand}', 'Get detailed help'),
                 BotCommand(f'{BotCommands.BotSetCommand}', 'Open Bot settings'),
                 BotCommand(f'{BotCommands.LogCommand}', 'View log'),

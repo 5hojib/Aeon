@@ -189,7 +189,7 @@ async def user_settings(client, message):
     thumbnail = f"Thumbnails/{user_id}.jpg"
     if not ospath.exists(thumbnail):
         thumbnail = 'https://graph.org/file/73ae908d18c6b38038071.jpg'
-    x = await message.reply_photo(thumbnail, caption=msg, reply_markup=button)
+    x = await sendMessage(message, msg, button, thumbnail)
     await five_minute_del(message)
     await deleteMessage(x)
 
