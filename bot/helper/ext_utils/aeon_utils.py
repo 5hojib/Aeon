@@ -1,6 +1,6 @@
-import re
 import pyshorteners
 from bot import LOGGER
+from re import IGNORECASE, search, escape
 
 nsfw_keywords = [
     "xxx",
@@ -16,8 +16,8 @@ nsfw_keywords = [
 
 
 def is_nsfw(text):
-    pattern = r'(?:^|\W|_)(?:' + '|'.join(re.escape(keyword) for keyword in nsfw_keywords) + r')(?:$|\W|_)'
-    if re.search(pattern, text, flags=re.IGNORECASE):
+    pattern = r'(?:^|\W|_)(?:' + '|'.join(escape(keyword) for keyword in nsfw_keywords) + r')(?:$|\W|_)'
+    if search(pattern, text, flags=IGNORECASE):
         return True
     return False
 
