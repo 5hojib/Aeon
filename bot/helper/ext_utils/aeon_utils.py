@@ -1,5 +1,5 @@
+import pyshorteners
 from bot import LOGGER
-from pyshorteners import Shortener
 from re import IGNORECASE, search, escape
 
 from bot.helper.ext_utils.text_utils import nsfw_keywords
@@ -32,8 +32,9 @@ async def check_nsfw(message, error_msg):
 
 
 def tinyfy(long_url):
+    s = pyshorteners.Shortener()
     try:
-        short_url = Shortener.tinyurl.short(long_url)
+        short_url = s.tinyurl.short(long_url)
         LOGGER.info(f'tinyfied {long_url} to {short_url}')
         return short_url
     except Exception:
