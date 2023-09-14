@@ -16,7 +16,11 @@ nsfw_keywords = [
 
 
 def is_nsfw(text):
-    return any(re.search(rf'\W{re.escape(keyword)}\W', text, re.IGNORECASE) for keyword in nsfw_keywords)
+    pattern = r'(?:^|\W|_)(?:' + '|'.join(re.escape(keyword) for keyword in nsfw_keywords) + r')(?:$|\W|_)'
+    if re.search(pattern, text, flags=re.IGNORECASE):
+        return True
+    else:
+        return False
 
 
 async def check_nsfw(message, error_msg):
