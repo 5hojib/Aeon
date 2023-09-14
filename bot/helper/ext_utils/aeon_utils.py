@@ -33,7 +33,7 @@ async def check_nsfw(message, error_msg):
 
 def tinyfy(long_url):
     try:
-        short_url = Shortener().tinyurl.short(long_url)
+        short_url = Shortener.tinyurl.short(long_url)
         LOGGER.info(f'tinyfied {long_url} to {short_url}')
         return short_url
     except Exception:
