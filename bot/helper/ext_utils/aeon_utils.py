@@ -19,8 +19,7 @@ def is_nsfw(text):
     pattern = r'(?:^|\W|_)(?:' + '|'.join(re.escape(keyword) for keyword in nsfw_keywords) + r')(?:$|\W|_)'
     if re.search(pattern, text, flags=re.IGNORECASE):
         return True
-    else:
-        return False
+    return False
 
 
 async def check_nsfw(message, error_msg):
