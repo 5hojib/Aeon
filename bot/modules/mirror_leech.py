@@ -38,7 +38,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     dottorrent = False
     arg_base = {'link'    : '', 
                 '-i'      : 0,
-                '-ss'     : 0,
+                '-ss'     : '0',
                 '-t'      : '',
                 '-d'      : False,
                 '-j'      : False,

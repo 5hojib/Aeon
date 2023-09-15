@@ -258,7 +258,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
                 '-id'    : '',
                 '-index' : '',
                 '-t'     : '',
-                '-ss'    : 0
+                '-ss'    : '0'
     }
 
     args = arg_parser(input_list[1:], arg_base)
