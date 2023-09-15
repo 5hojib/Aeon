@@ -257,6 +257,8 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
                 '-rcf'   : '',
                 '-id'    : '',
                 '-index' : '',
+                '-t'     : '',
+                '-ss'    : 0
     }
 
     args = arg_parser(input_list[1:], arg_base)
@@ -275,8 +277,10 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
     rcf         = args['-rcf']
     link        = args['link']
     compress    = args['-z']
+    thumb       = args['-t']
     drive_id    = args['-id']
     index_link  = args['-index']
+    sshots      = int(ss) if (ss := (args['-ss'])).isdigit() else 0
     bulk_start  = 0
     bulk_end    = 0
 
@@ -423,7 +427,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
             await delete_links(message)
             return
 
-    listener = MirrorLeechListener(message, compress, isLeech=isLeech, tag=tag, sameDir=sameDir, rcFlags=rcf, upPath=up, drive_id=drive_id, index_link=index_link, isYtdlp=True)
+    listener = MirrorLeechListener(message, compress, isLeech=isLeech, tag=tag, sameDir=sameDir, rcFlags=rcf, upPath=up, drive_id=drive_id, index_link=index_link, isYtdlp=True, leech_utils={'screenshots': sshots, 'thumb': thumb})
 
     if 'mdisk.me' in link:
         name, link = await _mdisk(link, name)
