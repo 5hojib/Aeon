@@ -38,6 +38,8 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     dottorrent = False
     arg_base = {'link'    : '', 
                 '-i'      : 0,
+                '-ss'     : 0,
+                '-t'      : '',
                 '-d'      : False,
                 '-j'      : False,
                 '-s'      : False,
@@ -73,9 +75,11 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     extract       = args['-e']
     compress      = args['-z']
     up            = args['-up']
+    thumb         = args['-t']
     rcf           = args['-rcf']
     drive_id      = args['-id']
     index_link    = args['-index']
+    sshots        = int(ss) if (ss := (args['-ss'])).isdigit() else 0
     bulk_start    = 0
     bulk_end      = 0
     ratio         = None
@@ -284,7 +288,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             await delete_links(message)
             return
 
-    listener = MirrorLeechListener(message, compress, extract, isQbit, isLeech, tag, select, seed, sameDir, rcf, up, join, drive_id=drive_id, index_link=index_link)
+    listener = MirrorLeechListener(message, compress, extract, isQbit, isLeech, tag, select, seed, sameDir, rcf, up, join, drive_id=drive_id, index_link=index_link, leech_utils={'screenshots': sshots, 'thumb': thumb})
 
     if file_ is not None:
         await delete_links(message)

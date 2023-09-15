@@ -181,11 +181,13 @@ async def aeoncb(_, query):
         async with aiopen('log.txt', 'r') as f:
             logFile = await f.read()
         cget = create_scraper().request
-        resp = cget('POST', 'http://stashbin.xyz/api/document', data={'content': logFile}).json()
-        if resp['ok']:
+        resp = cget('POST', 'https://spaceb.in/api/v1/documents', data={'content': logFile, 'extension': 'None'}).json()
+        if resp['status'] == 201:
             btn = ButtonMaker()
-            btn.ubutton('Web Paste', f"http://stashbin.xyz/{resp['data']['key']}")
+            btn.ubutton('Web Paste', f"https://spaceb.in/{resp['payload']['id']}")
             await query.edit_message_reply_markup(btn.build_menu(1))
+        else:
+        	  LOGGER.error(f"Web Paste Failed : {str(err)}")
     elif data[2] == "botpm":
         await query.answer(url=f"https://t.me/{bot_name}?start=aeon")
     elif data[2] == "pmc":

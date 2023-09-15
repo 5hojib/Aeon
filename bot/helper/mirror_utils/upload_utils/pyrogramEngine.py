@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from traceback import format_exc
 from logging import getLogger, ERROR
-from aiofiles.os import remove as aioremove, path as aiopath, rename as aiorename, makedirs
+from aiofiles.os import remove as aioremove, path as aiopath, rename as aiorename, makedirs, rmdir
 from os import walk, path as ospath
 from time import time
 from PIL import Image
@@ -35,6 +35,7 @@ class TgUploader:
         self.__start_time = time()
         self.__total_files = 0
         self.__is_cancelled = False
+        self.__retry_error = False
         self.__thumb = f"Thumbnails/{listener.message.from_user.id}.jpg"
         self.__sent_msg = None
         self.__has_buttons = False
@@ -53,9 +54,15 @@ class TgUploader:
         self.__bot_pm = False
         self.__user_id = listener.message.from_user.id
         self.__leechmsg = {}
+        self.__leech_utils = self.__listener.leech_utils
 
-    async def __buttons(self, up_path):
+    async def __buttons(self, up_path, is_video=False):
         buttons = ButtonMaker()
+        try:
+            if is_video and bool(self.__leech_utils['screenshots']):
+                buttons.ubutton('SCREENSHOTS', await get_ss(up_path, self.__leech_utils['screenshots']))
+        except Exception as e:
+            LOGGER.error(f"ScreenShots Error: {e}")
         try:
             if self.__mediainfo:
                 buttons.ubutton('MediaInfo', await get_mediainfo_link(up_path))
@@ -121,7 +128,7 @@ class TgUploader:
         self.__bot_pm = True
         self.__mediainfo = config_dict['SHOW_MEDIAINFO'] or user_dict.get('mediainfo')
         self.__ldump = user_dict.get('ldump', '') or ''
-        self.__has_buttons = bool(self.__mediainfo)
+        self.__has_buttons = bool(self.__mediainfo or self.__leech_utils['screenshots'])
         if not await aiopath.exists(self.__thumb):
             self.__thumb = None
 
@@ -303,6 +310,9 @@ class TgUploader:
         if self.__total_files <= self.__corrupted:
             await self.__listener.onUploadError('Files Corrupted or unable to upload. Check logs!')
             return
+        if self.__retry_error:
+            await self.__listener.onUploadError('Unknown Error Occurred. Check logs & Contact Bot Owner!')
+            return
         LOGGER.info(f"Leech Completed: {self.name}")
         await self.__listener.onUploadComplete(None, size, self.__msgs_dict, self.__total_files, self.__corrupted, self.name)
 
@@ -330,6 +340,7 @@ class TgUploader:
                     thumb = await take_ss(self.__up_path, None)
                 if self.__is_cancelled:
                     return
+                buttons = await self.__buttons(self.__up_path, is_video)
                 nrml_media = await self.__client.send_document(chat_id=self.__sent_msg.chat.id,
                                                                        reply_to_message_id=self.__sent_msg.id,
                                                                        document=self.__up_path,
@@ -338,11 +349,11 @@ class TgUploader:
                                                                        force_document=True,
                                                                        disable_notification=True,
                                                                        progress=self.__upload_progress,
-                                                                       reply_markup=await self.__buttons(self.__up_path))
+                                                                       reply_markup=buttons)
                 
                 if self.__prm_media and (self.__has_buttons or not self.__leechmsg):
                     try:
-                        self.__sent_msg = await bot.copy_message(nrml_media.chat.id, nrml_media.chat.id, nrml_media.id, reply_to_message_id=self.__sent_msg.id, reply_markup=await self.__buttons(self.__up_path))
+                        self.__sent_msg = await bot.copy_message(nrml_media.chat.id, nrml_media.chat.id, nrml_media.id, reply_to_message_id=self.__sent_msg.id, reply_markup=buttons)
                         if self.__sent_msg: await deleteMessage(nrml_media)
                     except:
                         self.__sent_msg = nrml_media
@@ -373,6 +384,7 @@ class TgUploader:
                         self.__up_path = new_path
                 if self.__is_cancelled:
                     return
+                buttons = await self.__buttons(self.__up_path, is_video)
                 nrml_media = await self.__client.send_video(chat_id=self.__sent_msg.chat.id,
                                                                     reply_to_message_id=self.__sent_msg.id,
                                                                     video=self.__up_path,
@@ -384,10 +396,10 @@ class TgUploader:
                                                                     supports_streaming=True,
                                                                     disable_notification=True,
                                                                     progress=self.__upload_progress,
-                                                                    reply_markup=await self.__buttons(self.__up_path))
+                                                                    reply_markup=buttons)
                 if self.__prm_media and (self.__has_buttons or not self.__leechmsg):
                     try:
-                        self.__sent_msg = await bot.copy_message(nrml_media.chat.id, nrml_media.chat.id, nrml_media.id, reply_to_message_id=self.__sent_msg.id, reply_markup=await self.__buttons(self.__up_path))
+                        self.__sent_msg = await bot.copy_message(nrml_media.chat.id, nrml_media.chat.id, nrml_media.id, reply_to_message_id=self.__sent_msg.id, reply_markup=buttons)
                         if self.__sent_msg: await deleteMessage(nrml_media)
                     except:
                         self.__sent_msg = nrml_media
@@ -438,12 +450,18 @@ class TgUploader:
 
             if self.__thumb is None and thumb is not None and await aiopath.exists(thumb):
                 await aioremove(thumb)
+                if (dir_name := ospath.dirname(thumb)) and dir_name != "Thumbnails" and await aiopath.exists(dir_name):
+                    await rmdir(dir_name)
+            self.__retry_error = False
         except FloodWait as f:
             LOGGER.warning(str(f))
             await sleep(f.value)
         except Exception as err:
+            self.__retry_error = True
             if self.__thumb is None and thumb is not None and await aiopath.exists(thumb):
                 await aioremove(thumb)
+                if (dir_name := ospath.dirname(thumb)) and dir_name != "Thumbnails" and await aiopath.exists(dir_name):
+                    await rmdir(dir_name)
             LOGGER.error(f"{format_exc()}. Path: {self.__up_path}")
             if 'Telegram says: [400' in str(err) and key != 'documents':
                 LOGGER.error(f"Retrying As Document. Path: {self.__up_path}")
