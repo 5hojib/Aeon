@@ -34,7 +34,7 @@ from bot.helper.ext_utils.db_handler import DbManager
 
 
 class MirrorLeechListener:
-    def __init__(self, message, compress=False, extract=False, isQbit=False, isLeech=False, tag=None, select=False, seed=False, sameDir=None, rcFlags=None, upPath=None, isClone=False, join=False, isYtdlp=False, drive_id=None, index_link=None):
+    def __init__(self, message, compress=False, extract=False, isQbit=False, isLeech=False, tag=None, select=False, seed=False, sameDir=None, rcFlags=None, upPath=None, isClone=False, join=False, isYtdlp=False, drive_id=None, index_link=None, leech_utils={}):
         if sameDir is None:
             sameDir = {}
         self.message = message
@@ -64,6 +64,7 @@ class MirrorLeechListener:
         self.__setModeEng()
         self.drive_id = drive_id
         self.index_link = index_link
+        self.leech_utils = leech_utils
 
     async def clean(self):
         try:
