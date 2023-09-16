@@ -33,57 +33,54 @@ from bot.helper.ext_utils.aeon_utils import check_nsfw_tg
 
 @new_task
 async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=None, bulk=[]):
-    text = message.text.split('\n')
-    input_list = text[0].split(' ')
-    dottorrent = False
-    arg_base = {'link'    : '', 
-                '-i'      : '0',
-                '-ss'     : '0',
-                '-t'      : '',
-                '-d'      : False,
-                '-j'      : False,
-                '-s'      : False,
-                '-b'      : False,
-                '-e'      : False,
-                '-z'      : False,
-                '-m'      : '',
-                '-n'      : '',
-                '-h'      : '',
-                '-u'      : '',
-                '-p'      : '',
-                '-up'     : '',
-                '-rcf'    : '', 
-                '-id'     : '',
-                '-index'  : '',
-    }
-
-    args          = arg_parser(input_list[1:], arg_base)
-    i             = args['-i']
-    link          = args['link']
-    headers       = args['-h']
-    folder_name   = args['-m']
-    seed          = args['-d']
-    join          = args['-j']
-    select        = args['-s']
-    isBulk        = args['-b']
-    name          = args['-n']
-    extract       = args['-e']
-    compress      = args['-z']
-    up            = args['-up']
-    thumb         = args['-t']
-    rcf           = args['-rcf']
-    drive_id      = args['-id']
-    index_link    = args['-index']
-    ss            = args['-ss']
-    multi         = int(i) if i.isdigit() else 0
-    sshots        = min(int(ss) if ss.isdigit() else 0, 10)
-    bulk_start    = 0
-    bulk_end      = 0
-    ratio         = None
-    seed_time     = None
-    reply_to      = None
-    file_         = None
-    session       = ''
+    text         = message.text.split('\n')
+    input_list   = text[0].split(' ')
+    arg_base     = {'link'    : '', 
+                    '-t'      : '',
+                    '-m'      : '',
+                    '-n'      : '',
+                    '-h'      : '',
+                    '-u'      : '',
+                    '-p'      : '',
+                    '-up'     : '',
+                    '-rcf'    : '', 
+                    '-id'     : '',
+                    '-index'  : '',
+                    '-d'      : False,
+                    '-j'      : False,
+                    '-s'      : False,
+                    '-b'      : False,
+                    '-e'      : False,
+                    '-z'      : False,
+                    '-i'      : '0',
+                    '-ss'     : '0'}
+    args         = arg_parser(input_list[1:], arg_base)
+    i            = args['-i']
+    link         = args['link']
+    headers      = args['-h']
+    folder_name  = args['-m']
+    seed         = args['-d']
+    join         = args['-j']
+    select       = args['-s']
+    isBulk       = args['-b']
+    name         = args['-n']
+    extract      = args['-e']
+    compress     = args['-z']
+    up           = args['-up']
+    thumb        = args['-t']
+    rcf          = args['-rcf']
+    drive_id     = args['-id']
+    index_link   = args['-index']
+    ss           = args['-ss']
+    multi        = int(i) if i.isdigit() else 0
+    sshots       = min(int(ss) if ss.isdigit() else 0, 10)
+    bulk_start   = 0
+    bulk_end     = 0
+    ratio        = None
+    seed_time    = None
+    reply_to     = None
+    file_        = None
+    session      = ''
 
     if not isinstance(seed, bool):
         dargs = seed.split(':')
@@ -196,7 +193,6 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         elif reply_to.document and (file_.mime_type == 'application/x-bittorrent' or file_.file_name.endswith('.torrent')):
             link = await reply_to.download()
             file_ = None
-            dottorrent = True
 
     if not is_url(link) and not is_magnet(link) and not await aiopath.exists(link) and not is_rclone_path(link) and file_ is None:
         reply_message = await sendMessage(message, MIRROR_HELP_MESSAGE)

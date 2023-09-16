@@ -61,19 +61,19 @@ async def select_format(_, query, obj):
 
 class YtSelection:
     def __init__(self, client, message):
-        self.__message = message
-        self.__user_id = message.from_user.id
-        self.__client = client
-        self.__is_m4a = False
-        self.__reply_to = None
-        self.__time = time()
-        self.__timeout = 120
-        self.__is_playlist = False
-        self.is_cancelled = False
+        self.__message      = message
+        self.__user_id      = message.from_user.id
+        self.__client       = client
+        self.__is_m4a       = False
+        self.__reply_to     = None
+        self.__time         = time()
+        self.__timeout      = 120
+        self.__is_playlist  = False
+        self.is_cancelled   = False
         self.__main_buttons = None
-        self.event = Event()
-        self.formats = {}
-        self.qual = None
+        self.event          = Event()
+        self.formats        = {}
+        self.qual           = None
 
     @new_thread
     async def __event_handler(self):
@@ -242,25 +242,23 @@ async def _mdisk(link, name):
 
 @new_task
 async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
-    text = message.text.split('\n')
-    input_list = text[0].split(' ')
-    qual = ''
-    arg_base = {'link'   : '', 
-                '-i'     : 0, 
-                '-m'     : '',
-                '-s'     : False,
-                '-opt'   : '',
-                '-b'     : False,
-                '-n'     : '',
-                '-z'     : False,
-                '-up'    : '',
-                '-rcf'   : '',
-                '-id'    : '',
-                '-index' : '',
-                '-t'     : '',
-                '-ss'    : '0'
-    }
-
+    text        = message.text.split('\n')
+    input_list  = text[0].split(' ')
+    qual        = ''
+    arg_base    = {'link'   : '', 
+                   '-m'     : '',
+                   '-n'     : '',
+                   '-opt'   : '',
+                   '-up'    : '',
+                   '-rcf'   : '',
+                   '-id'    : '',
+                   '-index' : '',
+                   '-t'     : '',
+                   '-s'     : False,
+                   '-b'     : False,
+                   '-z'     : False,
+                   '-i'     : '0', 
+                   '-ss'    : '0'}
     args        = arg_parser(input_list[1:], arg_base)
     i           = args['-i']
     select      = args['-s']
@@ -280,7 +278,6 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
     sshots      = min(int(ss) if ss.isdigit() else 0, 10)
     bulk_start  = 0
     bulk_end    = 0
-
 
     if not isinstance(isBulk, bool):
         dargs = isBulk.split(':')

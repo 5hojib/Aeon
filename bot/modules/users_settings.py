@@ -24,16 +24,15 @@ from bot.helper.ext_utils.bot_utils import update_user_ldata, get_readable_file_
 
 handler_dict = {}
 fname_dict = {'rcc': 'RClone',
-             'prefix': 'Prefix',
-             'suffix': 'Suffix',
-             'remname': 'Remname',
-             'ldump': 'Dump',
-             'user_tds': 'User Custom TDs',
-             'lcaption': 'Caption',
-             'thumb': 'Thumbnail',
-             'yt_opt': 'YT-DLP Options',
-             'split_size': 'Leech Splits',
-             }
+              'prefix': 'Prefix',
+              'suffix': 'Suffix',
+              'remname': 'Remname',
+              'ldump': 'Dump',
+              'user_tds': 'User Custom TDs',
+              'lcaption': 'Caption',
+              'thumb': 'Thumbnail',
+              'yt_opt': 'YT-DLP Options',
+              'split_size': 'Leech Splits'}
 
 async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None):
     user_id = from_user.id
