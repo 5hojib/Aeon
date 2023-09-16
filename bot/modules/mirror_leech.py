@@ -79,7 +79,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     rcf           = args['-rcf']
     drive_id      = args['-id']
     index_link    = args['-index']
-    sshots        = 10 if args['-ss'].isdigit() and int(args.get['-ss']) > 10 else int(args.get('-ss')) if args['-ss'].isdigit() else 0
+    sshots        = 10 if args['-ss'].isdigit() and int(args['-ss']) > 10 else int(args['-ss']) if args['-ss'].isdigit() else 0
     bulk_start    = 0
     bulk_end      = 0
     ratio         = None
