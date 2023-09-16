@@ -261,13 +261,8 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
                 '-ss'    : '0'
     }
 
-    args = arg_parser(input_list[1:], arg_base)
-
-    try:
-        multi = int(args['-i'])
-    except:
-        multi = 0
-
+    args        = arg_parser(input_list[1:], arg_base)
+    i           = args['-i']
     select      = args['-s']
     isBulk      = args['-b']
     opt         = args['-opt']
@@ -280,7 +275,9 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
     thumb       = args['-t']
     drive_id    = args['-id']
     index_link  = args['-index']
-    sshots      = int(ss) if (ss := (args['-ss'])).isdigit() else 0
+    ss          = args['-ss']
+    multi       = int(i) if i.isdigit() else 0
+    sshots      = min(int(ss) if ss.isdigit() else 0, 10)
     bulk_start  = 0
     bulk_end    = 0
 

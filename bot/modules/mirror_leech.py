@@ -37,7 +37,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     input_list = text[0].split(' ')
     dottorrent = False
     arg_base = {'link'    : '', 
-                '-i'      : 0,
+                '-i'      : '0',
                 '-ss'     : '0',
                 '-t'      : '',
                 '-d'      : False,
@@ -57,13 +57,8 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
                 '-index'  : '',
     }
 
-    args = arg_parser(input_list[1:], arg_base)
-
-    try:
-        multi = int(args['-i'])
-    except:
-        multi = 0
-
+    args          = arg_parser(input_list[1:], arg_base)
+    i             = args['-i']
     link          = args['link']
     headers       = args['-h']
     folder_name   = args['-m']
@@ -79,7 +74,9 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     rcf           = args['-rcf']
     drive_id      = args['-id']
     index_link    = args['-index']
-    sshots        = min(int(args['-ss']) if args['-ss'].isdigit() else 0, 10)
+    ss            = args['-ss']
+    multi         = int(i) if i.isdigit() else 0
+    sshots        = min(int(ss) if ss.isdigit() else 0, 10)
     bulk_start    = 0
     bulk_end      = 0
     ratio         = None
