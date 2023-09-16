@@ -22,7 +22,7 @@ from bot.helper.mirror_utils.rclone_utils.transfer import RcloneTransferHelper
 from bot.helper.ext_utils.help_messages import CLONE_HELP_MESSAGE
 from bot.helper.mirror_utils.status_utils.rclone_status import RcloneStatus
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
-from bot.helper.ext_utils.aeon_utils import check_nsfw
+from bot.helper.ext_utils.aeon_utils import check_nsfw_tg
 
 
 async def rcloneNode(client, message, link, dst_path, rcf, tag):
@@ -233,7 +233,7 @@ async def clone(client, message):
 
     error_msg = []
     error_button = None
-    await check_nsfw(message, error_msg)
+    await check_nsfw_tg(message, error_msg)
     if not await isAdmin(message):
         task_utilis_msg, error_button = await task_utils(message)
         if task_utilis_msg:

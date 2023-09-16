@@ -10,6 +10,10 @@ YT_HELP_MESSAGE = """
 
 <b>-n new_name:</b> Rename the file.
 
+<b>-t thumbnail url:</b>Custom thumbnail for each leexh.(raw or tg image url)
+
+<b>-ss value:</b> Generate ss for leech video, max 10 for each leach.
+
 <b>-id drive_folder_link or drive_id -index https://anything.in/0:</b> Upload to a custom drive.
 
 <b>-opt playliststart:^10|fragment_retries:^inf|matchtitle:S13|writesubtitles:true|live_from_start:true|postprocessor_args:{{"ffmpeg": ["-threads", "4"]}}|wait_for_video:(5, 100):</b> Set additional options.
@@ -29,6 +33,10 @@ MIRROR_HELP_MESSAGE = """
 
 <b>OPTIONS:</b>
 <b>-n new name:</b> Rename the file or folder.
+
+<b>-t thumbnail url:</b>Custom thumbnail for each leexh.(raw or tg image url)
+
+<b>-ss value:</b> Generate ss for leech video, max 10 for each leach.
 
 <b>-z or -z password:</b> Zip the file or folder with or without password.
 

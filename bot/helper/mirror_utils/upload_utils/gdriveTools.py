@@ -129,17 +129,6 @@ class GoogleDriveHelper:
 
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(3),
            retry=retry_if_exception_type(Exception))
-    def __set_permission(self, file_id):
-        permissions = {
-            'role': 'reader',
-            'type': 'anyone',
-            'value': None,
-            'withLink': True
-        }
-        return self.__service.permissions().create(fileId=file_id, body=permissions, supportsAllDrives=True).execute()
-
-    @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(3),
-           retry=retry_if_exception_type(Exception))
     def __getFileMetadata(self, file_id):
         return self.__service.files().get(fileId=file_id, supportsAllDrives=True,
                                           fields='name, id, mimeType, size').execute()
@@ -281,7 +270,6 @@ class GoogleDriveHelper:
         file = self.__service.files().create(
             body=file_metadata, supportsAllDrives=True).execute()
         file_id = file.get("id")
-        self.__set_permission(file_id)
         LOGGER.info(f'Created G-Drive Folder:\nName: {file.get("name")}\nID: {file_id}')
         return file_id
 
@@ -302,9 +290,7 @@ class GoogleDriveHelper:
                                          mimetype=mime_type,
                                          resumable=False)
             response = self.__service.files().create(body=file_metadata, media_body=media_body, supportsAllDrives=True).execute()
-            self.__set_permission(response['id'])
-            drive_file = self.__service.files().get(
-                fileId=response['id'], supportsAllDrives=True).execute()
+            drive_file = self.__service.files().get(fileId=response['id'], supportsAllDrives=True).execute()
             return self.__G_DRIVE_BASE_DOWNLOAD_URL.format(drive_file.get('id'))
         media_body = MediaFileUpload(file_path,
                                      mimetype=mime_type,
@@ -352,7 +338,6 @@ class GoogleDriveHelper:
             except:
                 pass
         self.__file_processed_bytes = 0
-        self.__set_permission(response['id'])
         if not is_dir:
             drive_file = self.__service.files().get(
                 fileId=response['id'], supportsAllDrives=True).execute()
