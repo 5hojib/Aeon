@@ -7,9 +7,7 @@ from bot.helper.ext_utils.text_utils import nsfw_keywords
 
 def is_nsfw(text):
     pattern = r'(?:^|\W|_)(?:' + '|'.join(escape(keyword) for keyword in nsfw_keywords) + r')(?:$|\W|_)'
-    if search(pattern, text, flags=IGNORECASE):
-        return True
-    return False
+    return bool(search(pattern, text, flags=IGNORECASE))
 
 
 async def check_nsfw_tg(message, error_msg):
