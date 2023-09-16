@@ -132,6 +132,7 @@ async def take_ss(video_file, duration=None, total=1, gen_ss=False):
         if await task.wait() != 0 or not await aiopath.exists(ospath.join(des_dir, f"aeon_{eq_thumb}.jpg")):
             err = (await task.stderr.read()).decode().strip()
             LOGGER.error(f'Error while extracting thumbnail no. {eq_thumb} from video. Name: {video_file} stderr: {err}')
+            await aiormtree(des_dir)
             return None
     return (des_dir, tstamps) if gen_ss else ospath.join(des_dir, "aeon_1.jpg")
 
@@ -294,7 +295,7 @@ async def get_ss(up_path, ss_no):
     th_html = f"<h4>{ospath.basename(up_path)}</h4><br><b>Total Screenshots:</b> {ss_no}<br><br>"
     th_html += ''.join(f'<img src="https://graph.org{upload_file(ospath.join(thumbs_path, thumb))[0]}"><br><pre>Screenshot at {tstamps[thumb]}</pre>' for thumb in natsorted(await listdir(thumbs_path)))
     await aiormtree(thumbs_path)
-    link_id = (await telegraph.create_page(title="ScreenShots X", content=th_html))["path"]
+    link_id = (await telegraph.create_page(title="ScreenShots", content=th_html))["path"]
     return f"https://graph.org/{link_id}"
 
 
