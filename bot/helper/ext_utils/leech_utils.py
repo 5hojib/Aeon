@@ -277,7 +277,7 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
             duration = get_readable_time(dur),
             quality = qual,
             languages = lang,
-            md5_hash = get_md5_hash(up_path)
+            md5_hash = get_md5_hash(up_path),
             subtitles = subs
         )
         if len(slit) > 1:
