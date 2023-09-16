@@ -16,8 +16,6 @@ async def add_direct_download(details, path, listener, foldername):
         await sendMessage(listener.message, 'There is nothing to download!')
         return
     size = details['total_size']
-    if foldername:
-        path = f'{path}/{foldername}'
     if not foldername:
         foldername = details['title']
     if check_nsfw_details(details):
@@ -25,6 +23,7 @@ async def add_direct_download(details, path, listener, foldername):
         await delete_links(listener.message)
         await one_minute_del(msg)
         return
+    path = f'{path}/{foldername}'
     msg, button = await stop_duplicate_check(foldername, listener)
     if msg:
         msg = await sendMessage(listener.message, msg, button)
