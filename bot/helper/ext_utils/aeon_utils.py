@@ -14,20 +14,20 @@ def is_nsfw(text):
 
 async def check_nsfw_tg(message, error_msg):
     nsfw_msg = ['NSFW detected']
-    if nsfw := is_nsfw(message.text):
+    if is_nsfw(message.text):
         error_msg.extend(nsfw_msg)
     elif message.reply_to_message:
         if message.reply_to_message.caption:
-            if nsfw := is_nsfw(message.reply_to_message.caption):
+            if is_nsfw(message.reply_to_message.caption):
                 return error_msg.extend(nsfw_msg)
         if message.reply_to_message.document:
-            if nsfw := is_nsfw(message.reply_to_message.document.file_name):
+            if is_nsfw(message.reply_to_message.document.file_name):
                 return error_msg.extend(nsfw_msg)
         if message.reply_to_message.video:
-            if nsfw := is_nsfw(message.reply_to_message.video.file_name):
+            if is_nsfw(message.reply_to_message.video.file_name):
                 return error_msg.extend(nsfw_msg)
         if message.reply_to_message.text:
-            if nsfw := is_nsfw(message.reply_to_message.text):
+            if is_nsfw(message.reply_to_message.text):
                 error_msg.extend(nsfw_msg)
 
 
