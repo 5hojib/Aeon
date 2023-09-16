@@ -101,7 +101,7 @@ class TgUploader:
         try:
             if self.__bot_pm and (self.__leechmsg or self.__listener.isSuperGroup):
                 destination = 'Bot PM'
-                copied = await bot.copy_message(chat_id=self.__user_id, from_chat_id=self.__sent_msg.chat.id, message_id=self.__sent_msg.id, reply_to_message_id=self.__listener.botpmmsg.id) 
+                copied = await bot.copy_message(chat_id=self.__user_id, from_chat_id=self.__sent_msg.chat.id, message_id=self.__sent_msg.id, reply_to_message_id=self.__listener.botpmmsg.id if self.__listener.botpmmsg else None) 
                 if self.__has_buttons:
                     rply = self.__sent_msg.reply_markup
                     try:
