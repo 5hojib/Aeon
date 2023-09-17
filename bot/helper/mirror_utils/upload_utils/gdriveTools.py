@@ -130,8 +130,7 @@ class GoogleDriveHelper:
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(3),
            retry=retry_if_exception_type(Exception))
     def __getFileMetadata(self, file_id):
-        return self.__service.files().get(fileId=file_id, supportsAllDrives=True,
-                                          fields='name, id, mimeType, size').execute()
+        return self.__service.files().get(fileId=file_id, supportsAllDrives=True, fields='name, id, mimeType, size').execute()
 
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(3),
            retry=retry_if_exception_type(Exception))
@@ -139,15 +138,12 @@ class GoogleDriveHelper:
         page_token = None
         files = []
         while True:
-            response = self.__service.files().list(supportsAllDrives=True, includeItemsFromAllDrives=True,
-                                                   q=f"'{folder_id}' in parents and trashed = false",
-                                                   spaces='drive', pageSize=200,
-                                                   fields='nextPageToken, files(id, name, mimeType, size, shortcutDetails)',
-                                                   orderBy='folder, name', pageToken=page_token).execute()
+            response = self.__service.files().list(supportsAllDrives=True, includeItemsFromAllDrives=True, q=f"'{folder_id}' in parents and trashed = false", spaces='drive', pageSize=200, fields='nextPageToken, files(id, name, mimeType, size, shortcutDetails)', orderBy='folder, name', pageToken=page_token).execute()
             files.extend(response.get('files', []))
             page_token = response.get('nextPageToken')
             if page_token is None:
                 break
+        LOGGER.info(files)
         return files
 
     async def __progress(self):
