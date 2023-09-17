@@ -41,15 +41,11 @@ def isNSFWfolder(data):
 
 
 def checkNSFW(data):
-    if isinstance(data, list):
-        data = [item for item in data if isinstance(item, dict)]
-        values = [value for item in data for value in item.values() if isinstance(value, str)]
-        return any(isNSFW(value) for value in values)
-    elif isinstance(data, dict):
-        values = [value for value in data.values() if isinstance(value, str)]
-        return any(isNSFW(value) for value in values)
+    for item in data:
+        for key, value in item.items():
+            if isinstance(value, str) and isNSFW(value):
+                return True
     return False
-
 
 def tinyfy(long_url):
     s = pyshorteners.Shortener()
