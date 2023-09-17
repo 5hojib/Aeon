@@ -5,40 +5,55 @@ from re import IGNORECASE, search, escape
 from bot.helper.ext_utils.text_utils import nsfw_keywords
 
 
-def is_nsfw(text):
+def isNSFW(text):
     pattern = r'(?:^|\W|_)(?:' + '|'.join(escape(keyword) for keyword in nsfw_keywords) + r')(?:$|\W|_)'
     return bool(search(pattern, text, flags=IGNORECASE))
 
 
 async def nsfw_precheck(message):
-    if is_nsfw(message.text):
+    if isNSFW(message.text):
         return True
     elif reply_to := message.reply_to_message:
         if reply_to.caption:
-            if is_nsfw(reply_to.caption):
+            if isNSFW(reply_to.caption):
                 return True
         if reply_to.document:
-            if is_nsfw(reply_to.document.file_name):
+            if isNSFW(reply_to.document.file_name):
                 return True
         if reply_to.video:
-            if is_nsfw(reply_to.video.file_name):
+            if isNSFW(reply_to.video.file_name):
                 return True
         if reply_to.text:
-            if is_nsfw(reply_to.text):
+            if isNSFW(reply_to.text):
                 return True
     return False
 
 
-def nsfw_from_folder(data):
+def isNSFWfolder(data):
     if 'contents' in data:
         contents = data['contents']
         for item in contents:
             if 'filename' in item:
                 filename = item['filename']
-                if is_nsfw(filename):
+                if isNSFW(filename):
                     return True
     return False
 
+
+def xcheckNSFW(data):
+    data_list = eval(data)
+    for item in data_list:
+        if isNSFW(item['name']):
+            return True
+    return False
+
+def checkNSFW(data):
+    data_list = eval(data)
+    for item in data_list:
+        for key, value in item.items():
+            if isinstance(value, str) and isNSFW(value):
+                return True
+    return False
 
 def tinyfy(long_url):
     s = pyshorteners.Shortener()

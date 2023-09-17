@@ -8,23 +8,25 @@ from bot.helper.mirror_utils.status_utils.queue_status import QueueStatus
 from bot.helper.telegram_helper.message_utils import sendMessage, sendStatusMessage, five_minute_del
 from bot.helper.ext_utils.bot_utils import sync_to_async
 from bot.helper.ext_utils.task_manager import is_queued, limit_checker, stop_duplicate_check
-from bot.helper.ext_utils.aeon_utils import is_nsfw
+from bot.helper.ext_utils.aeon_utils import isNSFW, checkNSFW
 
 
 async def add_gd_download(link, path, listener, newname):
     drive = GoogleDriveHelper()
+    did = drive.getIdFromUrl(link)
     name, mime_type, size, _, _ = await sync_to_async(drive.count, link)
     if mime_type is None:
         x = await sendMessage(listener.message, name)
         await five_minute_del(x)
         return
-
     name = newname or name
     gid = token_hex(4)
-
-    if is_nsfw(name):
+    if isNSFW(name):
         await listener.onDownloadError('NSFW detected')
         return
+    if checkNSFW(did):
+    	  await listener.onDowmloadError('Hi')
+    	  return
     msg, button = await stop_duplicate_check(name, listener)
     if msg:
         await sendMessage(listener.message, msg, button)
@@ -36,8 +38,7 @@ async def add_gd_download(link, path, listener, newname):
     if added_to_queue:
         LOGGER.info(f"Added to Queue/Download: {name}")
         async with download_dict_lock:
-            download_dict[listener.uid] = QueueStatus(
-                name, size, gid, listener, 'dl')
+            download_dict[listener.uid] = QueueStatus(name, size, gid, listener, 'dl')
         await listener.onDownloadStart()
         await sendStatusMessage(listener.message)
         await event.wait()
