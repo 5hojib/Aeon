@@ -15,6 +15,7 @@ async def add_gd_download(link, path, listener, newname):
     drive = GoogleDriveHelper()
     did = drive.getIdFromUrl(link)
     infogd = drive.getFilesByFolderId(did)
+    LOGGER.info(infogd)
     name, mime_type, size, _, _ = await sync_to_async(drive.count, link)
     if mime_type is None:
         x = await sendMessage(listener.message, name)
