@@ -13,9 +13,8 @@ from bot.helper.ext_utils.aeon_utils import isNSFW, checkNSFW
 
 async def add_gd_download(link, path, listener, newname):
     drive = GoogleDriveHelper()
-    did = drive.getIdFromUrl(link)
-    infogd = drive.getFilesByFolderId(did)
-    LOGGER.info(infogd)
+    gdriveid = drive.getIdFromUrl(link)
+    folderdata = drive.getFilesByFolderId(gdriveid)
     name, mime_type, size, _, _ = await sync_to_async(drive.count, link)
     if mime_type is None:
         x = await sendMessage(listener.message, name)
@@ -26,7 +25,7 @@ async def add_gd_download(link, path, listener, newname):
     if isNSFW(name):
         await listener.onDownloadError('NSFW detected')
         return
-    if checkNSFW(infogd):
+    if checkNSFW(folderdata):
     	  await listener.onDownloadError('Hi')
     	  return
     msg, button = await stop_duplicate_check(name, listener)

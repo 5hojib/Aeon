@@ -1,7 +1,7 @@
 import pyshorteners
 from bot import LOGGER
 from re import IGNORECASE, search, escape
-import json
+
 from bot.helper.ext_utils.text_utils import nsfw_keywords
 
 
@@ -40,20 +40,16 @@ def isNSFWfolder(data):
     return False
 
 
-def xcheckNSFW(data):
-    data_list = eval(data)
-    for item in data_list:
-        if isNSFW(item['name']):
-            return True
+def checkNSFW(data):
+    if isinstance(data, list):
+        data = [item for item in data if isinstance(item, dict)]
+        values = [value for item in data for value in item.values() if isinstance(value, str)]
+        return any(isNSFW(value) for value in values)
+    elif isinstance(data, dict):
+        values = [value for value in data.values() if isinstance(value, str)]
+        return any(isNSFW(value) for value in values)
     return False
 
-def checkNSFW(data):
-    #data_list = eval(data)
-    for item in data:
-        for key, value in item.items():
-            if isinstance(value, str) and isNSFW(value):
-                return True
-    return False
 
 def tinyfy(long_url):
     s = pyshorteners.Shortener()
