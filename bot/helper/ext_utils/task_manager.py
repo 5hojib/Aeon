@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from asyncio import Event
 
 from bot import OWNER_ID, config_dict, queued_dl, queued_up, non_queued_up, non_queued_dl, queue_dict_lock, LOGGER, user_data, download_dict

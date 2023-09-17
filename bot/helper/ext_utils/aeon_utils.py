@@ -10,26 +10,26 @@ def is_nsfw(text):
     return bool(search(pattern, text, flags=IGNORECASE))
 
 
-async def check_nsfw_tg(message, error_msg):
-    nsfw_msg = ['NSFW detected']
+async def nsfw_precheck(message):
     if is_nsfw(message.text):
-        error_msg.extend(nsfw_msg)
-    elif message.reply_to_message:
-        if message.reply_to_message.caption:
-            if is_nsfw(message.reply_to_message.caption):
-                return error_msg.extend(nsfw_msg)
-        if message.reply_to_message.document:
-            if is_nsfw(message.reply_to_message.document.file_name):
-                return error_msg.extend(nsfw_msg)
-        if message.reply_to_message.video:
-            if is_nsfw(message.reply_to_message.video.file_name):
-                return error_msg.extend(nsfw_msg)
-        if message.reply_to_message.text:
-            if is_nsfw(message.reply_to_message.text):
-                error_msg.extend(nsfw_msg)
+        return True
+    elif reply_to := message.reply_to_message:
+        if reply_to.caption:
+            if is_nsfw(reply_to.caption):
+                return True
+        if reply_to.document:
+            if is_nsfw(reply_to.document.file_name):
+                return True
+        if reply_to.video:
+            if is_nsfw(reply_to.video.file_name):
+                return True
+        if reply_to.text:
+            if is_nsfw(reply_to.text):
+                return True
+    return False
 
 
-def check_nsfw_details(data):
+def nsfw_from_folder(data):
     if 'contents' in data:
         contents = data['contents']
         for item in contents:
