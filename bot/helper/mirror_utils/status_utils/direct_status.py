@@ -6,6 +6,7 @@ class DirectStatus:
         self.__listener = listener
         self.__obj = obj
         self.message = self.__listener.message
+        self.upload_details = self.__listener.upload_details
 
     def gid(self):
         return self.__gid
