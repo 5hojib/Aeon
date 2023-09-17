@@ -27,7 +27,7 @@ async def add_gd_download(link, path, listener, newname):
         await listener.onDownloadError('NSFW detected')
         return
     if checkNSFW(infogd):
-    	  await listener.onDowmloadError('Hi')
+    	  await listener.onDownloadError('Hi')
     	  return
     msg, button = await stop_duplicate_check(name, listener)
     if msg:
