@@ -510,7 +510,8 @@ Your download has been stopped!
 <b>Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}'''
         x = await sendMessage(self.message, msg, button)
         await delete_links(self.message)
-        await deleteMessage(self.botpmmsg)
+        if self.botpmmsg:
+        	  await deleteMessage(self.botpmmsg)
         if self.linkslogmsg:
             await deleteMessage(self.linkslogmsg)
         if count == 0:
@@ -555,7 +556,8 @@ Your upload has been stopped!
         if self.linkslogmsg:
             await deleteMessage(self.linkslogmsg)
         await delete_links(self.message)
-        await deleteMessage(self.botpmmsg)
+        if self.botpmmsg:
+         	  await deleteMessage(self.botpmmsg)
         if count == 0:
             await self.clean()
         else:
