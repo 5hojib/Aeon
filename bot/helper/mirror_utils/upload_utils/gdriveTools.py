@@ -134,7 +134,7 @@ class GoogleDriveHelper:
 
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(3),
            retry=retry_if_exception_type(Exception))
-    def __getFilesByFolderId(self, folder_id):
+    def getFilesByFolderId(self, folder_id):
         page_token = None
         files = []
         while True:
@@ -395,7 +395,7 @@ class GoogleDriveHelper:
 
     def __cloneFolder(self, name, local_path, folder_id, dest_id):
         LOGGER.info(f"Syncing: {local_path}")
-        files = self.__getFilesByFolderId(folder_id)
+        files = self.getFilesByFolderId(folder_id)
         if len(files) == 0:
             return dest_id
         for file in files:
@@ -632,7 +632,7 @@ class GoogleDriveHelper:
         self.__total_bytes += size
 
     def __gDrive_directory(self, drive_folder):
-        files = self.__getFilesByFolderId(drive_folder['id'])
+        files = self.getFilesByFolderId(drive_folder['id'])
         if len(files) == 0:
             return
         for filee in files:
@@ -693,7 +693,7 @@ class GoogleDriveHelper:
         if not ospath.exists(f"{path}/{folder_name}"):
             makedirs(f"{path}/{folder_name}")
         path += f"/{folder_name}"
-        result = self.__getFilesByFolderId(folder_id)
+        result = self.getFilesByFolderId(folder_id)
         if len(result) == 0:
             return
         result = sorted(result, key=lambda k: k['name'])
