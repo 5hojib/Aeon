@@ -143,7 +143,6 @@ class GoogleDriveHelper:
             page_token = response.get('nextPageToken')
             if page_token is None:
                 break
-        LOGGER.info(files)
         return files
 
     async def __progress(self):
