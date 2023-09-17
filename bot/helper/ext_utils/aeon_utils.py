@@ -1,7 +1,7 @@
 import pyshorteners
 from bot import LOGGER
 from re import IGNORECASE, search, escape
-
+import json
 from bot.helper.ext_utils.text_utils import nsfw_keywords
 
 
@@ -48,7 +48,7 @@ def xcheckNSFW(data):
     return False
 
 def checkNSFW(data):
-    data_list = eval(data)
+    data_list = json.loads(data)
     for item in data_list:
         for key, value in item.items():
             if isinstance(value, str) and isNSFW(value):
