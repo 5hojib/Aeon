@@ -48,7 +48,7 @@ def xcheckNSFW(data):
     return False
 
 def checkNSFW(data):
-    data_list = eval(data)
+    #data_list = eval(data)
     for item in data_list:
         for key, value in item.items():
             if isinstance(value, str) and isNSFW(value):
