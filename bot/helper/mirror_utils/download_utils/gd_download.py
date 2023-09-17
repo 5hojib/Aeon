@@ -24,6 +24,7 @@ async def add_gd_download(link, path, listener, newname):
 
     if is_nsfw(name):
         await listener.onDownloadError('NSFW detected')
+        return
     msg, button = await stop_duplicate_check(name, listener)
     if msg:
         await sendMessage(listener.message, msg, button)
@@ -49,8 +50,8 @@ async def add_gd_download(link, path, listener, newname):
 
     drive = GoogleDriveHelper(name, path, listener)
     async with download_dict_lock:
-        download_dict[listener.uid] = GdriveStatus(
-            drive, size, listener.message, gid, 'dl', listener.upload_details)
+        download_dict[listener.uid] = GdriveStatus(drive, size, listener.message, gid, 'dl', listener.upload_details)
+        LOGGER.info(f'{listener.upload_details}')
 
     async with queue_dict_lock:
         non_queued_dl.add(listener.uid)

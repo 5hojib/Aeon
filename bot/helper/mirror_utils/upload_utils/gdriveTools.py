@@ -602,16 +602,14 @@ class GoogleDriveHelper:
             return self.__proceed_count(file_id)
         except Exception as err:
             if isinstance(err, RetryError):
-                LOGGER.info(
-                    f"Total Attempts: {err.last_attempt.attempt_number}")
+                LOGGER.info(f"Total Attempts: {err.last_attempt.attempt_number}")
                 err = err.last_attempt.exception()
             err = str(err).replace('>', '').replace('<', '')
             if "File not found" in err:
                 if not self.__alt_auth:
                     token_service = self.__alt_authorize()
                     if token_service is not None:
-                        LOGGER.error(
-                            'File not found. Trying with token.pickle...')
+                        LOGGER.error('File not found. Trying with token.pickle...')
                         self.__service = token_service
                         return self.count(link)
                 msg = "File not found."
