@@ -142,6 +142,9 @@ async def load_config():
     FILELION_API = environ.get('FILELION_API', '')
     if len(FILELION_API) == 0:
         FILELION_API = ''
+
+    LEECH_LOG_ID = environ.get('LEECH_LOG_ID', '')
+    LEECH_LOG_ID = '' if len(LEECH_LOG_ID) == 0 else int(LEECH_LOG_ID)
     
     SEARCH_PLUGINS = environ.get('SEARCH_PLUGINS', '')
     if len(SEARCH_PLUGINS) == 0:
@@ -309,11 +312,7 @@ async def load_config():
 
     MIRROR_LOG_ID = environ.get('MIRROR_LOG_ID', '')
     if len(MIRROR_LOG_ID) == 0:
-        MIRROR_LOG_ID = '-1001935353015'
-      
-    LEECH_LOG_ID = environ.get('LEECH_LOG_ID', '')
-    if len(LEECH_LOG_ID) == 0:
-        LEECH_LOG_ID = '-1001782039080'
+        MIRROR_LOG_ID = ''
 
     USER_MAX_TASKS = environ.get('USER_MAX_TASKS', '')
     USER_MAX_TASKS = '' if len(USER_MAX_TASKS) == 0 else int(USER_MAX_TASKS)
