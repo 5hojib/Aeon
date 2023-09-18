@@ -111,6 +111,23 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         buttons.ibutton("Leech Dump", f"userset {user_id} ldump")
         ldump = 'Not Exists' if (val:=user_dict.get('ldump', '')) == '' else val
 
+        buttons.ibutton("YT-DLP Options", f"userset {user_id} yt_opt")
+        ytopt = 'Not Exists' if (val:=user_dict.get('yt_opt', config_dict.get('YT_DLP_OPTIONS', ''))) == '' else val
+        buttons.ibutton("Prefix", f"userset {user_id} prefix")
+        prefix = user_dict.get('prefix', 'Not Exists')
+
+        buttons.ibutton("Suffix", f"userset {user_id} suffix")
+        suffix = user_dict.get('suffix', 'Not Exists')
+
+        buttons.ibutton("Remname", f"userset {user_id} remname")
+        remname = user_dict.get('remname', 'Not Exists')
+
+        buttons.ibutton("RClone", f"userset {user_id} rcc")
+        rccmsg = "Exists" if await aiopath.exists(rclone_path) else "Not Exists"
+        tds_mode = "Enabled" if user_dict.get('td_mode') else "Disabled"
+        user_tds = len(val) if (val := user_dict.get('user_tds', False)) else 0
+        buttons.ibutton("User TDs", f"userset {user_id} user_tds")
+
         text = f'<b>Leech Settings for {name}</b>\n\n'
         text += f'<b>• Leech Type:</b> {ltype}\n'
         text += f'<b>• Custom Thumbnail:</b> {thumbmsg}\n'
@@ -120,6 +137,12 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         text += f'<b>• Leech Caption:</b> <code>{escape(lcaption)}</code>\n'
         text += f'<b>• Leech Dump:</b> <code>{ldump}</code>\n'
         text += f'<b>• MediaInfo Mode:</b> <code>{mediainfo}</code>'
+        text += f'<b>• YT-DLP Options:</b> <b><code>{ytopt}</code></b>\n'
+        text += f'<b>• Prefix:</b> <code>{prefix}</code>\n'
+        text += f'<b>• Suffix:</b> <code>{suffix}</code>\n'
+        text += f'<b>• Remname:</b> <code>{remname}</code>'
+        text += f'<b>• Rclone Config:</b> {rccmsg}\n'
+        text += f'<b>• User TD Mode:</b> {tds_mode}'
 
         buttons.ibutton("Back", f"userset {user_id} back", "footer")
         buttons.ibutton("Close", f"userset {user_id} close", "footer")
@@ -177,7 +200,7 @@ async def update_user_settings(query, key=None, edit_type=None, edit_mode=None, 
     user_id = query.from_user.id
     thumbnail = f"Thumbnails/{user_id}.jpg"
     if not ospath.exists(thumbnail):
-        thumbnail = 'https://graph.org/file/73ae908d18c6b38038071.jpg'
+        thumbnail = 'https://graph.org/file/73e4acd0a9f4425fd34be.jpg'
     await editMessage(query.message, msg, button, photo=thumbnail)
 
 
