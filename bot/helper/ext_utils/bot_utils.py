@@ -146,8 +146,8 @@ def progress_bar(pct):
         pct = float(pct.strip('%'))
     p = min(max(pct, 0), 100)
     cFull = int((p + 5)// 10)
-    p_str = '●' * cFull
-    p_str += '○' * (10 - cFull)
+    p_str = '■' * cFull
+    p_str += '□' * (10 - cFull)
     return p_str
 
 
@@ -212,7 +212,6 @@ def get_readable_message():
         buttons.ibutton("⇇ ʙᴀᴄᴋ", "status pre")
         buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
         buttons.ibutton("ɴᴇxᴛ ⇉", "status nex")
-        buttons.ubutton(f"✧ ᴏᴍɢ ✗ ᴄʟᴏᴜᴅ ✧", f"https://t.me/OMGxCLOUD")
         button = buttons.build_menu(3)
     msg += f"<b>🖥️ ᴛᴀsᴋs</b>: <code>{tasks}{bmax_task}"
     msg += f"\n<b>⏰ ʙᴏᴛ ᴜᴘᴛɪᴍᴇ </b>: <code>{currentTime}"
