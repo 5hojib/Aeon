@@ -2,7 +2,7 @@
 
 class script(object):
   
-    USER_SETTINGS_TEXT = """<b><u>🌟 ᴜsᴇʀ sᴇᴛᴛɪɴɢs ғᴏʀ {name}</u></b>
+    USER_SETTINGS_TEXT = """<b><u>🌟 ᴜsᴇʀ sᴇᴛᴛɪɴɢs ғᴏʀ</u></b>
     
 <b>‣ ɴᴀᴍᴇ : {}</b>
 <b>‣ ᴜsᴇʀ ɴᴀᴍᴇ :</b>{} ( {} )
