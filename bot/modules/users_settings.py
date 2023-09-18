@@ -48,7 +48,7 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
             buttons.ibutton("↺ ʀᴇsᴇᴛ ᴀʟʟ sᴇᴛᴛɪɴɢs ↻", f"userset {user_id} reset_all")
         buttons.ibutton("⤬ ᴄʟᴏsᴇ sᴇᴛᴛɪɴɢ ⤬", f"userset {user_id} close")
         #text = f'<b>User Settings for {name}</b>'
-        text = script.USER_SETTINGS_TEXT.format(name, f'@{from_user.username}', user_id, from_user.language_code)
+        text = script.USER_SETTINGS_TEXT.format(name, f'@{from_user.username}', user_id, from_user.language_code, from_user.dc_id)
         button = buttons.build_menu(1)
     elif key == 'leech':
         if user_dict.get('as_doc', False) or 'as_doc' not in user_dict and config_dict['AS_DOCUMENT']:
