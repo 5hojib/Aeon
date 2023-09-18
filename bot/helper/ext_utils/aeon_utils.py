@@ -10,25 +10,6 @@ def isNSFW(text):
     return bool(search(pattern, text, flags=IGNORECASE))
 
 
-def isNSFWfolder(data):
-    if 'contents' in data:
-        contents = data['contents']
-        for item in contents:
-            if 'filename' in item:
-                filename = item['filename']
-                if isNSFW(filename):
-                    return True
-    return False
-
-
-def checkNSFW(data):
-    for item in data:
-        for key, value in item.items():
-            if isinstance(value, str) and isNSFW(value):
-                return True
-    return False
-
-
 def isNSFWdata(data):
     if isinstance(data, list):
         for item in data:

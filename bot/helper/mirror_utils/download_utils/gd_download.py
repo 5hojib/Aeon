@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from secrets import token_hex
 
 from bot import download_dict, download_dict_lock, LOGGER, non_queued_dl, queue_dict_lock
@@ -13,9 +12,8 @@ from bot.helper.ext_utils.aeon_utils import isNSFW, isNSFWdata
 
 async def add_gd_download(link, path, listener, newname):
     drive = GoogleDriveHelper()
-    gdid = drive.getIdFromUrl(link)
-    infogd = drive.getFilesByFolderId(gdid)
-    LOGGER.info(infogd)
+    id = drive.getIdFromUrl(link)
+    data = drive.getFilesByFolderId(id)
     name, mime_type, size, _, _ = await sync_to_async(drive.count, link)
     if mime_type is None:
         x = await sendMessage(listener.message, name)
@@ -26,7 +24,7 @@ async def add_gd_download(link, path, listener, newname):
     if isNSFW(name):
         await listener.onDownloadError('NSFW detected')
         return
-    if isNSFWdata(infogd):
+    if isNSFWdata(data):
     	  await listener.onDownloadError('NSFW detected')
     	  return
     msg, button = await stop_duplicate_check(name, listener)

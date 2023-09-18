@@ -60,8 +60,7 @@ class MegaAppListener(MegaListener):
         LOGGER.error(f'Mega Request error in {error}')
         if not self.is_cancelled:
             self.is_cancelled = True
-            async_to_sync(self.listener.onDownloadError,
-                          f"RequestTempError: {error.toString()}")
+            async_to_sync(self.listener.onDownloadError, f"RequestTempError: {error.toString()}")
         self.error = error.toString()
         self.continue_event.set()
 
@@ -87,16 +86,14 @@ class MegaAppListener(MegaListener):
         filen = transfer.getFileName()
         state = transfer.getState()
         errStr = error.toString()
-        LOGGER.error(
-            f'Mega download error in file {transfer} {filen}: {error}')
+        LOGGER.error(f'Mega download error in file {transfer} {filen}: {error}')
         if state in [1, 4]:
             return
 
         self.error = errStr
         if not self.is_cancelled:
             self.is_cancelled = True
-            async_to_sync(self.listener.onDownloadError,
-                          f"TransferTempError: {errStr} ({filen})")
+            async_to_sync(self.listener.onDownloadError, f"TransferTempError: {errStr} ({filen})")
             self.continue_event.set()
 
     async def cancel_download(self):
@@ -120,7 +117,7 @@ async def add_mega_download(mega_link, path, listener, name):
     MEGA_PASSWORD = config_dict['MEGA_PASSWORD']
 
     executor = AsyncExecutor()
-    api = MegaApi(None, None, None, 'WZML-X')
+    api = MegaApi(None, None, None, 'aeon')
     folder_api = None
 
     mega_listener = MegaAppListener(executor.continue_event, listener)
@@ -133,7 +130,7 @@ async def add_mega_download(mega_link, path, listener, name):
         await executor.do(api.getPublicNode, (mega_link,))
         node = mega_listener.public_node
     else:
-        folder_api = MegaApi(None, None, None, 'WZML-X')
+        folder_api = MegaApi(None, None, None, 'aeon')
         folder_api.addListener(mega_listener)
         await executor.do(folder_api.loginToFolder, (mega_link,))
         node = await sync_to_async(folder_api.authorizeNode, mega_listener.node)
@@ -158,12 +155,12 @@ async def add_mega_download(mega_link, path, listener, name):
     if limit_exceeded := await limit_checker(size, listener, isMega=True):
         await listener.onDownloadError(limit_exceeded)
         return
+    
     added_to_queue, event = await is_queued(listener.uid)
     if added_to_queue:
         LOGGER.info(f"Added to Queue/Download: {name}")
         async with download_dict_lock:
-            download_dict[listener.uid] = QueueStatus(
-                name, size, gid, listener, 'Dl')
+            download_dict[listener.uid] = QueueStatus(name, size, gid, listener, 'Dl')
         await listener.onDownloadStart()
         await sendStatusMessage(listener.message)
         await event.wait()
