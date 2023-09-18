@@ -285,7 +285,7 @@ async def update_all_messages(force=False):
     async with status_reply_dict_lock:
         for chat_id in list(status_reply_dict.keys()):
             if status_reply_dict[chat_id] and msg != status_reply_dict[chat_id][0].text:
-                rmsg = await editMessage(status_reply_dict[chat_id][0], msg, buttons)
+                rmsg = await editMessage(status_reply_dict[chat_id][0], msg, buttons, 'IMAGES')
                 if isinstance(rmsg, str) and rmsg.startswith('Telegram says: [400'):
                     del status_reply_dict[chat_id]
                     continue
@@ -295,13 +295,6 @@ async def update_all_messages(force=False):
 
 async def sendStatusMessage(msg):
     async with download_dict_lock:
-        r=await msg.reply_text('▣▣▢▢▢▢')
-        a=await r.edit('▣▣▣▢▢▢')
-        v=await a.edit('▣▣▣▣▢▢')
-        i=await v.edit('▣▣▣▣▣▢')
-        n=await i.edit('▣▣▣▣▣▣')
-        await asyncio.sleep(1)
-        await n.delete()
         progress, buttons = await sync_to_async(get_readable_message)
     if progress is None:
         return
@@ -311,7 +304,7 @@ async def sendStatusMessage(msg):
             message = status_reply_dict[chat_id][0]
             await deleteMessage(message)
             del status_reply_dict[chat_id]
-        message = await sendMessage(msg, progress, buttons)
+        message = await sendMessage(msg, progress, buttons, photo='IMAGES')
         message.text = progress
         status_reply_dict[chat_id] = [message, time()]
         if not Interval:
