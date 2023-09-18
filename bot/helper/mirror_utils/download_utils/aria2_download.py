@@ -44,8 +44,7 @@ async def add_aria2c_download(link, path, listener, filename, header, ratio, see
     gid = download.gid
     name = download.name
     async with download_dict_lock:
-        download_dict[listener.uid] = Aria2Status(
-            gid, listener, queued=added_to_queue)
+        download_dict[listener.uid] = Aria2Status(gid, listener, queued=added_to_queue)
     if added_to_queue:
         LOGGER.info(f"Added to Queue/Download: {name}. Gid: {gid}")
         if not listener.select or not download.is_torrent:

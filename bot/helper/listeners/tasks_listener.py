@@ -13,7 +13,7 @@ from asyncio import create_subprocess_exec, sleep, Event
 from pyrogram.enums import ChatType
 
 from bot import OWNER_ID, Interval, aria2, download_dict, download_dict_lock, LOGGER, bot_name, DATABASE_URL, MAX_SPLIT_SIZE, config_dict, status_reply_dict_lock, user_data, non_queued_up, non_queued_dl, queued_up, queued_dl, queue_dict_lock, bot, GLOBAL_EXTENSION_FILTER
-from bot.helper.ext_utils.bot_utils import extra_btns, sync_to_async, get_readable_file_size, get_readable_time, is_mega_link, is_gdrive_link, new_thread
+from bot.helper.ext_utils.bot_utils import extra_btns, sync_to_async, get_readable_file_size, get_readable_time, is_mega_link, new_thread
 from bot.helper.ext_utils.fs_utils import get_base_name, get_path_size, clean_download, clean_target, is_first_archive_split, is_archive, is_archive_split, join_files
 from bot.helper.ext_utils.leech_utils import split_file, format_filename
 from bot.helper.ext_utils.exceptions import NotSupportedExtractionArchive
@@ -510,7 +510,8 @@ Your download has been stopped!
 <b>Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}'''
         x = await sendMessage(self.message, msg, button)
         await delete_links(self.message)
-        await deleteMessage(self.botpmmsg)
+        if self.botpmmsg:
+        	  await deleteMessage(self.botpmmsg)
         if self.linkslogmsg:
             await deleteMessage(self.linkslogmsg)
         if count == 0:
@@ -555,7 +556,8 @@ Your upload has been stopped!
         if self.linkslogmsg:
             await deleteMessage(self.linkslogmsg)
         await delete_links(self.message)
-        await deleteMessage(self.botpmmsg)
+        if self.botpmmsg:
+         	  await deleteMessage(self.botpmmsg)
         if count == 0:
             await self.clean()
         else:

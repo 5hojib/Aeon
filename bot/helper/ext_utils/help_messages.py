@@ -10,7 +10,7 @@ YT_HELP_MESSAGE = """
 
 <b>-n new_name:</b> Rename the file.
 
-<b>-t thumbnail url:</b>Custom thumbnail for each leexh.(raw or tg image url)
+<b>-t thumbnail url:</b> Custom thumbnail for each leexh.(raw or tg image url)
 
 <b>-ss value:</b> Generate ss for leech video, max 10 for each leach.
 
@@ -34,7 +34,7 @@ MIRROR_HELP_MESSAGE = """
 <b>OPTIONS:</b>
 <b>-n new name:</b> Rename the file or folder.
 
-<b>-t thumbnail url:</b>Custom thumbnail for each leexh.(raw or tg image url)
+<b>-t thumbnail url:</b> Custom thumbnail for each leexh.(raw or tg image url)
 
 <b>-ss value:</b> Generate ss for leech video, max 10 for each leach.
 

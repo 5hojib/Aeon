@@ -9,7 +9,7 @@ from bot.helper.listeners.direct_listener import DirectListener
 from bot.helper.mirror_utils.status_utils.direct_status import DirectStatus
 from bot.helper.mirror_utils.status_utils.queue_status import QueueStatus
 from bot.helper.telegram_helper.message_utils import delete_links, sendMessage, sendStatusMessage, one_minute_del
-from bot.helper.ext_utils.aeon_utils import check_nsfw_details
+from bot.helper.ext_utils.aeon_utils import isNSFWdata
 
 async def add_direct_download(details, path, listener, foldername):
     if not (contents:= details.get('contents')):
@@ -18,10 +18,8 @@ async def add_direct_download(details, path, listener, foldername):
     size = details['total_size']
     if not foldername:
         foldername = details['title']
-    if check_nsfw_details(details):
-        msg = await sendMessage(listener.message, 'nsfw detected')
-        await delete_links(listener.message)
-        await one_minute_del(msg)
+    if isNSFWdata(details):
+        await listener.onDownloadError('NSFW detected')
         return
     path = f'{path}/{foldername}'
     msg, button = await stop_duplicate_check(foldername, listener)

@@ -4,7 +4,6 @@ from http.cookiejar import MozillaCookieJar
 from json import loads
 from os import path
 from re import findall, match, search
-from threading import Thread
 from time import sleep
 from urllib.parse import parse_qs, quote, urlparse
 from uuid import uuid4
@@ -26,7 +25,8 @@ from bot.helper.ext_utils.help_messages import PASSWORD_ERROR_MESSAGE
 
 terabox_domain = ['terabox', 'nephobox', '4funbox', 'mirrobox', 'momerybox', 'teraboxapp', '1024tera']
 streamtape_domain = ['streamtape.com', 'streamtape.co', 'streamtape.cc', 'streamtape.to', 'streamtape.net', 'streamta.pe', 'streamtape.xyz']
-doods_domain = ['dood.watch', 'doodstream.com', 'dood.to', 'dood.so', 'dood.cx', 'dood.la', 'dood.ws', 'dood.sh', 'doodstream.co', 'dood.pm', 'dood.wf', 'dood.re', 'dood.video', 'dooood.com', 'dood.yt', 'dood.stream', 'doods.pro']
+doods_domain = ['dood.watch', 'doodstream.com', 'dood.to', 'dood.so', 'dood.cx', 'dood.la', 'dood.ws', 'dood.sh', 'doodstream.co', 'dood.pm', 'dood.wf', 'dood.re', 'dood.video', 'dooood.com', 'dood.yt', 'doods.yt', 'dood.stream', 'doods.pro']
+filelions_domain = ['filelions.com', 'filelions.live', 'filelions.to', 'filelions.online']
 _caches = {}
 
 
@@ -86,7 +86,9 @@ def direct_link_generator(link):
         return wetransfer(link)
     elif any(x in domain for x in terabox_domain):
         return terabox(link)
-    elif any(x in domain for x in ['filelions.com', 'filelions.live', 'filelions.to']):
+    elif 'streamvid.net' in domain:
+        return streamvid(link)
+    elif any(x in domain for x in filelions_domain):
         return filelions(link)
     elif is_share_link(link):
         if 'gdtot' in domain:
@@ -867,18 +869,12 @@ def mediafireFolder(url):
                     details['total_size'] += size
                 details['contents'].append(item)
     try:
-        threads = []
         for folder in folder_infos:
-            thread = Thread(target=__get_content, args=(folder['folderkey'], folder['name']))
-            threads.append(thread)
-        for thread in threads:
-            thread.start()
-        for thread in threads:
-            thread.join()
+            __get_content(folder['folderkey'], folder['name'])
     except Exception as e:
-        session.close()
         raise DirectDownloadLinkException(e)
-    session.close()
+    finally:
+    	  session.close()
     if len(details['contents']) == 1:
         return (details['contents'][0]['url'], details['header'])
     return details
@@ -1013,14 +1009,13 @@ def doods(url):
     parsed_url = urlparse(url)
     with create_scraper() as session:
         try:
-            _res = session.get(url)
-            _res = session.get(_res.url)
-            html = HTML(_res.text)
+            html = HTML(session.get(url).text)
         except Exception as e:
             raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__} While fetching token link')
         if not (link := html.xpath("//div[@class='download-content']//a/@href")):
-            raise DirectDownloadLinkException('ERROR: Token Link not found')
-        link = f'{parsed_url.scheme}://{parsed_url.hostname}/{link[0]}'
+            raise DirectDownloadLinkException('ERROR: Token Link not found or maybe not allow to download! open in browser.')
+        link = f'{parsed_url.scheme}://{parsed_url.hostname}{link[0]}'
+        sleep(2)
         try:
             _res = session.get(link)
         except Exception as e:
@@ -1029,7 +1024,6 @@ def doods(url):
     if not (link := search(r"window\.open\('(\S+)'", _res.text)):
         raise DirectDownloadLinkException("ERROR: Download link not found try again")
     return (link.group(1), f'Referer: {parsed_url.scheme}://{parsed_url.hostname}/')
-
 
 def hubdrive(url):
     try:
@@ -1130,3 +1124,40 @@ def filelions(url):
             error += f"\nHD"
         error +=f" <code>{url}_{version['name']}</code>"
     raise DirectDownloadLinkException(f'ERROR: {error}')
+
+def streamvid(url: str):
+    file_code = url.split('/')[-1]
+    parsed_url = urlparse(url)
+    url = f'{parsed_url.scheme}://{parsed_url.hostname}/d/{file_code}'
+    quality_defined = bool(url.endswith(('_o', '_h', '_n', '_l')))
+    with create_scraper() as session:
+        try:
+            html = HTML(session.get(url).text)
+        except Exception as e:
+            raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+        if quality_defined:
+            data = {}
+            if not (inputs := html.xpath('//form[@id="F1"]//input')):
+                raise DirectDownloadLinkException('ERROR: No inputs found')
+            for i in inputs:
+                if key := i.get('name'):
+                    data[key] = i.get('value')
+            try:
+                html = HTML(session.post(url, data=data).text)
+            except Exception as e:
+                raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+            if not (script := html.xpath('//script[contains(text(),"document.location.href")]/text()')):
+                if error := html.xpath('//div[@class="alert alert-danger"][1]/text()[2]'):
+                    raise DirectDownloadLinkException(f'ERROR: {error[0]}')
+                raise DirectDownloadLinkException("ERROR: direct link script not found!")
+            if directLink:=findall(r'document\.location\.href="(.*)"', script[0]):
+                return directLink[0]
+            raise DirectDownloadLinkException("ERROR: direct link not found! in the script")
+        elif (qualities_urls := html.xpath('//div[@id="dl_versions"]/a/@href')) and (qualities := html.xpath('//div[@id="dl_versions"]/a/text()[2]')):
+            error = '\nProvide a quality to download the video\nAvailable Quality:'
+            for quality_url, quality in zip(qualities_urls, qualities):
+                error += f"\n{quality.strip()} <code>{quality_url}</code>"
+            raise DirectDownloadLinkException(f'ERROR: {error}')
+        elif error:= html.xpath('//div[@class="not-found-text"]/text()'):
+            raise DirectDownloadLinkException(f'ERROR: {error[0]}')
+        raise DirectDownloadLinkException('ERROR: Something went wrong')

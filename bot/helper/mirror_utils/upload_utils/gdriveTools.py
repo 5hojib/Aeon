@@ -130,20 +130,15 @@ class GoogleDriveHelper:
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(3),
            retry=retry_if_exception_type(Exception))
     def __getFileMetadata(self, file_id):
-        return self.__service.files().get(fileId=file_id, supportsAllDrives=True,
-                                          fields='name, id, mimeType, size').execute()
+        return self.__service.files().get(fileId=file_id, supportsAllDrives=True, fields='name, id, mimeType, size').execute()
 
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(3),
            retry=retry_if_exception_type(Exception))
-    def __getFilesByFolderId(self, folder_id):
+    def getFilesByFolderId(self, folder_id):
         page_token = None
         files = []
         while True:
-            response = self.__service.files().list(supportsAllDrives=True, includeItemsFromAllDrives=True,
-                                                   q=f"'{folder_id}' in parents and trashed = false",
-                                                   spaces='drive', pageSize=200,
-                                                   fields='nextPageToken, files(id, name, mimeType, size, shortcutDetails)',
-                                                   orderBy='folder, name', pageToken=page_token).execute()
+            response = self.__service.files().list(supportsAllDrives=True, includeItemsFromAllDrives=True, q=f"'{folder_id}' in parents and trashed = false", spaces='drive', pageSize=200, fields='nextPageToken, files(id, name, mimeType, size, shortcutDetails)', orderBy='folder, name', pageToken=page_token).execute()
             files.extend(response.get('files', []))
             page_token = response.get('nextPageToken')
             if page_token is None:
@@ -400,7 +395,7 @@ class GoogleDriveHelper:
 
     def __cloneFolder(self, name, local_path, folder_id, dest_id):
         LOGGER.info(f"Syncing: {local_path}")
-        files = self.__getFilesByFolderId(folder_id)
+        files = self.getFilesByFolderId(folder_id)
         if len(files) == 0:
             return dest_id
         for file in files:
@@ -602,16 +597,14 @@ class GoogleDriveHelper:
             return self.__proceed_count(file_id)
         except Exception as err:
             if isinstance(err, RetryError):
-                LOGGER.info(
-                    f"Total Attempts: {err.last_attempt.attempt_number}")
+                LOGGER.info(f"Total Attempts: {err.last_attempt.attempt_number}")
                 err = err.last_attempt.exception()
             err = str(err).replace('>', '').replace('<', '')
             if "File not found" in err:
                 if not self.__alt_auth:
                     token_service = self.__alt_authorize()
                     if token_service is not None:
-                        LOGGER.error(
-                            'File not found. Trying with token.pickle...')
+                        LOGGER.error('File not found. Trying with token.pickle...')
                         self.__service = token_service
                         return self.count(link)
                 msg = "File not found."
@@ -639,7 +632,7 @@ class GoogleDriveHelper:
         self.__total_bytes += size
 
     def __gDrive_directory(self, drive_folder):
-        files = self.__getFilesByFolderId(drive_folder['id'])
+        files = self.getFilesByFolderId(drive_folder['id'])
         if len(files) == 0:
             return
         for filee in files:
@@ -700,7 +693,7 @@ class GoogleDriveHelper:
         if not ospath.exists(f"{path}/{folder_name}"):
             makedirs(f"{path}/{folder_name}")
         path += f"/{folder_name}"
-        result = self.__getFilesByFolderId(folder_id)
+        result = self.getFilesByFolderId(folder_id)
         if len(result) == 0:
             return
         result = sorted(result, key=lambda k: k['name'])
