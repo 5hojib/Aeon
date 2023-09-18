@@ -223,15 +223,16 @@ def get_readable_message():
     buttons.ibutton("⇇ ʙᴀᴄᴋ", "status pre")
     buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
     buttons.ibutton("ɴᴇxᴛ ⇉", "status nex")
-    sbutton = buttons.build_menu(3)
+    button = buttons.build_menu(3)
+    #return msg, button
 
     buttons = ButtonMaker()
     buttons.ibutton("⇇ ʙᴀᴄᴋ", "status pre")
     buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
     buttons.ibutton("ɴᴇxᴛ ⇉", "status nex")
    # button = buttons.build_menu(3)
-    return msg, button, button
-    return msg, button, sbutton
+    return msg, button
+    return msg, sbutton
 
 
 def text_size_to_bytes(size_text):
