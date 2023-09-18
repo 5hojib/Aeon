@@ -42,9 +42,9 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
     rclone_path = f'tanha/{user_id}.conf'
     user_dict = user_data.get(user_id, {})
     if key is None:
-        buttons.ibutton("✧ ʟᴇᴇᴄʜ sᴇᴛᴛɪɴɢ ✧", f"userset {user_id} leech")
+        buttons.ibutton("✧ ᴏᴘᴇɴ ᴀʟʟ sᴇᴛᴛɪɴɢ ✧", f"userset {user_id} leech")
         if user_dict and any(key in user_dict for key in ['prefix', 'suffix', 'remname', 'ldump', 'yt_opt', 'media_group', 'equal_splits', 'split_size', 'rclone', 'thumb', 'as_doc']):
-            buttons.ibutton("⟲ ʀᴇsᴇᴛ sᴇᴛᴛɪɴɢ ⟳", f"userset {user_id} reset_all")
+            buttons.ibutton("⟲ ʀᴇsᴇᴛ ᴛʜᴇ sᴇᴛᴛɪɴɢ ⟳", f"userset {user_id} reset_all")
         buttons.ibutton("⇇ ᴄʟᴏsᴇ ᴛʜᴇ sᴇᴛᴛɪɴɢ ⇉", f"userset {user_id} close")
         text = f'<b>User Settings for {name}</b>'
         button = buttons.build_menu(1)
