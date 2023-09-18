@@ -80,7 +80,8 @@ async def stats(_, message):
 @new_thread
 async def start(client, message):
     buttons = ButtonMaker()
-    reply_markup = buttons.build_menu(2)
+    buttons.buildbutton(f"✧ ᴏᴍɢ ✗ ᴄʟᴏᴜᴅ ✧", f"https://t.me/OMGxCLOUD")
+    reply_markup = buttons.build_menu(1)
     if len(message.command) > 1 and message.command[1] == "aeon":
         await deleteMessage(message)
     elif len(message.command) > 1 and message.command[1] == "pmc":
@@ -113,9 +114,9 @@ async def start(client, message):
     elif await CustomFilters.authorized(client, message):
         help_command = f"/{BotCommands.HelpCommand}"
         start_string = f'This bot can mirror all your links|files|torrents to Google Drive or any rclone cloud or to telegram.\n<b>Type {help_command} to get a list of available commands</b>'
-        await sendMessage(message, start_string, photo='IMAGES')
+        await sendMessage(message, start_string, photo='IMAGES', reply_markup)
     else:
-        await sendMessage(message, 'You Are not authorized user!', photo='IMAGES')
+        await sendMessage(message, 'You Are not authorized user!', photo='IMAGES', reply_markup)
     await DbManager().update_pm_users(message.from_user.id)
 
 
