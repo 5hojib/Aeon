@@ -209,6 +209,9 @@ else:
 BOT_MAX_TASKS = environ.get('BOT_MAX_TASKS', '')
 BOT_MAX_TASKS = int(BOT_MAX_TASKS) if BOT_MAX_TASKS.isdigit() else ''
 
+LEECH_LOG_ID = environ.get('LEECH_LOG_ID', '')
+LEECH_LOG_ID = '' if len(LEECH_LOG_ID) == 0 else int(LEECH_LOG_ID)
+
 YT_DLP_OPTIONS = environ.get('YT_DLP_OPTIONS', '')
 if len(YT_DLP_OPTIONS) == 0:
     YT_DLP_OPTIONS = ''
@@ -337,11 +340,7 @@ if len(FSUB_IDS) == 0:
 
 MIRROR_LOG_ID = environ.get('MIRROR_LOG_ID', '')
 if len(MIRROR_LOG_ID) == 0:
-    MIRROR_LOG_ID = '-1001935353015'
-
-LEECH_LOG_ID = environ.get('LEECH_LOG_ID', '')
-if len(LEECH_LOG_ID) == 0:
-    LEECH_LOG_ID = '-1001782039080'
+    MIRROR_LOG_ID = ''
 
 IMAGES = environ.get('IMAGES', '')
 IMAGES = (IMAGES.replace("'", '').replace('"', '').replace(
