@@ -268,7 +268,7 @@ async def update_all_messages(force=False):
 
 async def sendStatusMessage(msg):
     async with download_dict_lock:
-        r=await query.message.reply_text('▣▣▢▢▢▢')
+        r=await msg.reply_text('▣▣▢▢▢▢')
         a=await r.edit('▣▣▣▢▢▢')
         v=await a.edit('▣▣▣▣▢▢')
         i=await v.edit('▣▣▣▣▣▢')
