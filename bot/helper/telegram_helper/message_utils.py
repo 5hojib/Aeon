@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import asyncio
 from traceback import format_exc
 from asyncio import sleep
 from aiofiles.os import remove as aioremove
@@ -267,6 +268,13 @@ async def update_all_messages(force=False):
 
 async def sendStatusMessage(msg):
     async with download_dict_lock:
+        r=await query.message.reply_text('▣▣▢▢▢▢')
+        a=await r.edit('▣▣▣▢▢▢')
+        v=await a.edit('▣▣▣▣▢▢')
+        i=await v.edit('▣▣▣▣▣▢')
+        n=await i.edit('▣▣▣▣▣▣')
+        await asyncio.sleep(1)
+        await n.delete()
         progress, buttons = await sync_to_async(get_readable_message)
     if progress is None:
         return
