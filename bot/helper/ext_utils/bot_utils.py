@@ -212,13 +212,13 @@ def get_readable_message():
         buttons.ibutton("⇇ ʙᴀᴄᴋ", "status pre")
         buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
         buttons.ibutton("ɴᴇxᴛ ⇉", "status nex")
-        buttons.ubutton(f"✧ ᴏᴍɢ ✗ ᴄʟᴏᴜᴅ ✧", f"https://t.me/OMGxCLOUD")
+        buttons.ubutton("✧ ᴏᴍɢ ✗ ᴄʟᴏᴜᴅ ✧", "https://t.me/OMGxCLOUD")
         button = buttons.build_menu(3)
     msg += f"<b>🖥️ ᴛᴀsᴋs</b>: <code>{tasks}{bmax_task}"
     msg += f"\n<b>⏰ ʙᴏᴛ ᴜᴘᴛɪᴍᴇ </b>: <code>{currentTime}"
     msg += f"\n<b>🎮 ғʀᴇᴇ ᴅɪsᴋ sᴘᴀᴄᴇ</b>: <code>{get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}</code>"
     msg += f"\n<b>📥 ᴜᴘʟᴏᴀᴅɪɴɢ sᴘᴇᴇᴅ</b>: <code>{get_readable_file_size(up_speed)}/s</code>"
-    msg += f"\n<b>📤 ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ sᴘᴇᴇᴅ </b>: <code>{get_readable_file_size(dl_speed)}/s</code>"      
+    msg += f"\n<b>📤 ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ sᴘᴇᴇᴅ </b>: <code>{get_readable_file_size(dl_speed)}/s</code>"
     return msg, button
 
 

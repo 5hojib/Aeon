@@ -80,7 +80,7 @@ async def stats(_, message):
 @new_thread
 async def start(client, message):
     buttons = ButtonMaker()
-    buttons.ubutton(f"✧ ᴏᴍɢ ✗ ᴄʟᴏᴜᴅ ✧", f"https://t.me/OMGxCLOUD")
+    buttons.ubutton("✧ ᴏᴍɢ ✗ ᴄʟᴏᴜᴅ ✧", "https://t.me/OMGxCLOUD")
     reply_markup = buttons.build_menu(1)
     if len(message.command) > 1 and message.command[1] == "aeon":
         await deleteMessage(message)
