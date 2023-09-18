@@ -206,17 +206,24 @@ def get_readable_message():
             elif tstatus == MirrorStatus.STATUS_SEEDING:
                 up_speed += text_size_to_bytes(download.upload_speed())
     if tasks > STATUS_LIMIT:
-        buttons = ButtonMaker()
-        buttons.ibutton("Prev", "status pre")
-        buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
-        buttons.ibutton("Next", "status nex")
-        buttons.ibutton(f"Repo", f"https://github.com/weebzone/WZML")
-        button = buttons.build_menu(3)
-    msg += f"<b>• Tasks</b>: {tasks}{bmax_task}"
-    msg += f"\n<b>• Bot uptime</b>: {currentTime}"
-    msg += f"\n<b>• Free disk space</b>: {get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}"
-    msg += f"\n<b>• Uploading speed</b>: {get_readable_file_size(up_speed)}/s"
-    msg += f"\n<b>• Downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
+        #"""buttons = ButtonMaker()
+        #buttons.ibutton("Prev", "status pre")
+        #buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
+        #buttons.ibutton("Next", "status nex")
+        #buttons.ibutton(f"Repo", f"https://github.com/weebzone/WZML")
+        #button = buttons.build_menu(3)"""
+        msg += f"<b>• Tasks</b>: {tasks}{bmax_task}"
+        msg += f"\n<b>• Bot uptime</b>: {currentTime}"
+        msg += f"\n<b>• Free disk space</b>: {get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}"
+        msg += f"\n<b>• Uploading speed</b>: {get_readable_file_size(up_speed)}/s"
+        msg += f"\n<b>• Downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
+    #return msg, button
+    buttons = ButtonMaker()
+    buttons.ibutton("Prev", "status pre")
+    buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
+    buttons.ibutton("Next", "status nex")
+    buttons.ibutton(f"Repo", f"https://github.com/weebzone/WZML")
+    button = buttons.build_menu(3)
     return msg, button
 
 
