@@ -207,12 +207,12 @@ def get_readable_message():
             elif tstatus == MirrorStatus.STATUS_SEEDING:
                 up_speed += text_size_to_bytes(download.upload_speed())
     if tasks > STATUS_LIMIT:
-        #"""buttons = ButtonMaker()
-        #buttons.ibutton("Prev", "status pre")
-        #buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
-        #buttons.ibutton("Next", "status nex")
-        #buttons.ibutton(f"Repo", f"https://github.com/weebzone/WZML")
-        #button = buttons.build_menu(3)"""
+        buttons = ButtonMaker()
+        buttons.ibutton("⇇ ʙᴀᴄᴋ", "status pre")
+        buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
+        buttons.ibutton("ɴᴇxᴛ ⇉", "status nex")
+        buttons.ubutton(f"✧ ᴏᴍɢ ✗ ᴄʟᴏᴜᴅ ✧", f"https://t.me/OMGxCLOUD")
+        button = buttons.build_menu(3)
     msg += f"<b>🖥️ ᴛᴀsᴋs</b>: <code>{tasks}{bmax_task}"
     msg += f"\n<b>⏰ ʙᴏᴛ ᴜᴘᴛɪᴍᴇ </b>: <code>{currentTime}"
     msg += f"\n<b>🎮 ғʀᴇᴇ ᴅɪsᴋ sᴘᴀᴄᴇ</b>: <code>{get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}</code>"
@@ -224,8 +224,8 @@ def get_readable_message():
     buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
     buttons.ibutton("ɴᴇxᴛ ⇉", "status nex")
     buttons.ubutton(f"✧ ᴏᴍɢ ✗ ᴄʟᴏᴜᴅ ✧", f"https://t.me/OMGxCLOUD")
-    button = buttons.build_menu(3)
-    return msg, button
+    hs = buttons.build_menu(3)
+    return msg, button, hs
 
 
 def text_size_to_bytes(size_text):
