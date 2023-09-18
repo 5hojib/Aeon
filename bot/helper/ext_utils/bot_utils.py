@@ -40,17 +40,17 @@ PAGE_NO = 1
 STATUS_LIMIT = 2
 
 class MirrorStatus:
-    STATUS_UPLOADING = "Uploading"
-    STATUS_DOWNLOADING = "Downloading"
-    STATUS_CLONING = "Cloning"
-    STATUS_QUEUEDL = "DL queued"
-    STATUS_QUEUEUP = "UL queued"
-    STATUS_PAUSED = "Paused"
-    STATUS_ARCHIVING = "Archiving"
-    STATUS_EXTRACTING = "Extracting"
-    STATUS_SPLITTING = "Splitting"
-    STATUS_CHECKING = "CheckUp"
-    STATUS_SEEDING = "Seeding"
+    STATUS_UPLOADING = "ᴜᴘʟᴏᴀᴅɪɴɢ"
+    STATUS_DOWNLOADING = "ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ"
+    STATUS_CLONING = "ᴄʟᴏɴɪɴɢ"
+    STATUS_QUEUEDL = "ᴅʟ ǫᴜᴇᴜᴇᴅ"
+    STATUS_QUEUEUP = "ᴜʟ ǫᴜᴇᴜᴇᴅ"
+    STATUS_PAUSED = "ᴘᴀᴜsᴇᴅ"
+    STATUS_ARCHIVING = "ᴀʀᴄʜɪᴠɪɴɢ"
+    STATUS_EXTRACTING = "ᴇxᴛʀᴀᴄᴛɪɴɢ"
+    STATUS_SPLITTING = "sᴘʟɪᴛᴛɪɴɢ"
+    STATUS_CHECKING = "ᴄʜᴇᴄᴋᴜᴘ"
+    STATUS_SEEDING = "sᴇᴇᴅɪɴɢ"
 
 
 class setInterval:
@@ -156,7 +156,7 @@ def source(self):
 
 
 def get_readable_message():
-    msg = '<b>Powered by Aeon</b>\n\n'
+    #msg = '<b>Powered by Aeon</b>\n\n'
     button = None
     tasks = len(download_dict)
     currentTime = get_readable_time(time() - botStartTime)
@@ -169,30 +169,31 @@ def get_readable_message():
         globals()['STATUS_START'] = STATUS_LIMIT * (PAGES - 1)
         globals()['PAGE_NO'] = PAGES
     for download in list(download_dict.values())[STATUS_START:STATUS_LIMIT+STATUS_START]:
-        msg += f"{escape(f'{download.name()}')}\n"
-        msg += f"by {source(download)}\n\n"
-        msg += f"<b>{download.status()}...</b>"
+        msg += f"<b>📁 ғɪʟᴇ ɴᴀᴍᴇ</b> : <code>{escape(f'{download.name()}')}</code>\n\n"
+        #msg += f"by {source(download)}\n\n"
+        #msg += f"<b>{download.status()}...</b>" 
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
-            msg += f"\n<code>{progress_bar(download.progress())}</code> {download.progress()}"
-            msg += f"\n{download.processed_bytes()} of {download.size()}"
-            msg += f"\nSpeed: {download.speed()}"
-            msg += f'\nEstimated: {download.eta()}'
+            msg += f"\n⏳ <b><a href='https://t.me/Hari_OP'>{progress_bar(download.progress())} {download.progress()}</a></b>"
+            msg += f"\n<b>🧾 sᴛᴀᴛᴜs : {download.status()}...</b>"
+            msg += f"\n<b>🍁 ᴅᴏɴᴇ :</b> <code>{download.processed_bytes()} of {download.size()}</code>"
+            msg += f"\n<b>🚀 sᴘᴇᴇᴅ :</b> <code>{download.speed()}</code>"
+            msg += f'\n<b>💡 ᴇsᴛɪᴍᴀᴛᴇᴅ :</b> <code>{download.eta()}</code>'
             if hasattr(download, 'seeders_num'):
                 try:
-                    msg += f"\nSeeders: {download.seeders_num()} | Leechers: {download.leechers_num()}"
+                    msg += f"\n<b>🥀 sᴇᴇᴅᴇʀs :</b> <code>{download.seeders_num()}</code> | ʟᴇᴇᴄʜᴇʀs : <code>{download.leechers_num()}</code>"
                 except:
                     pass
         elif download.status() == MirrorStatus.STATUS_SEEDING:
-            msg += f"\nSize: {download.size()}"
-            msg += f"\nSpeed: {download.upload_speed()}"
-            msg += f"\nUploaded: {download.uploaded_bytes()}"
-            msg += f"\nRatio: {download.ratio()}"
-            msg += f"\nTime: {download.seeding_time()}"
+            msg += f"\n<b>🔖 sɪᴢᴇ :</b> <code>{download.size()}</code>"
+            msg += f"\n<b>🚀 sᴘᴇᴇᴅ :</b> <code>{download.upload_speed()}</code>"
+            msg += f"\n<b>⌛ ᴜᴘʟᴏᴀᴅᴇᴅ :</b> <code>{download.uploaded_bytes()}</code>"
+            msg += f"\n<b>✨ ʀᴀᴛɪᴏ :</b> <code>{download.ratio()}</code>"
+            msg += f"\n<b>⏱️ ᴛɪᴍᴇ :</b> <code>{download.seeding_time()}</code>"
         else:
-            msg += f"\nSize: {download.size()}"
-        msg += f"\nElapsed: {get_readable_time(time() - download.message.date.timestamp())}"
-        msg += f"\nMode: {download.upload_details['mode']}"
-        msg += f"\n/{BotCommands.CancelMirror}_{download.gid()[:8]}\n\n"
+            msg += f"\n<b>🔖 sɪᴢᴇ:</b> <code>{download.size()}</code>"
+        msg += f"\n<b>🏺 ᴇʟᴀᴘsᴇᴅ :</b> <code>{get_readable_time(time() - download.message.date.timestamp())}</code>"
+        msg += f"\n<b>⚓ ᴍᴏᴅᴇ :</b> <code>{download.upload_details['mode']}</code>"
+        msg += f"\n<b>♻️ ᴄᴀɴᴄʟᴇ :</b> <code>/{BotCommands.CancelMirror}_{download.gid()[:8]}</code>\n\n"
     if len(msg) == 0:
         return None, None
     dl_speed = 0
@@ -212,17 +213,17 @@ def get_readable_message():
         #buttons.ibutton("Next", "status nex")
         #buttons.ibutton(f"Repo", f"https://github.com/weebzone/WZML")
         #button = buttons.build_menu(3)"""
-        msg += f"<b>• Tasks</b>: {tasks}{bmax_task}"
-        msg += f"\n<b>• Bot uptime</b>: {currentTime}"
-        msg += f"\n<b>• Free disk space</b>: {get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}"
-        msg += f"\n<b>• Uploading speed</b>: {get_readable_file_size(up_speed)}/s"
-        msg += f"\n<b>• Downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
+    msg += f"<b>🖥️ ᴛᴀsᴋs</b>: <code>{tasks}{bmax_task}"
+    msg += f"\n<b>⏰ ʙᴏᴛ ᴜᴘᴛɪᴍᴇ </b>: <code>{currentTime}"
+    msg += f"\n<b>🎮 ғʀᴇᴇ ᴅɪsᴋ sᴘᴀᴄᴇ</b>: <code>{get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}</code>"
+    msg += f"\n<b>📥 ᴜᴘʟᴏᴀᴅɪɴɢ sᴘᴇᴇᴅ</b>: <code>{get_readable_file_size(up_speed)}/s</code>"
+    msg += f"\n<b>📤 ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ sᴘᴇᴇᴅ </b>: <code>{get_readable_file_size(dl_speed)}/s</code>"
     #return msg, button
     buttons = ButtonMaker()
-    buttons.ibutton("Prev", "status pre")
+    buttons.ibutton("⇇ ʙᴀᴄᴋ", "status pre")
     buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
-    buttons.ibutton("Next", "status nex")
-    buttons.ibutton(f"Repo", f"https://github.com/weebzone/WZML")
+    buttons.ibutton("ɴᴇxᴛ ⇉", "status nex")
+    buttons.ubutton(f"✧ ᴏᴍɢ ✗ ᴄʟᴏᴜᴅ ✧", f"https://t.me/OMGxCLOUD")
     button = buttons.build_menu(3)
     return msg, button
 
