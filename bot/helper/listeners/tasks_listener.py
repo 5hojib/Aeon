@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import asyncio
 from random import choice
 from time import time
 from pytz import timezone
@@ -96,7 +97,9 @@ class MirrorLeechListener:
 <b>• Mode:</b> {self.upload_details['mode']}
 <b>• Task by:</b> {self.tag}
 <b>• User ID: </b><code>{self.message.from_user.id}</code>"""
-            self.linkslogmsg = await sendCustomMsg(config_dict['LEECH_LOG_ID'], msg)
+            myrr = self.linkslogmsg = await sendCustomMsg(config_dict['LEECH_LOG_ID'], msg)
+            await asyncio.sleep(1)
+            await myrr.delete()
         user_dict = user_data.get(self.message.from_user.id, {})
         self.botpmmsg = await sendCustomMsg(self.message.from_user.id, '<b>Task started</b>')
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
