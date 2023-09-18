@@ -10,6 +10,7 @@ from time import time
 from functools import partial
 from html import escape
 from io import BytesIO
+from Script import script
 from asyncio import sleep
 
 from bot import OWNER_ID, bot, user_data, config_dict, DATABASE_URL, IS_PREMIUM_USER, MAX_SPLIT_SIZE
@@ -47,6 +48,7 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
             buttons.ibutton("↺ ʀᴇsᴇᴛ ᴀʟʟ sᴇᴛᴛɪɴɢs ↻", f"userset {user_id} reset_all")
         buttons.ibutton("⤬ ᴄʟᴏsᴇ sᴇᴛᴛɪɴɢ ⤬", f"userset {user_id} close")
         text = f'<b>User Settings for {name}</b>'
+        text = script.USER_SETTINGS_TEXT.format(name, f'@{from_user.username}', user_id, from_user.language_code)
         button = buttons.build_menu(1)
     elif key == 'leech':
         if user_dict.get('as_doc', False) or 'as_doc' not in user_dict and config_dict['AS_DOCUMENT']:
