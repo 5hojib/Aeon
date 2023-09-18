@@ -43,6 +43,18 @@ async def sendMessage(message, text, buttons=None, photo=None):
         LOGGER.error(format_exc())
         return str(e)
 
+def sendPhoto_hs(text, bot, message, photo, reply_markup=None):
+    try:
+        return bot.send_photo(chat_id=message.chat_id, photo=photo,
+            caption=text, reply_markup=reply_markup, parse_mode='html')
+    except RetryAfter as r:
+        LOGGER.warning(str(r))
+        sleep(r.retry_after * 1.5)
+        return sendPhoto(text, bot, message, photo, reply_markup)
+    except Exception as e:
+        LOGGER.error(str(e))
+        return
+
 
 async def sendCustomMsg(chat_id, text, buttons=None, photo=None):
     try:
