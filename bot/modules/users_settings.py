@@ -47,7 +47,7 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         if user_dict and any(key in user_dict for key in ['prefix', 'suffix', 'remname', 'ldump', 'yt_opt', 'media_group', 'equal_splits', 'split_size', 'rclone', 'thumb', 'as_doc']):
             buttons.ibutton("↺ ʀᴇsᴇᴛ ᴀʟʟ sᴇᴛᴛɪɴɢs ↻", f"userset {user_id} reset_all")
         buttons.ibutton("⤬ ᴄʟᴏsᴇ sᴇᴛᴛɪɴɢ ⤬", f"userset {user_id} close")
-        text = f'<b>User Settings for {name}</b>'
+        #text = f'<b>User Settings for {name}</b>'
         text = script.USER_SETTINGS_TEXT.format(name, f'@{from_user.username}', user_id, from_user.language_code)
         button = buttons.build_menu(1)
     elif key == 'leech':
