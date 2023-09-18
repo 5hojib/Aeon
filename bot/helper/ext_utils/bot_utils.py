@@ -156,7 +156,7 @@ def source(self):
 
 
 def get_readable_message():
-    msg = '<b>Powered by Aeon</b>\n\n'
+    msg = '<b>──────「 <a href=https://t.me/Hari_OP>ʜᴀʀɪ ᠰ ᴛɢ​</a> 」─────</b>\n\n'
     #msg = f"<b>📁 ғɪʟᴇ ɴᴀᴍᴇ</b> : <code>{escape(f'{download.name()}')}</code>\n\n"
     button = None
     tasks = len(download_dict)
@@ -171,8 +171,8 @@ def get_readable_message():
         globals()['PAGE_NO'] = PAGES
     for download in list(download_dict.values())[STATUS_START:STATUS_LIMIT+STATUS_START]:
         msg += f"<b>📁 ғɪʟᴇ ɴᴀᴍᴇ</b> : <code>{escape(f'{download.name()}')}</code>\n\n"
-        msg += f"by {source(download)}\n\n"
-        msg += f"\n<b>🧾 sᴛᴀᴛᴜs : {download.status()}...</b>"
+        msg += f"🦸sᴏᴜʀᴄᴇ : {source(download)}\n"
+        msg += f"\n<b>🧾 sᴛᴀᴛᴜs : {download.status()}</b>"
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
             msg += f"\n⏳ <b><a href='https://t.me/Hari_OP'>{progress_bar(download.progress())} {download.progress()}</a></b>"
             #msg += f"\n<b>🧾 sᴛᴀᴛᴜs : {download.status()}...</b>"
@@ -208,21 +208,21 @@ def get_readable_message():
             elif tstatus == MirrorStatus.STATUS_SEEDING:
                 up_speed += text_size_to_bytes(download.upload_speed())
     if tasks > STATUS_LIMIT:
-        buttons = ButtonMaker()
+        """buttons = ButtonMaker()
         buttons.ibutton("⇇ ʙᴀᴄᴋ", "status pre")
         buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
         buttons.ibutton("ɴᴇxᴛ ⇉", "status nex")
-        button = buttons.build_menu(3)
-    msg += f"<b>🖥️ ᴛᴀsᴋs</b>: <code>{tasks}{bmax_task}"
-    msg += f"\n<b>⏰ ʙᴏᴛ ᴜᴘᴛɪᴍᴇ </b>: <code>{currentTime}"
-    msg += f"\n<b>🎮 ғʀᴇᴇ ᴅɪsᴋ sᴘᴀᴄᴇ</b>: <code>{get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}</code>"
-    msg += f"\n<b>📥 ᴜᴘʟᴏᴀᴅɪɴɢ sᴘᴇᴇᴅ</b>: <code>{get_readable_file_size(up_speed)}/s</code>"
-    msg += f"\n<b>📤 ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ sᴘᴇᴇᴅ </b>: <code>{get_readable_file_size(dl_speed)}/s</code>"
-    #buttons = ButtonMaker()
-    # buttons.ibutton("⇇ ʙᴀᴄᴋ", "status pre")
-    #buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
-    #buttons.ibutton("ɴᴇxᴛ ⇉", "status nex")
-    #button = buttons.build_menu(3)
+        button = buttons.build_menu(3)"""
+        msg += f"<b>🖥️ ᴛᴀsᴋs</b>: <code>{tasks}{bmax_task}"
+        msg += f"\n<b>⏰ ʙᴏᴛ ᴜᴘᴛɪᴍᴇ </b>: <code>{currentTime}"
+        msg += f"\n<b>🎮 ғʀᴇᴇ ᴅɪsᴋ sᴘᴀᴄᴇ</b>: <code>{get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}</code>"
+        msg += f"\n<b>📥 ᴜᴘʟᴏᴀᴅɪɴɢ sᴘᴇᴇᴅ</b>: <code>{get_readable_file_size(up_speed)}/s</code>"
+        msg += f"\n<b>📤 ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ sᴘᴇᴇᴅ </b>: <code>{get_readable_file_size(dl_speed)}/s</code>"
+    buttons = ButtonMaker()
+    buttons.ibutton("⇇ ʙᴀᴄᴋ", "status pre")
+    buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
+    buttons.ibutton("ɴᴇxᴛ ⇉", "status nex")
+    button = buttons.build_menu(3)
     return msg, button
 
 
