@@ -156,8 +156,8 @@ def source(self):
 
 
 def get_readable_message():
-    #msg = '<b>Powered by Aeon</b>\n\n'
-    msg = f"<b>📁 ғɪʟᴇ ɴᴀᴍᴇ</b> : <code>{escape(f'{download.name()}')}</code>\n\n"
+    msg = '<b>Powered by Aeon</b>\n\n'
+    #msg = f"<b>📁 ғɪʟᴇ ɴᴀᴍᴇ</b> : <code>{escape(f'{download.name()}')}</code>\n\n"
     button = None
     tasks = len(download_dict)
     currentTime = get_readable_time(time() - botStartTime)
@@ -170,12 +170,12 @@ def get_readable_message():
         globals()['STATUS_START'] = STATUS_LIMIT * (PAGES - 1)
         globals()['PAGE_NO'] = PAGES
     for download in list(download_dict.values())[STATUS_START:STATUS_LIMIT+STATUS_START]:
-        #msg = f"<b>📁 ғɪʟᴇ ɴᴀᴍᴇ</b> : <code>{escape(f'{download.name()}')}</code>\n\n"
+        msg += f"<b>📁 ғɪʟᴇ ɴᴀᴍᴇ</b> : <code>{escape(f'{download.name()}')}</code>\n\n"
         msg += f"by {source(download)}\n\n"
-        #msg += f"<b>{download.status()}...</b>" 
+        msg += f"\n<b>🧾 sᴛᴀᴛᴜs : {download.status()}...</b>"
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
             msg += f"\n⏳ <b><a href='https://t.me/Hari_OP'>{progress_bar(download.progress())} {download.progress()}</a></b>"
-            msg += f"\n<b>🧾 sᴛᴀᴛᴜs : {download.status()}...</b>"
+            #msg += f"\n<b>🧾 sᴛᴀᴛᴜs : {download.status()}...</b>"
             msg += f"\n<b>🍁 ᴅᴏɴᴇ :</b> <code>{download.processed_bytes()} of {download.size()}</code>"
             msg += f"\n<b>🚀 sᴘᴇᴇᴅ :</b> <code>{download.speed()}</code>"
             msg += f'\n<b>💡 ᴇsᴛɪᴍᴀᴛᴇᴅ :</b> <code>{download.eta()}</code>'
