@@ -66,6 +66,17 @@ async def __onDownloadStarted(api, gid):
                         await sync_to_async(api.remove, [download], force=True, files=True)
                         await delete_links(listener.message)
                         return
+    downloadx = await sync_to_async(api.get_download, gid)
+    if not downloadx.is_torrent:
+    	  downloadx = downloadx.live
+    name = downloadx.name
+    try:
+    	  name = get_base_name
+    except:
+    	  name = None
+    if isNSFW(name):
+    	  await listener.onDownloadError('x')
+    	  return
     if any([config_dict['DIRECT_LIMIT'],
             config_dict['TORRENT_LIMIT'],
             config_dict['LEECH_LIMIT'],

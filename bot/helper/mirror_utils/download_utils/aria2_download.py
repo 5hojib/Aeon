@@ -5,7 +5,6 @@ from bot.helper.ext_utils.bot_utils import bt_selection_buttons, sync_to_async
 from bot.helper.mirror_utils.status_utils.aria2_status import Aria2Status
 from bot.helper.telegram_helper.message_utils import sendStatusMessage, sendMessage
 from bot.helper.ext_utils.task_manager import is_queued
-from bot.helper.ext_utils.aeon_utils import isNSFW
 
 
 async def add_aria2c_download(link, path, listener, filename, header, ratio, seed_time):
@@ -44,9 +43,6 @@ async def add_aria2c_download(link, path, listener, filename, header, ratio, see
 
     gid = download.gid
     name = download.name
-    if isNSFW(name):
-    	  await listener.onDownloadError('NSFW detected')
-    	  return
     async with download_dict_lock:
         download_dict[listener.uid] = Aria2Status(gid, listener, queued=added_to_queue)
     if added_to_queue:
