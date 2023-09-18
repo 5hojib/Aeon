@@ -10,6 +10,44 @@ def isNSFW(text):
     return bool(search(pattern, text, flags=IGNORECASE))
 
 
+def isNSFWfolder(data):
+    if 'contents' in data:
+        contents = data['contents']
+        for item in contents:
+            if 'filename' in item:
+                filename = item['filename']
+                if isNSFW(filename):
+                    return True
+    return False
+
+
+def checkNSFW(data):
+    for item in data:
+        for key, value in item.items():
+            if isinstance(value, str) and isNSFW(value):
+                return True
+    return False
+
+
+def isNSFWdata(data):
+    if isinstance(data, list):
+        for item in data:
+            if isinstance(item, dict):
+                for key, value in item.items():
+                    if isinstance(value, str) and isNSFW(value):
+                        return True
+            elif 'name' in item and isinstance(item['name'], str) and isNSFW(item['name']):
+                return True
+    elif isinstance(data, dict) and 'contents' in data:
+        contents = data['contents']
+        for item in contents:
+            if 'filename' in item:
+                filename = item['filename']
+                if isNSFW(filename):
+                    return True
+    return False
+
+
 async def nsfw_precheck(message):
     if isNSFW(message.text):
         return True
@@ -28,24 +66,6 @@ async def nsfw_precheck(message):
                 return True
     return False
 
-
-def isNSFWfolder(data):
-    if 'contents' in data:
-        contents = data['contents']
-        for item in contents:
-            if 'filename' in item:
-                filename = item['filename']
-                if isNSFW(filename):
-                    return True
-    return False
-
-
-def checkNSFW(data):
-    for item in data:
-        for key, value in item.items():
-            if isinstance(value, str) and isNSFW(value):
-                return True
-    return False
 
 def tinyfy(long_url):
     s = pyshorteners.Shortener()
