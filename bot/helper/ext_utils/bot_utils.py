@@ -35,8 +35,8 @@ MAGNET_REGEX = r'magnet:\?xt=urn:(btih|btmh):[a-zA-Z0-9]*\s*'
 URL_REGEX = r'^(?!\/)(rtmps?:\/\/|mms:\/\/|rtsp:\/\/|https?:\/\/|ftp:\/\/)?([^\/:]+:[^\/@]+@)?(www\.)?(?=[^\/:\s]+\.[^\/:\s]+)([^\/:\s]+\.[^\/:\s]+)(:\d+)?(\/[^#\s]*[\s\S]*)?(\?[^#\s]*)?(#.*)?$'
 SIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
 STATUS_START = 0
-PAGES = 1
-PAGE_NO = 1
+PAGES = 0
+PAGE_NO = 0
 STATUS_LIMIT = 2
 
 class MirrorStatus:
@@ -219,13 +219,6 @@ def get_readable_message():
     msg += f"\n<b>📥 ᴜᴘʟᴏᴀᴅɪɴɢ sᴘᴇᴇᴅ</b>: <code>{get_readable_file_size(up_speed)}/s</code>"
     msg += f"\n<b>📤 ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ sᴘᴇᴇᴅ </b>: <code>{get_readable_file_size(dl_speed)}/s</code>"
     return msg, button
-    """buttons = ButtonMaker()
-    buttons.ibutton("⇇ ʙᴀᴄᴋ", "status pre")
-    buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
-    buttons.ibutton("ɴᴇxᴛ ⇉", "status nex")
-    buttons.ubutton(f"✧ ᴏᴍɢ ✗ ᴄʟᴏᴜᴅ ✧", f"https://t.me/OMGxCLOUD")
-    hs = buttons.build_menu(3)
-    return msg, button, hs"""
 
 
 def text_size_to_bytes(size_text):
