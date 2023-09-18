@@ -35,9 +35,9 @@ MAGNET_REGEX = r'magnet:\?xt=urn:(btih|btmh):[a-zA-Z0-9]*\s*'
 URL_REGEX = r'^(?!\/)(rtmps?:\/\/|mms:\/\/|rtsp:\/\/|https?:\/\/|ftp:\/\/)?([^\/:]+:[^\/@]+@)?(www\.)?(?=[^\/:\s]+\.[^\/:\s]+)([^\/:\s]+\.[^\/:\s]+)(:\d+)?(\/[^#\s]*[\s\S]*)?(\?[^#\s]*)?(#.*)?$'
 SIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
 STATUS_START = 0
-PAGES = 0
-PAGE_NO = 0
-STATUS_LIMIT = 2
+PAGES = 1
+PAGE_NO = 1
+STATUS_LIMIT = 4
 
 class MirrorStatus:
     STATUS_UPLOADING = "ᴜᴘʟᴏᴀᴅɪɴɢ"
@@ -208,16 +208,21 @@ def get_readable_message():
             elif tstatus == MirrorStatus.STATUS_SEEDING:
                 up_speed += text_size_to_bytes(download.upload_speed())
     if tasks > STATUS_LIMIT:
-        buttons = ButtonMaker()
+        """buttons = ButtonMaker()
         buttons.ibutton("⇇ ʙᴀᴄᴋ", "status pre")
         buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
         buttons.ibutton("ɴᴇxᴛ ⇉", "status nex")
-        button = buttons.build_menu(3)
-    msg += f"<b>🖥️ ᴛᴀsᴋs</b>: <code>{tasks}{bmax_task}"
-    msg += f"\n<b>⏰ ʙᴏᴛ ᴜᴘᴛɪᴍᴇ </b>: <code>{currentTime}"
-    msg += f"\n<b>🎮 ғʀᴇᴇ ᴅɪsᴋ sᴘᴀᴄᴇ</b>: <code>{get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}</code>"
-    msg += f"\n<b>📥 ᴜᴘʟᴏᴀᴅɪɴɢ sᴘᴇᴇᴅ</b>: <code>{get_readable_file_size(up_speed)}/s</code>"
-    msg += f"\n<b>📤 ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ sᴘᴇᴇᴅ </b>: <code>{get_readable_file_size(dl_speed)}/s</code>"
+        button = buttons.build_menu(3)"""
+        msg += f"<b>🖥️ ᴛᴀsᴋs</b>: <code>{tasks}{bmax_task}"
+        msg += f"\n<b>⏰ ʙᴏᴛ ᴜᴘᴛɪᴍᴇ </b>: <code>{currentTime}"
+        msg += f"\n<b>🎮 ғʀᴇᴇ ᴅɪsᴋ sᴘᴀᴄᴇ</b>: <code>{get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}</code>"
+        msg += f"\n<b>📥 ᴜᴘʟᴏᴀᴅɪɴɢ sᴘᴇᴇᴅ</b>: <code>{get_readable_file_size(up_speed)}/s</code>"
+        msg += f"\n<b>📤 ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ sᴘᴇᴇᴅ </b>: <code>{get_readable_file_size(dl_speed)}/s</code>"
+    buttons = ButtonMaker()
+    buttons.ibutton("⇇ ʙᴀᴄᴋ", "status pre")
+    buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
+    buttons.ibutton("ɴᴇxᴛ ⇉", "status nex")
+    button = buttons.build_menu(3)
     return msg, button
 
 
