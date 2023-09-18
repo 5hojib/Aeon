@@ -101,7 +101,9 @@ class MirrorLeechListener:
             await asyncio.sleep(1)
             await myrr.delete()
         user_dict = user_data.get(self.message.from_user.id, {})
-        self.botpmmsg = await sendCustomMsg(self.message.from_user.id, '<b>Task started</b>')
+        myr = self.botpmmsg = await sendCustomMsg(self.message.from_user.id, '<b>Task started</b>')
+        await asyncio.sleep(1)
+        await myr.delete()
         if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
             await DbManager().add_incomplete_task(self.message.chat.id, self.message.link, self.tag)
 
