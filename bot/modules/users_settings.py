@@ -23,16 +23,16 @@ from bot.helper.ext_utils.text_utils import uset_display_dict
 from bot.helper.ext_utils.bot_utils import update_user_ldata, get_readable_file_size, sync_to_async, new_thread, is_gdrive_link
 
 handler_dict = {}
-fname_dict = {'rcc': 'RClone',
-              'prefix': 'Prefix',
-              'suffix': 'Suffix',
-              'remname': 'Remname',
-              'ldump': 'Dump',
-              'user_tds': 'User Custom TDs',
-              'lcaption': 'Caption',
-              'thumb': 'Thumbnail',
-              'yt_opt': 'YT-DLP Options',
-              'split_size': 'Leech Splits'}
+fname_dict = {'rcc': 'ʀᴄʟᴏɴᴇ',
+              'prefix': 'ᴘʀᴇғɪx',
+              'suffix': 'sᴜғғɪx',
+              'remname': 'ʀᴇᴍɴᴀᴍᴇ',
+              'ldump': 'ᴅᴜᴍᴘ',
+              'user_tds': 'ᴜsᴇʀ ᴄᴜsᴛᴏᴍ ᴛᴅs',
+              'lcaption': 'ᴄᴀᴘᴛɪᴏɴ',
+              'thumb': 'ᴛʜᴜᴍʙɴᴀɪʟ',
+              'yt_opt': 'ʏᴛ-ᴅʟᴘ ᴏᴘᴛɪᴏɴs',
+              'split_size': 'ʟᴇᴇᴄʜ sᴘʟɪᴛs'}
 
 async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None):
     user_id = from_user.id
@@ -42,7 +42,7 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
     rclone_path = f'tanha/{user_id}.conf'
     user_dict = user_data.get(user_id, {})
     if key is None:
-        buttons.ibutton("⥦ ᴏᴘᴇɴ ᴀʟʟ sᴇᴛᴛɪɴɢs ⥨", f"userset {user_id} leech")
+        buttons.ibutton("⥢ ᴏᴘᴇɴ ᴀʟʟ sᴇᴛᴛɪɴɢs ⥤", f"userset {user_id} leech")
         if user_dict and any(key in user_dict for key in ['prefix', 'suffix', 'remname', 'ldump', 'yt_opt', 'media_group', 'equal_splits', 'split_size', 'rclone', 'thumb', 'as_doc']):
             buttons.ibutton("↺ ʀᴇsᴇᴛ ᴀʟʟ sᴇᴛᴛɪɴɢs ↻", f"userset {user_id} reset_all")
         buttons.ibutton("⤬ ᴄʟᴏsᴇ sᴇᴛᴛɪɴɢ ⤬", f"userset {user_id} close")
@@ -55,36 +55,28 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         else:
             ltype = "ᴍᴇᴅɪᴀ"
             buttons.ibutton("sᴇᴛ ᴅᴏᴄᴜᴍᴇɴᴛ", f"userset {user_id} doc")
-
-        mediainfo = "ᴇɴᴀʙʟᴇᴅ" if user_dict.get('mediainfo', config_dict['SHOW_MEDIAINFO']) else "ᴅɪsᴀʙʟᴇᴅ"
-        buttons.ibutton('Disable MediaInfo' if mediainfo == 'Enabled' else 'Enable MediaInfo', f"userset {user_id} mediainfo")
-        if config_dict['SHOW_MEDIAINFO']:
-            mediainfo = "Force Enabled"
         buttons.ibutton("ᴛʜᴜᴍʙɴᴀɪʟ", f"userset {user_id} thumb")
         thumbmsg = "ᴇxɪsᴛs" if await aiopath.exists(thumbpath) else "ɴᴏᴛ ᴇxɪsᴛs"
-
+        buttons.ibutton("sᴇᴛ ᴘʀᴇғɪx", f"userset {user_id} prefix")
+        prefix = user_dict.get('prefix', 'ɴᴏᴛ ᴇxɪsᴛs')
+        buttons.ibutton("sᴇᴛ sᴜғғɪx", f"userset {user_id} suffix")
+        suffix = user_dict.get('suffix', 'ɴᴏᴛ ᴇxɪsᴛs')
+        buttons.ibutton("ʟᴇᴇᴄʜ ᴄᴀᴘᴛɪᴏɴ", f"userset {user_id} lcaption")
+        lcaption = user_dict.get('lcaption', 'ɴᴏᴛ ᴇxɪsᴛs')
+        buttons.ibutton("ʟᴇᴇᴄʜ ᴅᴜᴍᴘ", f"userset {user_id} ldump")
+        ldump = 'ɴᴏᴛ ᴇxɪsᴛs' if (val:=user_dict.get('ldump', '')) == '' else val
         buttons.ibutton("ʟᴇᴄᴄʜ sᴘʟɪᴛs", f"userset {user_id} split_size")
         split_size = get_readable_file_size(config_dict['LEECH_SPLIT_SIZE']) + ' (Default)' if user_dict.get('split_size', '') == '' else get_readable_file_size(user_dict['split_size'])
         equal_splits = 'ᴇɴᴀʙʟᴇᴅ' if user_dict.get('equal_splits', config_dict.get('EQUAL_SPLITS')) else 'ᴅɪsᴀʙʟᴇᴅ'
         media_group = 'ᴇɴᴀʙʟᴇᴅ' if user_dict.get('media_group', config_dict.get('MEDIA_GROUP')) else 'ᴅɪsᴀʙʟᴇᴅ'
-
-        buttons.ibutton("ʟᴇᴇᴄʜ ᴄᴀᴘᴛɪᴏɴ", f"userset {user_id} lcaption")
-        lcaption = user_dict.get('lcaption', 'ɴᴏᴛ ᴇxɪsᴛs')
-
-        buttons.ibutton("ʟᴇᴇᴄʜ ᴅᴜᴍᴘ", f"userset {user_id} ldump")
-        ldump = 'ɴᴏᴛ ᴇxɪsᴛs' if (val:=user_dict.get('ldump', '')) == '' else val
-
+        mediainfo = "ᴇɴᴀʙʟᴇᴅ" if user_dict.get('mediainfo', config_dict['SHOW_MEDIAINFO']) else "ᴅɪsᴀʙʟᴇᴅ"
+        buttons.ibutton('ᴅɪsᴀʙʟᴇᴅ ᴍᴇᴅɪᴀɪɴғᴏ' if mediainfo == 'Enabled' else 'ᴇɴᴀʙʟᴇᴅ ᴍᴇᴅɪᴀɪɴғᴏ', f"userset {user_id} mediainfo")
+        if config_dict['SHOW_MEDIAINFO']:
+            mediainfo = "Force Enabled"
         buttons.ibutton("ʏᴛ-ᴅʟᴘ ᴏᴘᴛɪᴏɴs", f"userset {user_id} yt_opt")
         ytopt = 'ɴᴏᴛ ᴇxɪsᴛs' if (val:=user_dict.get('yt_opt', config_dict.get('YT_DLP_OPTIONS', ''))) == '' else val
-        buttons.ibutton("sᴇᴛ ᴘʀᴇғɪx", f"userset {user_id} prefix")
-        prefix = user_dict.get('prefix', 'ɴᴏᴛ ᴇxɪsᴛs')
-
-        buttons.ibutton("sᴇᴛ sᴜғғɪx", f"userset {user_id} suffix")
-        suffix = user_dict.get('suffix', 'ɴᴏᴛ ᴇxɪsᴛs')
-
         buttons.ibutton("ʀᴇᴍɴᴀᴍᴇ", f"userset {user_id} remname")
         remname = user_dict.get('remname', 'ɴᴏᴛ ᴇxɪsᴛs')
-
         buttons.ibutton("ʀᴄʟᴏɴᴇ", f"userset {user_id} rcc")
         rccmsg = "ᴇxɪsᴛs" if await aiopath.exists(rclone_path) else "ɴᴏᴛ ᴇxɪsᴛs"
         tds_mode = "ᴇɴᴀʙʟᴇᴅ" if user_dict.get('td_mode') else "ᴅɪsᴀʙʟᴇᴅ"
@@ -92,68 +84,68 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         buttons.ibutton("ᴜsᴇʀ ᴛᴅs", f"userset {user_id} user_tds")
 
         text = f'<b>ʟᴇᴇᴄʜ sᴇᴛᴛɪɴɢs ғᴏʀ {name}</b>\n\n'
-        text += f'<b>• ʟᴇᴇᴄʜ ᴛʏᴘᴇ :</b> <code>{ltype}</code>\n'
-        text += f'<b>• ᴄᴜsᴛᴏᴍ ᴛʜᴜᴍʙɴᴀɪʟ :</b> <code>{thumbmsg}</code>\n'
-        text += f'<b>• ʟᴇᴇᴄʜ ᴘʀᴇғɪx :</b> <code>{prefix}</code>\n'
-        text += f'<b>• ʟᴇᴇᴄʜ sᴜғғɪx :</b> <code>{suffix}</code>\n'
-        text += f'<b>• ʟᴇᴇᴄʜ ᴄᴀᴘᴛɪᴏɴ :</b> <code>{escape(lcaption)}</code>\n'
-        text += f'<b>• ʟᴇᴇᴄʜ ᴅᴜᴍᴘ :</b> <code>{ldump}</code>\n'
-        text += f'<b>• ʟᴇᴇᴄʜ sᴘʟɪᴛ sɪᴢᴇ :</b> <code>{split_size}</code>\n'
-        text += f'<b>• ᴇǫᴜᴀʟ sᴘʟɪᴛs :</b> <code>{equal_splits}</code>\n'
-        text += f'<b>• ᴍᴇᴅɪᴀ ɢʀᴏᴜᴘ :</b> <code>{media_group}</code>\n'
-        text += f'<b>• ᴍᴇᴅɪᴀ-ɪɴғᴏ ᴍᴏᴅᴇ :</b> <code>{mediainfo}</code>\n'
-        text += f'<b>• ʏᴛ-ᴅʟᴘ ᴏᴘᴛɪᴏɴs :</b> <b><code>{ytopt}</code></b>\n'
-        text += f'<b>• ʀᴇᴍɴᴀᴍᴇ :</b> <code>{remname}</code>\n'
-        text += f'<b>• ʀᴄʟᴏɴᴇ ᴄᴏɴғɪɢ:</b> <code>{rccmsg}</code>\n'
-        text += f'<b>• ᴜsᴇʀ ᴛᴅ ᴍᴏᴅᴇ :</b> <code>{tds_mode}</code>'
+        text += f'<b>‣ ʟᴇᴇᴄʜ ᴛʏᴘᴇ :</b> <code>{ltype}</code>\n'
+        text += f'<b>‣ ᴄᴜsᴛᴏᴍ ᴛʜᴜᴍʙɴᴀɪʟ :</b> <code>{thumbmsg}</code>\n'
+        text += f'<b>‣ ʟᴇᴇᴄʜ ᴘʀᴇғɪx :</b> <code>{prefix}</code>\n'
+        text += f'<b>‣ ʟᴇᴇᴄʜ sᴜғғɪx :</b> <code>{suffix}</code>\n'
+        text += f'<b>‣ ʟᴇᴇᴄʜ ᴄᴀᴘᴛɪᴏɴ :</b> <code>{escape(lcaption)}</code>\n'
+        text += f'<b>‣ ʟᴇᴇᴄʜ ᴅᴜᴍᴘ :</b> <code>{ldump}</code>\n'
+        text += f'<b>‣ ʟᴇᴇᴄʜ sᴘʟɪᴛ sɪᴢᴇ :</b> <code>{split_size}</code>\n'
+        text += f'<b>‣ ᴇǫᴜᴀʟ sᴘʟɪᴛs :</b> <code>{equal_splits}</code>\n'
+        text += f'<b>‣ ᴍᴇᴅɪᴀ ɢʀᴏᴜᴘ :</b> <code>{media_group}</code>\n'
+        text += f'<b>‣ ᴍᴇᴅɪᴀ-ɪɴғᴏ ᴍᴏᴅᴇ :</b> <code>{mediainfo}</code>\n'
+        text += f'<b>‣ ʏᴛ-ᴅʟᴘ ᴏᴘᴛɪᴏɴs :</b> <b><code>{ytopt}</code></b>\n'
+        text += f'<b>‣ ʀᴇᴍɴᴀᴍᴇ :</b> <code>{remname}</code>\n'
+        text += f'<b>‣ ʀᴄʟᴏɴᴇ ᴄᴏɴғɪɢ:</b> <code>{rccmsg}</code>\n'
+        text += f'<b>‣ ᴜsᴇʀ ᴛᴅ ᴍᴏᴅᴇ :</b> <code>{tds_mode}</code>'
 
         buttons.ibutton("⥢ ʙᴀᴄᴋ", f"userset {user_id} back", "footer")
         buttons.ibutton("ᴄʟᴏsᴇ ↻", f"userset {user_id} close", "footer")
         button = buttons.build_menu(2)
     elif edit_type:
-        text = f"<b><u>{fname_dict[key]} Settings :</u></b>\n\n"
+        text = f"<b><u>{fname_dict[key]} sᴇᴛᴛɪɴɢs :</u></b>\n\n"
         if key == 'rcc':
             set_exist = await aiopath.exists(rclone_path)
-            text += f"<b>rcl.conf File :</b> {'' if set_exist else 'Not'} Exists\n\n"
+            text += f"<b>ʀᴄʟ ᴄᴏɴғ ғɪʟᴇ :</b> {'' if set_exist else 'Not'} ᴇxɪsᴛs\n\n"
         elif key == 'thumb':
             set_exist = await aiopath.exists(thumbpath)
-            text += f"<b>Custom Thumbnail :</b> {'' if set_exist else 'Not'} Exists\n\n"
+            text += f"<b>ᴄᴜsᴛᴏᴍ ᴛʜᴜᴍʙɴᴀɪʟ :</b> {'' if set_exist else 'Not'} ᴇxɪsᴛs\n\n"
         elif key == 'yt_opt':
-            set_exist = 'Not Exists' if (val:=user_dict.get('yt_opt', config_dict.get('YT_DLP_OPTIONS', ''))) == '' else val
-            text += f"<b>YT-DLP Options :</b> <code>{escape(set_exist)}</code>\n\n"
+            set_exist = 'ɴᴏᴛ ᴇxɪsᴛs' if (val:=user_dict.get('yt_opt', config_dict.get('YT_DLP_OPTIONS', ''))) == '' else val
+            text += f"<b>ʏᴛ-ᴅʟᴘ ᴏᴘᴛɪᴏɴs :</b> <code>{escape(set_exist)}</code>\n\n"
         elif key == 'split_size':
             set_exist = get_readable_file_size(config_dict['LEECH_SPLIT_SIZE']) + ' (Default)' if user_dict.get('split_size', '') == '' else get_readable_file_size(user_dict['split_size'])
-            text += f"<b>Leech Split Size :</b> {set_exist}\n\n"
+            text += f"<b>ʟᴇᴇᴄʜ sᴘʟɪᴛ sɪᴢᴇ :</b> {set_exist}\n\n"
             if user_dict.get('equal_splits', False) or ('equal_splits' not in user_dict and config_dict['EQUAL_SPLITS']):
-                buttons.ibutton("Disable Equal Splits", f"userset {user_id} esplits", "header")
+                buttons.ibutton("ᴅɪsᴀʙʟᴇ ᴇǫᴜᴀʟ sᴘʟɪᴛs", f"userset {user_id} esplits", "header")
             else:
-                buttons.ibutton("Enable Equal Splits", f"userset {user_id} esplits", "header")
+                buttons.ibutton("ᴇɴᴀʙʟᴇ ᴇǫᴜᴀʟ sᴘʟɪᴛs", f"userset {user_id} esplits", "header")
             if user_dict.get('media_group', False) or ('media_group' not in user_dict and config_dict['MEDIA_GROUP']):
-                buttons.ibutton("Disable Media Group", f"userset {user_id} mgroup", "header")
+                buttons.ibutton("ᴅɪsᴀʙʟᴇ ɢʀᴏᴜᴘ ᴍᴇᴅɪᴀ", f"userset {user_id} mgroup", "header")
             else:
-                buttons.ibutton("Enable Media Group", f"userset {user_id} mgroup", "header")
+                buttons.ibutton("ᴇɴᴀʙʟᴇ ɢʀᴏᴜᴘ ᴍᴇᴅɪᴀ", f"userset {user_id} mgroup", "header")
         elif key in ['prefix', 'remname', 'suffix', 'lcaption', 'ldump']:
-            set_exist = 'Not Exists' if (val:=user_dict.get(key, '')) == '' else val
-            text += f"<b>Filename {fname_dict[key]} :</b> {set_exist}\n\n"
+            set_exist = 'ɴᴏᴛ ᴇxɪsᴛs' if (val:=user_dict.get(key, '')) == '' else val
+            text += f"<b>ғɪʟᴇ ɴᴀᴍᴇ {fname_dict[key]} :</b> {set_exist}\n\n"
         elif key == 'user_tds':
-            set_exist = len(val) if (val:=user_dict.get(key, False)) else 'Not Exists'
-            tds_mode = "Enabled" if user_dict.get('td_mode') else "Disabled"
-            buttons.ibutton('Disable UserTDs' if tds_mode == 'Enabled' else 'Enable UserTDs', f"userset {user_id} td_mode", "header")
-            text += f"<b>User TD Mode:</b> {tds_mode}\n"
+            set_exist = len(val) if (val:=user_dict.get(key, False)) else 'ɴᴏᴛ ᴇxɪsᴛs'
+            tds_mode = "ᴇɴᴀʙʟᴇᴅ" if user_dict.get('td_mode') else "ᴅɪsᴀʙʟᴇᴅ"
+            buttons.ibutton('ᴅɪsᴀʙʟᴇ ᴜsᴇʀ-ᴛᴅs' if tds_mode == 'Enabled' else 'ᴇɴᴀʙʟᴇ ᴜsᴇʀ-ᴛᴅs', f"userset {user_id} td_mode", "header")
+            text += f"<b>ᴜsᴇʀ ᴛᴅ ᴍᴏᴅᴇ :</b> {tds_mode}\n"
         else: 
             return
-        text += f"<b>Description :</b> {uset_display_dict[key][0]}"
+        text += f"<b>ᴅᴇsᴄʀɪᴘᴛɪᴏɴ :</b> {uset_display_dict[key][0]}"
         if edit_mode:
             text += '\n\n' + uset_display_dict[key][1]
-            buttons.ibutton("Stop Change", f"userset {user_id} {key}")
-        elif key != 'user_tds' or set_exist == 'Not Exists':
-            buttons.ibutton(f"Change {fname_dict[key]}" if set_exist and set_exist != 'Not Exists' and (set_exist != get_readable_file_size(config_dict['LEECH_SPLIT_SIZE']) + ' (Default)') else f"Set {fname_dict[key]}", f"userset {user_id} {key} edit")
-        if set_exist and set_exist != 'Not Exists' and (set_exist != get_readable_file_size(config_dict['LEECH_SPLIT_SIZE']) + ' (Default)'):
+            buttons.ibutton("sᴛᴏᴘ ᴄʜᴀɴɢᴇ", f"userset {user_id} {key}")
+        elif key != 'user_tds' or set_exist == 'ɴᴏᴛ ᴇxɪsᴛs':
+            buttons.ibutton(f"ᴄʜᴀɴɢᴇ {fname_dict[key]}" if set_exist and set_exist != 'ɴᴏᴛ ᴇxɪsᴛs' and (set_exist != get_readable_file_size(config_dict['LEECH_SPLIT_SIZE']) + ' (Default)') else f"sᴇᴛ {fname_dict[key]}", f"userset {user_id} {key} edit")
+        if set_exist and set_exist != 'ɴᴏᴛ ᴇxɪsᴛs' and (set_exist != get_readable_file_size(config_dict['LEECH_SPLIT_SIZE']) + ' (Default)'):
             if key == 'user_tds':
-                buttons.ibutton('Show UserTDs', f"userset {user_id} show_tds", "header")
-            buttons.ibutton("Delete", f"userset {user_id} d{key}")
-        buttons.ibutton("Back", f"userset {user_id} back {edit_type}", "footer")
-        buttons.ibutton("Close", f"userset {user_id} close", "footer")
+                buttons.ibutton('sʜᴏᴡ ᴜsᴇʀ ᴛᴅs', f"userset {user_id} show_tds", "header")
+            buttons.ibutton("ᴅᴇʟᴇᴛᴇ", f"userset {user_id} d{key}")
+        buttons.ibutton("⥢ ʙᴀᴄᴋ", f"userset {user_id} back {edit_type}", "footer")
+        buttons.ibutton("ᴄʟᴏsᴇ ↻", f"userset {user_id} close", "footer")
         button = buttons.build_menu(2)
     return text, button
 
