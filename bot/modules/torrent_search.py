@@ -13,7 +13,7 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.ext_utils.bot_utils import get_readable_file_size, sync_to_async, new_task, checking_access, new_thread
 from bot.helper.telegram_helper.button_build import ButtonMaker
 
-PLUGINS = ['https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/piratebay.py', 'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/limetorrents.py', 'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/torrentscsv.py', 'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/torlock.py', 'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/eztv.py', 'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/solidtorrents.py', 'https://raw.githubusercontent.com/MaurizioRicci/qBittorrent_search_engines/master/yts_am.py', 'https://raw.githubusercontent.com/MadeOfMagicAndWires/qBit-plugins/master/engines/nyaasi.py', 'https://raw.githubusercontent.com/LightDestory/qBittorrent-Search-Plugins/master/src/engines/ettv.py', 'https://raw.githubusercontent.com/LightDestory/qBittorrent-Search-Plugins/master/src/engines/thepiratebay.py', 'https://raw.githubusercontent.com/nindogo/qbtSearchScripts/master/magnetdl.py', 'https://raw.githubusercontent.com/msagca/qbittorrent_plugins/main/uniondht.py', 'https://raw.githubusercontent.com/khensolomon/leyts/master/yts.py']
+PLUGINS = ['piratebay', 'limetorrents', 'torrentscsv', 'torlock', 'eztv', 'solidtorrents', 'yts_am', 'nyaasi', 'ettv', 'thepiratebay', 'magnetdl', 'uniondht', 'yts']
 SITES = None
 TELEGRAPH_LIMIT = 300
 
