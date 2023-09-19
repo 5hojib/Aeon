@@ -13,7 +13,7 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.ext_utils.bot_utils import get_readable_file_size, sync_to_async, new_task, checking_access, new_thread
 from bot.helper.telegram_helper.button_build import ButtonMaker
 
-PLUGINS = []
+PLUGINS = ['https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/piratebay.py', 'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/limetorrents.py', 'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/torrentscsv.py', 'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/torlock.py', 'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/eztv.py', 'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/solidtorrents.py', 'https://raw.githubusercontent.com/MaurizioRicci/qBittorrent_search_engines/master/yts_am.py', 'https://raw.githubusercontent.com/MadeOfMagicAndWires/qBit-plugins/master/engines/nyaasi.py', 'https://raw.githubusercontent.com/LightDestory/qBittorrent-Search-Plugins/master/src/engines/ettv.py', 'https://raw.githubusercontent.com/LightDestory/qBittorrent-Search-Plugins/master/src/engines/thepiratebay.py', 'https://raw.githubusercontent.com/nindogo/qbtSearchScripts/master/magnetdl.py', 'https://raw.githubusercontent.com/msagca/qbittorrent_plugins/main/uniondht.py', 'https://raw.githubusercontent.com/khensolomon/leyts/master/yts.py']
 SITES = None
 TELEGRAPH_LIMIT = 300
 
@@ -21,14 +21,14 @@ TELEGRAPH_LIMIT = 300
 async def initiate_search_tools():
     qbclient = await sync_to_async(get_client)
     qb_plugins = await sync_to_async(qbclient.search_plugins)
-    if SEARCH_PLUGINS := config_dict['SEARCH_PLUGINS']:
+    '''if SEARCH_PLUGINS := config_dict['SEARCH_PLUGINS']:
         globals()['PLUGINS'] = []
         src_plugins = eval(SEARCH_PLUGINS)
         if qb_plugins:
             names = [plugin['name'] for plugin in qb_plugins]
             await sync_to_async(qbclient.search_uninstall_plugin, names=names)
-        await sync_to_async(qbclient.search_install_plugin, src_plugins)
-    elif qb_plugins:
+        await sync_to_async(qbclient.search_install_plugin, src_plugins)'''
+    if qb_plugins:
         for plugin in qb_plugins:
             await sync_to_async(qbclient.search_uninstall_plugin, names=plugin['name'])
         globals()['PLUGINS'] = []
@@ -111,7 +111,7 @@ async def __search(key, site, message, method):
         await sync_to_async(client.auth_log_out)
     link = await __getResult(search_results, key, message, method)
     buttons = ButtonMaker()
-    buttons.ubutton("🔎 VIEW", link)
+    buttons.ubutton("View", link)
     button = buttons.build_menu(1)
     await editMessage(message, msg, button)
 
@@ -177,8 +177,7 @@ async def __getResult(search_results, key, message, method):
         telegraph_content.append(msg)
 
     await editMessage(message, f"<b>Creating</b> {len(telegraph_content)} <b>Telegraph pages.</b>")
-    path = [(await telegraph.create_page(title="Torrent Search",
-                                         content=content))["path"] for content in telegraph_content]
+    path = [(await telegraph.create_page(title="Torrent Search", content=content))["path"] for content in telegraph_content]
     if len(path) > 1:
         await editMessage(message, f"<b>Editing</b> {len(telegraph_content)} <b>Telegraph pages.</b>")
         await telegraph.edit_telegraph(path, telegraph_content)
