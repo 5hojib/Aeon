@@ -16,22 +16,19 @@ from bot.helper.telegram_helper.button_build import ButtonMaker
 PLUGINS = ['piratebay', 'limetorrents', 'torrentscsv', 'torlock', 'eztv', 'solidtorrents', 'yts_am', 'nyaasi', 'ettv', 'thepiratebay', 'magnetdl', 'uniondht', 'yts']
 SITES = None
 TELEGRAPH_LIMIT = 300
-
+src_plugins = {'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/piratebay.py', 'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/limetorrents.py', 'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/torrentscsv.py', 'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/torlock.py', 'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/eztv.py', 'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/solidtorrents.py', 'https://raw.githubusercontent.com/MaurizioRicci/qBittorrent_search_engines/master/yts_am.py', 'https://raw.githubusercontent.com/MadeOfMagicAndWires/qBit-plugins/master/engines/nyaasi.py', 'https://raw.githubusercontent.com/LightDestory/qBittorrent-Search-Plugins/master/src/engines/ettv.py', 'https://raw.githubusercontent.com/LightDestory/qBittorrent-Search-Plugins/master/src/engines/thepiratebay.py', 'https://raw.githubusercontent.com/nindogo/qbtSearchScripts/master/magnetdl.py', 'https://raw.githubusercontent.com/msagca/qbittorrent_plugins/main/uniondht.py', 'https://raw.githubusercontent.com/khensolomon/leyts/master/yts.py'}
 
 async def initiate_search_tools():
     qbclient = await sync_to_async(get_client)
     qb_plugins = await sync_to_async(qbclient.search_plugins)
-    '''if SEARCH_PLUGINS := config_dict['SEARCH_PLUGINS']:
-        globals()['PLUGINS'] = []
-        src_plugins = eval(SEARCH_PLUGINS)
-        if qb_plugins:
-            names = [plugin['name'] for plugin in qb_plugins]
-            await sync_to_async(qbclient.search_uninstall_plugin, names=names)
-        await sync_to_async(qbclient.search_install_plugin, src_plugins)'''
     if qb_plugins:
+        names = [plugin['name'] for plugin in qb_plugins]
+        await sync_to_async(qbclient.search_uninstall_plugin, names=names)
+    await sync_to_async(qbclient.search_install_plugin, src_plugins)
+    '''if qb_plugins:
         for plugin in qb_plugins:
             await sync_to_async(qbclient.search_uninstall_plugin, names=plugin['name'])
-        globals()['PLUGINS'] = []
+        globals()['PLUGINS'] = []'''
     await sync_to_async(qbclient.auth_log_out)
 
     if SEARCH_API_LINK := config_dict['SEARCH_API_LINK']:
@@ -44,8 +41,7 @@ async def initiate_search_tools():
                      for site in data['supported_sites']}
             SITES['all'] = 'All'
         except Exception as e:
-            LOGGER.error(
-                f"{e} Can't fetching sites from SEARCH_API_LINK make sure use latest version of API")
+            LOGGER.error(f"{e} Can't fetching sites from SEARCH_API_LINK make sure use latest version of API")
             SITES = None
 
 
