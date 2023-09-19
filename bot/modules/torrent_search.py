@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.filters import command, regex
 from aiohttp import ClientSession
@@ -25,10 +24,6 @@ async def initiate_search_tools():
         names = [plugin['name'] for plugin in qb_plugins]
         await sync_to_async(qbclient.search_uninstall_plugin, names=names)
     await sync_to_async(qbclient.search_install_plugin, src_plugins)
-    '''if qb_plugins:
-        for plugin in qb_plugins:
-            await sync_to_async(qbclient.search_uninstall_plugin, names=plugin['name'])
-        globals()['PLUGINS'] = []'''
     await sync_to_async(qbclient.auth_log_out)
 
     if SEARCH_API_LINK := config_dict['SEARCH_API_LINK']:
@@ -37,8 +32,7 @@ async def initiate_search_tools():
             async with ClientSession(trust_env=True) as c:
                 async with c.get(f'{SEARCH_API_LINK}/api/v1/sites') as res:
                     data = await res.json()
-            SITES = {str(site): str(site).capitalize()
-                     for site in data['supported_sites']}
+            SITES = {str(site): str(site).capitalize() for site in data['supported_sites']}
             SITES['all'] = 'All'
         except Exception as e:
             LOGGER.error(f"{e} Can't fetching sites from SEARCH_API_LINK make sure use latest version of API")
@@ -190,15 +184,8 @@ def __api_buttons(user_id, method):
 
 async def __plugin_buttons(user_id):
     buttons = ButtonMaker()
-    if not PLUGINS:
-        qbclient = await sync_to_async(get_client)
-        pl = await sync_to_async(qbclient.search_plugins)
-        for name in pl:
-            PLUGINS.append(name['name'])
-        await sync_to_async(qbclient.auth_log_out)
     for siteName in PLUGINS:
-        buttons.ibutton(siteName.capitalize(),
-                        f"torser {user_id} {siteName} plugin")
+        buttons.ibutton(siteName.capitalize(), f"torser {user_id} {siteName} plugin")
     buttons.ibutton('All', f"torser {user_id} all plugin")
     buttons.ibutton("Cancel", f"torser {user_id} cancel")
     return buttons.build_menu(2)
@@ -208,7 +195,6 @@ async def torrentSearch(_, message):
     user_id = message.from_user.id
     buttons = ButtonMaker()
     key = message.text.split()
-    SEARCH_PLUGINS = config_dict['SEARCH_PLUGINS']
     if not await isAdmin(message, user_id):
         if message.chat.type != message.chat.type.PRIVATE:
             msg, buttons = await checking_access(user_id, buttons)
@@ -217,40 +203,31 @@ async def torrentSearch(_, message):
                 await delete_links(message)
                 await five_minute_del(reply_message)
                 return
-    if SITES is None and not SEARCH_PLUGINS:
-        reply_message = await sendMessage(message, "No API link or search PLUGINS added for this function")
-        await delete_links(message)
-        await one_minute_del(reply_message)
-    elif len(key) == 1 and SITES is None:
+    if len(key) == 1 and SITES is None:
         reply_message = await sendMessage(message, "Send a search key along with command")
-        await delete_links(message)
         await one_minute_del(reply_message)
+        await delete_links(message)
     elif len(key) == 1:
         buttons.ibutton('Trending', f"torser {user_id} apitrend")
         buttons.ibutton('Recent', f"torser {user_id} apirecent")
         buttons.ibutton("Cancel", f"torser {user_id} cancel")
         button = buttons.build_menu(2)
         reply_message = await sendMessage(message, "Send a search key along with command", button)
-        await delete_links(message)
         await five_minute_del(reply_message)
-    elif SITES is not None and SEARCH_PLUGINS:
+        await delete_links(message)
+    elif SITES is not None:
         buttons.ibutton('Api', f"torser {user_id} apisearch")
         buttons.ibutton('Plugins', f"torser {user_id} plugin")
         buttons.ibutton("Cancel", f"torser {user_id} cancel")
         button = buttons.build_menu(2)
         reply_message = await sendMessage(message, 'Choose tool to search:', button)
-        await delete_links(message)
         await five_minute_del(reply_message)
-    elif SITES is not None:
-        button = __api_buttons(user_id, "apisearch")
-        reply_message = await sendMessage(message, 'Choose site to search | API:', button)
         await delete_links(message)
-        await five_minute_del(reply_message)
     else:
         button = await __plugin_buttons(user_id)
         reply_message = await sendMessage(message, 'Choose site to search | Plugins:', button)
-        await delete_links(message)
         await five_minute_del(reply_message)
+        await delete_links(message)
 
 
 @new_task

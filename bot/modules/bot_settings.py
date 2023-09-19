@@ -144,10 +144,6 @@ async def load_config():
     LEECH_LOG_ID = environ.get('LEECH_LOG_ID', '')
     LEECH_LOG_ID = '' if len(LEECH_LOG_ID) == 0 else int(LEECH_LOG_ID)
     
-    SEARCH_PLUGINS = environ.get('SEARCH_PLUGINS', '')
-    if len(SEARCH_PLUGINS) == 0:
-        SEARCH_PLUGINS = ''
-
     MAX_SPLIT_SIZE = 4194304000 if IS_PREMIUM_USER else 2097152000
 
     LEECH_SPLIT_SIZE = environ.get('LEECH_SPLIT_SIZE', '')
@@ -421,7 +417,6 @@ async def load_config():
                         'RSS_DELAY': RSS_DELAY,
                         'SEARCH_API_LINK': SEARCH_API_LINK,
                         'SEARCH_LIMIT': SEARCH_LIMIT,
-                        'SEARCH_PLUGINS': SEARCH_PLUGINS,
                         'SET_COMMANDS': SET_COMMANDS,
                         'SHOW_MEDIAINFO': SHOW_MEDIAINFO,
                         'STOP_DUPLICATE': STOP_DUPLICATE,
@@ -542,7 +537,7 @@ async def edit_variable(_, message, pre_message, key):
     await message.delete()
     if DATABASE_URL:
         await DbManager().update_config({key: value})
-    if key in ['SEARCH_PLUGINS', 'SEARCH_API_LINK']:
+    if key == 'SEARCH_API_LINK':
         await initiate_search_tools()
     elif key in ['QUEUE_ALL', 'QUEUE_DOWNLOAD', 'QUEUE_UPLOAD']:
         await start_from_queued()
@@ -694,7 +689,7 @@ async def edit_bot_settings(client, query):
         await update_buttons(message, data[2], 'editvar', False)
         if DATABASE_URL:
             await DbManager().update_config({data[2]: value})
-        if data[2] in ['SEARCH_PLUGINS', 'SEARCH_API_LINK']:
+        if data[2] == 'SEARCH_API_LINK':
             await initiate_search_tools()
         elif data[2] in ['QUEUE_ALL', 'QUEUE_DOWNLOAD', 'QUEUE_UPLOAD']:
             await start_from_queued()
