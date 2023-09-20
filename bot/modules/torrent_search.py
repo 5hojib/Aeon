@@ -206,7 +206,6 @@ async def torrentSearch(_, message):
     if len(key) == 1 and SITES is None:
         reply_message = await sendMessage(message, "Send a search key along with command")
         await one_minute_del(reply_message)
-        await delete_links(message)
     elif len(key) == 1:
         buttons.ibutton('Trending', f"torser {user_id} apitrend")
         buttons.ibutton('Recent', f"torser {user_id} apirecent")
@@ -214,7 +213,6 @@ async def torrentSearch(_, message):
         button = buttons.build_menu(2)
         reply_message = await sendMessage(message, "Send a search key along with command", button)
         await five_minute_del(reply_message)
-        await delete_links(message)
     elif SITES is not None:
         buttons.ibutton('Api', f"torser {user_id} apisearch")
         buttons.ibutton('Plugins', f"torser {user_id} plugin")
@@ -222,12 +220,12 @@ async def torrentSearch(_, message):
         button = buttons.build_menu(2)
         reply_message = await sendMessage(message, 'Choose tool to search:', button)
         await five_minute_del(reply_message)
-        await delete_links(message)
     else:
         button = await __plugin_buttons(user_id)
         reply_message = await sendMessage(message, 'Choose site to search | Plugins:', button)
         await five_minute_del(reply_message)
-        await delete_links(message)
+
+    await delete_links(message)
 
 
 @new_task
