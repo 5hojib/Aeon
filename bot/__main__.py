@@ -27,7 +27,7 @@ from .helper.ext_utils.fs_utils import start_cleanup, clean_all, exit_clean_up
 from .helper.ext_utils.bot_utils import get_readable_file_size, get_readable_time, cmd_exec, sync_to_async, set_commands, update_user_ldata, new_thread, format_validity_time, new_task
 from .helper.ext_utils.db_handler import DbManager
 from .helper.telegram_helper.bot_commands import BotCommands
-from .helper.telegram_helper.message_utils import sendMessage, editMessage, sendFile, deleteMessage, one_minute_del
+from .helper.telegram_helper.message_utils import sendMessage, editMessage, sendFile, deleteMessage, one_minute_del, five_minute_del
 from .helper.telegram_helper.filters import CustomFilters
 from .helper.telegram_helper.button_build import ButtonMaker
 from .helper.listeners.aria2_listener import start_aria2_listener
@@ -203,7 +203,7 @@ async def log(_, message):
     buttons.ibutton('Web Paste', f'aeon {message.from_user.id} webpaste')
     reply_message = await sendFile(message, 'log.txt', buttons=buttons.build_menu(1))
     await deleteMessage(message)
-    await one_minute_del(reply_message)
+    await five_minute_del(reply_message)
 
 async def search_images():
     if not config_dict['IMG_SEARCH']:
