@@ -33,20 +33,18 @@ handler_dict = {}
 default_values = {'DEFAULT_UPLOAD': 'gd',
                   'LEECH_SPLIT_SIZE': MAX_SPLIT_SIZE,
                   'RSS_DELAY': 900,
-                  'STATUS_UPDATE_INTERVAL': 10,
                   'SEARCH_LIMIT': 0,
                   'UPSTREAM_BRANCH': 'main',
-                  'BOT_LANG': 'en',
                   'IMG_PAGE': 1,
-                  'TORRENT_TIMEOUT': 3000
-                  }
+                  'TORRENT_TIMEOUT': 3000}
 bool_vars = ['AS_DOCUMENT',
              'STOP_DUPLICATE',
              'SET_COMMANDS',
              'SHOW_MEDIAINFO',
              'USE_SERVICE_ACCOUNTS',
              'WEB_PINCODE',
-             'EQUAL_SPLITS']
+             'EQUAL_SPLITS',
+             'INCOMPLETE_TASK_NOTIFIER']
 
 
 async def load_config():
@@ -146,10 +144,6 @@ async def load_config():
     LEECH_LOG_ID = environ.get('LEECH_LOG_ID', '')
     LEECH_LOG_ID = '' if len(LEECH_LOG_ID) == 0 else int(LEECH_LOG_ID)
     
-    SEARCH_PLUGINS = environ.get('SEARCH_PLUGINS', '')
-    if len(SEARCH_PLUGINS) == 0:
-        SEARCH_PLUGINS = ''
-
     MAX_SPLIT_SIZE = 4194304000 if IS_PREMIUM_USER else 2097152000
 
     LEECH_SPLIT_SIZE = environ.get('LEECH_SPLIT_SIZE', '')
@@ -226,6 +220,10 @@ async def load_config():
     if not INCOMPLETE_TASK_NOTIFIER and DATABASE_URL:
         await DbManager().trunc_table('tasks')
 
+    STREAMWISH_API = environ.get('STREAMWISH_API', '')
+    if len(STREAMWISH_API) == 0:
+        STREAMWISH_API = ''
+    
     STOP_DUPLICATE = environ.get('STOP_DUPLICATE', '')
     STOP_DUPLICATE = STOP_DUPLICATE.lower() == 'true'
 
@@ -246,9 +244,6 @@ async def load_config():
 
     MEDIA_GROUP = environ.get('MEDIA_GROUP', '')
     MEDIA_GROUP = MEDIA_GROUP.lower() == 'true'
-
-    BASE_URL_PORT = environ.get('BASE_URL_PORT', '')
-    BASE_URL_PORT = 80 if len(BASE_URL_PORT) == 0 else int(BASE_URL_PORT)
 
     RCLONE_SERVE_URL = environ.get('RCLONE_SERVE_URL', '')
     if len(RCLONE_SERVE_URL) == 0:
@@ -271,7 +266,7 @@ async def load_config():
     if len(BASE_URL) == 0:
         BASE_URL = ''
     else:
-        await create_subprocess_shell(f"gunicorn web.wserver:app --bind 0.0.0.0:{BASE_URL_PORT} --worker-class gevent")
+        await create_subprocess_shell(f"gunicorn web.wserver:app --bind 0.0.0.0:80 --worker-class gevent")
 
     UPSTREAM_REPO = environ.get('UPSTREAM_REPO', '')
     if len(UPSTREAM_REPO) == 0:
@@ -374,7 +369,6 @@ async def load_config():
     config_dict.update({'AS_DOCUMENT': AS_DOCUMENT,
                         'AUTHORIZED_CHATS': AUTHORIZED_CHATS,
                         'BASE_URL': BASE_URL,
-                        'BASE_URL_PORT': BASE_URL_PORT,
                         'BOT_TOKEN': BOT_TOKEN,
                         'BOT_MAX_TASKS': BOT_MAX_TASKS,
                         'CMD_SUFFIX': CMD_SUFFIX,
@@ -423,10 +417,10 @@ async def load_config():
                         'RSS_DELAY': RSS_DELAY,
                         'SEARCH_API_LINK': SEARCH_API_LINK,
                         'SEARCH_LIMIT': SEARCH_LIMIT,
-                        'SEARCH_PLUGINS': SEARCH_PLUGINS,
                         'SET_COMMANDS': SET_COMMANDS,
                         'SHOW_MEDIAINFO': SHOW_MEDIAINFO,
                         'STOP_DUPLICATE': STOP_DUPLICATE,
+                        'STREAMWISH_API': STREAMWISH_API,
                         'SUDO_USERS': SUDO_USERS,
                         'TELEGRAM_API': TELEGRAM_API,
                         'TELEGRAM_HASH': TELEGRAM_HASH,
@@ -512,14 +506,6 @@ async def edit_variable(_, message, pre_message, key):
         addJob(value)
     elif key in ['LEECH_LOG_ID', 'RSS_CHAT_ID']:
         value = int(value)
-    elif key == 'STATUS_UPDATE_INTERVAL':
-        value = int(value)
-        if len(download_dict) != 0:
-            async with status_reply_dict_lock:
-                if Interval:
-                    Interval[0].cancel()
-                    Interval.clear()
-                    Interval.append(setInterval(value, update_all_messages))
     elif key == 'TORRENT_TIMEOUT':
         value = int(value)
         downloads = await sync_to_async(aria2.get_downloads)
@@ -532,11 +518,6 @@ async def edit_variable(_, message, pre_message, key):
         aria2_options['bt-stop-timeout'] = f'{value}'
     elif key == 'LEECH_SPLIT_SIZE':
         value = min(int(value), MAX_SPLIT_SIZE)
-    elif key == 'BASE_URL_PORT':
-        value = int(value)
-        if config_dict['BASE_URL']:
-            await (await create_subprocess_exec("pkill", "-9", "-f", "gunicorn")).wait()
-            await create_subprocess_shell(f"gunicorn web.wserver:app --bind 0.0.0.0:{value} --worker-class gevent")
     elif key == 'EXTENSION_FILTER':
         fx = value.split()
         GLOBAL_EXTENSION_FILTER.clear()
@@ -556,7 +537,7 @@ async def edit_variable(_, message, pre_message, key):
     await message.delete()
     if DATABASE_URL:
         await DbManager().update_config({key: value})
-    if key in ['SEARCH_PLUGINS', 'SEARCH_API_LINK']:
+    if key == 'SEARCH_API_LINK':
         await initiate_search_tools()
     elif key in ['QUEUE_ALL', 'QUEUE_DOWNLOAD', 'QUEUE_UPLOAD']:
         await start_from_queued()
@@ -702,18 +683,13 @@ async def edit_bot_settings(client, query):
                 await DbManager().update_aria2('bt-stop-timeout', '0')
         elif data[2] == 'BASE_URL':
             await (await create_subprocess_exec("pkill", "-9", "-f", "gunicorn")).wait()
-        elif data[2] == 'BASE_URL_PORT':
-            value = 80
-            if config_dict['BASE_URL']:
-                await (await create_subprocess_exec("pkill", "-9", "-f", "gunicorn")).wait()
-                await create_subprocess_shell("gunicorn web.wserver:app --bind 0.0.0.0:80 --worker-class gevent")
         elif data[2] == 'INCOMPLETE_TASK_NOTIFIER' and DATABASE_URL:
             await DbManager().trunc_table('tasks')
         config_dict[data[2]] = value
         await update_buttons(message, data[2], 'editvar', False)
         if DATABASE_URL:
             await DbManager().update_config({data[2]: value})
-        if data[2] in ['SEARCH_PLUGINS', 'SEARCH_API_LINK']:
+        if data[2] == 'SEARCH_API_LINK':
             await initiate_search_tools()
         elif data[2] in ['QUEUE_ALL', 'QUEUE_DOWNLOAD', 'QUEUE_UPLOAD']:
             await start_from_queued()

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from speedtest import Speedtest
 from pyrogram.handlers import MessageHandler
 from pyrogram.filters import command
@@ -19,20 +18,16 @@ async def speedtest(_, message):
     test.results.share()
     result = test.results.dict()
     path = result['share']
-    string_speed = f'''
-<b>SPEEDTEST INFO</b>
-
-<b>• Upload:</b> <code>{get_readable_file_size(result['upload'] / 8)}/s</code>
-<b>• Download:</b> <code>{get_readable_file_size(result['download'] / 8)}/s</code>
-<b>• Ping:</b> <code>{result['ping']} ms</code>
-<b>• IP Address:</b> <code>{result['client']['ip']}</code>
-'''
+    string_speed  = f"<b>SPEEDTEST INFO</b>\n\n"
+    string_speed += f"<b>• Upload:</b> <code>{get_readable_file_size(result['upload'] / 8)}/s</code>\n"
+    string_speed += f"<b>• Download:</b> <code>{get_readable_file_size(result['download'] / 8)}/s</code>\n"
+    string_speed += f"<b>• Ping:</b> <code>{result['ping']} ms</code>\n"
+    string_speed += f"<b>• IP Address:</b> <code>{result['client']['ip']}</code>"
     try:
-        pho = await sendMessage(message, string_speed, photo=path)
+        await sendMessage(message, string_speed, photo=path)
         await deleteMessage(speed)
     except Exception as e:
         LOGGER.error(str(e))
-        pho = await editMessage(speed, string_speed)
+        await editMessage(speed, string_speed)
 
-bot.add_handler(MessageHandler(speedtest, filters=command(
-    BotCommands.SpeedCommand) & CustomFilters.authorized))
+bot.add_handler(MessageHandler(speedtest, filters=command(BotCommands.SpeedCommand) & CustomFilters.authorized))
