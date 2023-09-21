@@ -43,8 +43,7 @@ bool_vars = ['AS_DOCUMENT',
              'SHOW_MEDIAINFO',
              'USE_SERVICE_ACCOUNTS',
              'WEB_PINCODE',
-             'EQUAL_SPLITS',
-             'INCOMPLETE_TASK_NOTIFIER']
+             'EQUAL_SPLITS',]
 
 
 async def load_config():
@@ -73,10 +72,6 @@ async def load_config():
     if len(USER_TD_SA) != 0:
         USER_TD_SA = USER_TD_SA.lower()
         
-    GDTOT_CRYPT = environ.get('GDTOT_CRYPT', '')
-    if len(GDTOT_CRYPT) == 0:
-        GDTOT_CRYPT = ''
-    
     DATABASE_URL = environ.get('DATABASE_URL', '')
     if len(DATABASE_URL) == 0:
         DATABASE_URL = ''
@@ -125,13 +120,13 @@ async def load_config():
         MEGA_EMAIL = ''
         MEGA_PASSWORD = ''
 
-    UPTOBOX_TOKEN = environ.get('UPTOBOX_TOKEN', '')
-    if len(UPTOBOX_TOKEN) == 0:
-        UPTOBOX_TOKEN = ''
-
     INDEX_URL = environ.get('INDEX_URL', '').rstrip("/")
     if len(INDEX_URL) == 0:
         INDEX_URL = ''
+
+    JIODRIVE_TOKEN = environ.get('JIODRIVE_TOKEN', '')
+    if len(JIODRIVE_TOKEN) == 0:
+        JIODRIVE_TOKEN = ''
 
     SEARCH_API_LINK = environ.get('SEARCH_API_LINK', '').rstrip("/")
     if len(SEARCH_API_LINK) == 0:
@@ -214,11 +209,6 @@ async def load_config():
 
     QUEUE_UPLOAD = environ.get('QUEUE_UPLOAD', '')
     QUEUE_UPLOAD = '' if len(QUEUE_UPLOAD) == 0 else int(QUEUE_UPLOAD)
-
-    INCOMPLETE_TASK_NOTIFIER = environ.get('INCOMPLETE_TASK_NOTIFIER', '')
-    INCOMPLETE_TASK_NOTIFIER = INCOMPLETE_TASK_NOTIFIER.lower() == 'true'
-    if not INCOMPLETE_TASK_NOTIFIER and DATABASE_URL:
-        await DbManager().trunc_table('tasks')
 
     STREAMWISH_API = environ.get('STREAMWISH_API', '')
     if len(STREAMWISH_API) == 0:
@@ -374,7 +364,6 @@ async def load_config():
                         'CMD_SUFFIX': CMD_SUFFIX,
                         'DATABASE_URL': DATABASE_URL,
                         'DEFAULT_UPLOAD': DEFAULT_UPLOAD,
-                        'GDTOT_CRYPT': GDTOT_CRYPT,
                         'STORAGE_THRESHOLD': STORAGE_THRESHOLD,
                         'TORRENT_LIMIT': TORRENT_LIMIT,
                         'DIRECT_LIMIT': DIRECT_LIMIT,
@@ -395,8 +384,8 @@ async def load_config():
                         'EQUAL_SPLITS': EQUAL_SPLITS,
                         'EXTENSION_FILTER': EXTENSION_FILTER,
                         'GDRIVE_ID': GDRIVE_ID,
-                        'INCOMPLETE_TASK_NOTIFIER': INCOMPLETE_TASK_NOTIFIER,
                         'INDEX_URL': INDEX_URL,
+                        'JIODRIVE_TOKEN': JIODRIVE_TOKEN,
                         'LEECH_LOG_ID': LEECH_LOG_ID,
                         'LEECH_SPLIT_SIZE': LEECH_SPLIT_SIZE,
                         'TOKEN_TIMEOUT': TOKEN_TIMEOUT,
@@ -427,7 +416,6 @@ async def load_config():
                         'TORRENT_TIMEOUT': TORRENT_TIMEOUT,
                         'UPSTREAM_REPO': UPSTREAM_REPO,
                         'UPSTREAM_BRANCH': UPSTREAM_BRANCH,
-                        'UPTOBOX_TOKEN': UPTOBOX_TOKEN,
                         'USER_SESSION_STRING': USER_SESSION_STRING,
                         'USER_TD_SA': USER_TD_SA,
                         'USE_SERVICE_ACCOUNTS': USE_SERVICE_ACCOUNTS,
@@ -683,8 +671,6 @@ async def edit_bot_settings(client, query):
                 await DbManager().update_aria2('bt-stop-timeout', '0')
         elif data[2] == 'BASE_URL':
             await (await create_subprocess_exec("pkill", "-9", "-f", "gunicorn")).wait()
-        elif data[2] == 'INCOMPLETE_TASK_NOTIFIER' and DATABASE_URL:
-            await DbManager().trunc_table('tasks')
         config_dict[data[2]] = value
         await update_buttons(message, data[2], 'editvar', False)
         if DATABASE_URL:
@@ -707,8 +693,6 @@ async def edit_bot_settings(client, query):
         value = data[3] == "on"
         await query.answer(f'Successfully Var changed to {value}!', show_alert=True)
         config_dict[data[2]] = value
-        if not value and data[2] == 'INCOMPLETE_TASK_NOTIFIER' and DATABASE_URL:
-            await DbManager().trunc_table('tasks')
         await update_buttons(message, data[2], 'editvar', False)
         if DATABASE_URL:
             await DbManager().update_config({data[2]: value})

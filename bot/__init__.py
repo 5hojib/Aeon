@@ -128,6 +128,10 @@ GDRIVE_ID = environ.get('GDRIVE_ID', '')
 if len(GDRIVE_ID) == 0:
     GDRIVE_ID = ''
 
+JIODRIVE_TOKEN = environ.get('JIODRIVE_TOKEN', '')
+if len(JIODRIVE_TOKEN) == 0:
+    JIODRIVE_TOKEN = ''
+
 RCLONE_PATH = environ.get('RCLONE_PATH', '')
 if len(RCLONE_PATH) == 0:
     RCLONE_PATH = ''
@@ -181,10 +185,6 @@ if len(MEGA_EMAIL) == 0 or len(MEGA_PASSWORD) == 0:
 FILELION_API = environ.get('FILELION_API', '')
 if len(FILELION_API) == 0:
     FILELION_API = ''
-
-UPTOBOX_TOKEN = environ.get('UPTOBOX_TOKEN', '')
-if len(UPTOBOX_TOKEN) == 0:
-    UPTOBOX_TOKEN = ''
 
 INDEX_URL = environ.get('INDEX_URL', '').rstrip("/")
 if len(INDEX_URL) == 0:
@@ -243,9 +243,6 @@ QUEUE_DOWNLOAD = '' if len(QUEUE_DOWNLOAD) == 0 else int(QUEUE_DOWNLOAD)
 QUEUE_UPLOAD = environ.get('QUEUE_UPLOAD', '')
 QUEUE_UPLOAD = '' if len(QUEUE_UPLOAD) == 0 else int(QUEUE_UPLOAD)
 
-INCOMPLETE_TASK_NOTIFIER = environ.get('INCOMPLETE_TASK_NOTIFIER', '')
-INCOMPLETE_TASK_NOTIFIER = INCOMPLETE_TASK_NOTIFIER.lower() == 'true'
-
 STOP_DUPLICATE = environ.get('STOP_DUPLICATE', '')
 STOP_DUPLICATE = STOP_DUPLICATE.lower() == 'true'
 
@@ -271,10 +268,6 @@ BASE_URL = environ.get('BASE_URL', '').rstrip("/")
 if len(BASE_URL) == 0:
     log_warning('BASE_URL not provided!')
     BASE_URL = ''
-
-GDTOT_CRYPT = environ.get('GDTOT_CRYPT', '')
-if len(GDTOT_CRYPT) == 0:
-    GDTOT_CRYPT = ''
 
 UPSTREAM_REPO = environ.get('UPSTREAM_REPO', '')
 if len(UPSTREAM_REPO) == 0:
@@ -366,7 +359,6 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'DATABASE_URL': DATABASE_URL,
                'DEFAULT_UPLOAD': DEFAULT_UPLOAD,
                'FILELION_API': FILELION_API,
-               'GDTOT_CRYPT': GDTOT_CRYPT,
                'STORAGE_THRESHOLD': STORAGE_THRESHOLD,
                'TORRENT_LIMIT': TORRENT_LIMIT,
                'DIRECT_LIMIT': DIRECT_LIMIT,
@@ -386,8 +378,8 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'EQUAL_SPLITS': EQUAL_SPLITS,
                'EXTENSION_FILTER': EXTENSION_FILTER,
                'GDRIVE_ID': GDRIVE_ID,
-               'INCOMPLETE_TASK_NOTIFIER': INCOMPLETE_TASK_NOTIFIER,
                'INDEX_URL': INDEX_URL,
+               'JIODRIVE_TOKEN': JIODRIVE_TOKEN,
                'LEECH_LOG_ID': LEECH_LOG_ID,
                'LEECH_SPLIT_SIZE': LEECH_SPLIT_SIZE,
                'TOKEN_TIMEOUT': TOKEN_TIMEOUT,
@@ -418,7 +410,6 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'TORRENT_TIMEOUT': TORRENT_TIMEOUT,
                'UPSTREAM_REPO': UPSTREAM_REPO,
                'UPSTREAM_BRANCH': UPSTREAM_BRANCH,
-               'UPTOBOX_TOKEN': UPTOBOX_TOKEN,
                'USER_SESSION_STRING': USER_SESSION_STRING,
                'USER_TD_SA': USER_TD_SA,
                'USE_SERVICE_ACCOUNTS': USE_SERVICE_ACCOUNTS,

@@ -158,37 +158,6 @@ class DbManager:
         await self.__db.rss[bot_id].delete_one({'_id': user_id})
         self.__conn.close
 
-    async def add_incomplete_task(self, cid, link, tag):
-        if self.__err:
-            return
-        await self.__db.tasks[bot_id].insert_one({'_id': link, 'cid': cid, 'tag': tag})
-        self.__conn.close
-
-    async def rm_complete_task(self, link):
-        if self.__err:
-            return
-        await self.__db.tasks[bot_id].delete_one({'_id': link})
-        self.__conn.close
-
-    async def get_incomplete_tasks(self):
-        notifier_dict = {}
-        if self.__err:
-            return notifier_dict
-        if await self.__db.tasks[bot_id].find_one():
-            rows = self.__db.tasks[bot_id].find({})
-            async for row in rows:
-                if row['cid'] in list(notifier_dict.keys()):
-                    if row['tag'] in list(notifier_dict[row['cid']]):
-                        notifier_dict[row['cid']][row['tag']].append(
-                            row['_id'])
-                    else:
-                        notifier_dict[row['cid']][row['tag']] = [row['_id']]
-                else:
-                    notifier_dict[row['cid']] = {row['tag']: [row['_id']]}
-        await self.__db.tasks[bot_id].drop()
-        self.__conn.close
-        return notifier_dict
-
     async def trunc_table(self, name):
         if self.__err:
             return

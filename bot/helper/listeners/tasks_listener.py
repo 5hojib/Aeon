@@ -99,8 +99,6 @@ class MirrorLeechListener:
             self.linkslogmsg = await sendCustomMsg(config_dict['LEECH_LOG_ID'], msg)
         user_dict = user_data.get(self.message.from_user.id, {})
         self.botpmmsg = await sendCustomMsg(self.message.from_user.id, '<b>Task started</b>')
-        if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
-            await DbManager().add_incomplete_task(self.message.chat.id, self.message.link, self.tag)
 
     async def onDownloadComplete(self):
         multi_links = False
@@ -363,8 +361,6 @@ class MirrorLeechListener:
             await RCTransfer.upload(up_path, size)
 
     async def onUploadComplete(self, link, size, files, folders, mime_type, name, rclonePath=''):
-        if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
-            await DbManager().rm_complete_task(self.message.link)
         user_id = self.message.from_user.id
         name, _ = await format_filename(name, user_id, isMirror=not self.isLeech)
         user_dict = user_data.get(user_id, {})
@@ -520,8 +516,6 @@ Your download has been stopped!
             await update_all_messages()
         if self.isSuperGroup and self.botpmmsg:
             await sendMessage(self.botpmmsg, msg, button)
-        if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
-            await DbManager().rm_complete_task(self.message.link)
         await five_minute_del(x)
         
         async with queue_dict_lock:
@@ -564,8 +558,6 @@ Your upload has been stopped!
             await update_all_messages()
         if self.isSuperGroup and self.botpmmsg:
             await sendMessage(self.botpmmsg, msg)
-        if self.isSuperGroup and config_dict['INCOMPLETE_TASK_NOTIFIER'] and DATABASE_URL:
-            await DbManager().rm_complete_task(self.message.link)
         await five_minute_del(x)
         
         async with queue_dict_lock:

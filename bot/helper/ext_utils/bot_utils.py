@@ -1,3 +1,4 @@
+from urllib.parse import urlparse
 from base64 import b64encode
 from datetime import datetime
 from os import path as ospath
@@ -282,7 +283,8 @@ def is_telegram_link(url):
 
 
 def is_share_link(url):
-    return bool(re_match(r'https?://(new\.filepress\.store|.+\.gdtot\.\S+|filepress|hubdrive|filebee|appdrive|gdflix)\b', url))
+    domain = urlparse(url).hostname
+    return any(x in domain for x in ['appdirve', 'hubdrive'])
 
 
 def is_mega_link(url):

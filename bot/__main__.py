@@ -22,7 +22,7 @@ from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.filters import command, private, regex
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from bot import bot, config_dict, user_data, botStartTime, LOGGER, Interval, DATABASE_URL, QbInterval, INCOMPLETE_TASK_NOTIFIER, scheduler, bot_name
+from bot import bot, config_dict, user_data, botStartTime, LOGGER, Interval, DATABASE_URL, QbInterval, scheduler, bot_name
 from .helper.ext_utils.fs_utils import start_cleanup, clean_all, exit_clean_up
 from .helper.ext_utils.bot_utils import get_readable_file_size, get_readable_time, cmd_exec, sync_to_async, set_commands, update_user_ldata, new_thread, format_validity_time, new_task
 from .helper.ext_utils.db_handler import DbManager
@@ -173,7 +173,7 @@ async def aeoncb(_, query):
             reply_message = await sendMessage(message, startLine + escape(Loglines) + endLine, btn.build_menu(1))
             await query.edit_message_reply_markup(None)
             await deleteMessage(message)
-            await one_minute_del(reply_message)
+            await five_minute_del(reply_message)
         except Exception as err:
             LOGGER.error(f"TG Log Display : {str(err)}")
     elif data[2] == "webpaste":
@@ -292,20 +292,6 @@ async def restart_notification():
                 await bot.send_message(chat_id=cid, text=msg, disable_web_page_preview=True, disable_notification=True)
         except Exception as e:
             LOGGER.error(e)
-
-    if INCOMPLETE_TASK_NOTIFIER and DATABASE_URL:
-        if notifier_dict := await DbManager().get_incomplete_tasks():
-            for cid, data in notifier_dict.items():
-                msg = rmsg if cid == chat_id else 'Bot restarted!'
-                for tag, links in data.items():
-                    msg += f"\n\n{tag}: "
-                    for index, link in enumerate(links, start=1):
-                        msg += f" <a href='{link}'>{index}</a> |"
-                        if len(msg.encode()) > 4000:
-                            await send_incompelete_task_message(cid, msg)
-                            msg = ''
-                if msg:
-                    await send_incompelete_task_message(cid, msg)
 
     if await aiopath.isfile(".restartmsg"):
         try:
