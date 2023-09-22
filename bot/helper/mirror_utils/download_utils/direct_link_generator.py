@@ -23,81 +23,6 @@ from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.help_messages import PASSWORD_ERROR_MESSAGE
 
 _caches = {}
-domain_dict = [
-        (mediafire,   ['mediafire.com']),
-        (osdn,        ['osdn.net']),
-        (github,      ['github.com']),
-        (hxfile,      ['hxfile.co']),
-        (onedrive,    ['1drv.ms']),
-        (pixeldrain,  ['pixeldrain.com']),
-        (racaty,      ['racaty']),
-        (fichier,     ['1fichier.com']),
-        (solidfiles,  ['solidfiles.com']),
-        (krakenfiles, ['krakenfiles.com']),
-        (uploadee,    ['upload.ee']),
-        (gofile,      ['gofile.io']),
-        (send_cm,     ['send.cm']),
-        (easyupload,  ['easyupload.io']),
-        (hubdrive,    ['hubdrive']),
-        (streamvid,   ['streamvid.net']),
-        (shrdsk,      ['shrdsk.me']),
-        (streamhub,   ['streamhub.ink']),
-        (appdrive,    ['appdrive']),
-        (jiodrive,    ['jiodrive']),
-        (akmfiles,    ['akmfiles.com', 'akmfls.xyz']),
-        (doods,       ['dood.watch',
-                       'doodstream.com',
-                       'dood.to',
-                       'dood.so',
-                       'dood.cx',
-                       'dood.la',
-                       'dood.ws',
-                       'dood.sh',
-                       'doodstream.co',
-                       'dood.pm',
-                       'dood.wf',
-                       'dood.re',
-                       'dood.video',
-                       'dooood.com',
-                       'dood.yt',
-                       'doods.yt',
-                       'dood.stream',
-                       'doods.pro']),
-        (streamtape,  ['streamtape.com',
-                       'streamtape.co',
-                       'streamtape.cc',
-                       'streamtape.to',
-                       'streamtape.net',
-                       'streamta.pe',
-                       'streamtape.xyz']),
-        (wetransfer,  ['wetransfer.com', 'we.tl']),
-        (terabox,     ['terabox',
-                       'nephobox',
-                       '4funbox',
-                       'mirrobox',
-                       'momerybox',
-                       'teraboxapp',
-                       '1024tera']),
-        (filewish,    ['filelions.com',
-                       'filelions.live',
-                       'filelions.to',
-                       'filelions.online',
-                       'embedwish.com',
-                       'streamwish.com',
-                       'kitabmarkaz.xyz',
-                       'wishfast.top']),
-        (linkBox, ['linkbox.to', 'lbx.to'])]
-
-def direct_link_generator(link):
-    domain = urlparse(link).hostname
-    if not domain:
-        raise DirectDownloadLinkException("ERROR: Invalid URL")
-    if 'youtube.com' in domain or 'youtu.be' in domain:
-        raise DirectDownloadLinkException("ERROR: Use ytdl cmds for Youtube links")
-    for func, domain_list in domain_dict:
-        if any(x in domain for x in domain_list):
-            return func(link)
-    raise DirectDownloadLinkException(f'ERROR: No Direct link function found for {link}')
 
 
 def get_captcha_token(session, params):
@@ -1179,3 +1104,79 @@ def jiodrive(url):
         if resp['code'] != '200':
             raise DirectDownloadLinkException("ERROR: The user's Drive storage quota has been exceeded.")
         return resp['file']
+
+domain_dict = [
+        (mediafire,   ['mediafire.com']),
+        (osdn,        ['osdn.net']),
+        (github,      ['github.com']),
+        (hxfile,      ['hxfile.co']),
+        (onedrive,    ['1drv.ms']),
+        (pixeldrain,  ['pixeldrain.com']),
+        (racaty,      ['racaty']),
+        (fichier,     ['1fichier.com']),
+        (solidfiles,  ['solidfiles.com']),
+        (krakenfiles, ['krakenfiles.com']),
+        (uploadee,    ['upload.ee']),
+        (gofile,      ['gofile.io']),
+        (send_cm,     ['send.cm']),
+        (easyupload,  ['easyupload.io']),
+        (hubdrive,    ['hubdrive']),
+        (streamvid,   ['streamvid.net']),
+        (shrdsk,      ['shrdsk.me']),
+        (streamhub,   ['streamhub.ink']),
+        (appdrive,    ['appdrive']),
+        (jiodrive,    ['jiodrive']),
+        (akmfiles,    ['akmfiles.com', 'akmfls.xyz']),
+        (doods,       ['dood.watch',
+                       'doodstream.com',
+                       'dood.to',
+                       'dood.so',
+                       'dood.cx',
+                       'dood.la',
+                       'dood.ws',
+                       'dood.sh',
+                       'doodstream.co',
+                       'dood.pm',
+                       'dood.wf',
+                       'dood.re',
+                       'dood.video',
+                       'dooood.com',
+                       'dood.yt',
+                       'doods.yt',
+                       'dood.stream',
+                       'doods.pro']),
+        (streamtape,  ['streamtape.com',
+                       'streamtape.co',
+                       'streamtape.cc',
+                       'streamtape.to',
+                       'streamtape.net',
+                       'streamta.pe',
+                       'streamtape.xyz']),
+        (wetransfer,  ['wetransfer.com', 'we.tl']),
+        (terabox,     ['terabox',
+                       'nephobox',
+                       '4funbox',
+                       'mirrobox',
+                       'momerybox',
+                       'teraboxapp',
+                       '1024tera']),
+        (filewish,    ['filelions.com',
+                       'filelions.live',
+                       'filelions.to',
+                       'filelions.online',
+                       'embedwish.com',
+                       'streamwish.com',
+                       'kitabmarkaz.xyz',
+                       'wishfast.top']),
+        (linkBox, ['linkbox.to', 'lbx.to'])]
+
+def direct_link_generator(link):
+    domain = urlparse(link).hostname
+    if not domain:
+        raise DirectDownloadLinkException("ERROR: Invalid URL")
+    if 'youtube.com' in domain or 'youtu.be' in domain:
+        raise DirectDownloadLinkException("ERROR: Use ytdl cmds for Youtube links")
+    for func, domain_list in domain_dict:
+        if any(x in domain for x in domain_list):
+            return func(link)
+    raise DirectDownloadLinkException(f'ERROR: No Direct link function found for {link}')
