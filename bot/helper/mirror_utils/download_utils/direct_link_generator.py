@@ -1176,7 +1176,11 @@ def direct_link_generator(link):
         raise DirectDownloadLinkException("ERROR: Invalid URL")
     if 'youtube.com' in domain or 'youtu.be' in domain:
         raise DirectDownloadLinkException("ERROR: Use ytdl cmds for Youtube links")
-    for func, domain_list in domain_dict:
+    for func_name, domain_list in domain_dict:
         if any(x in domain for x in domain_list):
-            return func(link)
+            func = globals().get(func_name)
+            if func and callable(func):
+                return func(link)
+            else:
+                raise DirectDownloadLinkException(f"ERROR: Function '{func_name}' not found or not callable.")
     raise DirectDownloadLinkException(f'ERROR: No Direct link function found for {link}')
