@@ -23,15 +23,78 @@ from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.help_messages import PASSWORD_ERROR_MESSAGE
 
 
-terabox_domain = ['terabox', 'nephobox', '4funbox', 'mirrobox', 'momerybox', 'teraboxapp', '1024tera']
-streamtape_domain = ['streamtape.com', 'streamtape.co', 'streamtape.cc', 'streamtape.to', 'streamtape.net', 'streamta.pe', 'streamtape.xyz']
-doods_domain = ['dood.watch', 'doodstream.com', 'dood.to', 'dood.so', 'dood.cx', 'dood.la', 'dood.ws', 'dood.sh', 'doodstream.co', 'dood.pm', 'dood.wf', 'dood.re', 'dood.video', 'dooood.com', 'dood.yt', 'doods.yt', 'dood.stream', 'doods.pro']
-filelions_n_streamwish = ['filelions.com', 'filelions.live', 'filelions.to', 'filelions.online','embedwish.com', 'streamwish.com', 'kitabmarkaz.xyz', 'wishfast.top']
-linkbox_domain = ['linkbox.to', 'lbx.to']
-wetransfer_domain = ['wetransfer.com', 'we.tl']
-akmfiles_domain = ['akmfiles.com', 'akmfls.xyz']
+terabox_domain = 
+streamtape_domain = 
+doods_domain = 
+filewish_domain = 
+linkbox_domain = 
+wetransfer_domain = 
+akmfiles_domain = 
 _caches = {}
-
+domain_dict = [
+        (mediafire,   ['mediafire.com']),
+        (osdn,        ['osdn.net']),
+        (github,      ['github.com']),
+        (hxfile,      ['hxfile.co']),
+        (onedrive,    ['1drv.ms']),
+        (pixeldrain,  ['pixeldrain.com']),
+        (racaty,      ['racaty']),
+        (fichier,     ['1fichier.com']),
+        (solidfiles,  ['solidfiles.com']),
+        (krakenfiles, ['krakenfiles.com']),
+        (uploadee,    ['upload.ee']),
+        (gofile,      ['gofile.io']),
+        (send_cm,     ['send.cm']),
+        (easyupload,  ['easyupload.io']),
+        (hubdrive,    ['hubdrive']),
+        (streamvid,   ['streamvid.net']),
+        (shrdsk,      ['shrdsk.me']),
+        (streamhub,   ['streamhub.ink']),
+        (appdrive,    ['appdrive']),
+        (jiodrive,    ['jiodrive']),
+        (akmfiles,    ['akmfiles.com', 'akmfls.xyz']),
+        (doods,       ['dood.watch',
+                       'doodstream.com',
+                       'dood.to',
+                       'dood.so',
+                       'dood.cx',
+                       'dood.la',
+                       'dood.ws',
+                       'dood.sh',
+                       'doodstream.co',
+                       'dood.pm',
+                       'dood.wf',
+                       'dood.re',
+                       'dood.video',
+                       'dooood.com',
+                       'dood.yt',
+                       'doods.yt',
+                       'dood.stream',
+                       'doods.pro']),
+        (streamtape,  ['streamtape.com',
+                       'streamtape.co',
+                       'streamtape.cc',
+                       'streamtape.to',
+                       'streamtape.net',
+                       'streamta.pe',
+                       'streamtape.xyz']),
+        (wetransfer,  ['wetransfer.com', 'we.tl']),
+        (terabox,     ['terabox',
+                       'nephobox',
+                       '4funbox',
+                       'mirrobox',
+                       'momerybox',
+                       'teraboxapp',
+                       '1024tera']),
+        (filewish,    ['filelions.com',
+                       'filelions.live',
+                       'filelions.to',
+                       'filelions.online',
+                       'embedwish.com',
+                       'streamwish.com',
+                       'kitabmarkaz.xyz',
+                       'wishfast.top']),
+        (linkBox, ['linkbox.to', 'lbx.to'])]
 
 def direct_link_generator(link):
     domain = urlparse(link).hostname
@@ -39,62 +102,11 @@ def direct_link_generator(link):
         raise DirectDownloadLinkException("ERROR: Invalid URL")
     if 'youtube.com' in domain or 'youtu.be' in domain:
         raise DirectDownloadLinkException("ERROR: Use ytdl cmds for Youtube links")
-    elif 'mediafire.com' in domain:
-        return mediafire(link)
-    elif 'osdn.net' in domain:
-        return osdn(link)
-    elif 'github.com' in domain:
-        return github(link)
-    elif 'hxfile.co' in domain:
-        return hxfile(link)
-    elif '1drv.ms' in domain:
-        return onedrive(link)
-    elif 'pixeldrain.com' in domain:
-        return pixeldrain(link)
-    elif 'racaty' in domain:
-        return racaty(link)
-    elif '1fichier.com' in domain:
-        return fichier(link)
-    elif 'solidfiles.com' in domain:
-        return solidfiles(link)
-    elif 'krakenfiles.com' in domain:
-        return krakenfiles(link)
-    elif 'upload.ee' in domain:
-        return uploadee(link)
-    elif 'gofile.io' in domain:
-        return gofile(link)
-    elif 'send.cm' in domain:
-        return send_cm(link)
-    elif 'easyupload.io' in domain:
-        return easyupload(link)
-    elif 'hubdrive' in domain:
-        return hubdrive(link)
-    elif 'streamvid.net' in domain:
-        return streamvid(link)
-    elif 'shrdsk.me' in domain:
-        return shrdsk(link)
-    elif 'streamhub.ink' in domain:
-        return streamhub(link)
-    elif 'appdrive' in domain:
-        return appdrive(link)
-    elif 'jiodrive' in domain:
-    	  return jiodrive(link)
-    elif any(x in domain for x in akmfiles_domain):
-        return akmfiles(link)
-    elif any(x in domain for x in doods_domain):
-        return doods(link)
-    elif any(x in domain for x in streamtape_domain):
-        return streamtape(link)
-    elif any(x in domain for x in wetransfer_domain):
-        return wetransfer(link)
-    elif any(x in domain for x in terabox_domain):
-        return terabox(link)
-    elif any(x in domain for x in filelions_n_streamwish):
-        return filelions_and_streamwish(link)
-    elif any(x in domain for x in linkbox_domain):
-        return linkBox(link)
-    else:
-        raise DirectDownloadLinkException(f'EROOR: No Direct link function found for {link}')
+    for func, domain_list in domain_dict:
+        if any(x in domain for x in domain_list):
+            return func(link)
+    raise DirectDownloadLinkException(f'ERROR: No Direct link function found for {link}')
+
 
 def get_captcha_token(session, params):
     recaptcha_api = 'https://www.google.com/recaptcha/api2'
@@ -1047,7 +1059,7 @@ def easyupload(url):
         raise DirectDownloadLinkException(f"ERROR: Failed to generate direct link due to {json_resp['data']}")
     raise DirectDownloadLinkException("ERROR: Failed to generate direct link from EasyUpload.")
 
-def filelions_and_streamwish(url):
+def filewish(url):
     parsed_url = urlparse(url)
     hostname = parsed_url.hostname
     scheme = parsed_url.scheme
