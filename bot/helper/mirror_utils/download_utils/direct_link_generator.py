@@ -77,6 +77,8 @@ def direct_link_generator(link):
         return streamhub(link)
     elif 'appdrive' in domain:
         return appdrive(link)
+    elif 'jiodrive' in domain:
+    	  return jiodrive(link)
     elif any(x in domain for x in akmfiles_domain):
         return akmfiles(link)
     elif any(x in domain for x in doods_domain):
