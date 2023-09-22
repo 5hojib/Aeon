@@ -22,14 +22,6 @@ from bot.helper.ext_utils.bot_utils import get_readable_time, is_share_link, tex
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.help_messages import PASSWORD_ERROR_MESSAGE
 
-
-terabox_domain = 
-streamtape_domain = 
-doods_domain = 
-filewish_domain = 
-linkbox_domain = 
-wetransfer_domain = 
-akmfiles_domain = 
 _caches = {}
 domain_dict = [
         (mediafire,   ['mediafire.com']),
