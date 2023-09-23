@@ -40,7 +40,6 @@ class _BotCommands:
         self.AddImageCommand = f'addimg{CMD_SUFFIX}'
         self.ImagesCommand = f'images{CMD_SUFFIX}'
         self.MediaInfoCommand = f'mediainfo{CMD_SUFFIX}'
-        self.BroadcastCommand = [f'broadcast{CMD_SUFFIX}', 'broadcastall'],
-        self.RemoveAllTokensCommand = 'cleartoken'
+        self.BroadcastCommand = [f'broadcast{CMD_SUFFIX}', 'broadcastall']
 
 BotCommands = _BotCommands()

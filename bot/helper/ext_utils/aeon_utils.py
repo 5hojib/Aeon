@@ -1,7 +1,8 @@
 import pyshorteners
+from bot import LOGGER
 from re import IGNORECASE, search, escape
+
 from bot.helper.ext_utils.text_utils import nsfw_keywords
-from bot import LOGGER, DATABASE_URL
 
 
 def isNSFW(text):
@@ -25,6 +26,7 @@ def isNSFWdata(data):
                 filename = item['filename']
                 if isNSFW(filename):
                     return True
+    return False
 
 
 async def nsfw_precheck(message):
