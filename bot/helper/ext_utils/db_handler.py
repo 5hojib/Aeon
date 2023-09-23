@@ -10,6 +10,13 @@ from time import time
 from dotenv import dotenv_values
 
 from bot import DATABASE_URL, LOGGER, aria2_options, bot_id, bot_loop, bot_name, config_dict, qbit_options, rss_dict, user_data
+from pyrogram.filters import command
+from pyrogram.handlers import MessageHandler
+
+from bot.helper.ext_utils.db_handler import DbManager
+from bot.helper.telegram_helper.bot_commands import BotCommands
+from bot.helper.telegram_helper.filters import CustomFilters
+from bot.helper.telegram_helper.message_utils import sendMessage
 
 class DbManager:
     def __init__(self):
@@ -230,3 +237,16 @@ class DbManager:
 
 if DATABASE_URL:
     bot_loop.run_until_complete(DbManager().db_load())
+
+
+
+async def RemoveAllTokens(_, message):
+    if DATABASE_URL:
+        await DbManager().delete_all_access_tokens()
+        msg = 'All access tokens have been removed from the database.'
+    else:
+        msg = 'Database URL not added.'
+    return await sendMessage(message, msg)
+
+
+bot.add_handler(MessageHandler(RemoveAllTokens, filters=command(BotCommands.RemoveAllTokensCommand) & CustomFilters.sudo))
