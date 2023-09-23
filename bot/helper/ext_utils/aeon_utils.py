@@ -4,7 +4,6 @@ from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 
 from bot import LOGGER, DATABASE_URL
-from bot.helper.ext_utils.bot_utils import new_task
 from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
@@ -55,7 +54,6 @@ async def nsfw_precheck(message):
     return False
 
 
-@new_task
 async def RemoveAllTokens(_, message):
     if DATABASE_URL:
         await DbManager().delete_all_access_tokens()
