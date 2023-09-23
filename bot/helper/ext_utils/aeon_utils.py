@@ -1,7 +1,14 @@
 import pyshorteners
-from bot import LOGGER
 from re import IGNORECASE, search, escape
+from pyrogram.filters import command
+from pyrogram.handlers import MessageHandler
 
+from bot import LOGGER, DATABASE_URL
+from bot.helper.ext_utils.bot_utils import new_task
+from bot.helper.ext_utils.db_handler import DbManager
+from bot.helper.telegram_helper.bot_commands import BotCommands
+from bot.helper.telegram_helper.filters import CustomFilters
+from bot.helper.telegram_helper.message_utils import sendMessage
 from bot.helper.ext_utils.text_utils import nsfw_keywords
 
 
@@ -48,6 +55,16 @@ async def nsfw_precheck(message):
     return False
 
 
+@new_task
+async def RemoveAllTokens(_, message):
+    if DATABASE_URL:
+        await DbManager().delete_all_access_tokens()
+        msg = 'All access tokens have been removed from the database.'
+    else:
+        msg = 'Database URL not added.'
+    return await sendMessage(message, msg)
+
+
 def tinyfy(long_url):
     s = pyshorteners.Shortener()
     try:
@@ -57,3 +74,6 @@ def tinyfy(long_url):
     except Exception:
         LOGGER.error(f'Failed to shorten URL: {long_url}')
         return long_url
+
+
+bot.add_handler(MessageHandler(RemoveAllTokens, filters=command(BotCommands.RemoveAllTokensCommand) & CustomFilters.sudo))
