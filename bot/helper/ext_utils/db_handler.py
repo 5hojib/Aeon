@@ -13,7 +13,6 @@ from bot import DATABASE_URL, LOGGER, aria2_options, bot_id, bot_loop, bot_name,
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 
-from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import sendMessage
