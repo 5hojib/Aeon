@@ -535,7 +535,7 @@ class GoogleDriveHelper:
                     msg += f"<code>{file.get('name')}<br>(folder)</code><br>"
                     msg += f"<b><a href={furl}>Drive Link</a></b>"
                     if index_url:
-                        url = f"{INDEX_URL}findpath?id={file.get('id')}"
+                        url = f"{index_url}findpath?id={file.get('id')}"
                         msg += f' <b>| <a href="{url}">Index Link</a></b>'
                 elif mime_type == 'application/vnd.google-apps.shortcut':
                     furl = self.__G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(file.get('id'))
@@ -545,11 +545,11 @@ class GoogleDriveHelper:
                     msg += f"<code>{file.get('name')}<br>({get_readable_file_size(int(file.get('size', 0)))})</code><br>"
                     msg += f"<b><a href={furl}>Drive Link</a></b>"
                     if index_url:
-                        url = f"{INDEX_URL}findpath?id={file.get('id')}"
+                        url = f"{index_url}findpath?id={file.get('id')}"
                         msg += f' <b>| <a href="{url}">Index Link</a></b>'
                         if mime_type.startswith(('image', 'video', 'audio')):
-                            urlv = f"{INDEX_URL}findpath?id={file.get('id')}&view=true"
-                            msg += f' <b>| <a href="{urlv}">View Link</a></b>'
+                            view_url = f"{url}&view=true"
+                            msg += f' <b>| <a href="{view_url}">View Link</a></b>'
                 msg += '<br><br>'
                 contents_no += 1
                 if len(msg.encode('utf-8')) > 39000:
