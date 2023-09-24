@@ -313,8 +313,7 @@ class GoogleDriveHelper:
                         raise err
                     if config_dict['USE_SERVICE_ACCOUNTS']:
                         if self.__sa_count >= self.__sa_number:
-                            LOGGER.info(
-                                f"Reached maximum number of service accounts switching, which is {self.__sa_count}")
+                            LOGGER.info(f"Reached maximum number of service accounts switching, which is {self.__sa_count}")
                             raise err
                         else:
                             if self.__is_cancelled:
@@ -431,8 +430,7 @@ class GoogleDriveHelper:
                     LOGGER.error(err)
                 elif config_dict['USE_SERVICE_ACCOUNTS']:
                     if self.__sa_count >= self.__sa_number:
-                        LOGGER.info(
-                            f"Reached maximum number of service accounts switching, which is {self.__sa_count}")
+                        LOGGER.info(f"Reached maximum number of service accounts switching, which is {self.__sa_count}")
                         raise err
                     else:
                         if self.__is_cancelled:
@@ -458,8 +456,7 @@ class GoogleDriveHelper:
         y = file.get("id")
         while (y != rootid):
             rtnlist.append(x)
-            file = self.__service.files().get(fileId=file.get("parents")[0], supportsAllDrives=True,
-                                              fields='id, name, parents').execute()
+            file = self.__service.files().get(fileId=file.get("parents")[0], supportsAllDrives=True, fields='id, name, parents').execute()
             x = file.get("name")
             y = file.get("id")
         rtnlist.reverse()
@@ -483,15 +480,9 @@ class GoogleDriveHelper:
                         query += "mimeType = 'application/vnd.google-apps.folder' and "
                 query += "trashed = false"
                 if dir_id == "root":
-                    return self.__service.files().list(q=f"{query} and 'me' in owners",
-                                                       pageSize=200, spaces='drive',
-                                                       fields='files(id, name, mimeType, size, parents)',
-                                                       orderBy='folder, name asc').execute()
+                    return self.__service.files().list(q=f"{query} and 'me' in owners", pageSize=200, spaces='drive', fields='files(id, name, mimeType, size, parents)', orderBy='folder, name asc').execute()
                 else:
-                    return self.__service.files().list(supportsAllDrives=True, includeItemsFromAllDrives=True,
-                                                       driveId=dir_id, q=query, spaces='drive', pageSize=150,
-                                                       fields='files(id, name, mimeType, size, teamDriveId, parents)',
-                                                       corpora='drive', orderBy='folder, name asc').execute()
+                    return self.__service.files().list(supportsAllDrives=True, includeItemsFromAllDrives=True, driveId=dir_id, q=query, spaces='drive', pageSize=150, fields='files(id, name, mimeType, size, teamDriveId, parents)', corpora='drive', orderBy='folder, name asc').execute()
             else:
                 if stopDup:
                     query = f"'{dir_id}' in parents and name = '{fileName}' and "
@@ -506,10 +497,7 @@ class GoogleDriveHelper:
                     elif itemType == "folders":
                         query += "mimeType = 'application/vnd.google-apps.folder' and "
                 query += "trashed = false"
-                return self.__service.files().list(supportsAllDrives=True, includeItemsFromAllDrives=True,
-                                                   q=query, spaces='drive', pageSize=150,
-                                                   fields='files(id, name, mimeType, size)',
-                                                   orderBy='folder, name asc').execute()
+                return self.__service.files().list(supportsAllDrives=True, includeItemsFromAllDrives=True, q=query, spaces='drive', pageSize=150, fields='files(id, name, mimeType, size)', orderBy='folder, name asc').execute()
         except Exception as err:
             err = str(err).replace('>', '').replace('<', '')
             LOGGER.error(err)
@@ -543,36 +531,25 @@ class GoogleDriveHelper:
                 msg += f"╾────────────╼<br><b>{drive_name}</b><br>╾────────────╼<br>"
             for file in response.get('files', []):
                 mime_type = file.get('mimeType')
-                if mime_type == "application/vnd.google-apps.folder":
-                    furl = f"https://drive.google.com/drive/folders/{file.get('id')}"
+                if mime_type == self.G_DRIVE_DIR_MIME_TYPE:
+                    furl = self.G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(file.get('id'))
                     msg += f"<code>{file.get('name')}<br>(folder)</code><br>"
                     msg += f"<b><a href={furl}>Drive Link</a></b>"
                     if index_url:
-                        if isRecur:
-                            url_path = "/".join([rquote(n, safe='')
-                                                for n in self.__get_recursive_list(file, dir_id)])
-                        else:
-                            url_path = rquote(f'{file.get("name")}', safe='')
-                        url = f'{index_url}/{url_path}/'
+                        url = f'{INDEX_URL}findpath?id={file.get('id')}'
                         msg += f' <b>| <a href="{url}">Index Link</a></b>'
                 elif mime_type == 'application/vnd.google-apps.shortcut':
-                    furl = f"https://drive.google.com/drive/folders/{file.get('id')}"
-                    msg += f"⁍<a href='https://drive.google.com/drive/folders/{file.get('id')}'>{file.get('name')}" \
-                        f"</a> (shortcut)"
+                    furl = self.G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(file.get('id'))
+                    msg += f"⁍<a href='{furl}'>{file.get('name')}</a> (shortcut)"
                 else:
-                    furl = f"https://drive.google.com/uc?id={file.get('id')}&export=download"
+                    furl = self.G_DRIVE_BASE_DOWNLOAD_URL.format(file.get('id'))
                     msg += f"<code>{file.get('name')}<br>({get_readable_file_size(int(file.get('size', 0)))})</code><br>"
                     msg += f"<b><a href={furl}>Drive Link</a></b>"
                     if index_url:
-                        if isRecur:
-                            url_path = "/".join(rquote(n, safe='')
-                                                for n in self.__get_recursive_list(file, dir_id))
-                        else:
-                            url_path = rquote(f'{file.get("name")}')
-                        url = f'{index_url}/{url_path}'
+                        url = f'{INDEX_URL}findpath?id={file.get('id')}'
                         msg += f' <b>| <a href="{url}">Index Link</a></b>'
                         if mime_type.startswith(('image', 'video', 'audio')):
-                            urlv = f'{index_url}/{url_path}?a=view'
+                            urlv = f'{INDEX_URL}findpath?id={file.get('id')}&view=true'
                             msg += f' <b>| <a href="{urlv}">View Link</a></b>'
                 msg += '<br><br>'
                 contents_no += 1
