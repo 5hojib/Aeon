@@ -213,9 +213,8 @@ async def __onDownloadError(api, gid):
 
 def start_aria2_listener():
     aria2.listen_to_notifications(threaded=False,
-                                  on_download_start=__onDownloadStarted,
-                                  on_download_error=__onDownloadError,
-                                  on_download_stop=__onDownloadStopped,
-                                  on_download_complete=__onDownloadComplete,
-                                  on_bt_download_complete=__onBtDownloadComplete,
-                                  timeout=60)
+       on_download_start=__onDownloadStarted,
+       on_download_error=__onDownloadError,
+       on_download_stop=__onDownloadStopped,
+       on_download_complete=__onDownloadComplete,
+       on_bt_download_complete=__onBtDownloadComplete, timeout=60)

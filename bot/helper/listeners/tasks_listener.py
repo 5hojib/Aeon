@@ -91,11 +91,10 @@ class MirrorLeechListener:
         
     async def onDownloadStart(self):
         if config_dict['LEECH_LOG_ID']:
-            msg = f"""<b>Task Started</b>
-
-<b>• Mode:</b> {self.upload_details['mode']}
-<b>• Task by:</b> {self.tag}
-<b>• User ID: </b><code>{self.message.from_user.id}</code>"""
+            msg = f'<b>Task Started</b>\n\n'
+            msg += f'<b>• Mode:</b> {self.upload_details['mode']}\n'
+            msg += f'<b>• Task by:</b> {self.tag}\n'
+            msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>'
             self.linkslogmsg = await sendCustomMsg(config_dict['LEECH_LOG_ID'], msg)
         user_dict = user_data.get(self.message.from_user.id, {})
         self.botpmmsg = await sendCustomMsg(self.message.from_user.id, '<b>Task started</b>')
@@ -405,7 +404,7 @@ class MirrorLeechListener:
                 if self.isSuperGroup:
                     btn.ibutton('View in inbox', f"aeon {user_id} botpm", 'header')
                     btn = extra_btns(btn)
-                    await sendMessage(self.message, f'{msg} <b>Files has been sent to your inbox</b>', btn.build_menu(1))
+                    await sendMessage(self.message, f'{msg}<b>Files has been sent to your inbox</b>', btn.build_menu(1))
                 else:
                     await deleteMessage(self.botpmmsg)
             if self.seed:
@@ -500,11 +499,10 @@ class MirrorLeechListener:
             if self.sameDir and self.uid in self.sameDir['tasks']:
                 self.sameDir['tasks'].remove(self.uid)
                 self.sameDir['total'] -= 1
-        msg = f'''Hey, {self.tag}!
-Your download has been stopped!
-
-<b>Reason:</b> {escape(error)}
-<b>Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}'''
+        msg = f'Hey, {self.tag}!\n'
+        msg += 'Your download has been stopped!\n\n'
+        msg += f'<b>Reason:</b> {escape(error)}\n'
+        msg += f'<b>Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}'
         x = await sendMessage(self.message, msg, button)
         await delete_links(self.message)
         if self.botpmmsg:
@@ -542,11 +540,10 @@ Your download has been stopped!
             if self.uid in download_dict.keys():
                 del download_dict[self.uid]
             count = len(download_dict)
-        msg = f'''Hey, {self.tag}!
-Your upload has been stopped!
-
-<b>Reason:</b> {escape(error)}
-<b>Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}'''
+        msg = f'Hey, {self.tag}!\n'
+        msg += 'Your upload has been stopped!\n\n'
+        msg += f'<b>Reason:</b> {escape(error)}\n'
+        msg += f'<b>Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}'
         x = await sendMessage(self.message, msg)
         if self.linkslogmsg:
             await deleteMessage(self.linkslogmsg)
