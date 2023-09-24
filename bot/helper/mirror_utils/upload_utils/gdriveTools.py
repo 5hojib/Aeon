@@ -516,8 +516,7 @@ class GoogleDriveHelper:
         for drive_name, drives_dict in list_drives_dict.items():
             dir_id = drives_dict['drive_id']
             index_url = drives_dict['index_link']
-            isRecur = False if isRecursive and len(
-                dir_id) > 23 else isRecursive
+            isRecur = False if isRecursive and len(dir_id) > 23 else isRecursive
             response = self.__drive_query(dir_id, fileName, stopDup, isRecur, itemType)
             if not response["files"]:
                 if noMulti:
@@ -531,18 +530,18 @@ class GoogleDriveHelper:
                 msg += f"╾────────────╼<br><b>{drive_name}</b><br>╾────────────╼<br>"
             for file in response.get('files', []):
                 mime_type = file.get('mimeType')
-                if mime_type == self.G_DRIVE_DIR_MIME_TYPE:
-                    furl = self.G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(file.get('id'))
+                if mime_type == self.__G_DRIVE_DIR_MIME_TYPE:
+                    furl = self.__G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(file.get('id'))
                     msg += f"<code>{file.get('name')}<br>(folder)</code><br>"
                     msg += f"<b><a href={furl}>Drive Link</a></b>"
                     if index_url:
                         url = f"{INDEX_URL}findpath?id={file.get('id')}"
                         msg += f' <b>| <a href="{url}">Index Link</a></b>'
                 elif mime_type == 'application/vnd.google-apps.shortcut':
-                    furl = self.G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(file.get('id'))
+                    furl = self.__G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(file.get('id'))
                     msg += f"⁍<a href='{furl}'>{file.get('name')}</a> (shortcut)"
                 else:
-                    furl = self.G_DRIVE_BASE_DOWNLOAD_URL.format(file.get('id'))
+                    furl = self.__G_DRIVE_BASE_DOWNLOAD_URL.format(file.get('id'))
                     msg += f"<code>{file.get('name')}<br>({get_readable_file_size(int(file.get('size', 0)))})</code><br>"
                     msg += f"<b><a href={furl}>Drive Link</a></b>"
                     if index_url:
@@ -641,8 +640,7 @@ class GoogleDriveHelper:
                                      self.name, meta.get('mimeType'))
         except Exception as err:
             if isinstance(err, RetryError):
-                LOGGER.info(
-                    f"Total Attempts: {err.last_attempt.attempt_number}")
+                LOGGER.info(f"Total Attempts: {err.last_attempt.attempt_number}")
                 err = err.last_attempt.exception()
             err = str(err).replace('>', '').replace('<', '')
             if "downloadQuotaExceeded" in err:
