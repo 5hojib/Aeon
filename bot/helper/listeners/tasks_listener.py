@@ -60,7 +60,6 @@ class MirrorLeechListener:
         self.linkslogmsg = None
         self.botpmmsg = None
         self.upload_details = {}
-        self.__setModeEng()
         self.drive_id = drive_id
         self.index_link = index_link
         self.leech_utils = leech_utils
@@ -76,22 +75,9 @@ class MirrorLeechListener:
         except:
             pass
 
-    def __setModeEng(self):
-        mode = (
-            'leech'
-            if self.isLeech
-            else 'clone'
-            if self.isClone
-            else 'rclone'
-            if self.upPath != 'gd'
-            else 'mirror'
-        ) + (' as zip' if self.compress else ' as unzip' if self.extract else '')
-        self.upload_details['mode'] = mode
-        
     async def onDownloadStart(self):
         if config_dict['LEECH_LOG_ID']:
             msg = f'<b>Task Started</b>\n\n'
-            msg += f"<b>• Mode:</b> {self.upload_details['mode']}\n"
             msg += f'<b>• Task by:</b> {self.tag}\n'
             msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>'
             self.linkslogmsg = await sendCustomMsg(config_dict['LEECH_LOG_ID'], msg)
@@ -365,7 +351,6 @@ class MirrorLeechListener:
         msg = f'{escape(name)}\n\n'
         msg += f'<b>• Size: </b>{get_readable_file_size(size)}\n'
         msg += f'<b>• Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n'
-        msg += f'<b>• Mode: </b>{self.upload_details["mode"]}\n'
         LOGGER.info(f'Task Done: {name}')
         buttons = ButtonMaker()
         if self.isLeech:
@@ -415,7 +400,6 @@ class MirrorLeechListener:
                 await start_from_queued()
                 return
         else:
-            msg += f'<b>• Type: </b>{mime_type}\n'
             if mime_type == "Folder":
                 msg += f'<b>• SubFolders: </b>{folders}\n'
                 msg += f'<b>• Files: </b>{files}\n'
