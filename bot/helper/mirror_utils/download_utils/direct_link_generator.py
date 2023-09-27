@@ -7,7 +7,6 @@ from re import findall, match, search
 from time import sleep
 from urllib.parse import parse_qs, quote, urlparse
 from uuid import uuid4
-from aiohttp import ClientSession 
 
 from bs4 import BeautifulSoup
 from cloudscraper import create_scraper
@@ -182,23 +181,22 @@ def hxfile(url):
     raise DirectDownloadLinkException("ERROR: Direct download link not found")
 
 
-def filepress(url: str):
-    cget = create_scraper().request
-    try:
-        url = cget('GET', url).url
-        raw = urlparse(url)
-        with ClientSession() as session:
+def filepress(url):
+    with create_scraper() as session:
+        try:
+            url = session.get(url).url
+            raw = urlparse(url)
             json_data = {
                 'id': raw.path.split('/')[-1],
                 'method': 'publicDownlaod',
             }
-            with session.post(f'{raw.scheme}://{raw.hostname}/api/file/downlaod/', headers={'Referer': f'{raw.scheme}://{raw.hostname}'}, json=json_data) as resp:
-                d_id = resp.json()
-            if d_id.get('data', False):
-                dl_link = f"https://drive.google.com/uc?id={d_id['data']}&export=download"
-    except Exception as e:
-        raise DirectDownloadLinkException(f'{e.__class__.__name__}')
-    return dl_link
+            api = f'{raw.scheme}://{raw.hostname}/api/file/downlaod/'
+            res = session.post(api, headers={'Referer': f'{raw.scheme}://{raw.hostname}'}, json=json_data).json()
+        except Exception as e:
+            raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+    if 'data' not in res:
+        raise DirectDownloadLinkException(f'ERROR: {res["statusText"]}')
+    return f'https://drive.google.com/uc?id={res["data"]}&export=download'
 
 
 def onedrive(link):
