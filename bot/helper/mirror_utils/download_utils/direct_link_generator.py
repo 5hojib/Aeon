@@ -7,6 +7,7 @@ from re import findall, match, search
 from time import sleep
 from urllib.parse import parse_qs, quote, urlparse
 from uuid import uuid4
+from aiohttp import ClientSession 
 
 from bs4 import BeautifulSoup
 from cloudscraper import create_scraper
