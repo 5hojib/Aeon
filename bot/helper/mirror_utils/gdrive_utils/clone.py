@@ -182,12 +182,13 @@ async def clone(client, message):
                   '-id'    : '',
                   '-index' : ''}
     args       = arg_parser(input_list[1:], arg_base)
-    multi      = int(i) if i.isdigit() else 0
+    i          = args['-i']
     dst_path   = args['-up']
     rcf        = args['-rcf']
     link       = args['link']
     drive_id   = args['-id']
     index_link = args['-index']
+    multi      = int(i) if i.isdigit() else 0
     
     if username := message.from_user.username:
         tag = f"@{username}"
