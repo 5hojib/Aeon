@@ -12,7 +12,7 @@ class _BotCommands:
         self.CloneCommand = f'clone{CMD_SUFFIX}'
         self.CountCommand = f'count{CMD_SUFFIX}'
         self.DeleteCommand = f'del{CMD_SUFFIX}'
-        self.CancelAllCommand = [f'cancelall{CMD_SUFFIX}', 'cancellallbot']
+        self.CancelAllCommand = [f'stopall{CMD_SUFFIX}', 'stopallbot']
         self.ListCommand = f'list{CMD_SUFFIX}'
         self.SearchCommand = f'search{CMD_SUFFIX}'
         self.StatusCommand = [f'status{CMD_SUFFIX}', 'statusall']
