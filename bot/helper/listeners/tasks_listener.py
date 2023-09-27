@@ -256,7 +256,7 @@ class MirrorLeechListener:
             o_files = []
             if not self.compress:
                 checked = False
-                LEECH_SPLIT_SIZE = MAX
+                LEECH_SPLIT_SIZE = MAX_SPLIT_SIZE
                 for dirpath, _, files in await sync_to_async(walk, up_dir, topdown=False):
                     for file_ in files:
                         f_path = ospath.join(dirpath, file_)
