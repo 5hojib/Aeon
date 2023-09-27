@@ -246,23 +246,12 @@ async def bot_help(client, message):
 
 
 async def restart_notification():
-    rmsg = f'Restarted Successfully!'
+    rmsg = 'Restarted Successfully!'
     if await aiopath.isfile(".restartmsg"):
         with open(".restartmsg") as f:
             chat_id, msg_id = map(int, f)
     else:
         chat_id, msg_id = 0, 0
-
-    async def send_incompelete_task_message(cid, msg):
-        try:
-            if msg.startswith(rmsg):
-                await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text=msg)
-                await aioremove(".restartmsg")
-            else:
-                await bot.send_message(chat_id=cid, text=msg, disable_web_page_preview=True, disable_notification=True)
-        except Exception as e:
-            LOGGER.error(e)
-
     if await aiopath.isfile(".restartmsg"):
         try:
             await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text=rmsg)
