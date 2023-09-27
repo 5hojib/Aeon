@@ -246,13 +246,13 @@ async def bot_help(client, message):
 
 
 async def restart_notification():
-    rmsg = 'Restarted Successfully!'
     if await aiopath.isfile(".restartmsg"):
         with open(".restartmsg") as f:
             chat_id, msg_id = map(int, f)
     else:
         chat_id, msg_id = 0, 0
     if await aiopath.isfile(".restartmsg"):
+        rmsg = 'Restarted Successfully!'
         try:
             await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text=rmsg)
         except:
