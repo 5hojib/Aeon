@@ -100,9 +100,9 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         thumbmsg = "Exists" if await aiopath.exists(thumbpath) else "Not Exists"
 
         if user_dict.get('media_group', False) or ('media_group' not in user_dict and config_dict['MEDIA_GROUP']):
-            buttons.ibutton("Disable Media Group", f"userset {user_id} mgroup", "header")
+            buttons.ibutton("Disable Media Group", f"userset {user_id} mgroup")
         else:
-            buttons.ibutton("Enable Media Group", f"userset {user_id} mgroup", "header")
+            buttons.ibutton("Enable Media Group", f"userset {user_id} mgroup")
         media_group = 'Enabled' if user_dict.get('media_group', config_dict.get('MEDIA_GROUP')) else 'Disabled'
 
         buttons.ibutton("Leech Caption", f"userset {user_id} lcaption")
