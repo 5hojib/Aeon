@@ -63,7 +63,7 @@ async def pictures(_, message):
         buttons.ibutton("Close", f"images {user_id} close")
         buttons.ibutton("Remove All", f"images {user_id} removall", 'footer')
         await deleteMessage(to_edit)
-        await sendMessage(message, f'🌄 <b>Image No. : 1 / {len(config_dict["IMAGES"])}</b>', buttons.build_menu(2), config_dict['IMAGES'][0])
+        await sendMessage(message, f'<b>Image No. : 1 / {len(config_dict["IMAGES"])}</b>', buttons.build_menu(2), config_dict['IMAGES'][0])
 
 
 @new_task
@@ -78,7 +78,7 @@ async def pics_callback(_, query):
         await query.answer()
         ind = handleIndex(int(data[3]), config_dict['IMAGES'])
         no = len(config_dict['IMAGES']) - abs(ind+1) if ind < 0 else ind + 1
-        pic_info = f'🌄 <b>Image No. : {no} / {len(config_dict["IMAGES"])}</b>'
+        pic_info = f'<b>Image No. : {no} / {len(config_dict["IMAGES"])}</b>'
         buttons = ButtonMaker()
         buttons.ibutton("<<", f"images {data[1]} turn {ind-1}")
         buttons.ibutton(">>", f"images {data[1]} turn {ind+1}")
@@ -97,7 +97,7 @@ async def pics_callback(_, query):
             return
         ind = int(data[3])+1
         ind = len(config_dict['IMAGES']) - abs(ind) if ind < 0 else ind
-        pic_info = f'🌄 <b>Image No. : {ind+1} / {len(config_dict["IMAGES"])}</b>'
+        pic_info = f'<b>Image No. : {ind+1} / {len(config_dict["IMAGES"])}</b>'
         buttons = ButtonMaker()
         buttons.ibutton("<<", f"images {data[1]} turn {ind-1}")
         buttons.ibutton(">>", f"images {data[1]} turn {ind+1}")

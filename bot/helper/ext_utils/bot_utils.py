@@ -192,7 +192,7 @@ def get_readable_message():
         else:
             msg += f"\nSize: {download.size()}"
         msg += f"\nElapsed: {get_readable_time(time() - download.message.date.timestamp())}"
-        msg += f"\n/{BotCommands.CancelMirror}_{download.gid()[:8]}\n\n"
+        msg += f"\n/stop_{download.gid()[:8]}\n\n"
     if len(msg) == 0:
         return None, None
     dl_speed = 0
@@ -468,7 +468,7 @@ async def set_commands(client):
                 BotCommand(f'{BotCommands.CloneCommand}', 'Copy file/folder to Drive'),
                 BotCommand(f'{BotCommands.CountCommand}', '[drive_url]: Count file/folder of Google Drive.'),
                 BotCommand(f'{BotCommands.StatusCommand[0]}', f'or /{BotCommands.StatusCommand[1]} Get mirror status message'),
-                BotCommand(f'{BotCommands.StatsCommand}', 'Check Bot & System stats'),
+                BotCommand(f'{BotCommands.StatsCommand[0]}', 'Check Bot & System stats'),
                 BotCommand(f'{BotCommands.CancelAllCommand[0]}', 'Cancel all tasks which added by you to in bots.'),
                 BotCommand(f'{BotCommands.ListCommand}', 'Search in Drive'),
                 BotCommand(f'{BotCommands.SearchCommand}', 'Search in Torrent'),

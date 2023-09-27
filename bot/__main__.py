@@ -243,8 +243,7 @@ NOTE: Try each command without any arguments to see more details.
 /{BotCommands.UserSetCommand} [query]: User settings.
 /{BotCommands.BotSetCommand} [query]: Bot settings.
 /{BotCommands.BtSelectCommand}: Select files from torrents by gid or reply.
-/{BotCommands.CancelMirror}: Cancels task by gid or reply.
-/{BotCommands.CancelAllCommand} [query]: Cancels all [status] tasks.
+/{BotCommands.CancelAllCommand} [query]: Cancel all [status] tasks.
 /{BotCommands.ListCommand} [query]: Searches in Google Drive(s).
 /{BotCommands.SearchCommand} [query]: Searches for torrents with API.
 /{BotCommands.StatusCommand}: Shows status of all downloads.

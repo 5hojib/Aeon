@@ -34,7 +34,6 @@ class TgUploader:
         self.__start_time = time()
         self.__total_files = 0
         self.__is_cancelled = False
-        self.__thumb = f"Thumbnails/{listener.message.from_user.id}.jpg"
         self.__sent_msg = None
         self.__has_buttons = False
         self.__msgs_dict = {}
@@ -53,6 +52,7 @@ class TgUploader:
         self.__user_id = listener.message.from_user.id
         self.__leechmsg = {}
         self.__leech_utils = self.__listener.leech_utils
+        self.__thumb = f"Thumbnails/{listener.message.from_user.id}.jpg"
 
     async def get_custom_thumb(self, thumb):
         if is_telegram_link(thumb):
