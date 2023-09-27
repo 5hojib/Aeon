@@ -148,10 +148,8 @@ async def split_file(path, size, file_, dirpath, split_size, listener, start_tim
             await mkdir(dirpath)
     user_id = listener.message.from_user.id
     user_dict = user_data.get(user_id, {})
-    leech_split_size = user_dict.get('split_size') or config_dict['LEECH_SPLIT_SIZE']
+    leech_split_size = MAX_SPLIT_SIZE
     parts = -(-size // leech_split_size)
-    if (user_dict.get('equal_splits') or config_dict['EQUAL_SPLITS'] and 'equal_splits' not in user_dict) and not inLoop:
-        split_size = ((size + parts - 1) // parts) + 1000
     if (await get_document_type(path))[0]:
         if multi_streams:
             multi_streams = await is_multi_streams(path)

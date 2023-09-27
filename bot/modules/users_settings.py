@@ -44,7 +44,7 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         buttons.ibutton("Universal", f"userset {user_id} universal")
         buttons.ibutton("Mirror", f"userset {user_id} mirror")
         buttons.ibutton("Leech", f"userset {user_id} leech")
-        if user_dict and any(key in user_dict for key in ['prefix', 'suffix', 'remname', 'ldump', 'yt_opt', 'media_group', 'equal_splits', 'split_size', 'rclone', 'thumb', 'as_doc']):
+        if user_dict and any(key in user_dict for key in ['prefix', 'suffix', 'remname', 'ldump', 'yt_opt', 'media_group', 'split_size', 'rclone', 'thumb', 'as_doc']):
             buttons.ibutton("Reset Setting", f"userset {user_id} reset_all")
         buttons.ibutton("Close", f"userset {user_id} close")
         text = f'<b>User Settings for {name}</b>'
@@ -99,9 +99,10 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         buttons.ibutton("Thumbnail", f"userset {user_id} thumb")
         thumbmsg = "Exists" if await aiopath.exists(thumbpath) else "Not Exists"
 
-        buttons.ibutton("Leech Splits", f"userset {user_id} split_size")
-        split_size = get_readable_file_size(config_dict['LEECH_SPLIT_SIZE']) + ' (Default)' if user_dict.get('split_size', '') == '' else get_readable_file_size(user_dict['split_size'])
-        equal_splits = 'Enabled' if user_dict.get('equal_splits', config_dict.get('EQUAL_SPLITS')) else 'Disabled'
+        if user_dict.get('media_group', False) or ('media_group' not in user_dict and config_dict['MEDIA_GROUP']):
+            buttons.ibutton("Disable Media Group", f"userset {user_id} mgroup", "header")
+        else:
+            buttons.ibutton("Enable Media Group", f"userset {user_id} mgroup", "header")
         media_group = 'Enabled' if user_dict.get('media_group', config_dict.get('MEDIA_GROUP')) else 'Disabled'
 
         buttons.ibutton("Leech Caption", f"userset {user_id} lcaption")
@@ -113,8 +114,6 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         text = f'<b>Leech Settings for {name}</b>\n\n'
         text += f'<b>• Leech Type:</b> {ltype}\n'
         text += f'<b>• Custom Thumbnail:</b> {thumbmsg}\n'
-        text += f'<b>• Leech Split Size:</b> <code>{split_size}</code>\n'
-        text += f'<b>• Equal Splits:</b> {equal_splits}\n'
         text += f'<b>• Media Group:</b> {media_group}\n'
         text += f'<b>• Leech Caption:</b> <code>{escape(lcaption)}</code>\n'
         text += f'<b>• Leech Dump:</b> <code>{ldump}</code>\n'
@@ -134,17 +133,6 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         elif key == 'yt_opt':
             set_exist = 'Not Exists' if (val:=user_dict.get('yt_opt', config_dict.get('YT_DLP_OPTIONS', ''))) == '' else val
             text += f"<b>YT-DLP Options :</b> <code>{escape(set_exist)}</code>\n\n"
-        elif key == 'split_size':
-            set_exist = get_readable_file_size(config_dict['LEECH_SPLIT_SIZE']) + ' (Default)' if user_dict.get('split_size', '') == '' else get_readable_file_size(user_dict['split_size'])
-            text += f"<b>Leech Split Size :</b> {set_exist}\n\n"
-            if user_dict.get('equal_splits', False) or ('equal_splits' not in user_dict and config_dict['EQUAL_SPLITS']):
-                buttons.ibutton("Disable Equal Splits", f"userset {user_id} esplits", "header")
-            else:
-                buttons.ibutton("Enable Equal Splits", f"userset {user_id} esplits", "header")
-            if user_dict.get('media_group', False) or ('media_group' not in user_dict and config_dict['MEDIA_GROUP']):
-                buttons.ibutton("Disable Media Group", f"userset {user_id} mgroup", "header")
-            else:
-                buttons.ibutton("Enable Media Group", f"userset {user_id} mgroup", "header")
         elif key in ['prefix', 'remname', 'suffix', 'lcaption', 'ldump']:
             set_exist = 'Not Exists' if (val:=user_dict.get(key, '')) == '' else val
             text += f"<b>Filename {fname_dict[key]} :</b> {set_exist}\n\n"
@@ -160,8 +148,8 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
             text += '\n\n' + uset_display_dict[key][1]
             buttons.ibutton("Stop Change", f"userset {user_id} {key}")
         elif key != 'user_tds' or set_exist == 'Not Exists':
-            buttons.ibutton(f"Change {fname_dict[key]}" if set_exist and set_exist != 'Not Exists' and (set_exist != get_readable_file_size(config_dict['LEECH_SPLIT_SIZE']) + ' (Default)') else f"Set {fname_dict[key]}", f"userset {user_id} {key} edit")
-        if set_exist and set_exist != 'Not Exists' and (set_exist != get_readable_file_size(config_dict['LEECH_SPLIT_SIZE']) + ' (Default)'):
+            buttons.ibutton(f"Change {fname_dict[key]}" if set_exist and set_exist != 'Not Exists' else f"Set {fname_dict[key]}", f"userset {user_id} {key} edit")
+        if set_exist and set_exist != 'Not Exists':
             if key == 'user_tds':
                 buttons.ibutton('Show UserTDs', f"userset {user_id} show_tds", "header")
             buttons.ibutton("Delete", f"userset {user_id} d{key}")
@@ -266,22 +254,6 @@ async def add_rclone(client, message, pre_event):
         await DbManager().update_user_doc(user_id, 'rclone', des_dir)
 
 
-async def leech_split_size(client, message, pre_event):
-    user_id = message.from_user.id
-    handler_dict[user_id] = False
-    sdic = ['b', 'kb', 'mb', 'gb']
-    value = message.text.strip()
-    slice = -2 if value[-2].lower() in ['k', 'm', 'g'] else -1
-    out = value[slice:].strip().lower()
-    if out in sdic:
-        value = min((float(value[:slice].strip()) * 1024**sdic.index(out)), MAX_SPLIT_SIZE)
-    update_user_ldata(user_id, 'split_size', int(round(value)))
-    await message.delete()
-    await update_user_settings(pre_event, 'split_size', 'leech')
-    if DATABASE_URL:
-        await DbManager().update_user_data(user_id)
-
-
 async def event_handler(client, query, pfunc, rfunc, photo=False, document=False):
     user_id = query.from_user.id
     handler_dict[user_id] = True
@@ -330,7 +302,7 @@ async def edit_user_settings(client, query):
     elif data[2] == 'show_tds':
         handler_dict[user_id] = False
         user_tds = user_dict.get('user_tds', {})
-        msg = f'<b><u>User TD(s) Details</u></b>\n\n<b>Total UserTD(s) :</b> {len(user_tds)}\n\n'
+        msg = f'<b><u>User TD Details</u></b>\n\n'
         for index_no, (drive_name, drive_dict) in enumerate(user_tds.items(), start=1):
             msg += f'{index_no}: <b>Name:</b> <code>{drive_name}</code>\n'
             msg += f"  <b>Drive ID:</b> <code>{drive_dict['drive_id']}</code>\n"
@@ -391,28 +363,6 @@ async def edit_user_settings(client, query):
             return await query.answer("Force Enabled! Can't Alter Settings", show_alert=True)
         await query.answer()
         update_user_ldata(user_id, data[2], not user_dict.get(data[2], False))
-        await update_user_settings(query, 'leech')
-        if DATABASE_URL:
-            await DbManager().update_user_data(user_id)
-    elif data[2] == 'split_size':
-        await query.answer()
-        edit_mode = len(data) == 4
-        await update_user_settings(query, data[2], 'leech', edit_mode)
-        if not edit_mode: return
-        pfunc = partial(leech_split_size, pre_event=query)
-        rfunc = partial(update_user_settings, query, data[2], 'leech')
-        await event_handler(client, query, pfunc, rfunc)
-    elif data[2] == 'dsplit_size':
-        handler_dict[user_id] = False
-        await query.answer()
-        update_user_ldata(user_id, 'split_size', '')
-        await update_user_settings(query, 'split_size', 'leech')
-        if DATABASE_URL:
-            await DbManager().update_user_data(user_id)
-    elif data[2] == 'esplits':
-        handler_dict[user_id] = False
-        await query.answer()
-        update_user_ldata(user_id, 'equal_splits', not user_dict.get('equal_splits', False))
         await update_user_settings(query, 'leech')
         if DATABASE_URL:
             await DbManager().update_user_data(user_id)
