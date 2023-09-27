@@ -42,15 +42,14 @@ async def stats(_, message):
     cpuUsage = cpu_percent(interval=0.5)
     quote = Quote.print().split('―', 1)[0].strip().replace("“", "").replace("”", "")
     limit_mapping = {
-        'Torrent':    config_dict.get('TORRENT_LIMIT', '∞'),
-        'Gdrive':     config_dict.get('GDRIVE_LIMIT', '∞'),
-        'Ytdlp':      config_dict.get('YTDLP_LIMIT', '∞'),
-        'Direct':     config_dict.get('DIRECT_LIMIT', '∞'),
-        'Leech':      config_dict.get('LEECH_LIMIT', '∞'),
-        'Clone':      config_dict.get('CLONE_LIMIT', '∞'),
-        'Mega':       config_dict.get('MEGA_LIMIT', '∞'),
-        'User tasks': config_dict.get('USER_MAX_TASKS', '∞'),
-    }
+        'Torrent'  : config_dict.get('TORRENT_LIMIT',  '∞'),
+        'Gdrive'   : config_dict.get('GDRIVE_LIMIT',   '∞'),
+        'Ytdlp'    : config_dict.get('YTDLP_LIMIT',    '∞'),
+        'Direct'   : config_dict.get('DIRECT_LIMIT',   '∞'),
+        'Leech'    : config_dict.get('LEECH_LIMIT',    '∞'),
+        'Clone'    : config_dict.get('CLONE_LIMIT',    '∞'),
+        'Mega'     : config_dict.get('MEGA_LIMIT',     '∞'),
+        'User task': config_dict.get('USER_MAX_TASKS', '∞')}
     system_info = f'<b>{quote}</b>\n\n'\
         f'<code>• Bot uptime :</code> {currentTime}\n'\
         f'<code>• Sys uptime :</code> {osUptime}\n'\
@@ -65,7 +64,7 @@ async def stats(_, message):
     for k, v in limit_mapping.items():
         if v == '':
             v = '∞'
-        elif k != 'User tasks':
+        elif k != 'User task':
             v = f'{v}GB/Link'
         else:
             v = f'{v} Tasks/user'
@@ -204,30 +203,6 @@ async def log(_, message):
     await deleteMessage(message)
     await five_minute_del(reply_message)
 
-async def search_images():
-    if not config_dict['IMG_SEARCH']:
-        return
-    try:
-        query_list = config_dict['IMG_SEARCH']
-        total_pages = config_dict['IMG_PAGE']
-        base_url = "https://www.wallpaperflare.com/search"
-
-        for query in query_list:
-            query = query.strip().replace(" ", "+")
-            for page in range(1, total_pages + 1):
-                url = f"{base_url}?wallpaper={query}&width=1280&height=720&page={page}"
-                r = rget(url)
-                soup = BeautifulSoup(r.text, "html.parser")
-                images = soup.select('img[data-src^="https://c4.wallpaperflare.com/wallpaper"]')
-                for img in images:
-                    img_url = img['data-src']
-                    if img_url not in config_dict['IMAGES']:
-                        config_dict['IMAGES'].append(img_url)
-            if DATABASE_URL:
-                await DbManager().update_config({'IMAGES': config_dict['IMAGES']})
-    except Exception as e:
-        LOGGER.error(f"An error occurred: {e}")
-
 
 help_string = f'''
 NOTE: Try each command without any arguments to see more details.
@@ -243,8 +218,7 @@ NOTE: Try each command without any arguments to see more details.
 /{BotCommands.UserSetCommand} [query]: User settings.
 /{BotCommands.BotSetCommand} [query]: Bot settings.
 /{BotCommands.BtSelectCommand}: Select files from torrents by gid or reply.
-/{BotCommands.CancelMirror}: Cancels task by gid or reply.
-/{BotCommands.CancelAllCommand} [query]: Cancels all [status] tasks.
+/{BotCommands.CancelAllCommand} [query]: Cancel all [status] tasks.
 /{BotCommands.ListCommand} [query]: Searches in Google Drive(s).
 /{BotCommands.SearchCommand} [query]: Searches for torrents with API.
 /{BotCommands.StatusCommand}: Shows status of all downloads.
@@ -272,27 +246,13 @@ async def bot_help(client, message):
 
 
 async def restart_notification():
-    now = datetime.now(timezone('Asia/Dhaka'))
-    date = now.strftime('%d/%m/%y')
-    time = now.strftime('%I:%M:%S %p')
-    rmsg = f'Restarted Successfully!\n\n<b>Date:</b> {date}\n<b>Time:</b> {time}'
     if await aiopath.isfile(".restartmsg"):
         with open(".restartmsg") as f:
             chat_id, msg_id = map(int, f)
     else:
         chat_id, msg_id = 0, 0
-
-    async def send_incompelete_task_message(cid, msg):
-        try:
-            if msg.startswith(rmsg):
-                await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text=msg)
-                await aioremove(".restartmsg")
-            else:
-                await bot.send_message(chat_id=cid, text=msg, disable_web_page_preview=True, disable_notification=True)
-        except Exception as e:
-            LOGGER.error(e)
-
     if await aiopath.isfile(".restartmsg"):
+        rmsg = 'Restarted Successfully!'
         try:
             await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text=rmsg)
         except:
@@ -301,21 +261,15 @@ async def restart_notification():
 
 
 async def main():
-    await gather(start_cleanup(), torrent_search.initiate_search_tools(), restart_notification(), search_images(), set_commands(bot))
+    await gather(start_cleanup(), torrent_search.initiate_search_tools(), restart_notification(), set_commands(bot))
     await sync_to_async(start_aria2_listener, wait=False)
     
-    bot.add_handler(MessageHandler(start, filters=command(
-        BotCommands.StartCommand)))
-    bot.add_handler(MessageHandler(log, filters=command(
-        BotCommands.LogCommand) & CustomFilters.sudo))
-    bot.add_handler(MessageHandler(restart, filters=command(
-        BotCommands.RestartCommand) & CustomFilters.sudo))
-    bot.add_handler(MessageHandler(ping, filters=command(
-        BotCommands.PingCommand) & CustomFilters.authorized))
-    bot.add_handler(MessageHandler(bot_help, filters=command(
-        BotCommands.HelpCommand) & CustomFilters.authorized))
-    bot.add_handler(MessageHandler(stats, filters=command(
-        BotCommands.StatsCommand) & CustomFilters.authorized))
+    bot.add_handler(MessageHandler(start, filters=command(BotCommands.StartCommand)))
+    bot.add_handler(MessageHandler(log, filters=command(BotCommands.LogCommand) & CustomFilters.sudo))
+    bot.add_handler(MessageHandler(restart, filters=command(BotCommands.RestartCommand) & CustomFilters.sudo))
+    bot.add_handler(MessageHandler(ping, filters=command(BotCommands.PingCommand) & CustomFilters.authorized))
+    bot.add_handler(MessageHandler(bot_help, filters=command(BotCommands.HelpCommand) & CustomFilters.authorized))
+    bot.add_handler(MessageHandler(stats, filters=command(BotCommands.StatsCommand) & CustomFilters.authorized))
     bot.add_handler(CallbackQueryHandler(aeoncb, filters=regex(r'^aeon')))
     LOGGER.info("Bot Started!")
     signal(SIGINT, exit_clean_up)

@@ -90,7 +90,8 @@ domain_dict = {
                      'kitabmarkaz.xyz',
                      'wishfast.top'],
     'linkBox':      ['linkbox.to',
-                     'lbx.to']
+                     'lbx.to'],
+    'filepress':    ['filepress']
 }
 
 def direct_link_generator(link):
@@ -178,6 +179,24 @@ def hxfile(url):
     if direct_link:= html.xpath('//a[@class="btn btn-dow"]/@href'):
         return direct_link[0]
     raise DirectDownloadLinkException("ERROR: Direct download link not found")
+
+
+def filepress(url):
+    with create_scraper() as session:
+        try:
+            url = session.get(url).url
+            raw = urlparse(url)
+            json_data = {
+                'id': raw.path.split('/')[-1],
+                'method': 'publicDownlaod',
+            }
+            api = f'{raw.scheme}://{raw.hostname}/api/file/downlaod/'
+            res = session.post(api, headers={'Referer': f'{raw.scheme}://{raw.hostname}'}, json=json_data).json()
+        except Exception as e:
+            raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
+    if 'data' not in res:
+        raise DirectDownloadLinkException(f'ERROR: {res["statusText"]}')
+    return f'https://drive.google.com/uc?id={res["data"]}&export=download'
 
 
 def onedrive(link):

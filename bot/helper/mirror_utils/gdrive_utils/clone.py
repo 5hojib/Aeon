@@ -63,8 +63,7 @@ async def rcloneNode(client, message, link, dst_path, rcf, tag):
     remote, src_path = link.split(':', 1)
     src_path = src_path.strip('/')
 
-    cmd = ['zcl', 'lsjson', '--fast-list', '--stat',
-           '--no-modtime', '--config', config_path, f'{remote}:{src_path}']
+    cmd = ['zcl', 'lsjson', '--fast-list', '--stat', '--no-modtime', '--config', config_path, f'{remote}:{src_path}']
     res = await cmd_exec(cmd)
     if res[2] != 0:
         if res[2] != -9:
@@ -176,27 +175,20 @@ async def gdcloneNode(message, link, listen_up):
 @new_task
 async def clone(client, message):
     input_list = message.text.split(' ')
-
-    arg_base = {'link': '', 
-                '-i': 0, 
-                '-up': '', '-upload': '',
-                '-rcf': '',
-                '-id': '',
-                '-index': '',
-    }
-
-    args = arg_parser(input_list[1:], arg_base)
-
-    try:
-        multi = int(args['-i'])
-    except:
-        multi = 0
-
-    dst_path   = args['-up'] or args['-upload']
+    arg_base   = {'link'   : '', 
+                  '-i'     : '0', 
+                  '-up'    : '',
+                  '-rcf'   : '',
+                  '-id'    : '',
+                  '-index' : ''}
+    args       = arg_parser(input_list[1:], arg_base)
+    i          = args['-i']
+    dst_path   = args['-up']
     rcf        = args['-rcf']
     link       = args['link']
     drive_id   = args['-id']
     index_link = args['-index']
+    multi      = int(i) if i.isdigit() else 0
     
     if username := message.from_user.username:
         tag = f"@{username}"

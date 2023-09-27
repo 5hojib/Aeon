@@ -21,26 +21,19 @@ async def cancel_mirror(_, message):
         gid = cmd_data[0]
         dl = await getDownloadByGid(gid)
         if dl is None:
-            x = await sendMessage(message, f"GID: <code>{gid}</code> Not Found.")
-            await one_minute_del(x)
+            await deleteMessage(message)
             return
     elif reply_to_id := message.reply_to_message_id:
         async with download_dict_lock:
             dl = download_dict.get(reply_to_id, None)
         if dl is None:
-            x = await sendMessage(message, "This is not an active task!")
-            await one_minute_del(x)
+            await deleteMessage(message)
             return
     elif len(msg) == 1:
-        msg = "Reply to an active Command message which was used to start the download" \
-              f" or send <code>/{BotCommands.CancelMirror}_GID</code> to cancel it!"
-        x = await sendMessage(message, msg)
-        await one_minute_del(x)
+        await deleteMessage(message)
         return
-    if OWNER_ID != user_id and dl.message.from_user.id != user_id and \
-       (user_id not in user_data or not user_data[user_id].get('is_sudo')):
-        x = await sendMessage(message, "This task is not for you!")
-        await one_minute_del(x)
+    if OWNER_ID != user_id and dl.message.from_user.id != user_id and (user_id not in user_data or not user_data[user_id].get('is_sudo')):
+        await deleteMessage(message)
         return
     obj = dl.download()
     await obj.cancel_download()
@@ -96,8 +89,6 @@ async def cancel_all_update(_, query):
             await sendMessage(reply_to, f"No matching tasks for {data[1]}!")
 
 
-bot.add_handler(MessageHandler(cancel_mirror, filters=regex(
-    f"^/{BotCommands.CancelMirror}(_\w+)?(?!all)") & CustomFilters.authorized))
-bot.add_handler(MessageHandler(cancell_all_buttons, filters=command(
-    BotCommands.CancelAllCommand) & CustomFilters.sudo))
+bot.add_handler(MessageHandler(cancel_mirror, filters=regex(f"^/stop(_\w+)?(?!all)") & CustomFilters.authorized))
+bot.add_handler(MessageHandler(cancell_all_buttons, filters=command(BotCommands.CancelAllCommand) & CustomFilters.sudo))
 bot.add_handler(CallbackQueryHandler(cancel_all_update, filters=regex(r"^canall")))

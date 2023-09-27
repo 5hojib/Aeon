@@ -30,19 +30,16 @@ START = 0
 STATE = 'view'
 handler_dict = {}
 default_values = {'DEFAULT_UPLOAD': 'gd',
-                  'LEECH_SPLIT_SIZE': MAX_SPLIT_SIZE,
                   'RSS_DELAY': 900,
                   'SEARCH_LIMIT': 0,
                   'UPSTREAM_BRANCH': 'main',
-                  'IMG_PAGE': 1,
                   'TORRENT_TIMEOUT': 3000}
 bool_vars = ['AS_DOCUMENT',
              'STOP_DUPLICATE',
              'SET_COMMANDS',
              'SHOW_MEDIAINFO',
              'USE_SERVICE_ACCOUNTS',
-             'WEB_PINCODE',
-             'EQUAL_SPLITS',]
+             'WEB_PINCODE']
 
 
 async def load_config():
@@ -67,9 +64,9 @@ async def load_config():
     OWNER_ID = environ.get('OWNER_ID', '')
     OWNER_ID = config_dict['OWNER_ID'] if len(OWNER_ID) == 0 else int(OWNER_ID)
 
-    USER_TD_SA = environ.get('USER_TD_SA', '')
-    if len(USER_TD_SA) != 0:
-        USER_TD_SA = USER_TD_SA.lower()
+    GROUPS_EMAIL = environ.get('GROUPS_EMAIL', '')
+    if len(GROUPS_EMAIL) != 0:
+        GROUPS_EMAIL = GROUPS_EMAIL.lower()
         
     DATABASE_URL = environ.get('DATABASE_URL', '')
     if len(DATABASE_URL) == 0:
@@ -138,14 +135,6 @@ async def load_config():
     LEECH_LOG_ID = environ.get('LEECH_LOG_ID', '')
     LEECH_LOG_ID = '' if len(LEECH_LOG_ID) == 0 else int(LEECH_LOG_ID)
     
-    MAX_SPLIT_SIZE = 4194304000 if IS_PREMIUM_USER else 2097152000
-
-    LEECH_SPLIT_SIZE = environ.get('LEECH_SPLIT_SIZE', '')
-    if len(LEECH_SPLIT_SIZE) == 0 or int(LEECH_SPLIT_SIZE) > MAX_SPLIT_SIZE:
-        LEECH_SPLIT_SIZE = MAX_SPLIT_SIZE
-    else:
-        LEECH_SPLIT_SIZE = int(LEECH_SPLIT_SIZE)
-
     if len(download_dict) != 0:
         async with status_reply_dict_lock:
             if Interval:
@@ -228,9 +217,6 @@ async def load_config():
     SHOW_MEDIAINFO = environ.get('SHOW_MEDIAINFO', '')
     SHOW_MEDIAINFO = SHOW_MEDIAINFO.lower() == 'true'
     
-    EQUAL_SPLITS = environ.get('EQUAL_SPLITS', '')
-    EQUAL_SPLITS = EQUAL_SPLITS.lower() == 'true'
-
     MEDIA_GROUP = environ.get('MEDIA_GROUP', '')
     MEDIA_GROUP = MEDIA_GROUP.lower() == 'true'
 
@@ -304,13 +290,6 @@ async def load_config():
     PLAYLIST_LIMIT = environ.get('PLAYLIST_LIMIT', '')
     PLAYLIST_LIMIT = '' if len(PLAYLIST_LIMIT) == 0 else int(PLAYLIST_LIMIT)
 
-    IMG_SEARCH = environ.get('IMG_SEARCH', '')
-    IMG_SEARCH = (IMG_SEARCH.replace("'", '').replace('"', '').replace(
-        '[', '').replace(']', '').replace(",", "")).split()
-
-    IMG_PAGE = environ.get('IMG_PAGE', '')
-    IMG_PAGE = 1 if not IMG_PAGE else int(IMG_PAGE)
-
     IMAGES = environ.get('IMAGES', '')
     IMAGES = (IMAGES.replace("'", '').replace('"', '').replace(
         '[', '').replace(']', '').replace(",", "")).split()
@@ -378,15 +357,11 @@ async def load_config():
                         'MIRROR_LOG_ID': MIRROR_LOG_ID,
                         'LEECH_DUMP_ID': LEECH_DUMP_ID,
                         'IMAGES': IMAGES,
-                        'IMG_SEARCH': IMG_SEARCH,
-                        'IMG_PAGE': IMG_PAGE,
-                        'EQUAL_SPLITS': EQUAL_SPLITS,
                         'EXTENSION_FILTER': EXTENSION_FILTER,
                         'GDRIVE_ID': GDRIVE_ID,
                         'INDEX_URL': INDEX_URL,
                         'JIODRIVE_TOKEN': JIODRIVE_TOKEN,
                         'LEECH_LOG_ID': LEECH_LOG_ID,
-                        'LEECH_SPLIT_SIZE': LEECH_SPLIT_SIZE,
                         'TOKEN_TIMEOUT': TOKEN_TIMEOUT,
                         'MEDIA_GROUP': MEDIA_GROUP,
                         'MEGA_EMAIL': MEGA_EMAIL,
@@ -416,7 +391,7 @@ async def load_config():
                         'UPSTREAM_REPO': UPSTREAM_REPO,
                         'UPSTREAM_BRANCH': UPSTREAM_BRANCH,
                         'USER_SESSION_STRING': USER_SESSION_STRING,
-                        'USER_TD_SA': USER_TD_SA,
+                        'GROUPS_EMAIL': GROUPS_EMAIL,
                         'USE_SERVICE_ACCOUNTS': USE_SERVICE_ACCOUNTS,
                         'WEB_PINCODE': WEB_PINCODE,
                         'YT_DLP_OPTIONS': YT_DLP_OPTIONS})
@@ -446,18 +421,14 @@ async def get_buttons(key=None, edit_type=None, edit_mode=None, mess=None):
     elif key == 'private':
         buttons.ibutton('Back', "botset back")
         buttons.ibutton('Close', "botset close")
-        msg = '''Send private file: config.env, token.pickle, accounts.zip, list_drives.txt, cookies.txt, terabox.txt, .netrc or any other file!
-To delete private file send only the file name as text message.
-Note: Changing .netrc will not take effect for aria2c until restart.
-Timeout: 60 sec'''
+        msg = 'Send private file: config.env, token.pickle, accounts.zip, list_drives.txt, cookies.txt, terabox.txt, .netrc or any other file!\nTo delete private file send only the file name as text message. \nNote: Changing .netrc will not take effect for aria2c until restart.\nTimeout: 60 sec'
     elif edit_type == 'editvar':
         msg = f'<b>Variable:</b> <code>{key}</code>\n\n'
         msg += f'<b>Description:</b> {bset_display_dict.get(key, "No Description Provided")}\n\n'
         if mess.chat.type == ChatType.PRIVATE:
             msg += f'<b>Value:</b> {config_dict.get(key, "None")}\n\n'
         else:
-            buttons.ibutton('View Var Value',
-                            f"botset showvar {key}", position="header")
+            buttons.ibutton('View Var Value', f"botset showvar {key}", position="header")
         buttons.ibutton('Back', "botset back var", position="footer")
         if key not in bool_vars:
             if not edit_mode:
@@ -467,8 +438,12 @@ Timeout: 60 sec'''
         if key not in ['TELEGRAM_HASH', 'TELEGRAM_API', 'OWNER_ID', 'BOT_TOKEN'] and key not in bool_vars:
             buttons.ibutton('Reset', f"botset resetvar {key}")
         buttons.ibutton('Close', "botset close", position="footer")
-        if edit_mode and key in ['SUDO_USERS', 'CMD_SUFFIX', 'OWNER_ID', 'USER_SESSION_STRING', 'TELEGRAM_HASH',
-                                 'TELEGRAM_API', 'AUTHORIZED_CHATS', 'DATABASE_URL', 'BOT_TOKEN']:
+        if edit_mode and key in ['SUDO_USERS',
+                                 'CMD_SUFFIX',
+                                 'OWNER_ID',
+                                 'USER_SESSION_STRING', 'TELEGRAM_HASH',
+                                 'TELEGRAM_API', 'AUTHORIZED_CHATS', 'DATABASE_URL',
+                                 'BOT_TOKEN']:
             msg += '<b>Note:</b> Restart required for this edit to take effect!\n\n'
         if edit_mode and key not in bool_vars:
             msg += 'Send a valid value for the above Var. <b>Timeout:</b> 60 sec'
@@ -503,8 +478,6 @@ async def edit_variable(_, message, pre_message, key):
                 except Exception as e:
                     LOGGER.error(e)
         aria2_options['bt-stop-timeout'] = f'{value}'
-    elif key == 'LEECH_SPLIT_SIZE':
-        value = min(int(value), MAX_SPLIT_SIZE)
     elif key == 'EXTENSION_FILTER':
         fx = value.split()
         GLOBAL_EXTENSION_FILTER.clear()
@@ -737,7 +710,5 @@ async def bot_settings(_, message):
     await sendMessage(message, msg, button)
 
 
-bot.add_handler(MessageHandler(bot_settings, filters=command(
-    BotCommands.BotSetCommand) & CustomFilters.sudo))
-bot.add_handler(CallbackQueryHandler(edit_bot_settings,
-                filters=regex("^botset") & CustomFilters.sudo))
+bot.add_handler(MessageHandler(bot_settings, filters=command(BotCommands.BotSetCommand) & CustomFilters.sudo))
+bot.add_handler(CallbackQueryHandler(edit_bot_settings, filters=regex("^botset") & CustomFilters.sudo))

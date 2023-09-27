@@ -12,8 +12,7 @@ class _BotCommands:
         self.CloneCommand = f'clone{CMD_SUFFIX}'
         self.CountCommand = f'count{CMD_SUFFIX}'
         self.DeleteCommand = f'del{CMD_SUFFIX}'
-        self.CancelMirror = f'cancel{CMD_SUFFIX}'
-        self.CancelAllCommand = [f'cancelall{CMD_SUFFIX}', 'cancellallbot']
+        self.CancelAllCommand = [f'stopall{CMD_SUFFIX}', 'stopallbot']
         self.ListCommand = f'list{CMD_SUFFIX}'
         self.SearchCommand = f'search{CMD_SUFFIX}'
         self.StatusCommand = [f'status{CMD_SUFFIX}', 'statusall']
@@ -24,7 +23,7 @@ class _BotCommands:
         self.RmSudoCommand = f'rmsudo{CMD_SUFFIX}'
         self.PingCommand = [f'ping{CMD_SUFFIX}', 'pingall']
         self.RestartCommand = [f'restart{CMD_SUFFIX}', 'restartall']
-        self.StatsCommand = f'stats{CMD_SUFFIX}'
+        self.StatsCommand = [f'stats{CMD_SUFFIX}', 'statsall']
         self.HelpCommand = f'help{CMD_SUFFIX}'
         self.LogCommand = f'log{CMD_SUFFIX}'
         self.ShellCommand = f'shell{CMD_SUFFIX}'

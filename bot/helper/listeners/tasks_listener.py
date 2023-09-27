@@ -60,7 +60,6 @@ class MirrorLeechListener:
         self.linkslogmsg = None
         self.botpmmsg = None
         self.upload_details = {}
-        self.__setModeEng()
         self.drive_id = drive_id
         self.index_link = index_link
         self.leech_utils = leech_utils
@@ -76,22 +75,9 @@ class MirrorLeechListener:
         except:
             pass
 
-    def __setModeEng(self):
-        mode = (
-            'leech'
-            if self.isLeech
-            else 'clone'
-            if self.isClone
-            else 'rclone'
-            if self.upPath != 'gd'
-            else 'mirror'
-        ) + (' as zip' if self.compress else ' as unzip' if self.extract else '')
-        self.upload_details['mode'] = mode
-        
     async def onDownloadStart(self):
         if config_dict['LEECH_LOG_ID']:
             msg = f'<b>Task Started</b>\n\n'
-            msg += f"<b>• Mode:</b> {self.upload_details['mode']}\n"
             msg += f'<b>• Task by:</b> {self.tag}\n'
             msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>'
             self.linkslogmsg = await sendCustomMsg(config_dict['LEECH_LOG_ID'], msg)
@@ -175,8 +161,7 @@ class MirrorLeechListener:
                                 f_path = ospath.join(dirpath, file_)
                                 t_path = dirpath.replace(
                                     self.dir, self.newDir) if self.seed else dirpath
-                                cmd = [
-                                    "7z", "x", f"-p{pswd}", f_path, f"-o{t_path}", "-aot", "-xr!@PaxHeader"]
+                                cmd = ["7z", "x", f"-p{pswd}", f_path, f"-o{t_path}", "-aot", "-xr!@PaxHeader"]
                                 if not pswd:
                                     del cmd[2]
                                 if self.suproc == 'cancelled' or self.suproc is not None and self.suproc.returncode == -9:
@@ -186,8 +171,7 @@ class MirrorLeechListener:
                                 if code == -9:
                                     return
                                 elif code != 0:
-                                    LOGGER.error(
-                                        'Unable to extract archive splits!')
+                                    LOGGER.error('Unable to extract archive splits!')
                         if not self.seed and self.suproc is not None and self.suproc.returncode == 0:
                             for file_ in files:
                                 if is_archive_split(file_) or is_archive(file_):
@@ -200,8 +184,7 @@ class MirrorLeechListener:
                     if self.seed:
                         self.newDir = f"{self.dir}10000"
                         up_path = up_path.replace(self.dir, self.newDir)
-                    cmd = ["7z", "x", f"-p{pswd}", dl_path,
-                           f"-o{up_path}", "-aot", "-xr!@PaxHeader"]
+                    cmd = ["7z", "x", f"-p{pswd}", dl_path, f"-o{up_path}", "-aot", "-xr!@PaxHeader"]
                     if not pswd:
                         del cmd[2]
                     if self.suproc == 'cancelled':
@@ -239,7 +222,7 @@ class MirrorLeechListener:
                 up_path = f"{dl_path}.zip"
             async with download_dict_lock:
                 download_dict[self.uid] = ZipStatus(name, size, gid, self)
-            LEECH_SPLIT_SIZE = user_dict.get('split_size', False) or config_dict['LEECH_SPLIT_SIZE']
+            LEECH_SPLIT_SIZE = MAX_SPLIT_SIZE
             cmd = ["7z", f"-v{LEECH_SPLIT_SIZE}b", "a",
                    "-mx=0", f"-p{pswd}", up_path, dl_path]
             for ext in GLOBAL_EXTENSION_FILTER:
@@ -273,8 +256,7 @@ class MirrorLeechListener:
             o_files = []
             if not self.compress:
                 checked = False
-                LEECH_SPLIT_SIZE = user_dict.get(
-                    'split_size', False) or config_dict['LEECH_SPLIT_SIZE']
+                LEECH_SPLIT_SIZE = MAX
                 for dirpath, _, files in await sync_to_async(walk, up_dir, topdown=False):
                     for file_ in files:
                         f_path = ospath.join(dirpath, file_)
@@ -283,8 +265,7 @@ class MirrorLeechListener:
                             if not checked:
                                 checked = True
                                 async with download_dict_lock:
-                                    download_dict[self.uid] = SplitStatus(
-                                        up_name, size, gid, self)
+                                    download_dict[self.uid] = SplitStatus(up_name, size, gid, self)
                                 LOGGER.info(f"Splitting: {up_name}")
                             res = await split_file(f_path, f_size, file_, dirpath, LEECH_SPLIT_SIZE, self)
                             if not res:
@@ -365,14 +346,14 @@ class MirrorLeechListener:
         msg = f'{escape(name)}\n\n'
         msg += f'<b>• Size: </b>{get_readable_file_size(size)}\n'
         msg += f'<b>• Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n'
-        msg += f'<b>• Mode: </b>{self.upload_details["mode"]}\n'
         LOGGER.info(f'Task Done: {name}')
         buttons = ButtonMaker()
         if self.isLeech:
-            msg += f'<b>• Total files: </b>{folders}\n'
+            if folders > 1:
+                msg += f'<b>• Total files: </b>{folders}\n'
             if mime_type != 0:
                 msg += f'<b>• Corrupted files: </b>{mime_type}\n'
-            msg += f'<b>• Leeched by: </b>{self.tag}\n'
+            msg += f'<b>• Uploaded by: </b>{self.tag}\n'
             msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n\n'
             if not files:
                 if self.isPrivate:
@@ -415,10 +396,8 @@ class MirrorLeechListener:
                 await start_from_queued()
                 return
         else:
-            msg += f'<b>• Type: </b>{mime_type}\n'
             if mime_type == "Folder":
-                msg += f'<b>• SubFolders: </b>{folders}\n'
-                msg += f'<b>• Files: </b>{files}\n'
+                msg += f'<b>• Total files: </b>{files}\n'
             if link or rclonePath and config_dict['RCLONE_SERVE_URL']:
                 if link:
                     buttons.ubutton('Cloud link', link)

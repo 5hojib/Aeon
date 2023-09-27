@@ -100,9 +100,9 @@ if DATABASE_URL:
 else:
     config_dict = {}
 
-USER_TD_SA = environ.get('USER_TD_SA', '')
-if len(USER_TD_SA) != 0:
-    USER_TD_SA = USER_TD_SA.lower()
+GROUPS_EMAIL = environ.get('GROUPS_EMAIL', '')
+if len(GROUPS_EMAIL) != 0:
+    GROUPS_EMAIL = GROUPS_EMAIL.lower()
     
 OWNER_ID = environ.get('OWNER_ID', '')
 if len(OWNER_ID) == 0:
@@ -174,6 +174,8 @@ if len(USER_SESSION_STRING) != 0:
         log_error(f"Failed making client from USER_SESSION_STRING : {e}")
         user = ''
 
+MAX_SPLIT_SIZE = 4194304000 if IS_PREMIUM_USER else 2097152000
+
 MEGA_EMAIL = environ.get('MEGA_EMAIL', '')
 MEGA_PASSWORD = environ.get('MEGA_PASSWORD', '')
 if len(MEGA_EMAIL) == 0 or len(MEGA_PASSWORD) == 0:
@@ -196,14 +198,6 @@ if len(SEARCH_API_LINK) == 0:
 STREAMWISH_API = environ.get('STREAMWISH_API', '')
 if len(STREAMWISH_API) == 0:
     STREAMWISH_API = ''
-
-MAX_SPLIT_SIZE = 4194304000 if IS_PREMIUM_USER else 2097152000
-
-LEECH_SPLIT_SIZE = environ.get('LEECH_SPLIT_SIZE', '')
-if str(LEECH_SPLIT_SIZE) in ["4194304000", "2097152000"] or len(LEECH_SPLIT_SIZE) == 0 or int(LEECH_SPLIT_SIZE) > MAX_SPLIT_SIZE:
-    LEECH_SPLIT_SIZE = MAX_SPLIT_SIZE
-else:
-    LEECH_SPLIT_SIZE = int(LEECH_SPLIT_SIZE)
 
 BOT_MAX_TASKS = environ.get('BOT_MAX_TASKS', '')
 BOT_MAX_TASKS = int(BOT_MAX_TASKS) if BOT_MAX_TASKS.isdigit() else ''
@@ -256,9 +250,6 @@ AS_DOCUMENT = AS_DOCUMENT.lower() == 'true'
 
 SHOW_MEDIAINFO = environ.get('SHOW_MEDIAINFO', '')
 SHOW_MEDIAINFO = SHOW_MEDIAINFO.lower() == 'true'
-
-EQUAL_SPLITS = environ.get('EQUAL_SPLITS', '')
-EQUAL_SPLITS = EQUAL_SPLITS.lower() == 'true'
 
 MEDIA_GROUP = environ.get('MEDIA_GROUP', '')
 MEDIA_GROUP = MEDIA_GROUP.lower() == 'true'
@@ -336,13 +327,6 @@ IMAGES = (IMAGES.replace("'", '').replace('"', '').replace(
     '[', '').replace(']', '').replace(",", "")).split()
 
 
-IMG_SEARCH = environ.get('IMG_SEARCH', '')
-IMG_SEARCH = (IMG_SEARCH.replace("'", '').replace('"', '').replace(
-    '[', '').replace(']', '').replace(",", "")).split()
-
-IMG_PAGE = environ.get('IMG_PAGE', '')
-IMG_PAGE = 1 if not IMG_PAGE else int(IMG_PAGE)
-
 SET_COMMANDS = environ.get('SET_COMMANDS', '')
 SET_COMMANDS = SET_COMMANDS.lower() == 'true'
 
@@ -372,15 +356,11 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'MIRROR_LOG_ID': MIRROR_LOG_ID,
                'LEECH_DUMP_ID': LEECH_DUMP_ID,
                'IMAGES': IMAGES,
-               'IMG_SEARCH': IMG_SEARCH,
-               'IMG_PAGE': IMG_PAGE,
-               'EQUAL_SPLITS': EQUAL_SPLITS,
                'EXTENSION_FILTER': EXTENSION_FILTER,
                'GDRIVE_ID': GDRIVE_ID,
                'INDEX_URL': INDEX_URL,
                'JIODRIVE_TOKEN': JIODRIVE_TOKEN,
                'LEECH_LOG_ID': LEECH_LOG_ID,
-               'LEECH_SPLIT_SIZE': LEECH_SPLIT_SIZE,
                'TOKEN_TIMEOUT': TOKEN_TIMEOUT,
                'MEDIA_GROUP': MEDIA_GROUP,
                'MEGA_EMAIL': MEGA_EMAIL,
@@ -410,7 +390,7 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'UPSTREAM_REPO': UPSTREAM_REPO,
                'UPSTREAM_BRANCH': UPSTREAM_BRANCH,
                'USER_SESSION_STRING': USER_SESSION_STRING,
-               'USER_TD_SA': USER_TD_SA,
+               'GROUPS_EMAIL': GROUPS_EMAIL,
                'USE_SERVICE_ACCOUNTS': USE_SERVICE_ACCOUNTS,
                'WEB_PINCODE': WEB_PINCODE,
                'YT_DLP_OPTIONS': YT_DLP_OPTIONS}
