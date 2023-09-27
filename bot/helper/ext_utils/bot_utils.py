@@ -283,7 +283,7 @@ def is_telegram_link(url):
 
 def is_share_link(url):
     domain = urlparse(url).hostname
-    return any(x in domain for x in ['appdirve', 'hubdrive', 'jiodrive'])
+    return any(x in domain for x in ['appdirve', 'hubdrive', 'jiodrive', 'filepress'])
 
 
 def is_mega_link(url):
