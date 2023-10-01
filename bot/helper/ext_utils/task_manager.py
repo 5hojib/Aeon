@@ -161,7 +161,7 @@ async def limit_checker(size, listener, isTorrent=False, isMega=False, isDriveLi
             limit = 3 * 1024**3
             acpt = await sync_to_async(check_storage_threshold, size, limit, arch)
             if not acpt:
-                limit_exceeded = f'You must leave 3GB free storage.'
+                limit_exceeded = 'You must leave 3GB free storage.'
     if limit_exceeded:
         if size:
             return f"{limit_exceeded}.\nYour file or folder size is {get_readable_file_size(size)}."
