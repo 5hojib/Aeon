@@ -13,7 +13,7 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 async def shell(_, message):
     cmd = message.text.split(maxsplit=1)
     if len(cmd) == 1:
-        await sendMessage(message, 'No command to execute was given.')
+        await sendMessage(message, 'No command to execute was provided.')
         return
     cmd = cmd[1]
     stdout, stderr, _ = await cmd_exec(cmd, shell=True)

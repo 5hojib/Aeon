@@ -143,18 +143,6 @@ DEFAULT_UPLOAD = environ.get('DEFAULT_UPLOAD', '')
 if DEFAULT_UPLOAD != 'rc':
     DEFAULT_UPLOAD = 'gd'
 
-AUTHORIZED_CHATS = environ.get('AUTHORIZED_CHATS', '')
-if len(AUTHORIZED_CHATS) != 0:
-    aid = AUTHORIZED_CHATS.split()
-    for id_ in aid:
-        user_data[int(id_.strip())] = {'is_auth': True}
-
-SUDO_USERS = environ.get('SUDO_USERS', '')
-if len(SUDO_USERS) != 0:
-    aid = SUDO_USERS.split()
-    for id_ in aid:
-        user_data[int(id_.strip())] = {'is_sudo': True}
-
 EXTENSION_FILTER = environ.get('EXTENSION_FILTER', '')
 if len(EXTENSION_FILTER) > 0:
     fx = EXTENSION_FILTER.split()
@@ -283,10 +271,6 @@ RCLONE_SERVE_PASS = environ.get('RCLONE_SERVE_PASS', '')
 if len(RCLONE_SERVE_PASS) == 0:
     RCLONE_SERVE_PASS = ''
 
-STORAGE_THRESHOLD = environ.get('STORAGE_THRESHOLD', '')
-STORAGE_THRESHOLD = '' if len(
-    STORAGE_THRESHOLD) == 0 else float(STORAGE_THRESHOLD)
-
 TORRENT_LIMIT = environ.get('TORRENT_LIMIT', '')
 TORRENT_LIMIT = '' if len(TORRENT_LIMIT) == 0 else float(TORRENT_LIMIT)
 
@@ -334,7 +318,6 @@ TOKEN_TIMEOUT = environ.get('TOKEN_TIMEOUT', '')
 TOKEN_TIMEOUT = int(TOKEN_TIMEOUT) if TOKEN_TIMEOUT.isdigit() else ''
 
 config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
-               'AUTHORIZED_CHATS': AUTHORIZED_CHATS,
                'BASE_URL': BASE_URL,
                'BOT_TOKEN': BOT_TOKEN,
                'BOT_MAX_TASKS': BOT_MAX_TASKS,
@@ -342,7 +325,6 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'DATABASE_URL': DATABASE_URL,
                'DEFAULT_UPLOAD': DEFAULT_UPLOAD,
                'FILELION_API': FILELION_API,
-               'STORAGE_THRESHOLD': STORAGE_THRESHOLD,
                'TORRENT_LIMIT': TORRENT_LIMIT,
                'DIRECT_LIMIT': DIRECT_LIMIT,
                'YTDLP_LIMIT': YTDLP_LIMIT,
@@ -383,7 +365,6 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'SHOW_MEDIAINFO': SHOW_MEDIAINFO,
                'STOP_DUPLICATE': STOP_DUPLICATE,
                'STREAMWISH_API': STREAMWISH_API,
-               'SUDO_USERS': SUDO_USERS,
                'TELEGRAM_API': TELEGRAM_API,
                'TELEGRAM_HASH': TELEGRAM_HASH,
                'TORRENT_TIMEOUT': TORRENT_TIMEOUT,

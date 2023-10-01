@@ -88,18 +88,6 @@ async def load_config():
     if len(RCLONE_FLAGS) == 0:
         RCLONE_FLAGS = ''
 
-    AUTHORIZED_CHATS = environ.get('AUTHORIZED_CHATS', '')
-    if len(AUTHORIZED_CHATS) != 0:
-        aid = AUTHORIZED_CHATS.split()
-        for id_ in aid:
-            user_data[int(id_.strip())] = {'is_auth': True}
-
-    SUDO_USERS = environ.get('SUDO_USERS', '')
-    if len(SUDO_USERS) != 0:
-        aid = SUDO_USERS.split()
-        for id_ in aid:
-            user_data[int(id_.strip())] = {'is_sudo': True}
-
     EXTENSION_FILTER = environ.get('EXTENSION_FILTER', '')
     if len(EXTENSION_FILTER) > 0:
         fx = EXTENSION_FILTER.split()
@@ -251,10 +239,6 @@ async def load_config():
     if len(UPSTREAM_BRANCH) == 0:
         UPSTREAM_BRANCH = 'main'
 
-    STORAGE_THRESHOLD = environ.get('STORAGE_THRESHOLD', '')
-    STORAGE_THRESHOLD = '' if len(
-        STORAGE_THRESHOLD) == 0 else float(STORAGE_THRESHOLD)
-
     TORRENT_LIMIT = environ.get('TORRENT_LIMIT', '')
     TORRENT_LIMIT = '' if len(TORRENT_LIMIT) == 0 else float(TORRENT_LIMIT)
 
@@ -335,14 +319,12 @@ async def load_config():
                     shorteners_list.append({'domain': temp[0],'api_key': temp[1]})
 
     config_dict.update({'AS_DOCUMENT': AS_DOCUMENT,
-                        'AUTHORIZED_CHATS': AUTHORIZED_CHATS,
                         'BASE_URL': BASE_URL,
                         'BOT_TOKEN': BOT_TOKEN,
                         'BOT_MAX_TASKS': BOT_MAX_TASKS,
                         'CMD_SUFFIX': CMD_SUFFIX,
                         'DATABASE_URL': DATABASE_URL,
                         'DEFAULT_UPLOAD': DEFAULT_UPLOAD,
-                        'STORAGE_THRESHOLD': STORAGE_THRESHOLD,
                         'TORRENT_LIMIT': TORRENT_LIMIT,
                         'DIRECT_LIMIT': DIRECT_LIMIT,
                         'YTDLP_LIMIT': YTDLP_LIMIT,
@@ -384,7 +366,6 @@ async def load_config():
                         'SHOW_MEDIAINFO': SHOW_MEDIAINFO,
                         'STOP_DUPLICATE': STOP_DUPLICATE,
                         'STREAMWISH_API': STREAMWISH_API,
-                        'SUDO_USERS': SUDO_USERS,
                         'TELEGRAM_API': TELEGRAM_API,
                         'TELEGRAM_HASH': TELEGRAM_HASH,
                         'TORRENT_TIMEOUT': TORRENT_TIMEOUT,
@@ -438,11 +419,11 @@ async def get_buttons(key=None, edit_type=None, edit_mode=None, mess=None):
         if key not in ['TELEGRAM_HASH', 'TELEGRAM_API', 'OWNER_ID', 'BOT_TOKEN'] and key not in bool_vars:
             buttons.ibutton('Reset', f"botset resetvar {key}")
         buttons.ibutton('Close', "botset close", position="footer")
-        if edit_mode and key in ['SUDO_USERS',
-                                 'CMD_SUFFIX',
+        if edit_mode and key in ['CMD_SUFFIX',
                                  'OWNER_ID',
                                  'USER_SESSION_STRING', 'TELEGRAM_HASH',
-                                 'TELEGRAM_API', 'AUTHORIZED_CHATS', 'DATABASE_URL',
+                                 'TELEGRAM_API',
+                                 'DATABASE_URL',
                                  'BOT_TOKEN']:
             msg += '<b>Note:</b> Restart required for this edit to take effect!\n\n'
         if edit_mode and key not in bool_vars:

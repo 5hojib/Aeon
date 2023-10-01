@@ -46,7 +46,7 @@ async def gen_mediainfo(message, link=None, media=None, mmsg=None):
             tc += parseinfo(stdout)
     except Exception as e:
         LOGGER.error(e)
-        await editMessage(temp_send, f"MediaInfo Stopped due to {str(e)}")
+        await editMessage(temp_send, f"MediaInfo stopped due to {str(e)}")
     finally:
         await aioremove(des_path)
     link_id = (await telegraph.create_page(title='MediaInfo', content=tc))["path"]
