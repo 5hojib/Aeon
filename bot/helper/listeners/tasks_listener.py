@@ -398,32 +398,20 @@ class MirrorLeechListener:
         else:
             if mime_type == "Folder":
                 msg += f'<b>• Total files: </b>{files}\n'
-            if link or rclonePath and config_dict['RCLONE_SERVE_URL']:
+            if link or rclonePath:
                 if link:
                     buttons.ubutton('Cloud link', link)
-                else:
-                    msg += f'<b>• Path: </b><code>{rclonePath}</code>\n'
-                if rclonePath and (RCLONE_SERVE_URL := config_dict['RCLONE_SERVE_URL']):
-                    remote, path = rclonePath.split(':', 1)
-                    url_path = rutils.quote(f'{path}')
-                    share_url = f'{RCLONE_SERVE_URL}/{remote}/{url_path}'
-                    if mime_type == "Folder":
-                        share_url += '/'
-                    buttons.ubutton('Rclone link', share_url)
-                elif not rclonePath:
                     INDEX_URL = self.index_link if self.drive_id else config_dict['INDEX_URL']
                     if INDEX_URL:
                         drive = GoogleDriveHelper()
                         dir_id = drive.getIdFromUrl(link)
                         share_url = f'{INDEX_URL}findpath?id={dir_id}'
-                        if mime_type == "Folder":
-                            share_url += '/'
                         buttons.ubutton('Index link', share_url)
+                else:
+                    msg += f'<b>• Path: </b><code>{rclonePath}</code>\n'
+                    button = None
                 buttons = extra_btns(buttons)
                 button = buttons.build_menu(2)
-            else:
-                msg += f'<b>• Path: </b><code>{rclonePath}</code>\n'
-                button = None
             msg += f'<b>• Uploaded by: </b>{self.tag}\n'
             msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n\n'
 

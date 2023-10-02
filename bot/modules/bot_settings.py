@@ -22,7 +22,6 @@ from bot.helper.ext_utils.bot_utils import setInterval, sync_to_async, new_threa
 from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.ext_utils.task_manager import start_from_queued
 from bot.helper.ext_utils.text_utils import bset_display_dict
-from bot.helper.mirror_utils.rclone_utils.serve import rclone_serve_booter
 from bot.modules.torrent_search import initiate_search_tools
 from bot.modules.rss import addJob
 
@@ -208,22 +207,6 @@ async def load_config():
     MEDIA_GROUP = environ.get('MEDIA_GROUP', '')
     MEDIA_GROUP = MEDIA_GROUP.lower() == 'true'
 
-    RCLONE_SERVE_URL = environ.get('RCLONE_SERVE_URL', '')
-    if len(RCLONE_SERVE_URL) == 0:
-        RCLONE_SERVE_URL = ''
-
-    RCLONE_SERVE_PORT = environ.get('RCLONE_SERVE_PORT', '')
-    RCLONE_SERVE_PORT = 8080 if len(
-        RCLONE_SERVE_PORT) == 0 else int(RCLONE_SERVE_PORT)
-
-    RCLONE_SERVE_USER = environ.get('RCLONE_SERVE_USER', '')
-    if len(RCLONE_SERVE_USER) == 0:
-        RCLONE_SERVE_USER = ''
-
-    RCLONE_SERVE_PASS = environ.get('RCLONE_SERVE_PASS', '')
-    if len(RCLONE_SERVE_PASS) == 0:
-        RCLONE_SERVE_PASS = ''
-
     await (await create_subprocess_exec("pkill", "-9", "-f", "gunicorn")).wait()
     BASE_URL = environ.get('BASE_URL', '').rstrip("/")
     if len(BASE_URL) == 0:
@@ -354,10 +337,6 @@ async def load_config():
                         'QUEUE_UPLOAD': QUEUE_UPLOAD,
                         'RCLONE_FLAGS': RCLONE_FLAGS,
                         'RCLONE_PATH': RCLONE_PATH,
-                        'RCLONE_SERVE_URL': RCLONE_SERVE_URL,
-                        'RCLONE_SERVE_USER': RCLONE_SERVE_USER,
-                        'RCLONE_SERVE_PASS': RCLONE_SERVE_PASS,
-                        'RCLONE_SERVE_PORT': RCLONE_SERVE_PORT,
                         'RSS_CHAT_ID': RSS_CHAT_ID,
                         'RSS_DELAY': RSS_DELAY,
                         'SEARCH_API_LINK': SEARCH_API_LINK,
@@ -381,7 +360,6 @@ async def load_config():
         await DbManager().update_config(config_dict)
     await initiate_search_tools()
     await start_from_queued()
-    await rclone_serve_booter()
 
 
 async def get_buttons(key=None, edit_type=None, edit_mode=None, mess=None):
@@ -482,8 +460,6 @@ async def edit_variable(_, message, pre_message, key):
         await initiate_search_tools()
     elif key in ['QUEUE_ALL', 'QUEUE_DOWNLOAD', 'QUEUE_UPLOAD']:
         await start_from_queued()
-    elif key in ['RCLONE_SERVE_URL', 'RCLONE_SERVE_PORT', 'RCLONE_SERVE_USER', 'RCLONE_SERVE_PASS']:
-        await rclone_serve_booter()
 
 
 async def update_private_file(_, message, pre_message):
@@ -556,8 +532,6 @@ async def update_private_file(_, message, pre_message):
             load_dotenv('config.env', override=True)
             await load_config()
         await message.delete()
-    if file_name == 'rcl.conf':
-        await rclone_serve_booter()
     await update_buttons(pre_message)
     if DATABASE_URL:
         await DbManager().update_private_file(file_name)
@@ -632,8 +606,6 @@ async def edit_bot_settings(client, query):
             await initiate_search_tools()
         elif data[2] in ['QUEUE_ALL', 'QUEUE_DOWNLOAD', 'QUEUE_UPLOAD']:
             await start_from_queued()
-        elif data[2] in ['RCLONE_SERVE_URL', 'RCLONE_SERVE_PORT', 'RCLONE_SERVE_USER', 'RCLONE_SERVE_PASS']:
-            await rclone_serve_booter()
     elif data[1] == 'private':
         handler_dict[message.chat.id] = False
         await query.answer()

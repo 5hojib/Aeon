@@ -255,22 +255,6 @@ UPSTREAM_BRANCH = environ.get('UPSTREAM_BRANCH', '')
 if len(UPSTREAM_BRANCH) == 0:
     UPSTREAM_BRANCH = 'main'
 
-RCLONE_SERVE_URL = environ.get('RCLONE_SERVE_URL', '')
-if len(RCLONE_SERVE_URL) == 0:
-    RCLONE_SERVE_URL = ''
-
-RCLONE_SERVE_PORT = environ.get('RCLONE_SERVE_PORT', '')
-RCLONE_SERVE_PORT = 8080 if len(
-    RCLONE_SERVE_PORT) == 0 else int(RCLONE_SERVE_PORT)
-
-RCLONE_SERVE_USER = environ.get('RCLONE_SERVE_USER', '')
-if len(RCLONE_SERVE_USER) == 0:
-    RCLONE_SERVE_USER = ''
-
-RCLONE_SERVE_PASS = environ.get('RCLONE_SERVE_PASS', '')
-if len(RCLONE_SERVE_PASS) == 0:
-    RCLONE_SERVE_PASS = ''
-
 TORRENT_LIMIT = environ.get('TORRENT_LIMIT', '')
 TORRENT_LIMIT = '' if len(TORRENT_LIMIT) == 0 else float(TORRENT_LIMIT)
 
@@ -353,10 +337,6 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'QUEUE_UPLOAD': QUEUE_UPLOAD,
                'RCLONE_FLAGS': RCLONE_FLAGS,
                'RCLONE_PATH': RCLONE_PATH,
-               'RCLONE_SERVE_URL': RCLONE_SERVE_URL,
-               'RCLONE_SERVE_USER': RCLONE_SERVE_USER,
-               'RCLONE_SERVE_PASS': RCLONE_SERVE_PASS,
-               'RCLONE_SERVE_PORT': RCLONE_SERVE_PORT,
                'RSS_CHAT_ID': RSS_CHAT_ID,
                'RSS_DELAY': RSS_DELAY,
                'SEARCH_API_LINK': SEARCH_API_LINK,
