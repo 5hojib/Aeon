@@ -398,18 +398,19 @@ class MirrorLeechListener:
         else:
             if mime_type == "Folder":
                 msg += f'<b>• Total files: </b>{files}\n'
-            if link or rclonePath:
-                if link:
-                    buttons.ubutton('Cloud link', link)
-                    INDEX_URL = self.index_link if self.drive_id else config_dict['INDEX_URL']
-                    if INDEX_URL:
-                        drive = GoogleDriveHelper()
-                        dir_id = drive.getIdFromUrl(link)
-                        share_url = f'{INDEX_URL}findpath?id={dir_id}'
-                        buttons.ubutton('Index link', share_url)
-                else:
-                    msg += f'<b>• Path: </b><code>{rclonePath}</code>\n'
-                    button = None
+            if link:
+                buttons.ubutton('Cloud link', link)
+                INDEX_URL = self.index_link if self.drive_id else config_dict['INDEX_URL']
+                if INDEX_URL:
+                    drive = GoogleDriveHelper()
+                    dir_id = drive.getIdFromUrl(link)
+                    share_url = f'{INDEX_URL}findpath?id={dir_id}'
+                    buttons.ubutton('Index link', share_url)
+                buttons = extra_btns(buttons)
+                button = buttons.build_menu(2)
+            elif rclonePath:
+                msg += f'<b>• Path: </b><code>{rclonePath}</code>\n'
+                button = None
                 buttons = extra_btns(buttons)
                 button = buttons.build_menu(2)
             msg += f'<b>• Uploaded by: </b>{self.tag}\n'
