@@ -401,11 +401,12 @@ class MirrorLeechListener:
             if link:
                 buttons.ubutton('Cloud link', link)
                 INDEX_URL = self.index_link if self.drive_id else config_dict['INDEX_URL']
-                if INDEX_URL:
-                    drive = GoogleDriveHelper()
-                    dir_id = drive.getIdFromUrl(link)
-                    share_url = f'{INDEX_URL}findpath?id={dir_id}'
-                    buttons.ubutton('Index link', share_url)
+                if not rclonePath:
+                    if INDEX_URL:
+                        drive = GoogleDriveHelper()
+                        dir_id = drive.getIdFromUrl(link)
+                        share_url = f'{INDEX_URL}findpath?id={dir_id}'
+                        buttons.ubutton('Index link', share_url)
                 buttons = extra_btns(buttons)
                 button = buttons.build_menu(2)
             elif rclonePath:
@@ -421,7 +422,6 @@ class MirrorLeechListener:
                 log_msg = list((await sendMultiMessage(config_dict['MIRROR_LOG_ID'], msg, buttonss)).values())[0]
                 if self.linkslogmsg:
                     await deleteMessage(self.linkslogmsg)
-            buttons = ButtonMaker()
             await sendMessage(self.botpmmsg, msg, button, self.random_pic)
             await deleteMessage(self.botpmmsg)
             if self.isSuperGroup:
