@@ -348,6 +348,9 @@ class MirrorLeechListener:
         msg += f'<b>• Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n'
         LOGGER.info(f'Task Done: {name}')
         buttons = ButtonMaker()
+        iButton = ButtonMaker()
+        iButton.ibutton('View in inbox', f"aeon {user_id} botpm", 'header')
+        iButton = extra_btns(iButton)
         if self.isLeech:
             if folders > 1:
                 msg += f'<b>• Total files: </b>{folders}\n'
@@ -378,13 +381,10 @@ class MirrorLeechListener:
                     if self.linkslogmsg:
                         await sendMessage(self.linkslogmsg, msg + lmsg + fmsg)
                         await deleteMessage(self.linkslogmsg)
-                btn = ButtonMaker()
                 await sendMessage(self.botpmmsg, msg + lmsg + fmsg)
                 await deleteMessage(self.botpmmsg)
                 if self.isSuperGroup:
-                    btn.ibutton('View in inbox', f"aeon {user_id} botpm", 'header')
-                    btn = extra_btns(btn)
-                    await sendMessage(self.message, f'{msg}<b>Files has been sent to your inbox</b>', btn.build_menu(1))
+                    await sendMessage(self.message, f'{msg}<b>Files has been sent to your inbox</b>', iButton.build_menu(1))
                 else:
                     await deleteMessage(self.botpmmsg)
             if self.seed:
@@ -425,9 +425,7 @@ class MirrorLeechListener:
             await sendMessage(self.botpmmsg, msg, button, self.random_pic)
             await deleteMessage(self.botpmmsg)
             if self.isSuperGroup:
-                buttons.ibutton('View in inbox', f"aeon {user_id} botpm", 'header')
-                buttons = extra_btns(buttons)
-                await sendMessage(self.message, f'{msg} <b>Links has been sent to your inbox</b>', buttons.build_menu(1))
+                await sendMessage(self.message, f'{msg} <b>Links has been sent to your inbox</b>', iButton.build_menu(1))
             else:
                 await deleteMessage(self.botpmmsg)
             if self.seed:
