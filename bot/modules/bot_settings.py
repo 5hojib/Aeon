@@ -59,14 +59,14 @@ async def load_config():
 
     BOT_MAX_TASKS = environ.get('BOT_MAX_TASKS', '')
     BOT_MAX_TASKS = int(BOT_MAX_TASKS) if BOT_MAX_TASKS.isdigit() else ''
-    
+
     OWNER_ID = environ.get('OWNER_ID', '')
     OWNER_ID = config_dict['OWNER_ID'] if len(OWNER_ID) == 0 else int(OWNER_ID)
 
     GROUPS_EMAIL = environ.get('GROUPS_EMAIL', '')
     if len(GROUPS_EMAIL) != 0:
         GROUPS_EMAIL = GROUPS_EMAIL.lower()
-        
+
     DATABASE_URL = environ.get('DATABASE_URL', '')
     if len(DATABASE_URL) == 0:
         DATABASE_URL = ''
@@ -121,7 +121,7 @@ async def load_config():
 
     LEECH_LOG_ID = environ.get('LEECH_LOG_ID', '')
     LEECH_LOG_ID = '' if len(LEECH_LOG_ID) == 0 else int(LEECH_LOG_ID)
-    
+
     if len(download_dict) != 0:
         async with status_reply_dict_lock:
             if Interval:
@@ -188,7 +188,7 @@ async def load_config():
     STREAMWISH_API = environ.get('STREAMWISH_API', '')
     if len(STREAMWISH_API) == 0:
         STREAMWISH_API = ''
-    
+
     STOP_DUPLICATE = environ.get('STOP_DUPLICATE', '')
     STOP_DUPLICATE = STOP_DUPLICATE.lower() == 'true'
 
@@ -203,7 +203,7 @@ async def load_config():
 
     SHOW_MEDIAINFO = environ.get('SHOW_MEDIAINFO', '')
     SHOW_MEDIAINFO = SHOW_MEDIAINFO.lower() == 'true'
-    
+
     MEDIA_GROUP = environ.get('MEDIA_GROUP', '')
     MEDIA_GROUP = MEDIA_GROUP.lower() == 'true'
 
@@ -212,7 +212,9 @@ async def load_config():
     if len(BASE_URL) == 0:
         BASE_URL = ''
     else:
-        await create_subprocess_shell(f"gunicorn web.wserver:app --bind 0.0.0.0:80 --worker-class gevent")
+        await create_subprocess_shell(
+            "gunicorn web.wserver:app --bind 0.0.0.0:80 --worker-class gevent"
+        )
 
     UPSTREAM_REPO = environ.get('UPSTREAM_REPO', '')
     if len(UPSTREAM_REPO) == 0:
@@ -263,7 +265,7 @@ async def load_config():
 
     SET_COMMANDS = environ.get('SET_COMMANDS', '')
     SET_COMMANDS = SET_COMMANDS.lower() == 'true'
-    
+
     TOKEN_TIMEOUT = environ.get('TOKEN_TIMEOUT', '')
     TOKEN_TIMEOUT = int(TOKEN_TIMEOUT) if TOKEN_TIMEOUT.isdigit() else ''
 
