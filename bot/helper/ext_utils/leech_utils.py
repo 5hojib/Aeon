@@ -231,7 +231,7 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
     lcaption = user_dict.get('lcaption', '')
     prefile_ = file_
     file_ = re_sub(r'www\S+', '', file_)
-        
+
     if remname:
         if not remname.startswith('|'):
             remname = f"|{remname}"
@@ -277,10 +277,8 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
 
     cap_mono = nfile_
     if lcaption and dirpath and not isMirror:
-        
         def lowerVars(match):
             return f"{{{match.group(1).lower()}}}"
-
         lcaption = lcaption.replace('\|', '%%').replace('\{', '&%&').replace('\}', '$%$').replace('\s', ' ')
         slit = lcaption.split("|")
         slit[0] = re_sub(r'\{([^}]+)\}', lowerVars, slit[0])
@@ -293,8 +291,7 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
             quality = qual,
             languages = lang,
             subtitles = subs,
-            md5_hash = get_md5_hash(up_path)
-        )
+            md5_hash = get_md5_hash(up_path))
         if len(slit) > 1:
             for rep in range(1, len(slit)):
                 args = slit[rep].split(":")
