@@ -212,9 +212,7 @@ async def load_config():
     if len(BASE_URL) == 0:
         BASE_URL = ''
     else:
-        await create_subprocess_shell(
-            "gunicorn web.wserver:app --bind 0.0.0.0:80 --worker-class gevent"
-        )
+        await create_subprocess_shell('gunicorn web.wserver:app --bind 0.0.0.0:80 --worker-class gevent')
 
     UPSTREAM_REPO = environ.get('UPSTREAM_REPO', '')
     if len(UPSTREAM_REPO) == 0:
