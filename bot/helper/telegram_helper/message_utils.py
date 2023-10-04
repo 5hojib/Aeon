@@ -185,11 +185,11 @@ async def five_minute_del(message):
     await deleteMessage(message)
 
 async def delete_links(message):
-    if reply_to := message.reply_to_message:
-        await deleteMessage(reply_to)
-    await deleteMessage(message)
-        
-        
+    if config_dict['DELETE_LINKS']:
+        if reply_to := message.reply_to_message:
+            await deleteMessage(reply_to)
+        await deleteMessage(message)
+
 async def delete_all_messages():
     async with status_reply_dict_lock:
         for key, data in list(status_reply_dict.items()):
@@ -239,8 +239,7 @@ async def get_tg_link_content(link):
     elif not private:
         return message, 'bot'
     else:
-        raise TgLinkException(
-            "Bot can't download from GROUPS without joining!")
+        raise TgLinkException("Bot can't download from GROUPS without joining!")
 
 
 async def update_all_messages(force=False):
@@ -302,7 +301,7 @@ async def forcesub(message, ids, button=None):
     if join_button:
         if button is None:
             button = ButtonMaker()
-        _msg = "You haven't joined our channel yet!"
+        _msg = "You haven't joined our channel/group yet!"
         for key, value in join_button.items():
             button.ubutton(f'Join {key}', value, 'footer')
     return _msg, button

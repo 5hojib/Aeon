@@ -34,6 +34,7 @@ default_values = {'DEFAULT_UPLOAD': 'gd',
                   'UPSTREAM_BRANCH': 'main',
                   'TORRENT_TIMEOUT': 3000}
 bool_vars = ['AS_DOCUMENT',
+             'DELETE_LINKS',
              'STOP_DUPLICATE',
              'SET_COMMANDS',
              'SHOW_MEDIAINFO',
@@ -243,6 +244,9 @@ async def load_config():
     LEECH_LIMIT = environ.get('LEECH_LIMIT', '')
     LEECH_LIMIT = '' if len(LEECH_LIMIT) == 0 else float(LEECH_LIMIT)
 
+    DELETE_LINKS = environ.get('DELETE_LINKS', '')
+    DELETE_LINKS = DELETE_LINKS.lower() == 'true'
+    
     FSUB_IDS = environ.get('FSUB_IDS', '')
     if len(FSUB_IDS) == 0:
         FSUB_IDS = ''
@@ -308,6 +312,7 @@ async def load_config():
                         'CMD_SUFFIX': CMD_SUFFIX,
                         'DATABASE_URL': DATABASE_URL,
                         'DEFAULT_UPLOAD': DEFAULT_UPLOAD,
+                        'DELETE_LINKS': DELETE_LINKS,
                         'TORRENT_LIMIT': TORRENT_LIMIT,
                         'DIRECT_LIMIT': DIRECT_LIMIT,
                         'YTDLP_LIMIT': YTDLP_LIMIT,

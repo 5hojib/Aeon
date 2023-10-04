@@ -282,6 +282,9 @@ USER_MAX_TASKS = '' if len(USER_MAX_TASKS) == 0 else int(USER_MAX_TASKS)
 PLAYLIST_LIMIT = environ.get('PLAYLIST_LIMIT', '')
 PLAYLIST_LIMIT = '' if len(PLAYLIST_LIMIT) == 0 else int(PLAYLIST_LIMIT)
 
+DELETE_LINKS = environ.get('DELETE_LINKS', '')
+DELETE_LINKS = DELETE_LINKS.lower() == 'true'
+
 FSUB_IDS = environ.get('FSUB_IDS', '')
 if len(FSUB_IDS) == 0:
     FSUB_IDS = ''
@@ -307,6 +310,7 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'BOT_MAX_TASKS': BOT_MAX_TASKS,
                'CMD_SUFFIX': CMD_SUFFIX,
                'DATABASE_URL': DATABASE_URL,
+               'DELETE_LINKS': DELETE_LINKS,
                'DEFAULT_UPLOAD': DEFAULT_UPLOAD,
                'FILELION_API': FILELION_API,
                'TORRENT_LIMIT': TORRENT_LIMIT,
