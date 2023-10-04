@@ -59,7 +59,6 @@ class MirrorLeechListener:
         self.join = join
         self.linkslogmsg = None
         self.botpmmsg = None
-        self.upload_details = {}
         self.drive_id = drive_id
         self.index_link = index_link
         self.leech_utils = leech_utils
@@ -315,7 +314,7 @@ class MirrorLeechListener:
             LOGGER.info(f"Leech Name: {up_name}")
             tg = TgUploader(up_name, up_dir, self)
             tg_upload_status = TelegramStatus(
-                tg, size, self.message, gid, 'up', self.upload_details)
+                tg, size, self.message, gid, 'up')
             async with download_dict_lock:
                 download_dict[self.uid] = tg_upload_status
             await update_all_messages()
@@ -324,7 +323,7 @@ class MirrorLeechListener:
             size = await get_path_size(up_path)
             LOGGER.info(f"Upload Name: {up_name}")
             drive = GoogleDriveHelper(up_name, up_dir, self)
-            upload_status = GdriveStatus(drive, size, self.message, gid, 'up', self.upload_details)
+            upload_status = GdriveStatus(drive, size, self.message, gid, 'up')
             async with download_dict_lock:
                 download_dict[self.uid] = upload_status
             await update_all_messages()
@@ -335,7 +334,7 @@ class MirrorLeechListener:
             RCTransfer = RcloneTransferHelper(self, up_name)
             async with download_dict_lock:
                 download_dict[self.uid] = RcloneStatus(
-                    RCTransfer, self.message, gid, 'up', self.upload_details)
+                    RCTransfer, self.message, gid, 'up')
             await update_all_messages()
             await RCTransfer.upload(up_path, size)
 
@@ -418,8 +417,7 @@ class MirrorLeechListener:
             msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n\n'
 
             if config_dict['MIRROR_LOG_ID']:
-                buttonss = button
-                log_msg = list((await sendMultiMessage(config_dict['MIRROR_LOG_ID'], msg, buttonss)).values())[0]
+                log_msg = list((await sendMultiMessage(config_dict['MIRROR_LOG_ID'], msg, button)).values())[0]
                 if self.linkslogmsg:
                     await deleteMessage(self.linkslogmsg)
             await sendMessage(self.botpmmsg, msg, button, self.random_pic)
