@@ -392,7 +392,7 @@ async def get_buttons(key=None, edit_type=None, edit_mode=None, mess=None):
         if mess.chat.type == ChatType.PRIVATE:
             msg += f'<b>Value:</b> {config_dict.get(key, "None")}\n\n'
         else:
-            buttons.ibutton('View Var Value', f"botset showvar {key}", position="header")
+            buttons.ibutton('View value', f"botset showvar {key}", position="header")
         buttons.ibutton('Back', "botset back var", position="footer")
         if key not in bool_vars:
             if not edit_mode:
@@ -412,9 +412,12 @@ async def get_buttons(key=None, edit_type=None, edit_mode=None, mess=None):
         if edit_mode and key not in bool_vars:
             msg += 'Send a valid value for the above Var. <b>Timeout:</b> 60 sec'
         if key in bool_vars:
+            value = config_dict.get(key)
             msg += 'Choose a valid value for the above Var'
-            buttons.ibutton('True', f"botset boolvar {key} on")
-            buttons.ibutton('False', f"botset boolvar {key} off")
+            if not value:
+            	  buttons.ibutton('Make it True', f"botset boolvar {key} on")
+            else:
+            	  buttons.ibutton('Make it False', f"botset boolvar {key} off")
     button = buttons.build_menu(1) if key is None else buttons.build_menu(2)
     return msg, button
 
