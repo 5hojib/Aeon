@@ -5,7 +5,7 @@ from aiofiles import open as aiopen
 from aiofiles.os import remove as aioremove, path as aiopath, mkdir
 from os import path as ospath, getcwd
 
-from pyrogram.handlers import MessageHandler 
+from pyrogram.handlers import MessageHandler
 from pyrogram.filters import command
 
 from bot import LOGGER, bot, config_dict
@@ -14,7 +14,6 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.message_utils import editMessage, sendMessage
 from bot.helper.ext_utils.bot_utils import cmd_exec
 from bot.helper.ext_utils.telegraph_helper import telegraph
-
 
 async def gen_mediainfo(message, link=None, media=None, mmsg=None):
     temp_send = await sendMessage(message, 'Generating MediaInfo...')
@@ -25,7 +24,8 @@ async def gen_mediainfo(message, link=None, media=None, mmsg=None):
         if link:
             filename = re_search(".+/(.+)", link).group(1)
             des_path = ospath.join(path, filename)
-            headers = {"user-agent":"Mozilla/5.0 (Linux; Android 12; 2201116PI) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36"}
+            headers = {"user-agent": "Mozilla/5.0 (Linux; Android 12; 2201116PI) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36"}
+            
             async with aiohttp.ClientSession() as session:
                 async with session.get(link, headers=headers) as response:
                     async with aiopen(des_path, "wb") as f:
@@ -52,8 +52,8 @@ async def gen_mediainfo(message, link=None, media=None, mmsg=None):
     link_id = (await telegraph.create_page(title='MediaInfo', content=tc))["path"]
     await temp_send.edit(f"<b>MediaInfo:</b>\n\n<b>Link :</b> https://graph.org/{link_id}", disable_web_page_preview=True)
 
-
 section_dict = {'General': '🗒', 'Video': '🎞', 'Audio': '🔊', 'Text': '🔠', 'Menu': '🗃'}
+
 def parseinfo(out):
     tc = ''
     trigger = False
@@ -72,7 +72,6 @@ def parseinfo(out):
             tc += line + '\n'
     tc += '</pre><br>'
     return tc
-
 
 async def mediainfo(_, message):
     rply = message.reply_to_message
