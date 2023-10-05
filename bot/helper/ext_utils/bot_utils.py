@@ -28,7 +28,7 @@ from bot import OWNER_ID, bot_name, DATABASE_URL, LOGGER, get_client, aria2, dow
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.telegraph_helper import telegraph
-from bot.helper.ext_utils.shortners import short_url
+from bot.helper.ext_utils.shorteners import short_url
 from bot.helper.ext_utils.aeon_utils import tinyfy
 
 THREADPOOL = ThreadPoolExecutor(max_workers = 1000)

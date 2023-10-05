@@ -1,4 +1,4 @@
-import pyshorteners
+from pyshorteners import Shortener
 from bot import LOGGER
 from re import IGNORECASE, search, escape
 
@@ -49,7 +49,7 @@ async def nsfw_precheck(message):
 
 
 def tinyfy(long_url):
-    s = pyshorteners.Shortener()
+    s = Shortener()
     try:
         short_url = s.tinyurl.short(long_url)
         LOGGER.info(f'tinyfied {long_url} to {short_url}')

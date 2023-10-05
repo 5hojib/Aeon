@@ -166,7 +166,7 @@ async def update_user_settings(query, key=None, edit_type=None, edit_mode=None, 
     thumbnail = f"Thumbnails/{user_id}.jpg"
     if not ospath.exists(thumbnail):
         thumbnail = 'https://graph.org/file/73ae908d18c6b38038071.jpg'
-    await editMessage(query.message, msg, button, photo=thumbnail)
+    await editMessage(query.message, msg, button, thumbnail)
 
 
 @new_thread
