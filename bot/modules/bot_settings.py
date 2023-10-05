@@ -390,8 +390,8 @@ async def get_buttons(key=None, edit_type=None, edit_mode=None, mess=None):
         msg = f'<b>Variable:</b> <code>{key}</code>\n\n'
         msg += f'<b>Description:</b> {bset_display_dict.get(key, "No Description Provided")}\n\n'
         if mess.chat.type == ChatType.PRIVATE:
-            msg += f'<b>Value:</b> {config_dict.get(key, "None")}\n\n'
-        else:
+            msg += f'<b>Value:</b> <code>{config_dict.get(key, "None")}</code>\n\n'
+        elif key not in bool_vars:
             buttons.ibutton('View value', f"botset showvar {key}", position="header")
         buttons.ibutton('Back', "botset back var", position="footer")
         if key not in bool_vars:
