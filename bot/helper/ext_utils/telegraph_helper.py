@@ -3,7 +3,8 @@ from asyncio import sleep
 from telegraph.aio import Telegraph
 from telegraph.exceptions import RetryAfterError
 
-from bot import LOGGER, bot_loop
+from bot import LOGGER, bot_loop, config_dict
+
 
 class TelegraphHelper:
     def __init__(self):
@@ -12,55 +13,44 @@ class TelegraphHelper:
         self.access_token = None
         self.author_name = 'Aeon'
         self.author_url = 'https://t.me/ProjectAeon'
-        self.create_account()
 
-    def create_account(self):
-        try:
-            self.telegraph.create_account(
-                short_name = self.short_name,
-                author_name = self.author_name,
-                author_url = self.author_url)
-            self.access_token = self.telegraph.get_access_token()
-            LOGGER.info("Creating Telegraph Account")
-        except Exception as e:
-            LOGGER.error(f"Telegraph account creation failed: {str(e)}")
+    async def create_account(self):
+        await self.telegraph.create_account(
+            short_name = self.short_name,
+            author_name = self.author_name,
+            author_url = self.author_url)
+        self.access_token = self.telegraph.get_access_token()
+        LOGGER.info("Creating Telegraph Account")
 
-    def handle_retry_error(self, method, *args, **kwargs):
+    async def create_page(self, title, content):
         try:
-            return method(*args, **kwargs)
-        except RetryAfterError as st:
-            LOGGER.warning(f'Telegraph Flood control exceeded. Sleeping for {st.retry_after} seconds.')
-            sleep(st.retry_after)
-            return self.handle_retry_error(method, *args, **kwargs)
-
-    def create_page(self, title, content):
-        try:
-            return self.handle_retry_error(
-                self.telegraph.create_page,
+            return await self.telegraph.create_page(
                 title = title,
                 author_name = self.author_name,
                 author_url = self.author_url,
                 html_content = content)
-        except Exception as e:
-            LOGGER.error(f"Telegraph page creation failed: {str(e)}")
+        except RetryAfterError as st:
+            LOGGER.warning(f'Telegraph Flood control exceeded. I will sleep for {st.retry_after} seconds.')
+            await sleep(st.retry_after)
+            return await self.create_page(title, content)
 
-    def edit_page(self, path, title, content):
+    async def edit_page(self, path, title, content):
         try:
-            return self.handle_retry_error(
-                self.telegraph.edit_page,
+            return await self.telegraph.edit_page(
                 path = path,
                 title = title,
                 author_name = self.author_name,
                 author_url = self.author_url,
                 html_content = content)
-        except Exception as e:
-            LOGGER.error(f"Telegraph page editing failed: {str(e)}")
+        except RetryAfterError as st:
+            LOGGER.warning(f'Telegraph Flood control exceeded. I will sleep for {st.retry_after} seconds.')
+            await sleep(st.retry_after)
+            return await self.edit_page(path, title, content)
 
-    def edit_telegraph(self, path, telegraph_content):
+    async def edit_telegraph(self, path, telegraph_content):
         nxt_page = 1
         prev_page = 0
         num_of_path = len(path)
-        
         for content in telegraph_content:
             if nxt_page == 1:
                 content += f'<b><a href="https://telegra.ph/{path[nxt_page]}">Next</a></b>'
@@ -72,10 +62,11 @@ class TelegraphHelper:
                 if nxt_page < num_of_path:
                     content += f'<b> | <a href="https://telegra.ph/{path[nxt_page]}">Next</a></b>'
                     nxt_page += 1
-            self.edit_page(
+            await self.edit_page(
                 path = path[prev_page],
                 title = "Torrent Search",
                 content = content)
+        return
 
-telegraph = TelegraphHelper()
-bot_loop.run_until_complete(telegraph.create_account())
+
+bot_loop.run_until_complete(TelegraphHelper().create_account())
