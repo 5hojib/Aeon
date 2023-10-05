@@ -20,38 +20,35 @@ async def broadcast(_, message):
     if not message.reply_to_message:
         return await sendMessage(message, '<b>Reply to any message to broadcast users in Bot PM.</b>')
 
-    t, s, b, u = 0, 0, 0, 0
+    total, successful, blocked, unsuccessful = 0, 0, 0, 0
     start_time = time()
-    status = '''<b>Broadcast Stats :</b>
-
-<b>• Total users:</b> {t}
-<b>• Success:</b> {s}
-<b>• Blocked or deleted:</b> {b}
-<b>• Unsuccessful attempts:</b> {u}'''
-    
+    status = '<b>Broadcast Stats :</b>\n\n'
+    status += f'<b>• Total users:</b> {total}\n'
+    status += f'<b>• Success:</b> {successful}\n'
+    status += f'<b>• Blocked or deleted:</b> {blocked}\n'
+    status += f'<b>• Unsuccessful attempts:</b> {unsuccessful}'
     updater = time()
-    pls_wait = await sendMessage(message, status.format(**locals()))
+    broadcast_message = await sendMessage(message, status.format(**locals()))
     
     for uid in (await DbManager().get_pm_uids()):
         try:
             await message.reply_to_message.copy(uid)
-            s += 1
+            successful += 1
         except FloodWait as e:
             await asyncio.sleep(e.value)
             await message.reply_to_message.copy(uid)
-            s += 1
+            successful += 1
         except (UserIsBlocked, InputUserDeactivated):
             await DbManager().rm_pm_user(uid)
-            b += 1
+            blocked += 1
         except Exception:
-            u += 1
-        
-        t += 1
+            unsuccessful += 1
+        total += 1
         if (time() - updater) > 10:
-            await editMessage(pls_wait, status.format(**locals()))
+            await editMessage(broadcast_message, status.format(**locals()))
             updater = time()
     
     elapsed_time = get_readable_time(time() - start_time)
-    await editMessage(pls_wait, f"{status.format(**locals())}\n\n<b>Elapsed Time:</b> <code>{elapsed_time}</code>")
+    await editMessage(broadcast_message, f"{status.format(**locals())}\n\n<b>Elapsed Time:</b> {elapsed_time}")
 
 bot.add_handler(MessageHandler(broadcast, filters=command(BotCommands.BroadcastCommand) & CustomFilters.owner))

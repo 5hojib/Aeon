@@ -22,7 +22,6 @@ from bot.helper.ext_utils.bot_utils import setInterval, sync_to_async, new_threa
 from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.ext_utils.task_manager import start_from_queued
 from bot.helper.ext_utils.text_utils import bset_display_dict
-from bot.helper.mirror_utils.rclone_utils.serve import rclone_serve_booter
 from bot.modules.torrent_search import initiate_search_tools
 from bot.modules.rss import addJob
 
@@ -35,6 +34,7 @@ default_values = {'DEFAULT_UPLOAD': 'gd',
                   'UPSTREAM_BRANCH': 'main',
                   'TORRENT_TIMEOUT': 3000}
 bool_vars = ['AS_DOCUMENT',
+             'DELETE_LINKS',
              'STOP_DUPLICATE',
              'SET_COMMANDS',
              'SHOW_MEDIAINFO',
@@ -60,14 +60,14 @@ async def load_config():
 
     BOT_MAX_TASKS = environ.get('BOT_MAX_TASKS', '')
     BOT_MAX_TASKS = int(BOT_MAX_TASKS) if BOT_MAX_TASKS.isdigit() else ''
-    
+
     OWNER_ID = environ.get('OWNER_ID', '')
     OWNER_ID = config_dict['OWNER_ID'] if len(OWNER_ID) == 0 else int(OWNER_ID)
 
     GROUPS_EMAIL = environ.get('GROUPS_EMAIL', '')
     if len(GROUPS_EMAIL) != 0:
         GROUPS_EMAIL = GROUPS_EMAIL.lower()
-        
+
     DATABASE_URL = environ.get('DATABASE_URL', '')
     if len(DATABASE_URL) == 0:
         DATABASE_URL = ''
@@ -87,18 +87,6 @@ async def load_config():
     RCLONE_FLAGS = environ.get('RCLONE_FLAGS', '')
     if len(RCLONE_FLAGS) == 0:
         RCLONE_FLAGS = ''
-
-    AUTHORIZED_CHATS = environ.get('AUTHORIZED_CHATS', '')
-    if len(AUTHORIZED_CHATS) != 0:
-        aid = AUTHORIZED_CHATS.split()
-        for id_ in aid:
-            user_data[int(id_.strip())] = {'is_auth': True}
-
-    SUDO_USERS = environ.get('SUDO_USERS', '')
-    if len(SUDO_USERS) != 0:
-        aid = SUDO_USERS.split()
-        for id_ in aid:
-            user_data[int(id_.strip())] = {'is_sudo': True}
 
     EXTENSION_FILTER = environ.get('EXTENSION_FILTER', '')
     if len(EXTENSION_FILTER) > 0:
@@ -134,7 +122,7 @@ async def load_config():
 
     LEECH_LOG_ID = environ.get('LEECH_LOG_ID', '')
     LEECH_LOG_ID = '' if len(LEECH_LOG_ID) == 0 else int(LEECH_LOG_ID)
-    
+
     if len(download_dict) != 0:
         async with status_reply_dict_lock:
             if Interval:
@@ -201,7 +189,7 @@ async def load_config():
     STREAMWISH_API = environ.get('STREAMWISH_API', '')
     if len(STREAMWISH_API) == 0:
         STREAMWISH_API = ''
-    
+
     STOP_DUPLICATE = environ.get('STOP_DUPLICATE', '')
     STOP_DUPLICATE = STOP_DUPLICATE.lower() == 'true'
 
@@ -216,32 +204,16 @@ async def load_config():
 
     SHOW_MEDIAINFO = environ.get('SHOW_MEDIAINFO', '')
     SHOW_MEDIAINFO = SHOW_MEDIAINFO.lower() == 'true'
-    
+
     MEDIA_GROUP = environ.get('MEDIA_GROUP', '')
     MEDIA_GROUP = MEDIA_GROUP.lower() == 'true'
-
-    RCLONE_SERVE_URL = environ.get('RCLONE_SERVE_URL', '')
-    if len(RCLONE_SERVE_URL) == 0:
-        RCLONE_SERVE_URL = ''
-
-    RCLONE_SERVE_PORT = environ.get('RCLONE_SERVE_PORT', '')
-    RCLONE_SERVE_PORT = 8080 if len(
-        RCLONE_SERVE_PORT) == 0 else int(RCLONE_SERVE_PORT)
-
-    RCLONE_SERVE_USER = environ.get('RCLONE_SERVE_USER', '')
-    if len(RCLONE_SERVE_USER) == 0:
-        RCLONE_SERVE_USER = ''
-
-    RCLONE_SERVE_PASS = environ.get('RCLONE_SERVE_PASS', '')
-    if len(RCLONE_SERVE_PASS) == 0:
-        RCLONE_SERVE_PASS = ''
 
     await (await create_subprocess_exec("pkill", "-9", "-f", "gunicorn")).wait()
     BASE_URL = environ.get('BASE_URL', '').rstrip("/")
     if len(BASE_URL) == 0:
         BASE_URL = ''
     else:
-        await create_subprocess_shell(f"gunicorn web.wserver:app --bind 0.0.0.0:80 --worker-class gevent")
+        await create_subprocess_shell('gunicorn web.wserver:app --bind 0.0.0.0:80 --worker-class gevent')
 
     UPSTREAM_REPO = environ.get('UPSTREAM_REPO', '')
     if len(UPSTREAM_REPO) == 0:
@@ -250,10 +222,6 @@ async def load_config():
     UPSTREAM_BRANCH = environ.get('UPSTREAM_BRANCH', '')
     if len(UPSTREAM_BRANCH) == 0:
         UPSTREAM_BRANCH = 'main'
-
-    STORAGE_THRESHOLD = environ.get('STORAGE_THRESHOLD', '')
-    STORAGE_THRESHOLD = '' if len(
-        STORAGE_THRESHOLD) == 0 else float(STORAGE_THRESHOLD)
 
     TORRENT_LIMIT = environ.get('TORRENT_LIMIT', '')
     TORRENT_LIMIT = '' if len(TORRENT_LIMIT) == 0 else float(TORRENT_LIMIT)
@@ -276,6 +244,9 @@ async def load_config():
     LEECH_LIMIT = environ.get('LEECH_LIMIT', '')
     LEECH_LIMIT = '' if len(LEECH_LIMIT) == 0 else float(LEECH_LIMIT)
 
+    DELETE_LINKS = environ.get('DELETE_LINKS', '')
+    DELETE_LINKS = DELETE_LINKS.lower() == 'true'
+    
     FSUB_IDS = environ.get('FSUB_IDS', '')
     if len(FSUB_IDS) == 0:
         FSUB_IDS = ''
@@ -296,7 +267,7 @@ async def load_config():
 
     SET_COMMANDS = environ.get('SET_COMMANDS', '')
     SET_COMMANDS = SET_COMMANDS.lower() == 'true'
-    
+
     TOKEN_TIMEOUT = environ.get('TOKEN_TIMEOUT', '')
     TOKEN_TIMEOUT = int(TOKEN_TIMEOUT) if TOKEN_TIMEOUT.isdigit() else ''
 
@@ -335,14 +306,13 @@ async def load_config():
                     shorteners_list.append({'domain': temp[0],'api_key': temp[1]})
 
     config_dict.update({'AS_DOCUMENT': AS_DOCUMENT,
-                        'AUTHORIZED_CHATS': AUTHORIZED_CHATS,
                         'BASE_URL': BASE_URL,
                         'BOT_TOKEN': BOT_TOKEN,
                         'BOT_MAX_TASKS': BOT_MAX_TASKS,
                         'CMD_SUFFIX': CMD_SUFFIX,
                         'DATABASE_URL': DATABASE_URL,
                         'DEFAULT_UPLOAD': DEFAULT_UPLOAD,
-                        'STORAGE_THRESHOLD': STORAGE_THRESHOLD,
+                        'DELETE_LINKS': DELETE_LINKS,
                         'TORRENT_LIMIT': TORRENT_LIMIT,
                         'DIRECT_LIMIT': DIRECT_LIMIT,
                         'YTDLP_LIMIT': YTDLP_LIMIT,
@@ -372,10 +342,6 @@ async def load_config():
                         'QUEUE_UPLOAD': QUEUE_UPLOAD,
                         'RCLONE_FLAGS': RCLONE_FLAGS,
                         'RCLONE_PATH': RCLONE_PATH,
-                        'RCLONE_SERVE_URL': RCLONE_SERVE_URL,
-                        'RCLONE_SERVE_USER': RCLONE_SERVE_USER,
-                        'RCLONE_SERVE_PASS': RCLONE_SERVE_PASS,
-                        'RCLONE_SERVE_PORT': RCLONE_SERVE_PORT,
                         'RSS_CHAT_ID': RSS_CHAT_ID,
                         'RSS_DELAY': RSS_DELAY,
                         'SEARCH_API_LINK': SEARCH_API_LINK,
@@ -384,7 +350,6 @@ async def load_config():
                         'SHOW_MEDIAINFO': SHOW_MEDIAINFO,
                         'STOP_DUPLICATE': STOP_DUPLICATE,
                         'STREAMWISH_API': STREAMWISH_API,
-                        'SUDO_USERS': SUDO_USERS,
                         'TELEGRAM_API': TELEGRAM_API,
                         'TELEGRAM_HASH': TELEGRAM_HASH,
                         'TORRENT_TIMEOUT': TORRENT_TIMEOUT,
@@ -400,7 +365,6 @@ async def load_config():
         await DbManager().update_config(config_dict)
     await initiate_search_tools()
     await start_from_queued()
-    await rclone_serve_booter()
 
 
 async def get_buttons(key=None, edit_type=None, edit_mode=None, mess=None):
@@ -438,11 +402,11 @@ async def get_buttons(key=None, edit_type=None, edit_mode=None, mess=None):
         if key not in ['TELEGRAM_HASH', 'TELEGRAM_API', 'OWNER_ID', 'BOT_TOKEN'] and key not in bool_vars:
             buttons.ibutton('Reset', f"botset resetvar {key}")
         buttons.ibutton('Close', "botset close", position="footer")
-        if edit_mode and key in ['SUDO_USERS',
-                                 'CMD_SUFFIX',
+        if edit_mode and key in ['CMD_SUFFIX',
                                  'OWNER_ID',
                                  'USER_SESSION_STRING', 'TELEGRAM_HASH',
-                                 'TELEGRAM_API', 'AUTHORIZED_CHATS', 'DATABASE_URL',
+                                 'TELEGRAM_API',
+                                 'DATABASE_URL',
                                  'BOT_TOKEN']:
             msg += '<b>Note:</b> Restart required for this edit to take effect!\n\n'
         if edit_mode and key not in bool_vars:
@@ -501,8 +465,6 @@ async def edit_variable(_, message, pre_message, key):
         await initiate_search_tools()
     elif key in ['QUEUE_ALL', 'QUEUE_DOWNLOAD', 'QUEUE_UPLOAD']:
         await start_from_queued()
-    elif key in ['RCLONE_SERVE_URL', 'RCLONE_SERVE_PORT', 'RCLONE_SERVE_USER', 'RCLONE_SERVE_PASS']:
-        await rclone_serve_booter()
 
 
 async def update_private_file(_, message, pre_message):
@@ -575,8 +537,6 @@ async def update_private_file(_, message, pre_message):
             load_dotenv('config.env', override=True)
             await load_config()
         await message.delete()
-    if file_name == 'rcl.conf':
-        await rclone_serve_booter()
     await update_buttons(pre_message)
     if DATABASE_URL:
         await DbManager().update_private_file(file_name)
@@ -651,8 +611,6 @@ async def edit_bot_settings(client, query):
             await initiate_search_tools()
         elif data[2] in ['QUEUE_ALL', 'QUEUE_DOWNLOAD', 'QUEUE_UPLOAD']:
             await start_from_queued()
-        elif data[2] in ['RCLONE_SERVE_URL', 'RCLONE_SERVE_PORT', 'RCLONE_SERVE_USER', 'RCLONE_SERVE_PASS']:
-            await rclone_serve_booter()
     elif data[1] == 'private':
         handler_dict[message.chat.id] = False
         await query.answer()

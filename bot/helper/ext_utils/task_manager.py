@@ -139,6 +139,9 @@ async def limit_checker(size, listener, isTorrent=False, isMega=False, isDriveLi
             limit = YTDLP_LIMIT * 1024**3
             if size > limit:
                 limit_exceeded = f'Ytdlp limit is {get_readable_file_size(limit)}'
+        if isPlayList != 0 and (PLAYLIST_LIMIT := config_dict['PLAYLIST_LIMIT']):
+            if isPlayList > PLAYLIST_LIMIT:
+                limit_exceeded = f'Playlist limit is {PLAYLIST_LIMIT}'
     elif isTorrent:
         if TORRENT_LIMIT := config_dict['TORRENT_LIMIT']:
             limit = TORRENT_LIMIT * 1024**3
@@ -153,16 +156,17 @@ async def limit_checker(size, listener, isTorrent=False, isMega=False, isDriveLi
             limit = LEECH_LIMIT * 1024**3
             if size > limit:
                 limit_exceeded = f'Leech limit is {get_readable_file_size(limit)}'
-        if (STORAGE_THRESHOLD := config_dict['STORAGE_THRESHOLD']) and not listener.isClone:
+        if not listener.isClone:
             arch = any([listener.compress, listener.extract])
-            limit = STORAGE_THRESHOLD * 1024**3
+            limit = 3 * 1024**3
             acpt = await sync_to_async(check_storage_threshold, size, limit, arch)
             if not acpt:
-                limit_exceeded = f'You must leave {get_readable_file_size(limit)} free storage.'
-        if (PLAYLIST_LIMIT := config_dict['PLAYLIST_LIMIT']):
-            limit_exceeded = f'Playlist limit is {PLAYLIST_LIMIT}'
+                limit_exceeded = 'You must leave 3GB free storage.'
     if limit_exceeded:
-        return f"{limit_exceeded}.\nYour file or folder size is {get_readable_file_size(size)}"
+        if size:
+            return f"{limit_exceeded}.\nYour file or folder size is {get_readable_file_size(size)}."
+        elif isPlayList != 0:
+            return f"{limit_exceeded}.\nYour playlist has {isPlayList} files."
 
 
 async def task_utils(message):

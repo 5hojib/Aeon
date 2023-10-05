@@ -59,7 +59,6 @@ class MirrorLeechListener:
         self.join = join
         self.linkslogmsg = None
         self.botpmmsg = None
-        self.upload_details = {}
         self.drive_id = drive_id
         self.index_link = index_link
         self.leech_utils = leech_utils
@@ -315,7 +314,7 @@ class MirrorLeechListener:
             LOGGER.info(f"Leech Name: {up_name}")
             tg = TgUploader(up_name, up_dir, self)
             tg_upload_status = TelegramStatus(
-                tg, size, self.message, gid, 'up', self.upload_details)
+                tg, size, self.message, gid, 'up')
             async with download_dict_lock:
                 download_dict[self.uid] = tg_upload_status
             await update_all_messages()
@@ -324,7 +323,7 @@ class MirrorLeechListener:
             size = await get_path_size(up_path)
             LOGGER.info(f"Upload Name: {up_name}")
             drive = GoogleDriveHelper(up_name, up_dir, self)
-            upload_status = GdriveStatus(drive, size, self.message, gid, 'up', self.upload_details)
+            upload_status = GdriveStatus(drive, size, self.message, gid, 'up')
             async with download_dict_lock:
                 download_dict[self.uid] = upload_status
             await update_all_messages()
@@ -335,7 +334,7 @@ class MirrorLeechListener:
             RCTransfer = RcloneTransferHelper(self, up_name)
             async with download_dict_lock:
                 download_dict[self.uid] = RcloneStatus(
-                    RCTransfer, self.message, gid, 'up', self.upload_details)
+                    RCTransfer, self.message, gid, 'up')
             await update_all_messages()
             await RCTransfer.upload(up_path, size)
 
@@ -348,6 +347,9 @@ class MirrorLeechListener:
         msg += f'<b>• Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n'
         LOGGER.info(f'Task Done: {name}')
         buttons = ButtonMaker()
+        iButton = ButtonMaker()
+        iButton.ibutton('View in inbox', f"aeon {user_id} botpm", 'header')
+        iButton = extra_btns(iButton)
         if self.isLeech:
             if folders > 1:
                 msg += f'<b>• Total files: </b>{folders}\n'
@@ -378,13 +380,10 @@ class MirrorLeechListener:
                     if self.linkslogmsg:
                         await sendMessage(self.linkslogmsg, msg + lmsg + fmsg)
                         await deleteMessage(self.linkslogmsg)
-                btn = ButtonMaker()
                 await sendMessage(self.botpmmsg, msg + lmsg + fmsg)
                 await deleteMessage(self.botpmmsg)
                 if self.isSuperGroup:
-                    btn.ibutton('View in inbox', f"aeon {user_id} botpm", 'header')
-                    btn = extra_btns(btn)
-                    await sendMessage(self.message, f'{msg}<b>Files has been sent to your inbox</b>', btn.build_menu(1))
+                    await sendMessage(self.message, f'{msg}<b>Files has been sent to your inbox</b>', iButton.build_menu(1))
                 else:
                     await deleteMessage(self.botpmmsg)
             if self.seed:
@@ -398,47 +397,33 @@ class MirrorLeechListener:
         else:
             if mime_type == "Folder":
                 msg += f'<b>• Total files: </b>{files}\n'
-            if link or rclonePath and config_dict['RCLONE_SERVE_URL']:
-                if link:
-                    buttons.ubutton('Cloud link', link)
-                else:
-                    msg += f'<b>• Path: </b><code>{rclonePath}</code>\n'
-                if rclonePath and (RCLONE_SERVE_URL := config_dict['RCLONE_SERVE_URL']):
-                    remote, path = rclonePath.split(':', 1)
-                    url_path = rutils.quote(f'{path}')
-                    share_url = f'{RCLONE_SERVE_URL}/{remote}/{url_path}'
-                    if mime_type == "Folder":
-                        share_url += '/'
-                    buttons.ubutton('Rclone link', share_url)
-                elif not rclonePath:
-                    INDEX_URL = self.index_link if self.drive_id else config_dict['INDEX_URL']
+            if link:
+                buttons.ubutton('Cloud link', link)
+                INDEX_URL = self.index_link if self.drive_id else config_dict['INDEX_URL']
+                if not rclonePath:
                     if INDEX_URL:
                         drive = GoogleDriveHelper()
                         dir_id = drive.getIdFromUrl(link)
                         share_url = f'{INDEX_URL}findpath?id={dir_id}'
-                        if mime_type == "Folder":
-                            share_url += '/'
                         buttons.ubutton('Index link', share_url)
                 buttons = extra_btns(buttons)
                 button = buttons.build_menu(2)
-            else:
+            elif rclonePath:
                 msg += f'<b>• Path: </b><code>{rclonePath}</code>\n'
                 button = None
+                buttons = extra_btns(buttons)
+                button = buttons.build_menu(2)
             msg += f'<b>• Uploaded by: </b>{self.tag}\n'
             msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n\n'
 
             if config_dict['MIRROR_LOG_ID']:
-                buttonss = button
-                log_msg = list((await sendMultiMessage(config_dict['MIRROR_LOG_ID'], msg, buttonss)).values())[0]
+                log_msg = list((await sendMultiMessage(config_dict['MIRROR_LOG_ID'], msg, button)).values())[0]
                 if self.linkslogmsg:
                     await deleteMessage(self.linkslogmsg)
-            buttons = ButtonMaker()
             await sendMessage(self.botpmmsg, msg, button, self.random_pic)
             await deleteMessage(self.botpmmsg)
             if self.isSuperGroup:
-                buttons.ibutton('View in inbox', f"aeon {user_id} botpm", 'header')
-                buttons = extra_btns(buttons)
-                await sendMessage(self.message, f'{msg} <b>Links has been sent to your inbox</b>', buttons.build_menu(1))
+                await sendMessage(self.message, f'{msg} <b>Links has been sent to your inbox</b>', iButton.build_menu(1))
             else:
                 await deleteMessage(self.botpmmsg)
             if self.seed:

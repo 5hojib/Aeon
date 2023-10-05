@@ -2,12 +2,11 @@ from bot.helper.ext_utils.bot_utils import MirrorStatus, get_readable_file_size,
 
 
 class TelegramStatus:
-    def __init__(self, obj, size, message, gid, status, upload_details):
+    def __init__(self, obj, size, message, gid, status):
         self.__obj = obj
         self.__size = size
         self.__gid = gid
         self.__status = status
-        self.upload_details = upload_details
         self.message = message
 
     def processed_bytes(self):

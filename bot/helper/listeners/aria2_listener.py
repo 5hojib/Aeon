@@ -66,36 +66,31 @@ async def __onDownloadStarted(api, gid):
                         await sync_to_async(api.remove, [download], force=True, files=True)
                         await delete_links(listener.message)
                         return
-    if any([config_dict['DIRECT_LIMIT'],
-            config_dict['TORRENT_LIMIT'],
-            config_dict['LEECH_LIMIT'],
-            config_dict['STORAGE_THRESHOLD']]):
-        await sleep(1)
-        if dl is None:
-            dl = await getDownloadByGid(gid)
-        if dl is not None:
-            if not hasattr(dl, 'listener'):
-                LOGGER.warning(
-                    f"onDownloadStart: {gid}. at Download limit didn't pass since download completed earlier!")
-                return
-            listener = dl.listener()
-            download = await sync_to_async(api.get_download, gid)
-            download = download.live
-            if download.total_length == 0:
-                start_time = time()
-                while time() - start_time <= 15:
-                    await sleep(0.5)
-                    download = await sync_to_async(api.get_download, gid)
-                    download = download.live
-                    if download.followed_by_ids:
-                        download = await sync_to_async(api.get_download, download.followed_by_ids[0])
-                    if download.total_length > 0:
-                        break
-            size = download.total_length
-            if limit_exceeded := await limit_checker(size, listener, download.is_torrent):
-                await listener.onDownloadError(limit_exceeded)
-                await sync_to_async(api.remove, [download], force=True, files=True)
-                await delete_links(listener.message)
+    await sleep(1)
+    if dl is None:
+        dl = await getDownloadByGid(gid)
+    if dl is not None:
+        if not hasattr(dl, 'listener'):
+            LOGGER.warning(f"onDownloadStart: {gid}. at Download limit didn't pass since download completed earlier!")
+            return
+        listener = dl.listener()
+        download = await sync_to_async(api.get_download, gid)
+        download = download.live
+        if download.total_length == 0:
+            start_time = time()
+            while time() - start_time <= 15:
+                await sleep(0.5)
+                download = await sync_to_async(api.get_download, gid)
+                download = download.live
+                if download.followed_by_ids:
+                    download = await sync_to_async(api.get_download, download.followed_by_ids[0])
+                if download.total_length > 0:
+                    break
+        size = download.total_length
+        if limit_exceeded := await limit_checker(size, listener, download.is_torrent):
+            await listener.onDownloadError(limit_exceeded)
+            await sync_to_async(api.remove, [download], force=True, files=True)
+            await delete_links(listener.message)
 
 
 @new_thread

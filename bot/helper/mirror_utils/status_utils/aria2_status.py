@@ -18,7 +18,6 @@ class Aria2Status:
         self.__gid = gid
         self.__download = get_download(gid)
         self.__listener = listener
-        self.upload_details = self.__listener.upload_details
         self.queued = queued
         self.start_time = 0
         self.seeding = seeding

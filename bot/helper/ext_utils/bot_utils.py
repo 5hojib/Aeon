@@ -467,7 +467,7 @@ async def set_commands(client):
              BotCommand(f'{BotCommands.CloneCommand}', 'Copy file/folder to Drive'),
              BotCommand(f'{BotCommands.StatusCommand[0]}', f'or /{BotCommands.StatusCommand[1]} Get mirror status message'),
              BotCommand(f'{BotCommands.StatsCommand[0]}', 'Check Bot & System stats'),
-             BotCommand(f'{BotCommands.CancelAllCommand[0]}', 'Cancel all tasks which added by you to in bots.'),
+             BotCommand(f'{BotCommands.StopAllCommand[0]}', 'Cancel all tasks which added by you to in bots.'),
              BotCommand(f'{BotCommands.ListCommand}', 'Search in Drive'),
              BotCommand(f'{BotCommands.SearchCommand}', 'Search in Torrent'),
              BotCommand(f'{BotCommands.UserSetCommand[0]}', 'Users settings'),

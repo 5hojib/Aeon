@@ -113,7 +113,7 @@ async def start(client, message):
         start_string = f'This bot can mirror all your links|files|torrents to Google Drive or any rclone cloud or to telegram.\n<b>Type {help_command} to get a list of available commands</b>'
         await sendMessage(message, start_string, photo='IMAGES')
     else:
-        await sendMessage(message, 'You Are not authorized user!', photo='IMAGES')
+        await sendMessage(message, 'You are not a authorized user!', photo='IMAGES')
     await DbManager().update_pm_users(message.from_user.id)
 
 
@@ -142,7 +142,7 @@ async def ping(_, message):
 
 
 @new_task
-async def aeoncb(_, query):
+async def AeonCallback(_, query):
     message = query.message
     user_id = query.from_user.id
     data = query.data.split()
@@ -164,7 +164,7 @@ async def aeoncb(_, query):
                 if ind == len(logFileLines): 
                     break
                 ind += 1
-            startLine = f"<b>Showing Last {ind} Lines from log.txt:</b> \n\n----------<b>START LOG</b>----------\n\n"
+            startLine = f"<b>Showing last {ind} lines from log.txt:</b> \n\n----------<b>START LOG</b>----------\n\n"
             endLine = "\n----------<b>END LOG</b>----------"
             btn = ButtonMaker()
             btn.ibutton('Close', f'aeon {user_id} close')
@@ -182,10 +182,10 @@ async def aeoncb(_, query):
         resp = cget('POST', 'https://spaceb.in/api/v1/documents', data={'content': logFile, 'extension': 'None'}).json()
         if resp['status'] == 201:
             btn = ButtonMaker()
-            btn.ubutton('Web Paste', f"https://spaceb.in/{resp['payload']['id']}")
+            btn.ubutton('Web paste', f"https://spaceb.in/{resp['payload']['id']}")
             await query.edit_message_reply_markup(btn.build_menu(1))
         else:
-        	  LOGGER.error(f"Web Paste Failed : {str(err)}")
+        	  LOGGER.error(f"Web paste failed : {str(err)}")
     elif data[2] == "botpm":
         await query.answer(url=f"https://t.me/{bot_name}?start=aeon")
     elif data[2] == "pmc":
@@ -197,8 +197,8 @@ async def aeoncb(_, query):
 @new_task
 async def log(_, message):
     buttons = ButtonMaker()
-    buttons.ibutton('Log Display', f'aeon {message.from_user.id} logdisplay')
-    buttons.ibutton('Web Paste', f'aeon {message.from_user.id} webpaste')
+    buttons.ibutton('Log display', f'aeon {message.from_user.id} logdisplay')
+    buttons.ibutton('Web paste', f'aeon {message.from_user.id} webpaste')
     reply_message = await sendFile(message, 'log.txt', buttons=buttons.build_menu(1))
     await deleteMessage(message)
     await five_minute_del(reply_message)
@@ -218,24 +218,11 @@ NOTE: Try each command without any arguments to see more details.
 /{BotCommands.UserSetCommand} [query]: User settings.
 /{BotCommands.BotSetCommand} [query]: Bot settings.
 /{BotCommands.BtSelectCommand}: Select files from torrents by gid or reply.
-/{BotCommands.CancelAllCommand} [query]: Cancel all [status] tasks.
+/{BotCommands.StopAllCommand} [query]: Cancel all [status] tasks.
 /{BotCommands.ListCommand} [query]: Searches in Google Drive(s).
-/{BotCommands.SearchCommand} [query]: Searches for torrents with API.
+/{BotCommands.SearchCommand} [query]: Searches for torrents with API or plugins.
 /{BotCommands.StatusCommand}: Shows status of all downloads.
 /{BotCommands.StatsCommand}: Shows stats of the machine hosting the bot.
-/{BotCommands.PingCommand}: Checks how long it takes to ping the bot (Only Owner & Sudo).
-/{BotCommands.AuthorizeCommand}: Authorizes a chat or a user to use the bot (Only Owner & Sudo).
-/{BotCommands.UnAuthorizeCommand}: Unauthorizes a chat or a user to use the bot (Only Owner & Sudo).
-/{BotCommands.UsersCommand}: Shows user settings (Only Owner & Sudo).
-/{BotCommands.AddSudoCommand}: Adds sudo user (Only Owner).
-/{BotCommands.RmSudoCommand}: Removes sudo users (Only Owner).
-/{BotCommands.RestartCommand}: Restarts and updates the bot (Only Owner & Sudo).
-/{BotCommands.LogCommand}: Gets a log file of the bot. Handy for getting crash reports (Only Owner & Sudo).
-/{BotCommands.ShellCommand}: Runs shell commands (Only Owner).
-/{BotCommands.EvalCommand}: Runs Python code line or lines (Only Owner).
-/{BotCommands.ExecCommand}: Runs commands in Exec (Only Owner).
-/{BotCommands.ClearLocalsCommand}: Clears {BotCommands.EvalCommand} or {BotCommands.ExecCommand} locals (Only Owner).
-/{BotCommands.RssCommand}: RSS Menu.
 '''
 
 @new_task
@@ -270,7 +257,7 @@ async def main():
     bot.add_handler(MessageHandler(ping, filters=command(BotCommands.PingCommand) & CustomFilters.authorized))
     bot.add_handler(MessageHandler(bot_help, filters=command(BotCommands.HelpCommand) & CustomFilters.authorized))
     bot.add_handler(MessageHandler(stats, filters=command(BotCommands.StatsCommand) & CustomFilters.authorized))
-    bot.add_handler(CallbackQueryHandler(aeoncb, filters=regex(r'^aeon')))
+    bot.add_handler(CallbackQueryHandler(AeonCallback, filters=regex(r'^aeon')))
     LOGGER.info("Bot Started!")
     signal(SIGINT, exit_clean_up)
 

@@ -108,9 +108,9 @@ async def clear(client, message):
     global namespaces
     if message.chat.id in namespaces:
         del namespaces[message.chat.id]
-        await send("<b>Cached Locals Cleared !</b>", message)
+        await send("<b>Cached locals cleared!</b>", message)
     else:
-        await send("<b>No Cache Locals Found !</b>", message)
+        await send("<b>No cache locals found!</b>", message)
 
 
 bot.add_handler(MessageHandler(evaluate, filters=command(
