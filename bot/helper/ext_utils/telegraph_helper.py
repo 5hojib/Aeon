@@ -68,5 +68,5 @@ class TelegraphHelper:
                 content = content)
         return
 
-
-bot_loop.run_until_complete(TelegraphHelper().create_account())
+telegraph = TelegraphHelper()
+bot_loop.run_until_complete(telegraph.create_account())
