@@ -25,7 +25,6 @@ async def change_authorization(message, is_authorize):
             update_user_ldata(id_, 'is_auth', True)
             if DATABASE_URL:
                 await DbManager().update_user_data(id_)
-        await sendMessage(message, success_message)
     else:
         success_message = 'Unauthorized'
         if id_ not in user_data or user_data[id_].get('is_auth'):
@@ -34,7 +33,8 @@ async def change_authorization(message, is_authorize):
                 await DbManager().update_user_data(id_)
         else:
             success_message = 'Already unauthorized!'
-        await sendMessage(message, success_message)
+
+    await sendMessage(message, success_message)
 
 async def change_sudo(message, is_sudo):
     id_ = ""
