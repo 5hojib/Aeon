@@ -18,7 +18,7 @@ async def authorize(client, message):
     else:
         id_ = message.chat.id
     if id_ in user_data and user_data[id_].get('is_auth'):
-        msg = 'Already Authorized!'
+        msg = 'Already authorized!'
     else:
         update_user_ldata(id_, 'is_auth', True)
         if DATABASE_URL:
@@ -61,7 +61,7 @@ async def addSudo(client, message):
                 await DbManager().update_user_data(id_)
             msg = 'Promoted as Sudo'
     else:
-        msg = "Give ID or Reply To message of whom you want to Promote."
+        msg = "Give an ID or reply to the message of the person you want to promote."
     await sendMessage(message, msg)
 
 
@@ -78,7 +78,7 @@ async def removeSudo(client, message):
             await DbManager().update_user_data(id_)
         msg = 'Demoted'
     else:
-        msg = "Give ID or Reply To message of whom you want to remove from Sudo"
+        msg = "Provide the user's ID or reply to the message of the user you wish to remove from the Sudo list."
     await sendMessage(message, msg)
 
 bot.add_handler(MessageHandler(authorize, filters=command(

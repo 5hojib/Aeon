@@ -385,7 +385,7 @@ async def get_buttons(key=None, edit_type=None, edit_mode=None, mess=None):
     elif key == 'private':
         buttons.ibutton('Back', "botset back")
         buttons.ibutton('Close', "botset close")
-        msg = "Send private files: config.env, token.pickle, accounts.zip, list_drives.txt, cookies.txt, terabox.txt, .netrc, or any other files!\n\nTo delete a private file, send only the file name as a text message.\n\nPlease note: Changes to .netrc will not take effect for aria2c until it's restarted.\n\nTimeout: 60 seconds"
+        msg = "Send private files: config.env, token.pickle, accounts.zip, list_drives.txt, cookies.txt, terabox.txt, .netrc, or any other files!\n\nTo delete a private file, send only the file name as a text message.\n\n<b>Please note:</b> Changes to .netrc will not take effect for aria2c until it's restarted.\n\n<b>Timeout:</b> 60 seconds"
     elif edit_type == 'editvar':
         msg = f'<b>Variable:</b> <code>{key}</code>\n\n'
         msg += f'<b>Description:</b> {bset_display_dict.get(key, "No Description Provided")}\n\n'
