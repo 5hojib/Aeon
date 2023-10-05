@@ -385,7 +385,7 @@ async def get_buttons(key=None, edit_type=None, edit_mode=None, mess=None):
     elif key == 'private':
         buttons.ibutton('Back', "botset back")
         buttons.ibutton('Close', "botset close")
-        msg = 'Send private file: config.env, token.pickle, accounts.zip, list_drives.txt, cookies.txt, terabox.txt, .netrc or any other file!\nTo delete private file send only the file name as text message. \nNote: Changing .netrc will not take effect for aria2c until restart.\nTimeout: 60 sec'
+        msg = "Send private files: config.env, token.pickle, accounts.zip, list_drives.txt, cookies.txt, terabox.txt, .netrc, or any other files!\n\nTo delete a private file, send only the file name as a text message.\n\nPlease note: Changes to .netrc will not take effect for aria2c until it's restarted.\n\nTimeout: 60 seconds"
     elif edit_type == 'editvar':
         msg = f'<b>Variable:</b> <code>{key}</code>\n\n'
         msg += f'<b>Description:</b> {bset_display_dict.get(key, "No Description Provided")}\n\n'
@@ -586,7 +586,7 @@ async def edit_bot_settings(client, query):
         await update_buttons(message, data[1])
     elif data[1] == 'resetvar':
         handler_dict[message.chat.id] = False
-        await query.answer('Reset Done!', show_alert=True)
+        await query.answer('Reset done!', show_alert=True)
         value = ''
         if data[2] in default_values:
             value = default_values[data[2]]
@@ -624,7 +624,7 @@ async def edit_bot_settings(client, query):
     elif data[1] == 'boolvar':
         handler_dict[message.chat.id] = False
         value = data[3] == "on"
-        await query.answer(f'Successfully Var changed to {value}!', show_alert=True)
+        await query.answer(f'Successfully variable	 changed to {value}!', show_alert=True)
         config_dict[data[2]] = value
         await update_buttons(message, data[2], 'editvar', False)
         if DATABASE_URL:
