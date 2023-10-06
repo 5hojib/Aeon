@@ -36,8 +36,8 @@ async def countNode(_, message):
         name, mime_type, size, files, folders = await sync_to_async(gd.count, link)
         if mime_type is None:
             await sendMessage(message, name)
+            await deleteMessage(msg)
             return
-        await deleteMessage(msg)
         msg = await format_node_count(name, mime_type, size, files, folders, tag)
     else:
         msg = 'Send a Google Drive link along with the command or reply to a link with the command.'
