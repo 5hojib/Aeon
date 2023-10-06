@@ -104,7 +104,7 @@ def direct_link_generator(link):
         if any(x in domain for x in domain_list):
             func = globals().get(func_name)
             return func(link)
-    raise DirectDownloadLinkException(f'ERROR: No Direct link function found for {link}')
+    raise DirectDownloadLinkException(f'No Direct link function found for {link}')
 
 
 def get_captcha_token(session, params):

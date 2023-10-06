@@ -81,6 +81,15 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     file_        = None
     session      = ''
 
+    '''
+    if link:
+    	  if is_magnet(link):
+    	  	  isQbit = True
+    if reply_to := message.reply_to_message:
+    	  file_ = getattr(reply_to, reply_to.media.value) if reply_to.media else None
+    	  if reply_to.document and (file_.mime_type == 'application/x-bittorrent' or file_.file_name.endswith('.torrent')):
+    	      isQbit = True
+    '''
     if not isinstance(seed, bool):
         dargs = seed.split(':')
         ratio = dargs[0] or None
@@ -332,11 +341,7 @@ async def qb_leech(client, message):
     _mirror_leech(client, message, isQbit=True, isLeech=True)
 
 
-bot.add_handler(MessageHandler(mirror, filters=command(
-    BotCommands.MirrorCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(qb_mirror, filters=command(
-    BotCommands.QbMirrorCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(leech, filters=command(
-    BotCommands.LeechCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(qb_leech, filters=command(
-    BotCommands.QbLeechCommand) & CustomFilters.authorized))
+bot.add_handler(MessageHandler(mirror, filters=command(BotCommands.MirrorCommand) & CustomFilters.authorized))
+bot.add_handler(MessageHandler(qb_mirror, filters=command(BotCommands.QbMirrorCommand) & CustomFilters.authorized))
+bot.add_handler(MessageHandler(leech, filters=command(BotCommands.LeechCommand) & CustomFilters.authorized))
+bot.add_handler(MessageHandler(qb_leech, filters=command(BotCommands.QbLeechCommand) & CustomFilters.authorized))
