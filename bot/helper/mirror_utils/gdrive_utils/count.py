@@ -33,21 +33,15 @@ async def countNode(_, message):
     if is_gdrive_link(link):
         msg = await sendMessage(message, f'<b>Counting:</b> <code>{link}</code>')
         gd = GoogleDriveHelper()
-        try:
-            name, mime_type, size, files, folders = await sync_to_async(gd.count, link)
-            if mime_type is None:
-                await sendMessage(message, name)
-                return
-            await deleteMessage(msg)
-            msg = await format_node_count(name, mime_type, size, files, folders, tag)
-        except Exception as e:
-            msg = f'An error occurred: {str(e)}'
-        finally:
-            await sendMessage(message, msg)
+        name, mime_type, size, files, folders = await sync_to_async(gd.count, link)
+        if mime_type is None:
+            await sendMessage(message, name)
+            return
+        await deleteMessage(msg)
+        msg = await format_node_count(name, mime_type, size, files, folders, tag)
     else:
         msg = 'Send a Google Drive link along with the command or reply to a link with the command.'
-        await sendMessage(message, msg)
+    await sendMessage(message, msg)
     await delete_links(message)
 
-bot.add_handler(MessageHandler(countNode, filters=command(
-    BotCommands.CountCommand) & CustomFilters.authorized))
+bot.add_handler(MessageHandler(countNode, filters=command(BotCommands.CountCommand) & CustomFilters.authorized))

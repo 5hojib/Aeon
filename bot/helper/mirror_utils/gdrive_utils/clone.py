@@ -133,7 +133,7 @@ async def gdcloneNode(message, link, listen_up):
         gd = GoogleDriveHelper()
         name, mime_type, size, files, _ = await sync_to_async(gd.count, link)
         if mime_type is None:
-            await sendMessage(message, name)
+            await listener.onDownloadError(name)
             return
         if config_dict['STOP_DUPLICATE']:
             LOGGER.info('Checking File/Folder if already in Drive...')
@@ -157,8 +157,7 @@ async def gdcloneNode(message, link, listen_up):
         else:
             gid = token_hex(4)
             async with download_dict_lock:
-                download_dict[message.id] = GdriveStatus(
-                    drive, size, message, gid, 'cl')
+                download_dict[message.id] = GdriveStatus(drive, size, message, gid, 'cl')
             await sendStatusMessage(message)
             link, size, mime_type, files, folders = await sync_to_async(drive.clone, link, listener.drive_id)
         if not link:
