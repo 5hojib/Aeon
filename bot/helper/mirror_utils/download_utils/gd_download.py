@@ -12,9 +12,9 @@ from bot.helper.ext_utils.aeon_utils import isNSFW, isNSFWdata
 
 async def add_gd_download(link, path, listener, newname):
     drive = GoogleDriveHelper()
+    name, mime_type, size, _, _ = await sync_to_async(drive.count, link)
     id = drive.getIdFromUrl(link)
     data = drive.getFilesByFolderId(id)
-    name, mime_type, size, _, _ = await sync_to_async(drive.count, link)
     if mime_type is None:
         await listener.onDownloadError(name)
         return

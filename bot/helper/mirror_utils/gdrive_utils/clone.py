@@ -86,8 +86,7 @@ async def rcloneNode(client, message, link, dst_path, rcf, tag):
     LOGGER.info(f'Clone Started: Name: {name} - Source: {link} - Destination: {dst_path}')
     gid = token_hex(4)
     async with download_dict_lock:
-        download_dict[message.id] = RcloneStatus(
-            RCTransfer, message, gid, 'cl')
+        download_dict[message.id] = RcloneStatus(RCTransfer, message, gid, 'cl')
     await sendStatusMessage(message)
     link, destination = await RCTransfer.clone(config_path, remote, src_path, dst_path, rcf, mime_type)
     if not link:
