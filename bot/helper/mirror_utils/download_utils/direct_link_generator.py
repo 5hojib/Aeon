@@ -1,4 +1,3 @@
-import requests
 from hashlib import sha256
 from http.cookiejar import MozillaCookieJar
 from json import loads
@@ -10,20 +9,17 @@ from uuid import uuid4
 
 from bs4 import BeautifulSoup
 from cloudscraper import create_scraper
-from lk21 import Bypass
 from lxml.etree import HTML
-from requests import Session, post
-from requests import session as req_session
+from requests import Session, post, session as req_session
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from bot import config_dict, LOGGER
-from bot.helper.ext_utils.bot_utils import get_readable_time, is_share_link, text_size_to_bytes
+from bot.helper.ext_utils.bot_utils import text_size_to_bytes
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.help_messages import PASSWORD_ERROR_MESSAGE
 
 _caches = {}
-
 domain_dict = {
     'mediafire':    ['mediafire.com'],
     'osdn':         ['osdn.net'],
@@ -338,12 +334,9 @@ def fichier(link):
 def solidfiles(url):
     with create_scraper() as session:
         try:
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36'
-            }
+            headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36'}
             pageSource = session.get(url, headers=headers).text
-            mainOptions = str(
-                search(r'viewerOptions\'\,\ (.*?)\)\;', pageSource).group(1))
+            mainOptions = str(search(r'viewerOptions\'\,\ (.*?)\)\;', pageSource).group(1))
             return loads(mainOptions)["downloadUrl"]
         except Exception as e:
             raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")

@@ -16,17 +16,15 @@ async def add_gd_download(link, path, listener, newname):
     data = drive.getFilesByFolderId(id)
     name, mime_type, size, _, _ = await sync_to_async(drive.count, link)
     if mime_type is None:
-        x = await sendMessage(listener.message, name)
-        await five_minute_del(x)
+        await listener.onDownloadError(name)
         return
     name = newname or name
     gid = token_hex(4)
-    if isNSFW(name):
+    
+    if isNSFW(name) or isNSFWdata(data):
         await listener.onDownloadError('NSFW detected')
         return
-    if isNSFWdata(data):
-    	  await listener.onDownloadError('NSFW detected')
-    	  return
+    
     msg, button = await stop_duplicate_check(name, listener)
     if msg:
         await sendMessage(listener.message, msg, button)
