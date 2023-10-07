@@ -41,7 +41,7 @@ async def __onSeedFinish(tor):
         return
     listener = download.listener()
     client = download.client()
-    msg = f"Seeding stopped with Ratio: {round(tor.ratio, 3)} and Time: {get_readable_time(tor.seeding_time)}"
+    msg = f"Seeding stopped with Ratio: {round(tor.ratio, 3)} and Time: {get_readable_time(tor.seeding_time, True)}"
     await listener.onUploadError(msg)
     await __remove_torrent(client, ext_hash, tor.tags)
 

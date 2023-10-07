@@ -200,11 +200,11 @@ def get_readable_message():
     for download in download_dict.values():
             tstatus = download.status()
             if tstatus == MirrorStatus.STATUS_DOWNLOADING:
-                dl_speed += text_size_to_bytes(download.speed())
+                dl_speed += text_to_bytes(download.speed())
             elif tstatus == MirrorStatus.STATUS_UPLOADING:
-                up_speed += text_size_to_bytes(download.speed())
+                up_speed += text_to_bytes(download.speed())
             elif tstatus == MirrorStatus.STATUS_SEEDING:
-                up_speed += text_size_to_bytes(download.upload_speed())
+                up_speed += text_to_bytes(download.upload_speed())
     if tasks > STATUS_LIMIT:
         buttons = ButtonMaker()
         buttons.ibutton("Prev", "status pre")
@@ -219,18 +219,14 @@ def get_readable_message():
     return msg, button
 
 
-def text_size_to_bytes(size_text):
-    size = 0
+def text_to_bytes(size_text):
     size_text = size_text.lower()
-    if 'k' in size_text:
-        size += float(size_text.split('k')[0]) * 1024
-    elif 'm' in size_text:
-        size += float(size_text.split('m')[0]) * 1048576
-    elif 'g' in size_text:
-        size += float(size_text.split('g')[0]) * 1073741824
-    elif 't' in size_text:
-        size += float(size_text.split('t')[0]) * 1099511627776
-    return size
+    multiplier = {'k': 1024, 'm': 1048576, 'g': 1073741824, 't': 1099511627776, 'p': 1125899906842624}
+    for unit, factor in multiplier.items():
+        if unit in size_text:
+            size_value = float(size_text.split(unit)[0])
+            return size_value * factor
+    return 0
 
 
 async def turn_page(data):
@@ -252,7 +248,7 @@ async def turn_page(data):
                 PAGE_NO -= 1
 
 
-def get_readable_time(seconds):
+def get_readable_time(seconds, full_time=False):
     periods = [('millennium', 31536000000), ('century', 3153600000), ('decade', 315360000), ('year', 31536000), ('month', 2592000), ('week', 604800), ('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
     result = ''
     for period_name, period_seconds in periods:
@@ -260,7 +256,7 @@ def get_readable_time(seconds):
             period_value, seconds = divmod(seconds, period_seconds)
             plural_suffix = 's' if period_value > 1 else ''
             result += f'{int(period_value)} {period_name}{plural_suffix} '
-            if len(result.split()) == 2:
+            if not full_time:
                 break
     return result.strip()
 
@@ -429,23 +425,12 @@ async def checking_access(user_id, button=None):
         if DATABASE_URL:
             await DbManager().update_user_token(user_id, token)
         user_data[user_id].update(data)
-        time_str = format_validity_time(token_timeout)
+        time_str = get_readable_time(token_timeout, True)
         if button is None:
             button = ButtonMaker()
         button.ubutton('Collect token', tinyfy(short_url(f'https://telegram.me/{bot_name}?start={token}')))
         return f'Your token has expired, please collect a new token.\n<b>It will expire after {time_str}</b>!', button
     return None, button
-
-
-def format_validity_time(seconds):
-    periods = [('millennium', 31536000000), ('century', 3153600000), ('decade', 315360000), ('year', 31536000), ('month', 2592000), ('week', 604800), ('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
-    result = ''
-    for period_name, period_seconds in periods:
-        if seconds >= period_seconds:
-            period_value, seconds = divmod(seconds, period_seconds)
-            plural_suffix = 's' if period_value > 1 else ''
-            result += f'{int(period_value)} {period_name}{plural_suffix} '
-    return result
 
 
 def extra_btns(buttons):

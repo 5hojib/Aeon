@@ -287,7 +287,7 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
         cap_mono = slit[0].format(
             filename = nfile_,
             size = get_readable_file_size(await aiopath.getsize(up_path)),
-            duration = get_readable_time(dur),
+            duration = get_readable_time(dur, True),
             quality = qual,
             languages = lang,
             subtitles = subs,

@@ -15,7 +15,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from bot import config_dict, LOGGER
-from bot.helper.ext_utils.bot_utils import text_size_to_bytes
+from bot.helper.ext_utils.bot_utils import text_to_bytes
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.help_messages import PASSWORD_ERROR_MESSAGE
 
@@ -946,7 +946,7 @@ def send_cm(url):
         file_names = html.xpath('//tr[@class="selectable"]//a/text()')
         sizes = html.xpath('//tr[@class="selectable"]//span/text()')
         for href, file_name, size_text in zip(hrefs, file_names, sizes):
-            files.append({'file_id':href.split('/')[-1], 'file_name':file_name.strip(), 'size':text_size_to_bytes(size_text.strip())})
+            files.append({'file_id':href.split('/')[-1], 'file_name':file_name.strip(), 'size':text_to_bytes(size_text.strip())})
         return files
 
     def __writeContents(html_text, folderPath=''):

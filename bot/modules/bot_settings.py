@@ -412,9 +412,7 @@ async def get_buttons(key=None, edit_type=None, edit_mode=None, mess=None):
         if edit_mode and key not in bool_vars:
             msg += 'Send a valid value for the above Var. <b>Timeout:</b> 60 sec'
         if key in bool_vars:
-            value = config_dict.get(key)
-            msg += 'Choose a valid value for the above Var'
-            if not value:
+            if not value := config_dict.get(key):
             	  buttons.ibutton('Make it True', f"botset boolvar {key} on")
             else:
             	  buttons.ibutton('Make it False', f"botset boolvar {key} off")

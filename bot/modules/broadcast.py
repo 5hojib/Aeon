@@ -48,7 +48,7 @@ async def broadcast(_, message):
             await editMessage(broadcast_message, status)
             updater = time()
 
-    elapsed_time = get_readable_time(time() - start_time)
+    elapsed_time = get_readable_time(time() - start_time, True)
     status = generate_status(total, successful, blocked, unsuccessful, elapsed_time)
     await editMessage(broadcast_message, status)
 
