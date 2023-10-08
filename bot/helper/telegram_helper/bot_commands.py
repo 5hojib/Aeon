@@ -7,7 +7,7 @@ class _BotCommands:
         self.YtdlCommand = [f'ytdl{CMD_SUFFIX}', f'y{CMD_SUFFIX}']
         self.LeechCommand = [f'leech{CMD_SUFFIX}', f'l{CMD_SUFFIX}']
         self.YtdlLeechCommand = [f'ytdlleech{CMD_SUFFIX}', f'yl{CMD_SUFFIX}']
-        self.CloneCommand = f'clone{CMD_SUFFIX}'
+        self.CloneCommand = [f'clone{CMD_SUFFIX}', f'c{CMD_SUFFIX}']
         self.CountCommand = f'count{CMD_SUFFIX}'
         self.DeleteCommand = f'del{CMD_SUFFIX}'
         self.StopAllCommand = [f'stopall{CMD_SUFFIX}', 'stopallbot']
