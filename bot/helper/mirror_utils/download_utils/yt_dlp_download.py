@@ -4,7 +4,7 @@ from logging import getLogger
 from yt_dlp import YoutubeDL, DownloadError
 from re import search as re_search
 
-from bot import download_dict_lock, download_dict, non_queued_dl, queue_dict_lock, config_dict
+from bot import download_dict_lock, download_dict, non_queued_dl, queue_dict_lock
 from bot.helper.telegram_helper.message_utils import sendStatusMessage
 from ..status_utils.yt_dlp_download_status import YtDlpDownloadStatus
 from bot.helper.mirror_utils.status_utils.queue_status import QueueStatus
@@ -255,9 +255,7 @@ class YoutubeDLHelper:
         if msg:
             await self.__listener.onDownloadError(msg, button)
             return
-        if limit_exceeded := await limit_checker(self.__size, self.__listener, isYtdlp=True):
-            if self.playlist_count > config_dict['PLAYLIST_LIMIT']:
-                limit_exceeded += f'\nYour Playlist has {self.playlist_count} files'
+        if limit_exceeded := await limit_checker(self.__size, self.__listener, isYtdlp=True, isPlayList=self.playlist_count):
             await self.__listener.onDownloadError(limit_exceeded)
             return
         added_to_queue, event = await is_queued(self.__listener.uid)
