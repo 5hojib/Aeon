@@ -332,19 +332,9 @@ async def mirror(client, message):
     _mirror_leech(client, message)
 
 
-async def qb_mirror(client, message):
-    _mirror_leech(client, message, isQbit=True)
-
-
 async def leech(client, message):
     _mirror_leech(client, message, isLeech=True)
 
 
-async def qb_leech(client, message):
-    _mirror_leech(client, message, isQbit=True, isLeech=True)
-
-
 bot.add_handler(MessageHandler(mirror, filters=command(BotCommands.MirrorCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(qb_mirror, filters=command(BotCommands.QbMirrorCommand) & CustomFilters.authorized))
 bot.add_handler(MessageHandler(leech, filters=command(BotCommands.LeechCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(qb_leech, filters=command(BotCommands.QbLeechCommand) & CustomFilters.authorized))

@@ -207,22 +207,20 @@ async def log(_, message):
 help_string = f'''
 NOTE: Try each command without any arguments to see more details.
 /{BotCommands.MirrorCommand[0]} or /{BotCommands.MirrorCommand[1]}: Starts mirroring to Google Drive.
-/{BotCommands.QbMirrorCommand[0]} or /{BotCommands.QbMirrorCommand[1]}: Starts mirroring to Google Drive using qBittorrent.
 /{BotCommands.YtdlCommand[0]} or /{BotCommands.YtdlCommand[1]}: Mirrors links supported by yt-dlp.
 /{BotCommands.LeechCommand[0]} or /{BotCommands.LeechCommand[1]}: Starts leeching to Telegram.
-/{BotCommands.QbLeechCommand[0]} or /{BotCommands.QbLeechCommand[1]}: Starts leeching using qBittorrent.
 /{BotCommands.YtdlLeechCommand[0]} or /{BotCommands.YtdlLeechCommand[1]}: Leeches links supported by yt-dlp.
 /{BotCommands.CloneCommand} [drive_url]: Copies files/folders to Google Drive.
 /{BotCommands.CountCommand} [drive_url]: Counts files/folders in Google Drive.
 /{BotCommands.DeleteCommand} [drive_url]: Deletes files/folders from Google Drive (Only Owner & Sudo).
-/{BotCommands.UserSetCommand} [query]: User settings.
+/{BotCommands.UserSetCommand[0]} [query]: User settings.
 /{BotCommands.BotSetCommand} [query]: Bot settings.
 /{BotCommands.BtSelectCommand}: Select files from torrents by gid or reply.
-/{BotCommands.StopAllCommand} [query]: Cancel all [status] tasks.
+/{BotCommands.StopAllCommand[0]} [query]: Cancel all [status] tasks.
 /{BotCommands.ListCommand} [query]: Searches in Google Drive(s).
 /{BotCommands.SearchCommand} [query]: Searches for torrents with API or plugins.
-/{BotCommands.StatusCommand}: Shows status of all downloads.
-/{BotCommands.StatsCommand}: Shows stats of the machine hosting the bot.
+/{BotCommands.StatusCommand[0]}: Shows status of all downloads.
+/{BotCommands.StatsCommand[0]}: Shows stats of the machine hosting the bot.
 '''
 
 @new_task
