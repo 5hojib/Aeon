@@ -82,7 +82,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     session      = ''
 
     if link:
-    	  if is_magnet(link):
+    	  if is_magnet(link) or link.endswith('.torrent'):
     	  	  isQbit = True
     elif not link and (reply_to := message.reply_to_message):
         if reply_to.text:
