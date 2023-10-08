@@ -81,15 +81,18 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     file_        = None
     session      = ''
 
-    '''
     if link:
     	  if is_magnet(link):
     	  	  isQbit = True
+    elif not link and (reply_to := message.reply_to_message):
+        if reply_to.text:
+            reply_text = reply_to.text.split('\n', 1)[0].strip()
+            if reply_text and is_magnet(reply_text):
+                isQbit = True
     if reply_to := message.reply_to_message:
     	  file_ = getattr(reply_to, reply_to.media.value) if reply_to.media else None
     	  if reply_to.document and (file_.mime_type == 'application/x-bittorrent' or file_.file_name.endswith('.torrent')):
     	      isQbit = True
-    '''
     if not isinstance(seed, bool):
         dargs = seed.split(':')
         ratio = dargs[0] or None
