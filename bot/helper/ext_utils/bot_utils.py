@@ -442,22 +442,23 @@ def extra_btns(buttons):
 
 async def set_commands(client):
     if config_dict['SET_COMMANDS']:
-        await client.set_bot_commands([
+        commands = [
             BotCommand(f'{BotCommands.MirrorCommand[0]}', '- Start mirroring'),
             BotCommand(f'{BotCommands.LeechCommand[0]}', '- Start leeching'),
             BotCommand(f'{BotCommands.YtdlCommand[0]}', '- Mirror yt-dlp supported link'),
             BotCommand(f'{BotCommands.YtdlLeechCommand[0]}', '- Leech through yt-dlp supported link'),
             BotCommand(f'{BotCommands.CloneCommand[0]}', '- Copy file/folder to Drive'),
-            BotCommand(f'{BotCommands.StatusCommand[0]}', '- Get mirror status message'),
-            BotCommand(f'{BotCommands.StatsCommand[0]}', '- Check Bot & System stats'),
-            BotCommand(f'{BotCommands.StopAllCommand[0]}', '- Cancel all tasks added by you to the bot.'),
+            BotCommand(f'{BotCommands.CountCommand}', '- Count file/folder on Google Drive.'),
+            BotCommand(f'{BotCommands.MediaInfoCommand}', '- Get MediaInfo'),
             BotCommand(f'{BotCommands.ListCommand}', '- Search in Drive'),
             BotCommand(f'{BotCommands.SearchCommand}', '- Search in Torrent'),
             BotCommand(f'{BotCommands.UserSetCommand[0]}', '- User settings'),
+            BotCommand(f'{BotCommands.StatusCommand[0]}', '- Get mirror status message'),
+            BotCommand(f'{BotCommands.StatsCommand[0]}', '- Check Bot & System stats'),
+            BotCommand(f'{BotCommands.StopAllCommand[0]}', '- Cancel all tasks added by you to the bot.'),
             BotCommand(f'{BotCommands.HelpCommand}', '- Get detailed help'),
             BotCommand(f'{BotCommands.BotSetCommand}', '- Open Bot settings'),
             BotCommand(f'{BotCommands.LogCommand}', '- View log'),
-            BotCommand(f'{BotCommands.MediaInfoCommand}', '- Get MediaInfo'),
-            BotCommand(f'{BotCommands.CountCommand}', '- Count file/folder on Google Drive.'),
             BotCommand(f'{BotCommands.RestartCommand[0]}', '- Restart the bot')
-        ])
+        ]
+        await client.set_bot_commands(commands)
