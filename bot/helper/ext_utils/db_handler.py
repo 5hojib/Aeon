@@ -75,12 +75,6 @@ class DbManager:
         await self.__db.settings.aria2c.update_one({'_id': bot_id}, {'$set': {key: value}}, upsert=True)
         self.__conn.close
 
-    async def update_qbittorrent(self, key, value):
-        if self.__err:
-            return
-        await self.__db.settings.qbittorrent.update_one({'_id': bot_id}, {'$set': {key: value}}, upsert=True)
-        self.__conn.close
-
     async def update_private_file(self, path):
         if self.__err:
             return
@@ -161,34 +155,6 @@ class DbManager:
         if self.__err:
             return
         await self.__db[name][bot_id].drop()
-        self.__conn.close
-
-    async def add_download_url(self, url: str, tag: str):
-        if self.__err:
-            return
-        download = {'_id': url, 'tag': tag, 'botname': bot_name}
-        await self.__db.download_links.update_one({'_id': url}, {'$set': download}, upsert=True)
-        self.__conn.close
-
-    async def check_download(self, url: str):
-        if self.__err:
-            return
-        exist = await self.__db.download_links.find_one({'_id': url})
-        self.__conn.close
-        return exist
-
-    async def clear_download_links(self, botName=None):
-        if self.__err:
-            return
-        if not botName:
-            botName = bot_name
-        await self.__db.download_links.delete_many({'botname': botName})
-        self.__conn.close
-
-    async def remove_download(self, url: str):
-        if self.__err:
-            return
-        await self.__db.download_links.delete_one({'_id': url})
         self.__conn.close
 
     async def update_user_tdata(self, user_id, token, time):

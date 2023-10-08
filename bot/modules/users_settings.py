@@ -112,7 +112,7 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
 
         SPLIT_SIZE = '4GB' if IS_PREMIUM_USER else '2GB'
         text = f'<b>Leech Settings for {name}</b>\n\n'
-        text += f'<b>• Leech split size: {SPLIT_SIZE}\n'
+        text += f'<b>• Leech split size:</b> {SPLIT_SIZE}\n'
         text += f'<b>• Leech Type:</b> {ltype}\n'
         text += f'<b>• Custom Thumbnail:</b> {thumbmsg}\n'
         text += f'<b>• Media Group:</b> {media_group}\n'
@@ -166,7 +166,7 @@ async def update_user_settings(query, key=None, edit_type=None, edit_mode=None, 
     thumbnail = f"Thumbnails/{user_id}.jpg"
     if not ospath.exists(thumbnail):
         thumbnail = 'https://graph.org/file/73ae908d18c6b38038071.jpg'
-    await editMessage(query.message, msg, button, photo=thumbnail)
+    await editMessage(query.message, msg, button, thumbnail)
 
 
 @new_thread

@@ -385,14 +385,14 @@ async def get_buttons(key=None, edit_type=None, edit_mode=None, mess=None):
     elif key == 'private':
         buttons.ibutton('Back', "botset back")
         buttons.ibutton('Close', "botset close")
-        msg = 'Send private file: config.env, token.pickle, accounts.zip, list_drives.txt, cookies.txt, terabox.txt, .netrc or any other file!\nTo delete private file send only the file name as text message. \nNote: Changing .netrc will not take effect for aria2c until restart.\nTimeout: 60 sec'
+        msg = "Send private files: config.env, token.pickle, accounts.zip, list_drives.txt, cookies.txt, terabox.txt, .netrc, or any other files!\n\nTo delete a private file, send only the file name as a text message.\n\n<b>Please note:</b> Changes to .netrc will not take effect for aria2c until it's restarted.\n\n<b>Timeout:</b> 60 seconds"
     elif edit_type == 'editvar':
         msg = f'<b>Variable:</b> <code>{key}</code>\n\n'
         msg += f'<b>Description:</b> {bset_display_dict.get(key, "No Description Provided")}\n\n'
         if mess.chat.type == ChatType.PRIVATE:
-            msg += f'<b>Value:</b> {config_dict.get(key, "None")}\n\n'
-        else:
-            buttons.ibutton('View Var Value', f"botset showvar {key}", position="header")
+            msg += f'<b>Value:</b> <code>{config_dict.get(key, "None")}</code>\n\n'
+        elif key not in bool_vars:
+            buttons.ibutton('View value', f"botset showvar {key}", position="header")
         buttons.ibutton('Back', "botset back var", position="footer")
         if key not in bool_vars:
             if not edit_mode:
@@ -412,9 +412,10 @@ async def get_buttons(key=None, edit_type=None, edit_mode=None, mess=None):
         if edit_mode and key not in bool_vars:
             msg += 'Send a valid value for the above Var. <b>Timeout:</b> 60 sec'
         if key in bool_vars:
-            msg += 'Choose a valid value for the above Var'
-            buttons.ibutton('True', f"botset boolvar {key} on")
-            buttons.ibutton('False', f"botset boolvar {key} off")
+            if not (value := config_dict.get(key)):
+            	  buttons.ibutton('Make it True', f"botset boolvar {key} on")
+            else:
+            	  buttons.ibutton('Make it False', f"botset boolvar {key} off")
     button = buttons.build_menu(1) if key is None else buttons.build_menu(2)
     return msg, button
 
@@ -583,7 +584,7 @@ async def edit_bot_settings(client, query):
         await update_buttons(message, data[1])
     elif data[1] == 'resetvar':
         handler_dict[message.chat.id] = False
-        await query.answer('Reset Done!', show_alert=True)
+        await query.answer('Reset done!', show_alert=True)
         value = ''
         if data[2] in default_values:
             value = default_values[data[2]]
@@ -621,7 +622,7 @@ async def edit_bot_settings(client, query):
     elif data[1] == 'boolvar':
         handler_dict[message.chat.id] = False
         value = data[3] == "on"
-        await query.answer(f'Successfully Var changed to {value}!', show_alert=True)
+        await query.answer(f'Successfully variable	 changed to {value}!', show_alert=True)
         config_dict[data[2]] = value
         await update_buttons(message, data[2], 'editvar', False)
         if DATABASE_URL:

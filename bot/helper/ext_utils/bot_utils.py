@@ -28,7 +28,7 @@ from bot import OWNER_ID, bot_name, DATABASE_URL, LOGGER, get_client, aria2, dow
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.telegraph_helper import telegraph
-from bot.helper.ext_utils.shortners import short_url
+from bot.helper.ext_utils.shorteners import short_url
 from bot.helper.ext_utils.aeon_utils import tinyfy
 
 THREADPOOL = ThreadPoolExecutor(max_workers = 1000)
@@ -200,11 +200,11 @@ def get_readable_message():
     for download in download_dict.values():
             tstatus = download.status()
             if tstatus == MirrorStatus.STATUS_DOWNLOADING:
-                dl_speed += text_size_to_bytes(download.speed())
+                dl_speed += text_to_bytes(download.speed())
             elif tstatus == MirrorStatus.STATUS_UPLOADING:
-                up_speed += text_size_to_bytes(download.speed())
+                up_speed += text_to_bytes(download.speed())
             elif tstatus == MirrorStatus.STATUS_SEEDING:
-                up_speed += text_size_to_bytes(download.upload_speed())
+                up_speed += text_to_bytes(download.upload_speed())
     if tasks > STATUS_LIMIT:
         buttons = ButtonMaker()
         buttons.ibutton("Prev", "status pre")
@@ -219,18 +219,14 @@ def get_readable_message():
     return msg, button
 
 
-def text_size_to_bytes(size_text):
-    size = 0
+def text_to_bytes(size_text):
     size_text = size_text.lower()
-    if 'k' in size_text:
-        size += float(size_text.split('k')[0]) * 1024
-    elif 'm' in size_text:
-        size += float(size_text.split('m')[0]) * 1048576
-    elif 'g' in size_text:
-        size += float(size_text.split('g')[0]) * 1073741824
-    elif 't' in size_text:
-        size += float(size_text.split('t')[0]) * 1099511627776
-    return size
+    multiplier = {'k': 1024, 'm': 1048576, 'g': 1073741824, 't': 1099511627776, 'p': 1125899906842624}
+    for unit, factor in multiplier.items():
+        if unit in size_text:
+            size_value = float(size_text.split(unit)[0])
+            return size_value * factor
+    return 0
 
 
 async def turn_page(data):
@@ -252,7 +248,7 @@ async def turn_page(data):
                 PAGE_NO -= 1
 
 
-def get_readable_time(seconds):
+def get_readable_time(seconds, full_time=False):
     periods = [('millennium', 31536000000), ('century', 3153600000), ('decade', 315360000), ('year', 31536000), ('month', 2592000), ('week', 604800), ('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
     result = ''
     for period_name, period_seconds in periods:
@@ -260,7 +256,7 @@ def get_readable_time(seconds):
             period_value, seconds = divmod(seconds, period_seconds)
             plural_suffix = 's' if period_value > 1 else ''
             result += f'{int(period_value)} {period_name}{plural_suffix} '
-            if len(result.split()) == 2:
+            if not full_time:
                 break
     return result.strip()
 
@@ -429,23 +425,12 @@ async def checking_access(user_id, button=None):
         if DATABASE_URL:
             await DbManager().update_user_token(user_id, token)
         user_data[user_id].update(data)
-        time_str = format_validity_time(token_timeout)
+        time_str = get_readable_time(token_timeout, True)
         if button is None:
             button = ButtonMaker()
         button.ubutton('Collect token', tinyfy(short_url(f'https://telegram.me/{bot_name}?start={token}')))
         return f'Your token has expired, please collect a new token.\n<b>It will expire after {time_str}</b>!', button
     return None, button
-
-
-def format_validity_time(seconds):
-    periods = [('millennium', 31536000000), ('century', 3153600000), ('decade', 315360000), ('year', 31536000), ('month', 2592000), ('week', 604800), ('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
-    result = ''
-    for period_name, period_seconds in periods:
-        if seconds >= period_seconds:
-            period_value, seconds = divmod(seconds, period_seconds)
-            plural_suffix = 's' if period_value > 1 else ''
-            result += f'{int(period_value)} {period_name}{plural_suffix} '
-    return result
 
 
 def extra_btns(buttons):
@@ -457,23 +442,23 @@ def extra_btns(buttons):
 
 async def set_commands(client):
     if config_dict['SET_COMMANDS']:
-        await client.set_bot_commands(
-            [BotCommand(f'{BotCommands.MirrorCommand[0]}', f'or /{BotCommands.MirrorCommand[1]} Mirror'),
-             BotCommand(f'{BotCommands.LeechCommand[0]}', f'or /{BotCommands.LeechCommand[1]} Leech'),
-             BotCommand(f'{BotCommands.QbMirrorCommand[0]}', f'or /{BotCommands.QbMirrorCommand[1]} Mirror torrent using qBittorrent'),
-             BotCommand(f'{BotCommands.QbLeechCommand[0]}', f'or /{BotCommands.QbLeechCommand[1]} Leech torrent using qBittorrent'),
-             BotCommand(f'{BotCommands.YtdlCommand[0]}', f'or /{BotCommands.YtdlCommand[1]} Mirror yt-dlp supported link'),
-             BotCommand(f'{BotCommands.YtdlLeechCommand[0]}', f'or /{BotCommands.YtdlLeechCommand[1]} Leech through yt-dlp supported link'),
-             BotCommand(f'{BotCommands.CloneCommand}', 'Copy file/folder to Drive'),
-             BotCommand(f'{BotCommands.StatusCommand[0]}', f'or /{BotCommands.StatusCommand[1]} Get mirror status message'),
-             BotCommand(f'{BotCommands.StatsCommand[0]}', 'Check Bot & System stats'),
-             BotCommand(f'{BotCommands.StopAllCommand[0]}', 'Cancel all tasks which added by you to in bots.'),
-             BotCommand(f'{BotCommands.ListCommand}', 'Search in Drive'),
-             BotCommand(f'{BotCommands.SearchCommand}', 'Search in Torrent'),
-             BotCommand(f'{BotCommands.UserSetCommand[0]}', 'Users settings'),
-             BotCommand(f'{BotCommands.HelpCommand}', 'Get detailed help'),
-             BotCommand(f'{BotCommands.BotSetCommand}', 'Open Bot settings'),
-             BotCommand(f'{BotCommands.LogCommand}', 'View log'),
-             BotCommand(f'{BotCommands.MediaInfoCommand}', 'Get MediaInfo'),
-             BotCommand(f'{BotCommands.CountCommand}', 'Count file/folder of Google Drive.'),
-             BotCommand(f'{BotCommands.RestartCommand[0]}', 'Restart bot')])
+        commands = [
+            BotCommand(f'{BotCommands.MirrorCommand[0]}', '- Start mirroring'),
+            BotCommand(f'{BotCommands.LeechCommand[0]}', '- Start leeching'),
+            BotCommand(f'{BotCommands.YtdlCommand[0]}', '- Mirror yt-dlp supported link'),
+            BotCommand(f'{BotCommands.YtdlLeechCommand[0]}', '- Leech through yt-dlp supported link'),
+            BotCommand(f'{BotCommands.CloneCommand[0]}', '- Copy file/folder to Drive'),
+            BotCommand(f'{BotCommands.CountCommand}', '- Count file/folder on Google Drive.'),
+            BotCommand(f'{BotCommands.MediaInfoCommand}', '- Get MediaInfo'),
+            BotCommand(f'{BotCommands.ListCommand}', '- Search in Drive'),
+            BotCommand(f'{BotCommands.SearchCommand}', '- Search in Torrent'),
+            BotCommand(f'{BotCommands.UserSetCommand[0]}', '- User settings'),
+            BotCommand(f'{BotCommands.StatusCommand[0]}', '- Get mirror status message'),
+            BotCommand(f'{BotCommands.StatsCommand[0]}', '- Check Bot & System stats'),
+            BotCommand(f'{BotCommands.StopAllCommand[0]}', '- Cancel all tasks added by you to the bot.'),
+            BotCommand(f'{BotCommands.HelpCommand}', '- Get detailed help'),
+            BotCommand(f'{BotCommands.BotSetCommand}', '- Open Bot settings'),
+            BotCommand(f'{BotCommands.LogCommand}', '- View log'),
+            BotCommand(f'{BotCommands.RestartCommand[0]}', '- Restart the bot')
+        ]
+        await client.set_bot_commands(commands)

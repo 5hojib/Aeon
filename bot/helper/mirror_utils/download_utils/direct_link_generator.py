@@ -1,4 +1,3 @@
-import requests
 from hashlib import sha256
 from http.cookiejar import MozillaCookieJar
 from json import loads
@@ -10,20 +9,17 @@ from uuid import uuid4
 
 from bs4 import BeautifulSoup
 from cloudscraper import create_scraper
-from lk21 import Bypass
 from lxml.etree import HTML
-from requests import Session, post
-from requests import session as req_session
+from requests import Session, post, session as req_session
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from bot import config_dict, LOGGER
-from bot.helper.ext_utils.bot_utils import get_readable_time, is_share_link, text_size_to_bytes
+from bot.helper.ext_utils.bot_utils import text_to_bytes
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.help_messages import PASSWORD_ERROR_MESSAGE
 
 _caches = {}
-
 domain_dict = {
     'mediafire':    ['mediafire.com'],
     'osdn':         ['osdn.net'],
@@ -104,7 +100,7 @@ def direct_link_generator(link):
         if any(x in domain for x in domain_list):
             func = globals().get(func_name)
             return func(link)
-    raise DirectDownloadLinkException(f'ERROR: No Direct link function found for {link}')
+    raise DirectDownloadLinkException(f'No Direct link function found for {link}')
 
 
 def get_captcha_token(session, params):
@@ -338,12 +334,9 @@ def fichier(link):
 def solidfiles(url):
     with create_scraper() as session:
         try:
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36'
-            }
+            headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36'}
             pageSource = session.get(url, headers=headers).text
-            mainOptions = str(
-                search(r'viewerOptions\'\,\ (.*?)\)\;', pageSource).group(1))
+            mainOptions = str(search(r'viewerOptions\'\,\ (.*?)\)\;', pageSource).group(1))
             return loads(mainOptions)["downloadUrl"]
         except Exception as e:
             raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
@@ -953,7 +946,7 @@ def send_cm(url):
         file_names = html.xpath('//tr[@class="selectable"]//a/text()')
         sizes = html.xpath('//tr[@class="selectable"]//span/text()')
         for href, file_name, size_text in zip(hrefs, file_names, sizes):
-            files.append({'file_id':href.split('/')[-1], 'file_name':file_name.strip(), 'size':text_size_to_bytes(size_text.strip())})
+            files.append({'file_id':href.split('/')[-1], 'file_name':file_name.strip(), 'size':text_to_bytes(size_text.strip())})
         return files
 
     def __writeContents(html_text, folderPath=''):

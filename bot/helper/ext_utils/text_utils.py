@@ -77,7 +77,7 @@ nsfw_keywords = [
     "nsfwcherry",
     "hardcore",
     "Pornhub",
-    "xvideos2"
+    "xvideos2",
     "youporn",
     "pornrip",
     "playboy",

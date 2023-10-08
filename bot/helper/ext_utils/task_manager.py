@@ -111,7 +111,7 @@ async def start_from_queued():
                     start_dl_from_queued(uid)
 
 
-async def limit_checker(size, listener, isTorrent=False, isMega=False, isDriveLink=False, isYtdlp=False):
+async def limit_checker(size, listener, isTorrent=False, isMega=False, isDriveLink=False, isYtdlp=False, isPlayList=None):
     LOGGER.info('Checking limit')
     user_id = listener.message.from_user.id
     if user_id == OWNER_ID or user_id in user_data and user_data[user_id].get('is_sudo'):
@@ -170,26 +170,23 @@ async def limit_checker(size, listener, isTorrent=False, isMega=False, isDriveLi
 
 
 async def task_utils(message):
-    LOGGER.info('Checking Task Utilities ...')
     msg = []
     button = None
     user_id = message.from_user.id
+    token = config_dict['TOKEN_TIMEOUT']
+    admin = await isAdmin(message)
     if message.chat.type != message.chat.type.BOT:
         if ids := config_dict['FSUB_IDS']:
             _msg, button = await forcesub(message, ids, button)
             if _msg:
                 msg.append(_msg)
-        if not config_dict['TOKEN_TIMEOUT']:
-            _msg, button = await BotPm_check(message, button)
-            if _msg:
-                msg.append(_msg)
-        if config_dict['TOKEN_TIMEOUT'] and (await isAdmin(message) or user_id == OWNER_ID or user_id in user_data and user_data[user_id].get('is_sudo')):
+        if not token or (token and (admin or user_id == OWNER_ID or (user_id in user_data and user_data[user_id].get('is_sudo')))):
             _msg, button = await BotPm_check(message, button)
             if _msg:
                 msg.append(_msg)
     if user_id == OWNER_ID or user_id in user_data and user_data[user_id].get('is_sudo'):
         return msg, button
-    if await isAdmin(message):
+    if admin:
         return msg, button
     token_msg, button = await checking_access(message.from_user.id, button)
     if token_msg is not None:

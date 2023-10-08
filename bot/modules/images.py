@@ -17,15 +17,18 @@ from bot.helper.telegram_helper.button_build import ButtonMaker
 async def picture_add(_, message):
     reply = message.reply_to_message
     msg = await sendMessage(message, "Fetching input...")
-    if len(message.command) > 1 or reply and reply.text:
+
+    if len(message.command) > 1 or (reply and reply.text):
         msg_text = reply.text if reply else message.command[1]
         if not msg_text.startswith("http"):
             return await editMessage(msg, "This is not a valid link. It must start with 'http'.")
         graph_url = msg_text.strip()
         await editMessage(msg, f"Adding your link: <code>{graph_url}</code>")
+
     elif reply and reply.photo:
         if reply.photo.file_size > 5242880 * 2:
             return await editMessage(msg, "Media format is not supported. Only photos are allowed.")
+
         try:
             photo_dir = await reply.download()
             await editMessage(msg, "Now, uploading to <code>graph.org</code>, Please Wait...")
@@ -37,15 +40,18 @@ async def picture_add(_, message):
             await editMessage(msg, str(e))
         finally:
             await aioremove(photo_dir)
+
     else:
         help_msg = f"Add an image using /{BotCommands.AddImageCommand} followed by IMAGE_LINK, or reply to an image with /{BotCommands.AddImageCommand}."
         return await editMessage(msg, help_msg)
+
     config_dict['IMAGES'].append(graph_url)
+
     if DATABASE_URL:
         await DbManager().update_config({'IMAGES': config_dict['IMAGES']})
+
     await asleep(1.5)
     await editMessage(msg, f"<b>Successfully added to the images list!</b>\n\n<b>Total images: {len(config_dict['IMAGES'])}</b>")
-
 
 async def pictures(_, message):
     if not config_dict['IMAGES']:
@@ -62,15 +68,16 @@ async def pictures(_, message):
         await deleteMessage(to_edit)
         await sendMessage(message, f'<b>Image No. : 1 / {len(config_dict["IMAGES"])}</b>', buttons.build_menu(2), config_dict['IMAGES'][0])
 
-
 @new_task
 async def pics_callback(_, query):
     message = query.message
     user_id = query.from_user.id
     data = query.data.split()
+
     if user_id != int(data[1]):
         await query.answer(text="Not authorized user!", show_alert=True)
         return
+
     if data[2] == "turn":
         await query.answer()
         ind = handleIndex(int(data[3]), config_dict['IMAGES'])
@@ -83,16 +90,19 @@ async def pics_callback(_, query):
         buttons.ibutton("Close", f"images {data[1]} close")
         buttons.ibutton("Remove all", f"images {data[1]} removeall", 'footer')
         await editMessage(message, pic_info, buttons.build_menu(2), config_dict['IMAGES'][ind])
+
     elif data[2] == "remove":
         config_dict['IMAGES'].pop(int(data[3]))
         if DATABASE_URL:
             await DbManager().update_config({'IMAGES': config_dict['IMAGES']})
         query.answer("Image has been successfully deleted", show_alert=True)
+
         if len(config_dict['IMAGES']) == 0:
             await query.message.delete()
             await sendMessage(message, f"No images to display! Add images using /{BotCommands.AddImageCommand}.")
             return
-        ind = int(data[3])+1
+
+        ind = int(data[3]) + 1
         ind = len(config_dict['IMAGES']) - abs(ind) if ind < 0 else ind
         pic_info = f'<b>Image No. : {ind+1} / {len(config_dict["IMAGES"])}</b>'
         buttons = ButtonMaker()
@@ -102,6 +112,7 @@ async def pics_callback(_, query):
         buttons.ibutton("Close", f"images {data[1]} close")
         buttons.ibutton("Remove all", f"images {data[1]} removeall", 'footer')
         await editMessage(message, pic_info, buttons.build_menu(2), config_dict['IMAGES'][ind])
+
     elif data[2] == 'removeall':
         config_dict['IMAGES'].clear()
         if DATABASE_URL:
@@ -113,7 +124,6 @@ async def pics_callback(_, query):
         await query.answer()
         await message.delete()
         await message.reply_to_message.delete()
-
 
 bot.add_handler(MessageHandler(picture_add, filters=command(BotCommands.AddImageCommand) & CustomFilters.authorized))
 bot.add_handler(MessageHandler(pictures, filters=command(BotCommands.ImagesCommand) & CustomFilters.authorized))

@@ -81,6 +81,18 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     file_        = None
     session      = ''
 
+    if link:
+    	  if is_magnet(link) or link.endswith('.torrent'):
+    	  	  isQbit = True
+    elif not link and (reply_to := message.reply_to_message):
+        if reply_to.text:
+            reply_text = reply_to.text.split('\n', 1)[0].strip()
+            if reply_text and is_magnet(reply_text):
+                isQbit = True
+    if reply_to := message.reply_to_message:
+    	  file_ = getattr(reply_to, reply_to.media.value) if reply_to.media else None
+    	  if reply_to.document and (file_.mime_type == 'application/x-bittorrent' or file_.file_name.endswith('.torrent')):
+    	      isQbit = True
     if not isinstance(seed, bool):
         dargs = seed.split(':')
         ratio = dargs[0] or None
@@ -203,10 +215,9 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     error_button = None
     if await nsfw_precheck(message):
     	  error_msg.extend(['NSFW detected'])
-    if not await isAdmin(message):
-        task_utilis_msg, error_button = await task_utils(message)
-        if task_utilis_msg:
-            error_msg.extend(task_utilis_msg)
+    task_utilis_msg, error_button = await task_utils(message)
+    if task_utilis_msg:
+        error_msg.extend(task_utilis_msg)
     if error_msg:
         final_msg = f'Hey, <b>{tag}</b>!\n'
         for __i, __msg in enumerate(error_msg, 1):
@@ -306,6 +317,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         await add_mega_download(link, f'{path}/', listener, name)
     elif isQbit:
         await add_qb_torrent(link, path, listener, ratio, seed_time)
+        LOGGER.info('Downloading with qbitEngine')
     else:
         ussr = args['-u']
         pssw = args['-p']
@@ -320,23 +332,9 @@ async def mirror(client, message):
     _mirror_leech(client, message)
 
 
-async def qb_mirror(client, message):
-    _mirror_leech(client, message, isQbit=True)
-
-
 async def leech(client, message):
     _mirror_leech(client, message, isLeech=True)
 
 
-async def qb_leech(client, message):
-    _mirror_leech(client, message, isQbit=True, isLeech=True)
-
-
-bot.add_handler(MessageHandler(mirror, filters=command(
-    BotCommands.MirrorCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(qb_mirror, filters=command(
-    BotCommands.QbMirrorCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(leech, filters=command(
-    BotCommands.LeechCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(qb_leech, filters=command(
-    BotCommands.QbLeechCommand) & CustomFilters.authorized))
+bot.add_handler(MessageHandler(mirror, filters=command(BotCommands.MirrorCommand) & CustomFilters.authorized))
+bot.add_handler(MessageHandler(leech, filters=command(BotCommands.LeechCommand) & CustomFilters.authorized))

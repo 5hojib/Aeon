@@ -81,7 +81,7 @@ class QbittorrentStatus:
         return f"{round(self.__info.ratio, 3)}"
 
     def seeding_time(self):
-        return get_readable_time(self.__info.seeding_time)
+        return get_readable_time(self.__info.seeding_time, True)
 
     def download(self):
         return self

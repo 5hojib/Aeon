@@ -7,48 +7,43 @@ from bot import LOGGER, bot_loop, config_dict
 
 
 class TelegraphHelper:
-    def __init__(self, author_name=None, author_url=None):
+    def __init__(self):
         self.telegraph = Telegraph(domain='graph.org')
         self.short_name = token_hex(4)
         self.access_token = None
-        self.author_name = author_name
-        self.author_url = author_url
+        self.author_name = 'Aeon'
+        self.author_url = 'https://t.me/ProjectAeon'
 
     async def create_account(self):
         await self.telegraph.create_account(
-            short_name=self.short_name,
-            author_name=self.author_name,
-            author_url=self.author_url
-        )
+            short_name = self.short_name,
+            author_name = self.author_name,
+            author_url = self.author_url)
         self.access_token = self.telegraph.get_access_token()
         LOGGER.info("Creating Telegraph Account")
 
     async def create_page(self, title, content):
         try:
             return await self.telegraph.create_page(
-                title=title,
-                author_name=self.author_name,
-                author_url=self.author_url,
-                html_content=content
-            )
+                title = title,
+                author_name = self.author_name,
+                author_url = self.author_url,
+                html_content = content)
         except RetryAfterError as st:
-            LOGGER.warning(
-                f'Telegraph Flood control exceeded. I will sleep for {st.retry_after} seconds.')
+            LOGGER.warning(f'Telegraph Flood control exceeded. I will sleep for {st.retry_after} seconds.')
             await sleep(st.retry_after)
             return await self.create_page(title, content)
 
     async def edit_page(self, path, title, content):
         try:
             return await self.telegraph.edit_page(
-                path=path,
-                title=title,
-                author_name=self.author_name,
-                author_url=self.author_url,
-                html_content=content
-            )
+                path = path,
+                title = title,
+                author_name = self.author_name,
+                author_url = self.author_url,
+                html_content = content)
         except RetryAfterError as st:
-            LOGGER.warning(
-                f'Telegraph Flood control exceeded. I will sleep for {st.retry_after} seconds.')
+            LOGGER.warning(f'Telegraph Flood control exceeded. I will sleep for {st.retry_after} seconds.')
             await sleep(st.retry_after)
             return await self.edit_page(path, title, content)
 
@@ -68,13 +63,10 @@ class TelegraphHelper:
                     content += f'<b> | <a href="https://telegra.ph/{path[nxt_page]}">Next</a></b>'
                     nxt_page += 1
             await self.edit_page(
-                path=path[prev_page],
-                title="Torrent Search",
-                content=content
-            )
+                path = path[prev_page],
+                title = "Torrent Search",
+                content = content)
         return
 
-
-telegraph = TelegraphHelper('Aeon', 'https://t.me/ProjectAeon')
-
+telegraph = TelegraphHelper()
 bot_loop.run_until_complete(telegraph.create_account())

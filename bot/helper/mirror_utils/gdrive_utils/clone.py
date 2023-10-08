@@ -86,8 +86,7 @@ async def rcloneNode(client, message, link, dst_path, rcf, tag):
     LOGGER.info(f'Clone Started: Name: {name} - Source: {link} - Destination: {dst_path}')
     gid = token_hex(4)
     async with download_dict_lock:
-        download_dict[message.id] = RcloneStatus(
-            RCTransfer, message, gid, 'cl')
+        download_dict[message.id] = RcloneStatus(RCTransfer, message, gid, 'cl')
     await sendStatusMessage(message)
     link, destination = await RCTransfer.clone(config_path, remote, src_path, dst_path, rcf, mime_type)
     if not link:
@@ -158,8 +157,7 @@ async def gdcloneNode(message, link, listen_up):
         else:
             gid = token_hex(4)
             async with download_dict_lock:
-                download_dict[message.id] = GdriveStatus(
-                    drive, size, message, gid, 'cl')
+                download_dict[message.id] = GdriveStatus(drive, size, message, gid, 'cl')
             await sendStatusMessage(message)
             link, size, mime_type, files, folders = await sync_to_async(drive.clone, link, listener.drive_id)
         if not link:
@@ -226,10 +224,9 @@ async def clone(client, message):
     error_button = None
     if await nsfw_precheck(message):
     	  error_msg.extend(['NSFW detected'])
-    if not await isAdmin(message):
-        task_utilis_msg, error_button = await task_utils(message)
-        if task_utilis_msg:
-            error_msg.extend(task_utilis_msg)
+    task_utilis_msg, error_button = await task_utils(message)
+    if task_utilis_msg:
+        error_msg.extend(task_utilis_msg)
     if error_msg:
         final_msg = f'Hey, <b>{tag}</b>!\n'
         for __i, __msg in enumerate(error_msg, 1):

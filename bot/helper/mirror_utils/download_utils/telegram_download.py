@@ -1,3 +1,4 @@
+from secrets import token_hex
 from logging import getLogger, ERROR
 from time import time
 from asyncio import Lock
@@ -36,9 +37,10 @@ class TelegramDownloadHelper:
             GLOBAL_GID.add(file_id)
         self.name = name
         self.__id = file_id
+        gid = token_hex(4)
         async with download_dict_lock:
             download_dict[self.__listener.uid] = TelegramStatus(
-                self, size, self.__listener.message, file_id[:8], 'dl')
+                self, size, self.__listener.message, gid, 'dl')
         async with queue_dict_lock:
             non_queued_dl.add(self.__listener.uid)
         if not from_queue:
