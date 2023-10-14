@@ -210,7 +210,7 @@ help_string = f'''<b>NOTE: Try each command without any arguments to see more de
 /{BotCommands.LeechCommand[0]} - Start leeching to Telegram.
 /{BotCommands.YtdlCommand[0]} - Mirror links supported by yt-dlp.
 /{BotCommands.YtdlLeechCommand[0]} - Leech links supported by yt-dlp.
-/{BotCommands.CloneCommand} - Copy files/folders to Google Drive.
+/{BotCommands.CloneCommand[0]} - Copy files/folders to Google Drive.
 /{BotCommands.CountCommand} - Count files/folders in Google Drive.
 /{BotCommands.UserSetCommand[0]} - User settings.
 /{BotCommands.BtSelectCommand} - Select files from torrents by gid or reply.
