@@ -528,8 +528,13 @@ class GoogleDriveHelper:
                     msg += f"<code>{file.get('name')}<br>(folder)</code><br>"
                     msg += f"<b><a href={furl}>Drive Link</a></b>"
                     if index_url:
-                        url = f"{index_url}findpath?id={file.get('id')}"
-                        msg += f' <b>| <a href="{url}">Index Link</a></b>'
+                        if isRecur:
+                            url_path = "/".join([rquote(n, safe='')
+                                                for n in self.__get_recursive_list(file, dir_id)])
+                        else:
+                            url_path = rquote(f'{file.get("name")}', safe='')
+                        url = f'{index_url}/{url_path}/'
+                        msg += f' <b><a href="{url}">Index Link</a></b>'
                 elif mime_type == 'application/vnd.google-apps.shortcut':
                     furl = self.__G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(file.get('id'))
                     msg += f"⁍<a href='{furl}'>{file.get('name')}</a> (shortcut)"
@@ -538,11 +543,12 @@ class GoogleDriveHelper:
                     msg += f"<code>{file.get('name')}<br>({get_readable_file_size(int(file.get('size', 0)))})</code><br>"
                     msg += f"<b><a href={furl}>Drive Link</a></b>"
                     if index_url:
-                        url = f"{index_url}findpath?id={file.get('id')}"
-                        msg += f' <b>| <a href="{url}">Index Link</a></b>'
-                        if mime_type.startswith(('image', 'video', 'audio')):
-                            view_url = f"{url}&view=true"
-                            msg += f' <b>| <a href="{view_url}">View Link</a></b>'
+                        if isRecur:
+                            url_path = "/".join(rquote(n, safe='') for n in self.__get_recursive_list(file, dir_id))
+                        else:
+                            url_path = rquote(f'{file.get("name")}')
+                        url = f'{index_url}/{url_path}'
+                        msg += f' <b> <a href="{url}">Index Link</a></b>'
                 msg += '<br><br>'
                 contents_no += 1
                 if len(msg.encode('utf-8')) > 39000:
