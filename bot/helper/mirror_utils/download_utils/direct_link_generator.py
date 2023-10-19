@@ -193,7 +193,7 @@ def filepress(url):
                'id':res2["data"],
                'method': 'publicUserDownlaod',
             }
-            api2 = f'https://new2.filepress.store/api/file/downlaod2/'
+            api2 = 'https://new2.filepress.store/api/file/downlaod2/'
             res = session.post(api2, headers={'Referer': f'{raw.scheme}://{raw.hostname}'}, json=json_data2).json()
         except Exception as e:
             raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')

@@ -53,14 +53,13 @@ async def change_sudo(message, is_sudo):
                 success_message = 'Promoted as Sudo'
         else:
             success_message = "Give ID or Reply To message of whom you want to Promote."
+    elif id_ and id_ in user_data and user_data[id_].get('is_sudo'):
+        update_user_ldata(id_, 'is_sudo', False)
+        if DATABASE_URL:
+            await DbManager().update_user_data(id_)
+        success_message = 'Demoted'
     else:
-        if id_ and id_ in user_data and user_data[id_].get('is_sudo'):
-            update_user_ldata(id_, 'is_sudo', False)
-            if DATABASE_URL:
-                await DbManager().update_user_data(id_)
-            success_message = 'Demoted'
-        else:
-            success_message = "Give ID or Reply To message of whom you want to remove from Sudo"
+        success_message = "Give ID or Reply To message of whom you want to remove from Sudo"
     await sendMessage(message, success_message)
 
 
