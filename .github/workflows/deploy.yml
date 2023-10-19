@@ -9,17 +9,17 @@ jobs:
       - uses: actions/checkout@v2
       - uses: akhileshns/heroku-deploy@v3.12.12
         with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
-          heroku_email: ${{secrets.HEROKU_EMAIL}}
+          heroku_api_key: ${{14d0011b-69da-4ceb-be32-66d9b5ecbcec}}
+          heroku_app_name: ${{ajmirrordc02bot}}
+          heroku_email: ${{vg766337@gmail.com}}
           usedocker: true
           docker_heroku_process_type: web
           stack: "container"
           region: "eu"
         env:
-          HD_OWNER_ID: ${{secrets.OWNER_ID}}
-          HD_TELEGRAM_API: ${{secrets.TELEGRAM_API}}
-          HD_TELEGRAM_HASH: ${{secrets.TELEGRAM_HASH}}
-          HD_DATABASE_URL: ${{secrets.DATABASE_URL}}
-          HD_BOT_TOKEN: ${{secrets.BOT_TOKEN}}
+          HD_OWNER_ID: ${{827547960}}
+          HD_TELEGRAM_API: ${{25285117}}
+          HD_TELEGRAM_HASH: ${{ 5c25c8dd95fb74a843aaa62af4324771}}
+          HD_DATABASE_URL: ${{mongodb+srv://Vg766337:zBbojTV4aboRbeYd@cluster0.narhcqk.mongodb.net/?retryWrites=true&w=majority}}
+          HD_BOT_TOKEN: ${{6468829747:AAE1zDbCrMCHA2pQJ0z90EEwsswWAW8YD-s}}
           HD_CONFIG_FILE_URL: ${{secrets.CONFIG_FILE_URL}}
