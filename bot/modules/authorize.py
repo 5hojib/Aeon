@@ -16,7 +16,6 @@ async def change_authorization(message, is_authorize):
         id_ = reply_to.from_user.id
     else:
         id_ = message.chat.id
-
     if is_authorize:
         success_message = 'Authorized'
         if id_ in user_data and user_data[id_].get('is_auth'):
@@ -33,8 +32,8 @@ async def change_authorization(message, is_authorize):
                 await DbManager().update_user_data(id_)
         else:
             success_message = 'Already unauthorized!'
-
     await sendMessage(message, success_message)
+
 
 async def change_sudo(message, is_sudo):
     id_ = ""
@@ -43,19 +42,26 @@ async def change_sudo(message, is_sudo):
         id_ = int(msg[1].strip())
     elif reply_to := message.reply_to_message:
         id_ = reply_to.from_user.id
-
-    if id_:
-        success_message = 'Promoted as Sudo'
-        if id_ in user_data and user_data[id_].get('is_sudo'):
-            success_message = 'Already Sudo!'
+    if is_sudo:
+        if id_:
+            if id_ in user_data and user_data[id_].get('is_sudo'):
+                success_message = 'Already Sudo!'
+            else:
+                update_user_ldata(id_, 'is_sudo', True)
+                if DATABASE_URL:
+                    await DbManager().update_user_data(id_)
+                success_message = 'Promoted as Sudo'
         else:
-            update_user_ldata(id_, 'is_sudo', True)
-            if DATABASE_URL:
-                await DbManager().update_user_data(id_)
+            success_message = "Give ID or Reply To message of whom you want to Promote."
+    elif id_ and id_ in user_data and user_data[id_].get('is_sudo'):
+        update_user_ldata(id_, 'is_sudo', False)
+        if DATABASE_URL:
+            await DbManager().update_user_data(id_)
+        success_message = 'Demoted'
     else:
-        success_message = "Give an ID or reply to the message of the person you want to promote."
-
+        success_message = "Give ID or Reply To message of whom you want to remove from Sudo"
     await sendMessage(message, success_message)
+
 
 async def authorize(client, message):
     await change_authorization(message, True)

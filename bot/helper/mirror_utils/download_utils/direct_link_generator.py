@@ -39,7 +39,8 @@ domain_dict = {
     'streamvid':    ['streamvid.net'],
     'shrdsk':       ['shrdsk.me'],
     'streamhub':    ['streamhub.ink'],
-    'appdrive':     ['appdrive'],
+    'appflix':      ['appdrive',
+                      'gdflix'],
     'jiodrive':     ['jiodrive'],
     'akmfiles':     ['akmfiles.com',
                      'akmfls.xyz'],
@@ -187,7 +188,13 @@ def filepress(url):
                 'method': 'publicDownlaod',
             }
             api = f'{raw.scheme}://{raw.hostname}/api/file/downlaod/'
-            res = session.post(api, headers={'Referer': f'{raw.scheme}://{raw.hostname}'}, json=json_data).json()
+            res2 = session.post(api, headers={'Referer': f'{raw.scheme}://{raw.hostname}'}, json=json_data).json()
+            json_data2 = {
+               'id':res2["data"],
+               'method': 'publicUserDownlaod',
+            }
+            api2 = 'https://new2.filepress.store/api/file/downlaod2/'
+            res = session.post(api2, headers={'Referer': f'{raw.scheme}://{raw.hostname}'}, json=json_data2).json()
         except Exception as e:
             raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}')
     if 'data' not in res:
@@ -464,7 +471,7 @@ def terabox(url):
     return details
 
 
-def appdrive(url):
+def appflix(url):
     cget = create_scraper().request
     try:
         url = cget('GET', url).url

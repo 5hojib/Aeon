@@ -579,7 +579,7 @@ async def edit_bot_settings(client, query):
         if key is None:
             globals()['START'] = 0
         await update_buttons(message, key)
-    elif data[1] in ['var', 'aria', 'qbit']:
+    elif data[1] == 'var':
         await query.answer()
         await update_buttons(message, data[1])
     elif data[1] == 'resetvar':

@@ -65,13 +65,7 @@ MIRROR_HELP_MESSAGE = """
 
 <b>-rcf:</b> Set Rclone flags for the command.
 
-<b>main:dump/ubuntu.iso</b> or <b>rcl:</b> Treat a path as an rclone download.
-
-
-<b>Note:</b>
-<b>Commands starting with qb are specifically for torrents.</b>
-Some commands may require additional user access or settings.
-"""
+<b>main:dump/ubuntu.iso</b> or <b>rcl:</b> Treat a path as an rclone download."""
 
 RSS_HELP_MESSAGE = """
 Use this format to add feed URL:

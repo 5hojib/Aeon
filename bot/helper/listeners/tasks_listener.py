@@ -402,9 +402,10 @@ class MirrorLeechListener:
                 INDEX_URL = self.index_link if self.drive_id else config_dict['INDEX_URL']
                 if not rclonePath:
                     if INDEX_URL:
-                        drive = GoogleDriveHelper()
-                        dir_id = drive.getIdFromUrl(link)
-                        share_url = f'{INDEX_URL}findpath?id={dir_id}'
+                        url_path = rutils.quote(f'{name}')
+                        share_url = f'{INDEX_URL}/{url_path}'
+                        if mime_type == "Folder":
+                            share_url += '/'
                         buttons.ubutton('Index link', share_url)
                 buttons = extra_btns(buttons)
                 button = buttons.build_menu(2)
