@@ -18,5 +18,3 @@
 
 7. Run action workflow.
 8. After the deployment is complete, finalize the remaining variables and upload sensitive files like `token.pickle` using the `bsetting` command.
-
-[Donate](.github/donations.md)
