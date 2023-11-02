@@ -1,7 +1,7 @@
 from random import choice
-from pyrogram.handlers import MessageHandler, CallbackQueryHandler
-from pyrogram.filters import command, regex, create
-from pyrogram.enums import ChatType
+from telegram.handlers import MessageHandler, CallbackQueryHandler
+from telegram.filters import command, regex, create
+from telegram.enums import ChatType
 from functools import partial
 from collections import OrderedDict
 from asyncio import create_subprocess_exec, create_subprocess_shell, sleep

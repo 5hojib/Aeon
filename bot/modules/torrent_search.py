@@ -1,5 +1,5 @@
-from pyrogram.handlers import MessageHandler, CallbackQueryHandler
-from pyrogram.filters import command, regex
+from telegram.handlers import MessageHandler, CallbackQueryHandler
+from telegram.filters import command, regex
 from aiohttp import ClientSession
 from html import escape
 from urllib.parse import quote

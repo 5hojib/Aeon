@@ -1,5 +1,5 @@
-from pyrogram.handlers import MessageHandler, EditedMessageHandler
-from pyrogram.filters import command
+from telegram.handlers import MessageHandler, EditedMessageHandler
+from telegram.filters import command
 from io import BytesIO
 
 from bot import LOGGER, bot

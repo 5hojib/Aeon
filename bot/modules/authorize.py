@@ -1,5 +1,5 @@
-from pyrogram.handlers import MessageHandler
-from pyrogram.filters import command
+from telegram.handlers import MessageHandler
+from telegram.filters import command
 
 from bot import user_data, DATABASE_URL, bot
 from bot.helper.telegram_helper.message_utils import sendMessage

@@ -1,6 +1,6 @@
 from speedtest import Speedtest
-from pyrogram.handlers import MessageHandler
-from pyrogram.filters import command
+from telegram.handlers import MessageHandler
+from telegram.filters import command
 
 from bot import bot, LOGGER
 from bot.helper.telegram_helper.filters import CustomFilters

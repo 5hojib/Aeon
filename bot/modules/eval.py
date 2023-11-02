@@ -1,5 +1,5 @@
-from pyrogram.handlers import MessageHandler
-from pyrogram.filters import command
+from telegram.handlers import MessageHandler
+from telegram.filters import command
 from os import path as ospath, getcwd, chdir
 from aiofiles import open as aiopen
 from traceback import format_exc
