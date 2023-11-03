@@ -1,6 +1,6 @@
 from importlib import import_module
 
-from . import types, functions, base, core
+from pyrogram.raw import types, functions, base, core
 from pyrogram.raw.all import objects
 
 for k, v in objects.items():
