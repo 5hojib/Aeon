@@ -2,7 +2,7 @@ from io import BytesIO
 from json import dumps
 from typing import cast, List, Any, Union, Dict
 
-from ..all import objects
+from pyrogram.raw.all import objects
 
 
 class TLObject:
