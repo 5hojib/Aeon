@@ -189,8 +189,8 @@ def get_readable_message():
             msg += f"\nRatio: {download.ratio()}"
             msg += f"\nTime: {download.seeding_time()}"
         else:
-            msg += f"\n<blockquote>Size: {download.size()}"
-        msg += f"\nElapsed: {get_readable_time(time() - download.message.date.timestamp())}</blockquote"
+            msg += f"<blockquote>\nSize: {download.size()}"
+        msg += f"\nElapsed: {get_readable_time(time() - download.message.date.timestamp())}</blockquote>"
         msg += f"\n<blockquote>/stop_{download.gid()[:8]}</blockquote>\n\n"
     if len(msg) == 0:
         return None, None
