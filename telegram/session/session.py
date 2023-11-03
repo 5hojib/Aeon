@@ -13,7 +13,7 @@ from telegram.errors import (
     RPCError, InternalServerError, AuthKeyDuplicated, FloodWait, ServiceUnavailable, BadMsgNotification,
     SecurityCheckMismatch
 )
-from telegram.raw.all import layer
+from pyrogram.raw.all import layer
 from telegram.raw.core import TLObject, MsgContainer, Int, FutureSalts
 from .internals import MsgId, MsgFactory
 
