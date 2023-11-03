@@ -17,9 +17,9 @@ from signal import signal, SIGINT
 from aiofiles.os import path as aiopath, remove as aioremove
 from aiofiles import open as aiopen
 from psutil import disk_usage, cpu_percent, swap_memory, cpu_count, cpu_freq, virtual_memory, net_io_counters, boot_time
-from telegram.handlers import MessageHandler, CallbackQueryHandler
-from telegram.filters import command, private, regex
-from telegram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.handlers import MessageHandler, CallbackQueryHandler
+from pyrogram.filters import command, private, regex
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot import bot, config_dict, user_data, botStartTime, LOGGER, Interval, DATABASE_URL, QbInterval, scheduler, bot_name
 from .helper.ext_utils.fs_utils import start_cleanup, clean_all, exit_clean_up

@@ -2,8 +2,8 @@ from asyncio import sleep as asleep
 from aiofiles.os import path as aiopath, remove as aioremove, mkdir
 from telegraph import upload_file
 
-from telegram.handlers import MessageHandler, CallbackQueryHandler
-from telegram.filters import command, regex
+from pyrogram.handlers import MessageHandler, CallbackQueryHandler
+from pyrogram.filters import command, regex
 
 from bot import bot, LOGGER, config_dict, DATABASE_URL
 from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, deleteMessage

@@ -1,6 +1,6 @@
 from tzlocal import get_localzone
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from telegram import Client as tgClient, enums
+from pyrogram import Client as tgClient, enums
 from pymongo import MongoClient
 from asyncio import Lock
 from dotenv import load_dotenv, dotenv_values

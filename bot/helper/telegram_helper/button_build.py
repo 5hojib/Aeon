@@ -1,4 +1,4 @@
-from telegram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 class ButtonMaker:
     def __init__(self):

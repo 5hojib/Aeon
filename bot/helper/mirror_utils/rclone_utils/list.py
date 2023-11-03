@@ -2,8 +2,8 @@ from asyncio import wait_for, Event, wrap_future
 from aiofiles.os import path as aiopath
 from aiofiles import open as aiopen
 from configparser import ConfigParser
-from telegram.handlers import CallbackQueryHandler
-from telegram.filters import regex, user
+from pyrogram.handlers import CallbackQueryHandler
+from pyrogram.filters import regex, user
 from functools import partial
 from json import loads
 from time import time

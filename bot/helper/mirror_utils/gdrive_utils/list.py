@@ -1,5 +1,5 @@
-from telegram.handlers import MessageHandler, CallbackQueryHandler
-from telegram.filters import command, regex
+from pyrogram.handlers import MessageHandler, CallbackQueryHandler
+from pyrogram.filters import command, regex
 
 from bot import LOGGER, bot, config_dict
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper

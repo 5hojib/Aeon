@@ -1,5 +1,5 @@
-from telegram.handlers import MessageHandler
-from telegram.filters import command
+from pyrogram.handlers import MessageHandler
+from pyrogram.filters import command
 
 from bot import bot
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper

@@ -1,5 +1,5 @@
-from telegram.handlers import MessageHandler, CallbackQueryHandler
-from telegram.filters import command, regex
+from pyrogram.handlers import MessageHandler, CallbackQueryHandler
+from pyrogram.filters import command, regex
 from aiofiles.os import remove as aioremove, path as aiopath
 
 from bot import bot, aria2, download_dict, download_dict_lock, OWNER_ID, user_data, LOGGER

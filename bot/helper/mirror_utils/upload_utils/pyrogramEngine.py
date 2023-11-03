@@ -4,8 +4,8 @@ from aiofiles.os import remove as aioremove, path as aiopath, rename as aiorenam
 from os import walk, path as ospath
 from time import time
 from PIL import Image
-from telegram.types import InputMediaVideo, InputMediaDocument, InlineKeyboardMarkup
-from telegram.errors import FloodWait, RPCError, PeerIdInvalid, MessageNotModified, ChannelInvalid
+from pyrogram.types import InputMediaVideo, InputMediaDocument, InlineKeyboardMarkup
+from pyrogram.errors import FloodWait, RPCError, PeerIdInvalid, MessageNotModified, ChannelInvalid
 from asyncio import sleep
 from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type, RetryError
 from re import match as re_match, sub as re_sub

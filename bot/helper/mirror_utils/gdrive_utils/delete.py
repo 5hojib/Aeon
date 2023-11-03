@@ -1,5 +1,5 @@
-from telegram.handlers import MessageHandler
-from telegram.filters import command
+from pyrogram.handlers import MessageHandler
+from pyrogram.filters import command
 
 from bot import LOGGER, bot
 from bot.helper.telegram_helper.message_utils import one_minute_del, sendMessage, deleteMessage

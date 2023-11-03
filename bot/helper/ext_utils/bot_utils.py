@@ -19,9 +19,9 @@ from aiohttp import ClientSession as aioClientSession
 from psutil import virtual_memory, cpu_percent, disk_usage
 from requests import get as rget
 from mega import MegaApi
-from telegram.enums import ChatType
-from telegram.types import BotCommand
-from telegram.errors import PeerIdInvalid
+from pyrogram.enums import ChatType
+from pyrogram.types import BotCommand
+from pyrogram.errors import PeerIdInvalid
 
 from bot.helper.ext_utils.db_handler import DbManager
 from bot import OWNER_ID, bot_name, DATABASE_URL, LOGGER, get_client, aria2, download_dict, download_dict_lock, botStartTime, user_data, config_dict, bot_loop, extra_buttons, user

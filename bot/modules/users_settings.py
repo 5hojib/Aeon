@@ -1,6 +1,6 @@
 from datetime import datetime
-from telegram.handlers import MessageHandler, CallbackQueryHandler
-from telegram.filters import command, regex, create
+from pyrogram.handlers import MessageHandler, CallbackQueryHandler
+from pyrogram.filters import command, regex, create
 from aiofiles import open as aiopen
 from aiofiles.os import remove as aioremove, path as aiopath, mkdir
 from os import path as ospath, getcwd
