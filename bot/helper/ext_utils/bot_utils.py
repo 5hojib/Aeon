@@ -191,10 +191,10 @@ def get_readable_message():
             msg += f"\n<b>├ ʀᴀᴛɪᴏ : {download.ratio()}</b>"
             msg += f"\n<b>├ ᴛɪᴍᴇ : {download.seeding_time()}</b>"
         else:
-            chatid = str(download.message.chat.id)[4:]
+            #chatid = str(download.message.chat.id)[4:]
             msg += f"\n<b>├ sɪᴢᴇ : {download.size()}</b>"
         msg += f"\n<b>├ ᴇʟᴀᴘsᴇᴅ : {get_readable_time(time() - download.message.date.timestamp())}</b>"
-        msg += f'\n<b>├ sᴏᴜʀᴄᴇ : </b><a href="https://t.me/c/{chatid}/{download.message.message_id}">{download.message.from_user.first_name}</a></b>'
+        msg += f'\n<b>├ sᴏᴜʀᴄᴇ :  {download.message.from_user.mention(style='html')}</b>'
         msg += f"\n<b>└ ᴄᴀɴᴄʟᴇ : <code>/stop_{download.gid()[:8]}</code>\n\n"
     if len(msg) == 0:
         return None, None
