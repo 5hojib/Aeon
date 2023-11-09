@@ -173,7 +173,7 @@ def get_readable_message():
     for download in list(download_dict.values())[STATUS_START:STATUS_LIMIT+STATUS_START]:
         msg += f"<b>✓ ғɪʟᴇ ɴᴀᴍᴇ</b> :<code>{escape(f'{download.name()}')}</code>\n"
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
-            msg += f"\n<b>┌────❪ ᴏᴍɢ × ᴄʟᴏᴜᴅ ❫─────</b>"
+            msg += f"\n<b>┌────❪ ᴏᴍɢ × ᴄʟᴏᴜᴅ ❫─────༻</b>"
             msg += f"\n<b>├  [{progress_bar(download.progress())}] <code>{download.progress()}</code></b>"
             msg += f"\n<b>├  sᴛᴀᴛᴜs : <code>{download.status()}</code></b>"
             msg += f"\n<b>├  ᴅᴏɴᴇ : <code>{download.processed_bytes()} of {download.size()}</code></b>"
@@ -208,12 +208,12 @@ def get_readable_message():
                 up_speed += text_to_bytes(download.speed())
             elif tstatus == MirrorStatus.STATUS_SEEDING:
                 up_speed += text_to_bytes(download.upload_speed())
-    if tasks > STATUS_LIMIT:
-        buttons = ButtonMaker()
-        buttons.ibutton("⇇ ʙᴀᴄᴋ", "status pre")
-        buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
-        buttons.ibutton("ɴᴇxᴛ ⇉", "status nex")
-        button = buttons.build_menu(3)
+    #if tasks > STATUS_LIMIT:
+    #    buttons = ButtonMaker()
+    #    buttons.ibutton("⇇ ʙᴀᴄᴋ", "status pre")
+    #    buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
+    #    buttons.ibutton("ɴᴇxᴛ ⇉", "status nex")
+    #    button = buttons.build_menu(3)
     #msg += f"<b>• Tasks</b>: {tasks}{bmax_task}"
     #msg += f"\n<b>• Bot uptime</b>: {currentTime}"
     #msg += f"\n<b>• Free disk space</b>: {get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}"
@@ -224,8 +224,22 @@ def get_readable_message():
     msg += f"\n<b>├  ᴜᴘ :</b> {currentTime} | <b>ғʀᴇᴇ :</b> {get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}"
     msg += f"\n<b>├  ᴅʟ :</b> {get_readable_file_size(dl_speed)}/s | <b>ᴜʟ :</b> {get_readable_file_size(up_speed)}/s"
     msg += f"\n<b>└──────────────────༻</b>\n\n"
+    if tasks <= STATUS_LIMIT:
+        buttons = ButtonMaker()
+        buttons.ibutton(f"ᴘᴀɢᴇs\n{PAGE_NO}/{PAGES}", "status ref")
+        button = buttons.build_menu(1)
+    if tasks > STATUS_LIMIT:
+        return get_pages(msg)
     return msg, button
+  #  return msg, button
 
+def get_pages(msg):
+    buttons = ButtonMaker()
+    buttons.ibutton("⇇ ʙᴀᴄᴋ", "status pre")
+    buttons.ibutton(f"ᴘᴀɢᴇs\n{PAGE_NO}/{PAGES}", "status ref")
+    buttons.ibutton("ɴᴇxᴛ ⇉", "status nex")
+    button = buttons.build_menu(3)
+    return msg, button
 
 def text_to_bytes(size_text):
     size_text = size_text.lower()
