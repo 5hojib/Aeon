@@ -171,31 +171,31 @@ def get_readable_message():
         globals()['STATUS_START'] = STATUS_LIMIT * (PAGES - 1)
         globals()['PAGE_NO'] = PAGES
     for download in list(download_dict.values())[STATUS_START:STATUS_LIMIT+STATUS_START]:
-        msg += f"<code>{escape(f'{download.name()}')}</code>\n\n"
+        msg += f"<b>✓ ғɪʟᴇ ɴᴀᴍᴇ</b> :<code>{escape(f'{download.name()}')}</code>\n"
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
             msg += f"\n<b>┌────❪ ᴏᴍɢ × ᴄʟᴏᴜᴅ ❫─────</b>"
-            msg += f"\n<b>├ {progress_bar(download.progress())} {download.progress()}</b>"
-            msg += f"\n<b>├ sᴛᴀᴛᴜs : {download.status()}</b>"
-            msg += f"\n<b>├ ᴅᴏɴᴇ : {download.processed_bytes()} of {download.size()}</b>"
-            msg += f"\n<b>├ sᴘᴇᴇᴅ : {download.speed()}</b>"
-            msg += f'\n<b>├ ᴇsᴛɪᴍᴀᴛᴇᴅ : {download.eta()}</b>'
+            msg += f"\n<b>├  [{progress_bar(download.progress())}] <code>{download.progress()}</code></b>"
+            msg += f"\n<b>├  sᴛᴀᴛᴜs : <code>{download.status()}</code></b>"
+            msg += f"\n<b>├  ᴅᴏɴᴇ : <code>{download.processed_bytes()} of {download.size()}</code></b>"
+            msg += f"\n<b>├  sᴘᴇᴇᴅ : <code>{download.speed()}</code></b>"
+            msg += f'\n<b>├  ᴇsᴛɪᴍᴀᴛᴇᴅ : <code>{download.eta()}</code></b>'
             if hasattr(download, 'seeders_num'):
                 try:
-                    msg += f"\n<b>├ sᴇᴇᴅᴇʀs : {download.seeders_num()} | Leechers: {download.leechers_num()}</b>"
+                    msg += f"\n<b>├  sᴇᴇᴅᴇʀs : <code>{download.seeders_num()} | ʟᴇᴇᴄʜᴇʀs : {download.leechers_num()}</b>ʟᴇᴇᴄʜᴇʀs"
                 except:
                     pass
         elif download.status() == MirrorStatus.STATUS_SEEDING:
-            msg += f"\n<b>├ sɪᴢᴇ : {download.size()}</b>"
-            msg += f"\n<b>├ sᴘᴇᴇᴅ : {download.upload_speed()}</b>"
-            msg += f"\n<b>├ ᴜᴘʟᴏᴀᴅᴇᴅ : {download.uploaded_bytes()}</b>"
-            msg += f"\n<b>├ ʀᴀᴛɪᴏ : {download.ratio()}</b>"
-            msg += f"\n<b>├ ᴛɪᴍᴇ : {download.seeding_time()}</b>"
+            msg += f"\n<b>├  sɪᴢᴇ : <code>{download.size()}</code></b>"
+            msg += f"\n<b>├  sᴘᴇᴇᴅ : <code>{download.upload_speed()}</code></b>"
+            msg += f"\n<b>├  ᴜᴘʟᴏᴀᴅᴇᴅ : <code>{download.uploaded_bytes()}</code></b>"
+            msg += f"\n<b>├  ʀᴀᴛɪᴏ : <code>{download.ratio()}</code></b>"
+            msg += f"\n<b>├  ᴛɪᴍᴇ : <code>{download.seeding_time()}</code></b>"
         else:
             #chatid = str(download.message.chat.id)[4:]
-            msg += f"\n<b>├ sɪᴢᴇ : {download.size()}</b>"
-        msg += f"\n<b>├ ᴇʟᴀᴘsᴇᴅ : {get_readable_time(time() - download.message.date.timestamp())}</b>"
-        msg += f"\n<b>├ sᴏᴜʀᴄᴇ :  {download.message.from_user.mention(style='html')}</b>"
-        msg += f"\n<b>└ ᴄᴀɴᴄʟᴇ : <code>/stop_{download.gid()[:8]}</code>\n\n"
+            msg += f"\n<b>├  sɪᴢᴇ : <code>{download.size()}</code></b>"
+        msg += f"\n<b>├  ᴇʟᴀᴘsᴇᴅ : <code>{get_readable_time(time() - download.message.date.timestamp())}</code></b>"
+        msg += f"\n<b>├  sᴏᴜʀᴄᴇ :  {download.message.from_user.mention(style='html')}</b>"
+        msg += f"\n<b>└  ᴄᴀɴᴄʟᴇ : <code>/stop_{download.gid()[:8]}</code></b>\n\n"
     if len(msg) == 0:
         return None, None
     dl_speed = 0
@@ -214,11 +214,15 @@ def get_readable_message():
         buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
         buttons.ibutton("Next", "status nex")
         button = buttons.build_menu(3)
+    #msg += f"<b>• Tasks</b>: {tasks}{bmax_task}"
+    #msg += f"\n<b>• Bot uptime</b>: {currentTime}"
+    #msg += f"\n<b>• Free disk space</b>: {get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}"
+    #msg += f"\n<b>• Uploading speed</b>: {get_readable_file_size(up_speed)}/s"
+    #msg += f"\n<b>• Downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
     msg += f"<b>• Tasks</b>: {tasks}{bmax_task}"
-    msg += f"\n<b>• Bot uptime</b>: {currentTime}"
-    msg += f"\n<b>• Free disk space</b>: {get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}"
-    msg += f"\n<b>• Uploading speed</b>: {get_readable_file_size(up_speed)}/s"
-    msg += f"\n<b>• Downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
+    msg += f"<b>🟢 UP:</b> {currentTime} | <b>💿 FREE:</b> {get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}"
+    #msg += f"\n<b>🎮 RAM:</b> {virtual_memory().percent}% | <b>🟢 UP:</b> {currentTime}"
+    msg += f"\n<b>🔽 DL:</b> {get_readable_file_size(dl_speed)}/s | <b>🔼 UL:</b> {get_readable_file_size(up_speed)}/s\n\n"
     return msg, button
 
 
