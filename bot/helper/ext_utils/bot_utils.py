@@ -219,10 +219,11 @@ def get_readable_message():
     #msg += f"\n<b>• Free disk space</b>: {get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}"
     #msg += f"\n<b>• Uploading speed</b>: {get_readable_file_size(up_speed)}/s"
     #msg += f"\n<b>• Downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
-    msg += f"<b>• Tasks</b>: {tasks}{bmax_task}"
-    msg += f"<b>🟢 UP:</b> {currentTime} | <b>💿 FREE:</b> {get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}"
-    #msg += f"\n<b>🎮 RAM:</b> {virtual_memory().percent}% | <b>🟢 UP:</b> {currentTime}"
-    msg += f"\n<b>🔽 DL:</b> {get_readable_file_size(dl_speed)}/s | <b>🔼 UL:</b> {get_readable_file_size(up_speed)}/s\n\n"
+    msg += f"<b>┌──────────────────༻</b>"
+    msg += f"\n<b>├  ᴛᴀsᴋs</b>: {tasks}{bmax_task}"
+    msg += f"\n<b>├  ᴜᴘ :</b> {currentTime} | <b>ғʀᴇᴇ :</b> {get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}"
+    msg += f"\n<b>├  ᴅʟ :</b> {get_readable_file_size(dl_speed)}/s | <b>ᴜʟ :</b> {get_readable_file_size(up_speed)}/s"
+    msg += f"<b>└──────────────────༻</b>\n\n"
     return msg, button
 
 
