@@ -47,6 +47,7 @@ queue_dict_lock = Lock()
 qb_listener_lock = Lock()
 status_reply_dict = {}
 download_dict = {}
+bot_cache = {}
 rss_dict = {}
 
 BOT_TOKEN = environ.get('BOT_TOKEN', '')
