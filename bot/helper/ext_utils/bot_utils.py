@@ -160,6 +160,7 @@ def get_readable_message():
     msg = ''
     button = None
     tasks = len(download_dict)
+    chatid = str(download.message.chat.id)[4:]
     currentTime = get_readable_time(time() - botStartTime)
     if config_dict['BOT_MAX_TASKS']:
         bmax_task = f"/{config_dict['BOT_MAX_TASKS']}"
