@@ -307,8 +307,14 @@ async def forcesub(message, ids, button=None):
     return _msg, button
 
 
-async def user_info(client, userId):
-    return await client.get_users(userId)
+#async def user_info(client, userId):
+#    return await client.get_users(userId)
+
+async def user_info(user_id):
+    try:
+        return await bot.get_users(user_id)
+    except Exception:
+        return ''
 
 
 async def BotPm_check(message, button=None):
