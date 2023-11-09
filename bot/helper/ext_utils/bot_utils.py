@@ -160,7 +160,7 @@ def get_readable_message():
     msg = ''
     button = None
     tasks = len(download_dict)
-    chatid = str(download.message.chat.id)[4:]
+    #chatid = str(download.message.chat.id)[4:]
     currentTime = get_readable_time(time() - botStartTime)
     if config_dict['BOT_MAX_TASKS']:
         bmax_task = f"/{config_dict['BOT_MAX_TASKS']}"
@@ -191,6 +191,7 @@ def get_readable_message():
             msg += f"\n<b>├ ʀᴀᴛɪᴏ : {download.ratio()}</b>"
             msg += f"\n<b>├ ᴛɪᴍᴇ : {download.seeding_time()}</b>"
         else:
+            chatid = str(download.message.chat.id)[4:]
             msg += f"\n<b>├ sɪᴢᴇ : {download.size()}</b>"
         msg += f"\n<b>├ ᴇʟᴀᴘsᴇᴅ : {get_readable_time(time() - download.message.date.timestamp())}</b>"
         msg += f'\n<b>├ sᴏᴜʀᴄᴇ : </b><a href="https://t.me/c/{chatid}/{download.message.message_id}">{download.message.from_user.first_name}</a></b>'
