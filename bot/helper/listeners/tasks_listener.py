@@ -348,7 +348,7 @@ class MirrorLeechListener:
         LOGGER.info(f'Task Done: {name}')
         buttons = ButtonMaker()
         iButton = ButtonMaker()
-        iButton.ubutton(f'🔥 Omg x Cloud 🔥', f"https://t.me/OMGxCLOUD")
+        iButton.ubutton('🔥 Omg x Cloud 🔥', "https://t.me/OMGxCLOUD")
         iButton.ibutton('🤖 View in Bot Pm 🤖', f"aeon {user_id} botpm", 'header')
         iButton = extra_btns(iButton)
         if self.isLeech:

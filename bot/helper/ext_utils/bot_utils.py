@@ -221,7 +221,7 @@ def get_readable_message():
     #msg += f"\n<b>• Free disk space</b>: {get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}"
     #msg += f"\n<b>• Uploading speed</b>: {get_readable_file_size(up_speed)}/s"
     #msg += f"\n<b>• Downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
-    msg += f"<b>┌────❪ ʙᴏᴛ sᴛᴀᴛᴜs ❫─────༻</b>"
+    msg += "<b>┌────❪ ʙᴏᴛ sᴛᴀᴛᴜs ❫─────༻</b>"
     msg += f"\n<b>├  ᴛᴀsᴋs</b> : <code>{tasks}{bmax_task}</code>"
     msg += f"\n<b>├  ᴜᴘ :</b> <code>{currentTime}</code> | <b>ғʀᴇᴇ :</b> <code>{get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}</code>"
     msg += f"\n<b>├  ᴅʟ :</b> <code>{get_readable_file_size(dl_speed)}/s</code> | <b>ᴜʟ :</b> <code>{get_readable_file_size(up_speed)}/s</code>"
@@ -230,9 +230,7 @@ def get_readable_message():
         buttons = ButtonMaker()
         buttons.ibutton(f"ᴘᴀɢᴇs\n{PAGE_NO}/{PAGES}", "status ref")
         button = buttons.build_menu(1)
-    if tasks > STATUS_LIMIT:
-        return get_pages(msg)
-    return msg, button
+    return get_pages(msg) if tasks > STATUS_LIMIT else (msg, button)
   #  return msg, button
 
 def get_pages(msg):
