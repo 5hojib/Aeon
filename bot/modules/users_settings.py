@@ -40,48 +40,13 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
     rclone_path = f'tanha/{user_id}.conf'
     user_dict = user_data.get(user_id, {})
     if key is None:
-        buttons.ibutton("Universal", f"userset {user_id} universal")
-        buttons.ibutton("Mirror", f"userset {user_id} mirror")
+        #buttons.ibutton("Universal", f"userset {user_id} universal")
+        #buttons.ibutton("Mirror", f"userset {user_id} mirror")
         buttons.ibutton("Leech", f"userset {user_id} leech")
         if user_dict and any(key in user_dict for key in ['prefix', 'suffix', 'remname', 'ldump', 'yt_opt', 'media_group', 'rclone', 'thumb', 'as_doc']):
             buttons.ibutton("Reset Setting", f"userset {user_id} reset_all")
         buttons.ibutton("Close", f"userset {user_id} close")
         text = f'<b>User Settings for {name}</b>'
-        button = buttons.build_menu(2)
-    elif key == 'universal':
-        buttons.ibutton("YT-DLP Options", f"userset {user_id} yt_opt")
-        ytopt = 'Not Exists' if (val:=user_dict.get('yt_opt', config_dict.get('YT_DLP_OPTIONS', ''))) == '' else val
-        buttons.ibutton("Prefix", f"userset {user_id} prefix")
-        prefix = user_dict.get('prefix', 'Not Exists')
-
-        buttons.ibutton("Suffix", f"userset {user_id} suffix")
-        suffix = user_dict.get('suffix', 'Not Exists')
-
-        buttons.ibutton("Remname", f"userset {user_id} remname")
-        remname = user_dict.get('remname', 'Not Exists')
-
-
-        text = f'<b>Universal Settings for {name}</b>\n\n'
-        text += f'<b>• YT-DLP Options:</b> <b><code>{ytopt}</code></b>\n'
-        text += f'<b>• Prefix:</b> <code>{prefix}</code>\n'
-        text += f'<b>• Suffix:</b> <code>{suffix}</code>\n'
-        text += f'<b>• Remname:</b> <code>{remname}</code>'
-        buttons.ibutton("Back", f"userset {user_id} back", "footer")
-        buttons.ibutton("Close", f"userset {user_id} close", "footer")
-        button = buttons.build_menu(2)
-    elif key == 'mirror':
-        buttons.ibutton("RClone", f"userset {user_id} rcc")
-        rccmsg = "Exists" if await aiopath.exists(rclone_path) else "Not Exists"
-        tds_mode = "Enabled" if user_dict.get('td_mode') else "Disabled"
-        user_tds = len(val) if (val := user_dict.get('user_tds', False)) else 0
-        buttons.ibutton("User TDs", f"userset {user_id} user_tds")
-
-        text = f'<b>Mirror Settings for {name}</b>\n\n'
-        text += f'<b>• Rclone Config:</b> {rccmsg}\n'
-        text += f'<b>• User TD Mode:</b> {tds_mode}'
-
-        buttons.ibutton("Back", f"userset {user_id} back", "footer")
-        buttons.ibutton("Close", f"userset {user_id} close", "footer")
         button = buttons.build_menu(2)
     elif key == 'leech':
         if user_dict.get('as_doc', False) or 'as_doc' not in user_dict and config_dict['AS_DOCUMENT']:
@@ -109,6 +74,21 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
 
         buttons.ibutton("Leech Dump", f"userset {user_id} ldump")
         ldump = 'Not Exists' if (val:=user_dict.get('ldump', '')) == '' else val
+        buttons.ibutton("YT-DLP Options", f"userset {user_id} yt_opt")
+        ytopt = 'Not Exists' if (val:=user_dict.get('yt_opt', config_dict.get('YT_DLP_OPTIONS', ''))) == '' else val
+        buttons.ibutton("Prefix", f"userset {user_id} prefix")
+        prefix = user_dict.get('prefix', 'Not Exists')
+
+        buttons.ibutton("Suffix", f"userset {user_id} suffix")
+        suffix = user_dict.get('suffix', 'Not Exists')
+
+        buttons.ibutton("Remname", f"userset {user_id} remname")
+        remname = user_dict.get('remname', 'Not Exists')
+        buttons.ibutton("RClone", f"userset {user_id} rcc")
+        rccmsg = "Exists" if await aiopath.exists(rclone_path) else "Not Exists"
+        tds_mode = "Enabled" if user_dict.get('td_mode') else "Disabled"
+        user_tds = len(val) if (val := user_dict.get('user_tds', False)) else 0
+        buttons.ibutton("User TDs", f"userset {user_id} user_tds")
 
         SPLIT_SIZE = '4GB' if IS_PREMIUM_USER else '2GB'
         text = f'<b>Leech Settings for {name}</b>\n\n'
@@ -118,6 +98,12 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         text += f'<b>• Media Group:</b> {media_group}\n'
         text += f'<b>• Leech Caption:</b> <code>{escape(lcaption)}</code>\n'
         text += f'<b>• Leech Dump:</b> <code>{ldump}</code>\n'
+        text += f'<b>• YT-DLP Options:</b> <b><code>{ytopt}</code></b>\n'
+        text += f'<b>• Prefix:</b> <code>{prefix}</code>\n'
+        text += f'<b>• Suffix:</b> <code>{suffix}</code>\n'
+        text += f'<b>• Rclone Config:</b> {rccmsg}\n'
+        text += f'<b>• User TD Mode:</b> {tds_mode}\n'
+        text += f'<b>• Remname:</b> <code>{remname}</code>\n'
         text += f'<b>• MediaInfo Mode:</b> <code>{mediainfo}</code>'
 
         buttons.ibutton("Back", f"userset {user_id} back", "footer")
@@ -187,7 +173,7 @@ async def set_yt_options(client, message, pre_event):
     value = message.text
     update_user_ldata(user_id, 'yt_opt', value)
     await message.delete()
-    await update_user_settings(pre_event, 'yt_opt', 'universal')
+    await update_user_settings(pre_event, 'yt_opt', 'leech')
     if DATABASE_URL:
         await DbManager().update_user_data(user_id)
 
@@ -215,7 +201,7 @@ async def set_custom(client, message, pre_event, key):
                 if await sync_to_async(GoogleDriveHelper().getFolderData, td_details[1]):
                     user_tds[td_details[0]] = {'drive_id': td_details[1],'index_link': td_details[2].rstrip('/') if len(td_details) > 2 else ''}
         value = user_tds
-        return_key = 'mirror'
+        return_key = 'leech'
     update_user_ldata(user_id, n_key, value)
     await message.delete()
     await update_user_settings(pre_event, key, return_key, msg=message)
@@ -250,7 +236,7 @@ async def add_rclone(client, message, pre_event):
     await message.download(file_name=des_dir)
     update_user_ldata(user_id, 'rclone', f'tanha/{user_id}.conf')
     await message.delete()
-    await update_user_settings(pre_event, 'rcc', 'mirror')
+    await update_user_settings(pre_event, 'rcc', 'leech')
     if DATABASE_URL:
         await DbManager().update_user_doc(user_id, 'rclone', des_dir)
 
@@ -290,7 +276,7 @@ async def edit_user_settings(client, query):
     user_dict = user_data.get(user_id, {})
     if user_id != int(data[1]):
         await query.answer("Not Yours!", show_alert=True)
-    elif data[2] in ['universal', 'mirror', 'leech']:
+    elif data[2] in ['leech']:
         await query.answer()
         await update_user_settings(query, data[2])
     elif data[2] == "doc":
@@ -313,7 +299,7 @@ async def edit_user_settings(client, query):
             await query.answer('User TDs Successfully Send in your PM', show_alert=True)
         except:
             await query.answer('Start the Bot in PM (Private) and Try Again', show_alert=True)
-        await update_user_settings(query, 'user_tds', 'mirror')
+        await update_user_settings(query, 'user_tds', 'leech')
     elif data[2] == "dthumb":
         handler_dict[user_id] = False
         if await aiopath.exists(thumb_path):
@@ -337,16 +323,16 @@ async def edit_user_settings(client, query):
     elif data[2] == 'yt_opt':
         await query.answer()
         edit_mode = len(data) == 4
-        await update_user_settings(query, data[2], 'universal', edit_mode)
+        await update_user_settings(query, data[2], 'leech', edit_mode)
         if not edit_mode: return
         pfunc = partial(set_yt_options, pre_event=query)
-        rfunc = partial(update_user_settings, query, data[2], 'universal')
+        rfunc = partial(update_user_settings, query, data[2], 'leech')
         await event_handler(client, query, pfunc, rfunc)
     elif data[2] == 'dyt_opt':
         handler_dict[user_id] = False
         await query.answer()
         update_user_ldata(user_id, 'yt_opt', '')
-        await update_user_settings(query, 'yt_opt', 'universal')
+        await update_user_settings(query, 'yt_opt', 'leech')
         if DATABASE_URL:
             await DbManager().update_user_data(user_id)
     elif data[2] == 'td_mode':
@@ -355,7 +341,7 @@ async def edit_user_settings(client, query):
             return await query.answer("Set UserTD first to Enable User TD Mode !", show_alert=True)
         await query.answer()
         update_user_ldata(user_id, data[2], not user_dict.get(data[2], False))
-        await update_user_settings(query, 'user_tds', 'mirror')
+        await update_user_settings(query, 'user_tds', 'leech')
         if DATABASE_URL:
             await DbManager().update_user_data(user_id)
     elif data[2] == 'mediainfo':
@@ -377,10 +363,10 @@ async def edit_user_settings(client, query):
     elif data[2] == 'rcc':
         await query.answer()
         edit_mode = len(data) == 4
-        await update_user_settings(query, data[2], 'mirror', edit_mode)
+        await update_user_settings(query, data[2], 'leech', edit_mode)
         if not edit_mode: return
         pfunc = partial(add_rclone, pre_event=query)
-        rfunc = partial(update_user_settings, query, data[2], 'mirror')
+        rfunc = partial(update_user_settings, query, data[2], 'leech')
         await event_handler(client, query, pfunc, rfunc, document=True)
     elif data[2] == 'drcc':
         handler_dict[user_id] = False
@@ -388,7 +374,7 @@ async def edit_user_settings(client, query):
             await query.answer()
             await aioremove(rclone_path)
             update_user_ldata(user_id, 'rclone', '')
-            await update_user_settings(query, 'rcc', 'mirror')
+            await update_user_settings(query, 'rcc', 'leech')
             if DATABASE_URL:
                 await DbManager().update_user_doc(user_id, 'rclone')
         else:
@@ -398,19 +384,19 @@ async def edit_user_settings(client, query):
         handler_dict[user_id] = False
         await query.answer()
         edit_mode = len(data) == 4
-        await update_user_settings(query, data[2], 'mirror', edit_mode)
+        await update_user_settings(query, data[2], 'leech', edit_mode)
         if not edit_mode: return
         pfunc = partial(set_custom, pre_event=query, key=data[2])
-        rfunc = partial(update_user_settings, query, data[2], 'mirror')
+        rfunc = partial(update_user_settings, query, data[2], 'leech')
         await event_handler(client, query, pfunc, rfunc)
     elif data[2] in ['prefix', 'suffix', 'remname']:
         handler_dict[user_id] = False
         await query.answer()
         edit_mode = len(data) == 4
-        await update_user_settings(query, data[2], 'universal', edit_mode)
+        await update_user_settings(query, data[2], 'leech', edit_mode)
         if not edit_mode: return
         pfunc = partial(set_custom, pre_event=query, key=data[2])
-        rfunc = partial(update_user_settings, query, data[2], 'universal')
+        rfunc = partial(update_user_settings, query, data[2], 'leech')
         await event_handler(client, query, pfunc, rfunc)
     elif data[2] in ['lcaption', 'ldump']:
         handler_dict[user_id] = False
@@ -432,7 +418,7 @@ async def edit_user_settings(client, query):
         handler_dict[user_id] = False
         await query.answer()
         update_user_ldata(user_id, data[2][1:], '')
-        await update_user_settings(query, data[2][1:], 'universal')
+        await update_user_settings(query, data[2][1:], 'leech')
         if DATABASE_URL:
             await DbManager().update_user_data(user_id)
     elif data[2] == 'duser_tds':
@@ -441,7 +427,7 @@ async def edit_user_settings(client, query):
         update_user_ldata(user_id, data[2][1:], {})
         if data[2] == 'duser_tds':
             update_user_ldata(user_id, 'td_mode', False)
-        await update_user_settings(query, data[2][1:], 'mirror')
+        await update_user_settings(query, data[2][1:], 'leech')
         if DATABASE_URL:
             await DbManager().update_user_data(user_id)
     elif data[2] == 'back':
