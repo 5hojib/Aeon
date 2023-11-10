@@ -143,13 +143,15 @@ async def fetch_user_tds(user_id, force=False):
 
 
 def progress_bar(pct):
-    if isinstance(pct, str):
-        pct = float(pct.strip('%'))
+    pct = float(str(pct).strip('%'))
     p = min(max(pct, 0), 100)
-    cFull = int((p + 5)// 10)
+    cFull = int(p // 8)
+    cPart = int(p % 8 - 1)
     p_str = '●' * cFull
-    p_str += '○' * (10 - cFull)
-    return p_str
+    if cPart >= 0:
+        p_str += ['◐', '◑', '◒', '◓', '◔', '◕', '●'][cPart]
+    p_str += '○' * (12 - cFull)
+    return f"[{p_str}]"
 
 
 def source(self):
@@ -171,7 +173,7 @@ def get_readable_message():
         globals()['STATUS_START'] = STATUS_LIMIT * (PAGES - 1)
         globals()['PAGE_NO'] = PAGES
     for download in list(download_dict.values())[STATUS_START:STATUS_LIMIT+STATUS_START]:
-        msg += f"<b>✓ ғɪʟᴇ ɴᴀᴍᴇ</b> :<code>{escape(f'{download.name()}')}</code>\n"
+        msg += f"<b>✓ ғɪʟᴇ ɴᴀᴍᴇ</b> : <code>{escape(f'{download.name()}')}</code>\n"
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
             msg += f"\n<b>┌────❪ ᴏᴍɢ × ᴄʟᴏᴜᴅ ❫─────༻</b>"
             msg += f"\n<b>├  [{progress_bar(download.progress())}] <code>{download.progress()}</code></b>"
@@ -220,9 +222,9 @@ def get_readable_message():
     #msg += f"\n<b>• Uploading speed</b>: {get_readable_file_size(up_speed)}/s"
     #msg += f"\n<b>• Downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
     msg += f"<b>┌────❪ ʙᴏᴛ sᴛᴀᴛᴜs ❫─────༻</b>"
-    msg += f"\n<b>├  ᴛᴀsᴋs</b>: {tasks}{bmax_task}"
-    msg += f"\n<b>├  ᴜᴘ :</b> {currentTime} | <b>ғʀᴇᴇ :</b> {get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}"
-    msg += f"\n<b>├  ᴅʟ :</b> {get_readable_file_size(dl_speed)}/s | <b>ᴜʟ :</b> {get_readable_file_size(up_speed)}/s"
+    msg += f"\n<b>├  ᴛᴀsᴋs</b> : <code>{tasks}{bmax_task}</code>"
+    msg += f"\n<b>├  ᴜᴘ :</b> <code>{currentTime}</code> | <b>ғʀᴇᴇ :</b> <code>{get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}</code>"
+    msg += f"\n<b>├  ᴅʟ :</b> <code>{get_readable_file_size(dl_speed)}/s</code> | <b>ᴜʟ :</b> <code>{get_readable_file_size(up_speed)}/s</code>"
     msg += f"\n<b>└──────────────────༻</b>\n\n"
     if tasks <= STATUS_LIMIT:
         buttons = ButtonMaker()
