@@ -148,7 +148,7 @@ if len(EXTENSION_FILTER) > 0:
         x = x.lstrip('.')
         GLOBAL_EXTENSION_FILTER.append(x.strip().lower())
 
-IS_PREMIUM_USER = False
+IS_PREMIUM_USER = True 
 user = ''
 USER_SESSION_STRING = environ.get('USER_SESSION_STRING', '')
 if len(USER_SESSION_STRING) != 0:
