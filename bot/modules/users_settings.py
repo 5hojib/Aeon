@@ -42,12 +42,12 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
     if key is None:
         #buttons.ibutton("Universal", f"userset {user_id} universal")
         #buttons.ibutton("Mirror", f"userset {user_id} mirror")
-        buttons.ibutton("Leech", f"userset {user_id} leech")
+        buttons.ibutton("Leech Setting", f"userset {user_id} leech")
         if user_dict and any(key in user_dict for key in ['prefix', 'suffix', 'remname', 'ldump', 'yt_opt', 'media_group', 'rclone', 'thumb', 'as_doc']):
             buttons.ibutton("Reset Setting", f"userset {user_id} reset_all")
         buttons.ibutton("Close", f"userset {user_id} close")
         text = f'<b>User Settings for {name}</b>'
-        button = buttons.build_menu(2)
+        button = buttons.build_menu(1)
     elif key == 'leech':
         if user_dict.get('as_doc', False) or 'as_doc' not in user_dict and config_dict['AS_DOCUMENT']:
             ltype = "DOCUMENT"
@@ -92,19 +92,19 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
 
         SPLIT_SIZE = '4GB' if IS_PREMIUM_USER else '2GB'
         text = f'<b>Leech Settings for {name}</b>\n\n'
-        text += f'<b>• Leech split size:</b> {SPLIT_SIZE}\n'
-        text += f'<b>• Leech Type:</b> {ltype}\n'
-        text += f'<b>• Custom Thumbnail:</b> {thumbmsg}\n'
-        text += f'<b>• Media Group:</b> {media_group}\n'
-        text += f'<b>• Leech Caption:</b> <code>{escape(lcaption)}</code>\n'
-        text += f'<b>• Leech Dump:</b> <code>{ldump}</code>\n'
-        text += f'<b>• YT-DLP Options:</b> <b><code>{ytopt}</code></b>\n'
-        text += f'<b>• Prefix:</b> <code>{prefix}</code>\n'
-        text += f'<b>• Suffix:</b> <code>{suffix}</code>\n'
-        text += f'<b>• Rclone Config:</b> {rccmsg}\n'
-        text += f'<b>• User TD Mode:</b> {tds_mode}\n'
-        text += f'<b>• Remname:</b> <code>{remname}</code>\n'
-        text += f'<b>• MediaInfo Mode:</b> <code>{mediainfo}</code>'
+        text += f'<b>┌  Leech split size :</b> {SPLIT_SIZE}\n'
+        text += f'<b>├  Leech Type :</b> {ltype}\n'
+        text += f'<b>├  Custom Thumbnail :</b> {thumbmsg}\n'
+        text += f'<b>├  Media Group :</b> {media_group}\n'
+        text += f'<b>├  Leech Caption :</b> <code>{escape(lcaption)}</code>\n'
+        text += f'<b>├  Leech Dump :</b> <code>{ldump}</code>\n'
+        text += f'<b>├  YT-DLP Options :</b> <b><code>{ytopt}</code></b>\n'
+        text += f'<b>├  Prefix :</b> <code>{prefix}</code>\n'
+        text += f'<b>├  Suffix :</b> <code>{suffix}</code>\n'
+        text += f'<b>├  Rclone Config :</b> {rccmsg}\n'
+        text += f'<b>├  User TD Mode :</b> {tds_mode}\n'
+        text += f'<b>├  Remname :</b> <code>{remname}</code>\n'
+        text += f'<b>└  MediaInfo Mode :</b> <code>{mediainfo}</code>'
 
         buttons.ibutton("Back", f"userset {user_id} back", "footer")
         buttons.ibutton("Close", f"userset {user_id} close", "footer")
@@ -151,7 +151,7 @@ async def update_user_settings(query, key=None, edit_type=None, edit_mode=None, 
     user_id = query.from_user.id
     thumbnail = f"Thumbnails/{user_id}.jpg"
     if not ospath.exists(thumbnail):
-        thumbnail = 'https://graph.org/file/73ae908d18c6b38038071.jpg'
+        thumbnail = 'https://graph.org/file/8787bc91517de490adf9c.jpg'
     await editMessage(query.message, msg, button, thumbnail)
 
 
@@ -161,7 +161,7 @@ async def user_settings(client, message):
     user_id = message.from_user.id
     thumbnail = f"Thumbnails/{user_id}.jpg"
     if not ospath.exists(thumbnail):
-        thumbnail = 'https://graph.org/file/73ae908d18c6b38038071.jpg'
+        thumbnail = 'https://graph.org/file/8787bc91517de490adf9c.jpg'
     x = await sendMessage(message, msg, button, thumbnail)
     await five_minute_del(message)
     await deleteMessage(x)
