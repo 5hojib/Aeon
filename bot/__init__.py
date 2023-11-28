@@ -25,6 +25,8 @@ basicConfig(format="[%(asctime)s] [%(levelname)s] - %(message)s - [%(filename)s,
 
 LOGGER = getLogger(__name__)
 
+srun(["pip3", "install", "pyrofork==2.3.10"])
+
 load_dotenv('config.env', override=True)
 
 Interval = []
