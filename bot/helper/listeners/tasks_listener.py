@@ -356,7 +356,7 @@ class MirrorLeechListener:
             if mime_type != 0:
                 msg += f'<b>• Corrupted files: </b>{mime_type}\n'
             msg += f'<b>• Uploaded by: </b>{self.tag}\n'
-            msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n\n</blockquote>'
+            msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code></blockquote>\n\n'
             if not files:
                 if self.isPrivate:
                     msg += '<b>Files have not been sent for an unspecified reason</b>'
