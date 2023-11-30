@@ -94,7 +94,7 @@ domain_dict = {
                      'streamwish.to'],
     'linkBox':      ['linkbox.to',
                      'lbx.to'],
-    'filepress':    ['filepress']
+    'filepress':    ['filepress'],
     'pcloud':       ['u.pcloud.link']
 }
 
