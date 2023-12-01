@@ -164,8 +164,8 @@ async def AeonCallback(_, query):
                 if ind == len(logFileLines): 
                     break
                 ind += 1
-            startLine = f"<b>Showing last {ind} lines from log.txt:</b> \n\n```Python\n"
-            endLine = "\n```<b>END LOG</b>"
+            startLine = f"<b>Showing last {ind} lines from log.txt:</b> \n\n<pre language="python">\n"
+            endLine = "\n</pre><b>END LOG</b>"
             btn = ButtonMaker()
             btn.ibutton('Close', f'aeon {user_id} close')
             reply_message = await sendMessage(message, startLine + escape(Loglines) + endLine, btn.build_menu(1))
