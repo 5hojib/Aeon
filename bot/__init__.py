@@ -59,7 +59,6 @@ queue_dict_lock = Lock()
 qb_listener_lock = Lock()
 status_reply_dict = {}
 download_dict = {}
-rss_dict = {}
 
 BOT_TOKEN = environ.get('BOT_TOKEN', '')
 if len(BOT_TOKEN) == 0:
@@ -176,7 +175,6 @@ MAX_SPLIT_SIZE = 4194304000 if IS_PREMIUM_USER else 2097152000
 MEGA_EMAIL = environ.get('MEGA_EMAIL', '')
 MEGA_PASSWORD = environ.get('MEGA_PASSWORD', '')
 if len(MEGA_EMAIL) == 0 or len(MEGA_PASSWORD) == 0:
-    warning('MEGA Credentials not provided!')
     MEGA_EMAIL = ''
     MEGA_PASSWORD = ''
 
@@ -214,12 +212,6 @@ if len(LEECH_DUMP_ID) == 0:
     LEECH_DUMP_ID = ''
 
 CMD_SUFFIX = environ.get('CMD_SUFFIX', '')
-
-RSS_CHAT_ID = environ.get('RSS_CHAT_ID', '')
-RSS_CHAT_ID = '' if len(RSS_CHAT_ID) == 0 else int(RSS_CHAT_ID)
-
-RSS_DELAY = environ.get('RSS_DELAY', '')
-RSS_DELAY = 900 if len(RSS_DELAY) == 0 else int(RSS_DELAY)
 
 TORRENT_TIMEOUT = environ.get('TORRENT_TIMEOUT', '')
 TORRENT_TIMEOUT = 3000 if len(TORRENT_TIMEOUT) == 0 else int(TORRENT_TIMEOUT)
@@ -350,8 +342,6 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'QUEUE_UPLOAD': QUEUE_UPLOAD,
                'RCLONE_FLAGS': RCLONE_FLAGS,
                'RCLONE_PATH': RCLONE_PATH,
-               'RSS_CHAT_ID': RSS_CHAT_ID,
-               'RSS_DELAY': RSS_DELAY,
                'SEARCH_API_LINK': SEARCH_API_LINK,
                'SEARCH_LIMIT': SEARCH_LIMIT,
                'SET_COMMANDS': SET_COMMANDS,

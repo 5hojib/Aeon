@@ -155,21 +155,6 @@ async def sendFile(message, file, caption=None, buttons=None):
         return str(e)
 
 
-async def sendRss(text):
-    try:
-        if user:
-            return await user.send_message(chat_id=config_dict['RSS_CHAT_ID'], text=text, disable_web_page_preview=True, disable_notification=True)
-        else:
-            return await bot.send_message(chat_id=config_dict['RSS_CHAT_ID'], text=text, disable_web_page_preview=True, disable_notification=True)
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
-        return await sendRss(text)
-    except Exception as e:
-        LOGGER.error(str(e))
-        return str(e)
-
-
 async def deleteMessage(message):
     try:
         await message.delete()

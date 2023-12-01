@@ -23,13 +23,11 @@ from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.ext_utils.task_manager import start_from_queued
 from bot.helper.ext_utils.text_utils import bset_display_dict
 from bot.modules.torrent_search import initiate_search_tools
-from bot.modules.rss import addJob
 
 START = 0
 STATE = 'view'
 handler_dict = {}
 default_values = {'DEFAULT_UPLOAD': 'gd',
-                  'RSS_DELAY': 900,
                   'SEARCH_LIMIT': 0,
                   'UPSTREAM_BRANCH': 'main',
                   'TORRENT_TIMEOUT': 3000}
@@ -140,12 +138,6 @@ async def load_config():
     LEECH_DUMP_ID = environ.get('LEECH_DUMP_ID', '')
     if len(LEECH_DUMP_ID) == 0: 
         LEECH_DUMP_ID = ''
-
-    RSS_CHAT_ID = environ.get('RSS_CHAT_ID', '')
-    RSS_CHAT_ID = '' if len(RSS_CHAT_ID) == 0 else int(RSS_CHAT_ID)
-
-    RSS_DELAY = environ.get('RSS_DELAY', '')
-    RSS_DELAY = 900 if len(RSS_DELAY) == 0 else int(RSS_DELAY)
 
     CMD_SUFFIX = environ.get('CMD_SUFFIX', '')
 
@@ -342,8 +334,6 @@ async def load_config():
                         'QUEUE_UPLOAD': QUEUE_UPLOAD,
                         'RCLONE_FLAGS': RCLONE_FLAGS,
                         'RCLONE_PATH': RCLONE_PATH,
-                        'RSS_CHAT_ID': RSS_CHAT_ID,
-                        'RSS_DELAY': RSS_DELAY,
                         'SEARCH_API_LINK': SEARCH_API_LINK,
                         'SEARCH_LIMIT': SEARCH_LIMIT,
                         'SET_COMMANDS': SET_COMMANDS,
@@ -428,10 +418,7 @@ async def update_buttons(message, key=None, edit_type=None, edit_mode=None):
 async def edit_variable(_, message, pre_message, key):
     handler_dict[message.chat.id] = False
     value = message.text
-    if key == 'RSS_DELAY':
-        value = int(value)
-        addJob(value)
-    elif key in ['LEECH_LOG_ID', 'RSS_CHAT_ID']:
+    if key == 'LEECH_LOG_ID':
         value = int(value)
     elif key == 'TORRENT_TIMEOUT':
         value = int(value)

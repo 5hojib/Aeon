@@ -32,7 +32,6 @@ class _BotCommands:
         self.UserSetCommand = [f'usetting{CMD_SUFFIX}', f'us{CMD_SUFFIX}']
         self.BtSelectCommand = f'btsel{CMD_SUFFIX}'
         self.SpeedCommand = f'speedtest{CMD_SUFFIX}'
-        self.RssCommand = f'rss{CMD_SUFFIX}'
         self.AddImageCommand = f'addimg{CMD_SUFFIX}'
         self.ImagesCommand = f'images{CMD_SUFFIX}'
         self.MediaInfoCommand = f'mediainfo{CMD_SUFFIX}'
