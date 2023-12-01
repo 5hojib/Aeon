@@ -21,7 +21,13 @@ setdefaulttimeout(600)
 
 botStartTime = time()
 
-basicConfig(format="[%(asctime)s] [%(levelname)s] - %(message)s", datefmt="%d-%b-%y %I:%M:%S %p", handlers=[FileHandler('log.txt'), StreamHandler()], level=INFO)
+class CustomFormatter(Formatter):
+    def format(self, record):
+        return super().format(record).replace(record.levelname, record.levelname[:4])
+
+formatter = CustomFormatter("[%(asctime)s] [%(levelname)s] - %(message)s", datefmt="%d-%b-%y %I:%M:%S %p")
+
+basicConfig(format=formatter, handlers=[FileHandler('log.txt'), StreamHandler()], level=INFO)
 
 LOGGER = getLogger(__name__)
 

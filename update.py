@@ -9,7 +9,13 @@ if path.exists('log.txt'):
     with open('log.txt', 'r+') as f:
         f.truncate(0)
 
-basicConfig(format="[%(asctime)s] [%(levelname)s] - %(message)s", datefmt="%d-%b-%y %I:%M:%S %p", handlers=[FileHandler('log.txt'), StreamHandler()], level=INFO)
+class CustomFormatter(Formatter):
+    def format(self, record):
+        return super().format(record).replace(record.levelname, record.levelname[:4])
+
+formatter = CustomFormatter("[%(asctime)s] [%(levelname)s] - %(message)s", datefmt="%d-%b-%y %I:%M:%S %p")
+
+basicConfig(format=formatter, handlers=[FileHandler('log.txt'), StreamHandler()], level=INFO)
 
 CONFIG_FILE_URL = environ.get('CONFIG_FILE_URL')
 try:
