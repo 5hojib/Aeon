@@ -9,7 +9,7 @@ if path.exists('log.txt'):
     with open('log.txt', 'r+') as f:
         f.truncate(0)
 
-basicConfig(format='%(message)s', handlers=[FileHandler('log.txt'), StreamHandler()], level=INFO)
+basicConfig(format="[%(asctime)s] [%(levelname)s] - %(message)s", datefmt="%d-%b-%y %I:%M:%S %p", handlers=[FileHandler('log.txt'), StreamHandler()], level=INFO)
 
 CONFIG_FILE_URL = environ.get('CONFIG_FILE_URL')
 try:
