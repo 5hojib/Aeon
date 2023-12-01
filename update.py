@@ -3,7 +3,7 @@ from subprocess import run
 from requests import get
 from dotenv import load_dotenv
 from pymongo import MongoClient
-from logging import FileHandler, StreamHandler, INFO, basicConfig, error, info
+from logging import FileHandler, StreamHandler, INFO, basicConfig, error, info, Formatter
 
 if path.exists('log.txt'):
     with open('log.txt', 'r+') as f:
