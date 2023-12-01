@@ -15,7 +15,9 @@ class CustomFormatter(Formatter):
 
 formatter = CustomFormatter("[%(asctime)s] [%(levelname)s] - %(message)s", datefmt="%d-%b-%y %I:%M:%S %p")
 
-basicConfig(format=formatter, handlers=[FileHandler('log.txt'), StreamHandler()], level=INFO)
+formatter_str = formatter.format(Formatter('%(message)s'))
+
+basicConfig(format=formatter_str, handlers=[FileHandler('log.txt'), StreamHandler()], level=INFO)
 
 CONFIG_FILE_URL = environ.get('CONFIG_FILE_URL')
 try:
