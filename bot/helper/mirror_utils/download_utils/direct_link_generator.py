@@ -95,7 +95,9 @@ domain_dict = {
                      'wishfast.top',
                      'streamwish.to'],
     'linkBox':      ['linkbox.to',
-                     'lbx.to'],
+                     'lbx.to',
+                     'telbx.net',
+                     'teltobx.net'],
     'filepress':    ['filepress'],
     'pcloud':       ['u.pcloud.link']
 }
