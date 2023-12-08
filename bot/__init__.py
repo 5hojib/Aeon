@@ -228,12 +228,6 @@ QUEUE_UPLOAD = '' if len(QUEUE_UPLOAD) == 0 else int(QUEUE_UPLOAD)
 STOP_DUPLICATE = environ.get('STOP_DUPLICATE', '')
 STOP_DUPLICATE = STOP_DUPLICATE.lower() == 'true'
 
-USE_SERVICE_ACCOUNTS = environ.get('USE_SERVICE_ACCOUNTS', '')
-USE_SERVICE_ACCOUNTS = USE_SERVICE_ACCOUNTS.lower() == 'true'
-
-WEB_PINCODE = environ.get('WEB_PINCODE', '')
-WEB_PINCODE = WEB_PINCODE.lower() == 'true'
-
 AS_DOCUMENT = environ.get('AS_DOCUMENT', '')
 AS_DOCUMENT = AS_DOCUMENT.lower() == 'true'
 
@@ -355,8 +349,6 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'UPSTREAM_BRANCH': UPSTREAM_BRANCH,
                'USER_SESSION_STRING': USER_SESSION_STRING,
                'GROUPS_EMAIL': GROUPS_EMAIL,
-               'USE_SERVICE_ACCOUNTS': USE_SERVICE_ACCOUNTS,
-               'WEB_PINCODE': WEB_PINCODE,
                'YT_DLP_OPTIONS': YT_DLP_OPTIONS}
 
 if GDRIVE_ID:
@@ -407,14 +399,6 @@ with open("a2c.conf", "a+") as a:
     a.write(f"bt-tracker=[{trackers}]")
 srun(["buffet", "--conf-path=/usr/src/app/a2c.conf"])
 
-if ospath.exists('accounts.zip'):
-    if ospath.exists('accounts'):
-        srun(["rm", "-rf", "accounts"])
-    srun(["7z", "x", "-o.", "-bd", "-aoa", "accounts.zip", "accounts/*.json"])
-    srun(["chmod", "-R", "777", "accounts"])
-    osremove('accounts.zip')
-if not ospath.exists('accounts'):
-    config_dict['USE_SERVICE_ACCOUNTS'] = False
 alive = Popen(['python3', 'alive.py'])
 sleep(0.5)
 

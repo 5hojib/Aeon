@@ -28,9 +28,6 @@ class RcloneTransferHelper:
         self.__is_cancelled = False
         self.__is_download = False
         self.__is_upload = False
-        self.__sa_count = 1
-        self.__sa_index = 0
-        self.__sa_number = 0
         self.name = name
 
     @property
@@ -65,39 +62,6 @@ class RcloneTransferHelper:
                 self.__transferred_size, self.__size, self.__percentage, self.__speed, self.__eta = data[
                     0]
 
-    def __switchServiceAccount(self):
-        if self.__sa_index == self.__sa_number - 1:
-            self.__sa_index = 0
-        else:
-            self.__sa_index += 1
-        self.__sa_count += 1
-        remote = f'sa{self.__sa_index:03}'
-        LOGGER.info(f"Switching to {remote} remote")
-        return remote
-
-    async def __create_rc_sa(self, remote, remote_opts):
-        sa_conf_dir = 'rclone_sa'
-        sa_conf_file = f'{sa_conf_dir}/{remote}.conf'
-        if not await aiopath.isdir(sa_conf_dir):
-            await mkdir(sa_conf_dir)
-        elif await aiopath.isfile(sa_conf_file):
-            return sa_conf_file
-
-        if gd_id := remote_opts.get('team_drive'):
-            option = 'team_drive'
-        elif gd_id := remote_opts.get('root_folder_id'):
-            option = 'root_folder_id'
-        else:
-            return 'rcl.conf'
-
-        files = await listdir('accounts')
-        text = ''.join(f"[sa{i:03}]\ntype = drive\nscope = drive\nservice_account_file = accounts/{sa}\n{option} = {gd_id}\n\n"
-                       for i, sa in enumerate(files))
-
-        async with aiopen(sa_conf_file, 'w') as f:
-            await f.write(text)
-        return sa_conf_file
-
     async def __start_download(self, cmd, remote_type):
         self.__proc = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
         _, return_code = await gather(self.__progress(), self.__proc.wait())
@@ -109,20 +73,7 @@ class RcloneTransferHelper:
             await self.__listener.onDownloadComplete()
         elif return_code != -9:
             error = (await self.__proc.stderr.read()).decode().strip()
-            if not error and remote_type == 'drive' and config_dict['USE_SERVICE_ACCOUNTS']:
-                error = "Mostly your service accounts don't have access to this drive!"
             LOGGER.error(error)
-
-            if self.__sa_number != 0 and remote_type == 'drive' and 'RATE_LIMIT_EXCEEDED' in error and config_dict['USE_SERVICE_ACCOUNTS']:
-                if self.__sa_count < self.__sa_number:
-                    remote = self.__switchServiceAccount()
-                    cmd[6] = f"{remote}:{cmd[6].split(':', 1)[1]}"
-                    if self.__is_cancelled:
-                        return
-                    return await self.__start_download(cmd, remote_type)
-                else:
-                    LOGGER.info(
-                        f"Reached maximum number of service accounts switching, which is {self.__sa_count}")
 
             await self.__listener.onDownloadError(error[:4000])
 
@@ -134,16 +85,6 @@ class RcloneTransferHelper:
             await self.__listener.onDownloadError(str(err))
             return
         remote_type = remote_opts['type']
-
-        if remote_type == 'drive' and config_dict['USE_SERVICE_ACCOUNTS'] and config_path == 'rcl.conf' \
-                and await aiopath.isdir('accounts') and not remote_opts.get('service_account_file'):
-            config_path = await self.__create_rc_sa(remote, remote_opts)
-            if config_path != 'rcl.conf':
-                sa_files = await listdir('accounts')
-                self.__sa_number = len(sa_files)
-                self.__sa_index = randrange(self.__sa_number)
-                remote = f'sa{self.__sa_index:03}'
-                LOGGER.info(f'Download with service account {remote}')
 
         rcflags = self.__listener.rcFlags or config_dict['RCLONE_FLAGS']
         cmd = self.__getUpdatedCommand(
@@ -195,17 +136,7 @@ class RcloneTransferHelper:
             return False
         elif return_code != 0:
             error = (await self.__proc.stderr.read()).decode().strip()
-            if not error and remote_type == 'drive' and config_dict['USE_SERVICE_ACCOUNTS']:
-                error = "Mostly your service accounts don't have access to this drive!"
             LOGGER.error(error)
-            if self.__sa_number != 0 and remote_type == 'drive' and 'RATE_LIMIT_EXCEEDED' in error and config_dict['USE_SERVICE_ACCOUNTS']:
-                if self.__sa_count < self.__sa_number:
-                    remote = self.__switchServiceAccount()
-                    cmd[7] = f"{remote}:{cmd[7].split(':', 1)[1]}"
-                    return False if self.__is_cancelled else await self.__start_upload(cmd, remote_type)
-                else:
-                    LOGGER.info(
-                        f"Reached maximum number of service accounts switching, which is {self.__sa_count}")
             await self.__listener.onUploadError(error[:4000])
             return False
         else:
@@ -243,16 +174,6 @@ class RcloneTransferHelper:
 
         fremote = oremote
         fconfig_path = oconfig_path
-        if remote_type == 'drive' and config_dict['USE_SERVICE_ACCOUNTS'] and fconfig_path == 'rcl.conf' \
-                and await aiopath.isdir('accounts') and not remote_opts.get('service_account_file'):
-            fconfig_path = await self.__create_rc_sa(oremote, remote_opts)
-            if fconfig_path != 'rcl.conf':
-                sa_files = await listdir('accounts')
-                self.__sa_number = len(sa_files)
-                self.__sa_index = randrange(self.__sa_number)
-                fremote = f'sa{self.__sa_index:03}'
-                LOGGER.info(f'Upload with service account {fremote}')
-
         rcflags = self.__listener.rcFlags or config_dict['RCLONE_FLAGS']
         method = 'move' if not self.__listener.seed or self.__listener.newDir else 'copy'
         cmd = self.__getUpdatedCommand(

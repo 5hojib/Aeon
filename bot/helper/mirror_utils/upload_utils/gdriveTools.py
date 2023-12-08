@@ -6,7 +6,6 @@ from io import FileIO
 from re import search as re_search
 from urllib.parse import parse_qs, urlparse, quote as rquote
 from random import randrange
-from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
@@ -46,9 +45,6 @@ class GoogleDriveHelper:
         self.__status = None
         self.__updater = None
         self.__update_interval = 3
-        self.__sa_index = 0
-        self.__sa_count = 1
-        self.__sa_number = 100
         self.__service = self.__authorize()
         self.__file_processed_bytes = 0
         self.__processed_bytes = 0
@@ -67,16 +63,7 @@ class GoogleDriveHelper:
 
     def __authorize(self):
         credentials = None
-        if config_dict['USE_SERVICE_ACCOUNTS']:
-            json_files = listdir("accounts")
-            self.__sa_number = len(json_files)
-            self.__sa_index = randrange(self.__sa_number)
-            LOGGER.info(
-                f"Authorizing with {json_files[self.__sa_index]} service account")
-            credentials = service_account.Credentials.from_service_account_file(
-                f'accounts/{json_files[self.__sa_index]}',
-                scopes=self.__OAUTH_SCOPE)
-        elif ospath.exists('token.pickle'):
+        if ospath.exists('token.pickle'):
             LOGGER.info("Authorize with token.pickle")
             with open('token.pickle', 'rb') as f:
                 credentials = pload(f)
@@ -95,15 +82,6 @@ class GoogleDriveHelper:
             else:
                 LOGGER.error('token.pickle not found!')
         return None
-
-    def __switchServiceAccount(self):
-        if self.__sa_index == self.__sa_number - 1:
-            self.__sa_index = 0
-        else:
-            self.__sa_index += 1
-        self.__sa_count += 1
-        LOGGER.info(f"Switching to {self.__sa_index} index")
-        self.__service = self.__authorize()
 
     @staticmethod
     def getIdFromUrl(link):
@@ -304,19 +282,8 @@ class GoogleDriveHelper:
                         'dailyLimitExceeded',
                     ]:
                         raise err
-                    if config_dict['USE_SERVICE_ACCOUNTS']:
-                        if self.__sa_count >= self.__sa_number:
-                            LOGGER.info(f"Reached maximum number of service accounts switching, which is {self.__sa_count}")
-                            raise err
-                        else:
-                            if self.__is_cancelled:
-                                return
-                            self.__switchServiceAccount()
-                            LOGGER.info(f"Got: {reason}, Trying Again.")
-                            return self.__upload_file(file_path, file_name, mime_type, dest_id)
-                    else:
-                        LOGGER.error(f"Got: {reason}")
-                        raise err
+                    LOGGER.error(f"Got: {reason}")
+                    raise err
         if self.__is_cancelled:
             return
         if not self.__listener.seed or self.__listener.newDir:
@@ -421,15 +388,6 @@ class GoogleDriveHelper:
                     raise err
                 if reason == 'cannotCopyFile':
                     LOGGER.error(err)
-                elif config_dict['USE_SERVICE_ACCOUNTS']:
-                    if self.__sa_count >= self.__sa_number:
-                        LOGGER.info(f"Reached maximum number of service accounts switching, which is {self.__sa_count}")
-                        raise err
-                    else:
-                        if self.__is_cancelled:
-                            return
-                        self.__switchServiceAccount()
-                        return self.__copyFile(file_id, dest_id, file_name)
                 else:
                     LOGGER.error(f"Got: {reason}")
                     raise err
@@ -723,20 +681,8 @@ class GoogleDriveHelper:
                         'dailyLimitExceeded',
                     ]:
                         raise err
-                    if config_dict['USE_SERVICE_ACCOUNTS']:
-                        if self.__sa_count >= self.__sa_number:
-                            LOGGER.info(
-                                f"Reached maximum number of service accounts switching, which is {self.__sa_count}")
-                            raise err
-                        else:
-                            if self.__is_cancelled:
-                                return
-                            self.__switchServiceAccount()
-                            LOGGER.info(f"Got: {reason}, Trying Again...")
-                            return self.__download_file(file_id, path, filename, mime_type)
-                    else:
-                        LOGGER.error(f"Got: {reason}")
-                        raise err
+                    LOGGER.error(f"Got: {reason}")
+                    raise err
         self.__file_processed_bytes = 0
 
     async def cancel_download(self):

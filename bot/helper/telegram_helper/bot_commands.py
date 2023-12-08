@@ -29,8 +29,7 @@ class _BotCommands:
         self.ExecCommand = f'exec{CMD_SUFFIX}'
         self.ClearLocalsCommand = f'clearlocals{CMD_SUFFIX}'
         self.BotSetCommand = f'bsetting{CMD_SUFFIX}'
-        self.UserSetCommand = [f'usetting{CMD_SUFFIX}', f'us{CMD_SUFFIX}']
-        self.BtSelectCommand = f'btsel{CMD_SUFFIX}'
+        self.UserSetCommand = [f'setting{CMD_SUFFIX}', f'us{CMD_SUFFIX}']
         self.SpeedCommand = f'speedtest{CMD_SUFFIX}'
         self.AddImageCommand = f'addimg{CMD_SUFFIX}'
         self.ImagesCommand = f'images{CMD_SUFFIX}'
