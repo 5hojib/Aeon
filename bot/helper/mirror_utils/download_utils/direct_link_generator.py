@@ -1016,12 +1016,10 @@ def doods(url):
     if response.status_code != 200:
         raise DirectDownloadLinkException("ERROR: Failed to fetch direct link from API")
     json_data = response.json()
-    direct_link = json_data.get("data", {}).get("direct_link")
-    if not direct_link:
-       raise DirectDownloadLinkException("ERROR: Direct link not found in API response")
-
-    final_link = f"https://dd-cdn.pakai.eu.org/download?url={direct_link}"
-    return final_link
+    if direct_link := json_data.get("data", {}).get("direct_link"):
+        return f"https://dd-cdn.pakai.eu.org/download?url={direct_link}"
+    else:
+        raise DirectDownloadLinkException("ERROR: Direct link not found in API response")
 
 
 def hubdrive(url):
