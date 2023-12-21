@@ -44,7 +44,7 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         buttons.ibutton("Mirror", f"userset {user_id} mirror")
         buttons.ibutton("Leech", f"userset {user_id} leech")
         if user_dict and any(key in user_dict for key in ['prefix', 'suffix', 'remname', 'ldump', 'yt_opt', 'media_group', 'rclone', 'thumb', 'as_doc']):
-            buttons.ibutton("Reset Setting", f"userset {user_id} reset_all")
+            buttons.ibutton("Reset", f"userset {user_id} reset_all")
         buttons.ibutton("Close", f"userset {user_id} close")
         text = f'<b>User Settings for {name}</b>'
         button = buttons.build_menu(2)
@@ -545,8 +545,6 @@ async def send_users_settings(client, message):
         await sendMessage(message, f'{userid} have not saved anything..')
 
 
-bot.add_handler(MessageHandler(send_users_settings, filters=command(
-    BotCommands.UsersCommand) & CustomFilters.sudo))
-bot.add_handler(MessageHandler(user_settings, filters=command(
-    BotCommands.UserSetCommand) & CustomFilters.authorized_uset))
+bot.add_handler(MessageHandler(send_users_settings, filters=command(BotCommands.UsersCommand) & CustomFilters.sudo))
+bot.add_handler(MessageHandler(user_settings, filters=command(BotCommands.UserSetCommand) & CustomFilters.authorized_uset))
 bot.add_handler(CallbackQueryHandler(edit_user_settings, filters=regex("^userset")))
