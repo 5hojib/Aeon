@@ -147,12 +147,12 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         text += f"<b>Description :</b> {uset_display_dict[key][0]}"
         if edit_mode:
             text += '\n\n' + uset_display_dict[key][1]
-            buttons.ibutton("Stop Change", f"userset {user_id} {key}")
+            buttons.ibutton("Stop", f"userset {user_id} {key}")
         elif key != 'user_tds' or set_exist == 'Not Exists':
-            buttons.ibutton(f"Change {fname_dict[key]}" if set_exist and set_exist != 'Not Exists' else f"Set {fname_dict[key]}", f"userset {user_id} {key} edit")
+            buttons.ibutton(f"Change/Edit" if set_exist and set_exist != 'Not Exists' else f"Set", f"userset {user_id} {key} edit")
         if set_exist and set_exist != 'Not Exists':
             if key == 'user_tds':
-                buttons.ibutton('Show UserTDs', f"userset {user_id} show_tds", "header")
+                buttons.ibutton('Show', f"userset {user_id} show_tds", "header")
             buttons.ibutton("Delete", f"userset {user_id} d{key}")
         buttons.ibutton("Back", f"userset {user_id} back {edit_type}", "footer")
         buttons.ibutton("Close", f"userset {user_id} close", "footer")
@@ -530,7 +530,7 @@ async def send_users_settings(client, message):
         msg = f'{await getUserInfo(client, userid)} ( <code>{userid}</code> ):'
         if data := user_data[int(userid)]:
             buttons = ButtonMaker()
-            buttons.ibutton("Delete Data", f"userset {message.from_user.id} user_del {userid}")
+            buttons.ibutton("Delete", f"userset {message.from_user.id} user_del {userid}")
             buttons.ibutton("Close", f"userset {message.from_user.id} close")
             button = buttons.build_menu(1)
             for key, value in data.items():
