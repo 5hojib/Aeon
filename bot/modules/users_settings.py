@@ -149,7 +149,7 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
             text += '\n\n' + uset_display_dict[key][1]
             buttons.ibutton("Stop", f"userset {user_id} {key}")
         elif key != 'user_tds' or set_exist == 'Not Exists':
-            buttons.ibutton(f"Change/Edit" if set_exist and set_exist != 'Not Exists' else f"Set", f"userset {user_id} {key} edit")
+            buttons.ibutton("Change/Edit" if set_exist and set_exist != 'Not Exists' else "Set", f"userset {user_id} {key} edit")
         if set_exist and set_exist != 'Not Exists':
             if key == 'user_tds':
                 buttons.ibutton('Show', f"userset {user_id} show_tds", "header")

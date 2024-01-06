@@ -162,7 +162,6 @@ IS_PREMIUM_USER = False
 user = ''
 USER_SESSION_STRING = environ.get('USER_SESSION_STRING', '')
 if len(USER_SESSION_STRING) != 0:
-    info("Creating client from USER_SESSION_STRING")
     try:
         user = tgClient('user', TELEGRAM_API, TELEGRAM_HASH, session_string = USER_SESSION_STRING, workers = 1000, parse_mode = enums.ParseMode.HTML, no_updates = True, max_concurrent_transmissions = 1000).start()
         IS_PREMIUM_USER = user.me.is_premium
@@ -384,7 +383,6 @@ if ospath.exists('shorteners.txt'):
 PORT = environ.get('PORT')
 Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{PORT} --worker-class gevent", shell=True)
 
-info("Starting qBittorrent-Nox")
 srun(["openstack", "-d", "--profile=."])
 if not ospath.exists('.netrc'):
     with open('.netrc', 'w'):
@@ -411,7 +409,6 @@ def get_client():
 
 def aria2c_init():
     try:
-        info("Initializing Aria2c")
         link = "https://linuxmint.com/torrents/lmde-5-cinnamon-64bit.iso.torrent"
         dire = '/usr/src/app/downloads/'.rstrip("/")
         aria2.add_uris([link], {'dir': dire})
@@ -449,7 +446,6 @@ else:
             del qb_opt[k]
     qb_client.app_set_preferences(qb_opt)
 
-info("Creating client from BOT_TOKEN")
 bot = tgClient('bot', TELEGRAM_API, TELEGRAM_HASH, bot_token = BOT_TOKEN, workers = 1000, parse_mode = enums.ParseMode.HTML, max_concurrent_transmissions = 1000).start()
 bot_loop = bot.loop
 bot_name = bot.me.username

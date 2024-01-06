@@ -50,7 +50,6 @@ class DbManager:
                         await f.write(row['rclone'])
                     row['rclone'] = rclone_path
                 user_data[uid] = row
-            LOGGER.info("Users data has been imported from Database")
         self.__conn.close
 
     async def update_config(self, dict_):
