@@ -232,12 +232,8 @@ async def restart_notification():
     if await aiopath.isfile(".restartmsg"):
         with open(".restartmsg") as f:
             chat_id, msg_id = map(int, f)
-    else:
-        chat_id, msg_id = 0, 0
-    if await aiopath.isfile(".restartmsg"):
-        rmsg = 'Restarted Successfully!'
         try:
-            await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text=rmsg)
+            await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text='Restarted Successfully!')
         except:
             pass
         await aioremove(".restartmsg")
@@ -246,7 +242,6 @@ async def restart_notification():
 async def main():
     await gather(start_cleanup(), torrent_search.initiate_search_tools(), restart_notification(), set_commands(bot))
     await sync_to_async(start_aria2_listener, wait=False)
-    
     bot.add_handler(MessageHandler(start, filters=command(BotCommands.StartCommand)))
     bot.add_handler(MessageHandler(log, filters=command(BotCommands.LogCommand) & CustomFilters.sudo))
     bot.add_handler(MessageHandler(restart, filters=command(BotCommands.RestartCommand) & CustomFilters.sudo))
