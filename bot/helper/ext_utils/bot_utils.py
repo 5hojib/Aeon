@@ -448,9 +448,9 @@ async def set_commands(client):
             BotCommand(f'{BotCommands.StatsCommand[0]}', '- Check Bot & System stats'),
             BotCommand(f'{BotCommands.StopAllCommand[0]}', '- Cancel all tasks added by you to the bot.'),
             BotCommand(f'{BotCommands.HelpCommand}', '- Get detailed help'),
-            BotCommand(f'{BotCommands.BotSetCommand}', '- Open Bot settings'),
-            BotCommand(f'{BotCommands.LogCommand}', '- View log'),
-            BotCommand(f'{BotCommands.RestartCommand[0]}', '- Restart the bot')
+            BotCommand(f'{BotCommands.BotSetCommand}', '- [ADMIN] Open Bot settings'),
+            BotCommand(f'{BotCommands.LogCommand}', '- [ADMIN] View log'),
+            BotCommand(f'{BotCommands.RestartCommand[0]}', '- [ADMIN] Restart the bot')
         ]
         await client.set_bot_commands(commands)
 
