@@ -106,11 +106,8 @@ def bt_selection_buttons(id_):
     pincode = ''.join([n for n in id_ if n.isdigit()][:4])
     buttons = ButtonMaker()
     BASE_URL = config_dict['BASE_URL']
-    if config_dict['WEB_PINCODE']:
-        buttons.ubutton("Select Files", f"{BASE_URL}/app/files/{id_}")
-        buttons.ibutton("Pincode", f"btsel pin {gid} {pincode}")
-    else:
-        buttons.ubutton("Select Files", f"{BASE_URL}/app/files/{id_}?pin_code={pincode}")
+    buttons.ubutton("Select", f"{BASE_URL}/app/files/{id_}")
+    buttons.ibutton("Pincode", f"btsel pin {gid} {pincode}")
     buttons.ibutton("Cancel", f"btsel rm {gid} {id_}")
     buttons.ibutton("Done Selecting", f"btsel done {gid} {id_}")
     return buttons.build_menu(2)
@@ -170,11 +167,10 @@ def get_readable_message():
         globals()['STATUS_START'] = STATUS_LIMIT * (PAGES - 1)
         globals()['PAGE_NO'] = PAGES
     for download in list(download_dict.values())[STATUS_START:STATUS_LIMIT+STATUS_START]:
-        msg += f"{escape(f'{download.name()}')}\n"
-        msg += f"by {source(download)}\n\n"
-        msg += f"<b>{download.status()}...</b>"
+        msg += f"<b>{download.status()}:</b> {escape(f'{download.name()}')}\n"
+        msg += f"by {source(download)}\n"
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
-            msg += f"\n<code>{progress_bar(download.progress())}</code> {download.progress()}"
+            msg += f"<blockquote><code>{progress_bar(download.progress())}</code> {download.progress()}"
             msg += f"\n{download.processed_bytes()} of {download.size()}"
             msg += f"\nSpeed: {download.speed()}"
             msg += f'\nEstimated: {download.eta()}'
@@ -184,15 +180,15 @@ def get_readable_message():
                 except:
                     pass
         elif download.status() == MirrorStatus.STATUS_SEEDING:
-            msg += f"\nSize: {download.size()}"
+            msg += f"<blockquote>\nSize: {download.size()}"
             msg += f"\nSpeed: {download.upload_speed()}"
             msg += f"\nUploaded: {download.uploaded_bytes()}"
             msg += f"\nRatio: {download.ratio()}"
             msg += f"\nTime: {download.seeding_time()}"
         else:
-            msg += f"\nSize: {download.size()}"
-        msg += f"\nElapsed: {get_readable_time(time() - download.message.date.timestamp())}"
-        msg += f"\n/stop_{download.gid()[:8]}\n\n"
+            msg += f"<blockquote>\nSize: {download.size()}"
+        msg += f"\nElapsed: {get_readable_time(time() - download.message.date.timestamp())}</blockquote>"
+        msg += f"\n<blockquote>/stop_{download.gid()[:8]}</blockquote>\n\n"
     if len(msg) == 0:
         return None, None
     dl_speed = 0
@@ -443,22 +439,26 @@ def extra_btns(buttons):
 async def set_commands(client):
     if config_dict['SET_COMMANDS']:
         commands = [
-            BotCommand(f'{BotCommands.MirrorCommand[0]}', '- Start mirroring'),
             BotCommand(f'{BotCommands.LeechCommand[0]}', '- Start leeching'),
-            BotCommand(f'{BotCommands.YtdlCommand[0]}', '- Mirror yt-dlp supported link'),
             BotCommand(f'{BotCommands.YtdlLeechCommand[0]}', '- Leech through yt-dlp supported link'),
-            BotCommand(f'{BotCommands.CloneCommand[0]}', '- Copy file/folder to Drive'),
-            BotCommand(f'{BotCommands.CountCommand}', '- Count file/folder on Google Drive.'),
             BotCommand(f'{BotCommands.MediaInfoCommand}', '- Get MediaInfo'),
-            BotCommand(f'{BotCommands.ListCommand}', '- Search in Drive'),
             BotCommand(f'{BotCommands.SearchCommand}', '- Search in Torrent'),
             BotCommand(f'{BotCommands.UserSetCommand[0]}', '- User settings'),
             BotCommand(f'{BotCommands.StatusCommand[0]}', '- Get mirror status message'),
             BotCommand(f'{BotCommands.StatsCommand[0]}', '- Check Bot & System stats'),
             BotCommand(f'{BotCommands.StopAllCommand[0]}', '- Cancel all tasks added by you to the bot.'),
             BotCommand(f'{BotCommands.HelpCommand}', '- Get detailed help'),
-            BotCommand(f'{BotCommands.BotSetCommand}', '- Open Bot settings'),
-            BotCommand(f'{BotCommands.LogCommand}', '- View log'),
-            BotCommand(f'{BotCommands.RestartCommand[0]}', '- Restart the bot')
+            BotCommand(f'{BotCommands.BotSetCommand}', '- [ADMIN] Open Bot settings'),
+            BotCommand(f'{BotCommands.LogCommand}', '- [ADMIN] View log'),
+            BotCommand(f'{BotCommands.RestartCommand[0]}', '- [ADMIN] Restart the bot')
         ]
         await client.set_bot_commands(commands)
+
+
+"""
+BotCommand(f'{BotCommands.MirrorCommand[0]}', '- Start mirroring'),
+BotCommand(f'{BotCommands.YtdlCommand[0]}', '- Mirror yt-dlp supported link'),
+BotCommand(f'{BotCommands.CountCommand}', '- Count file/folder on Google Drive.'),
+BotCommand(f'{BotCommands.CloneCommand[0]}', '- Copy file/folder to Drive'),
+BotCommand(f'{BotCommands.ListCommand}', '- Search in Drive'),
+"""

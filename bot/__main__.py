@@ -30,7 +30,7 @@ from .helper.telegram_helper.message_utils import sendMessage, editMessage, send
 from .helper.telegram_helper.filters import CustomFilters
 from .helper.telegram_helper.button_build import ButtonMaker
 from .helper.listeners.aria2_listener import start_aria2_listener
-from .modules import authorize, cancel_mirror, mirror_leech, status, torrent_search, torrent_select, ytdlp, rss, shell, eval, users_settings, bot_settings, speedtest, images, mediainfo, broadcast
+from .modules import authorize, cancel_mirror, mirror_leech, status, torrent_search, ytdlp, shell, eval, users_settings, bot_settings, speedtest, images, mediainfo, broadcast
 from .helper.mirror_utils.gdrive_utils import count, delete, list, clone
 
 @new_thread
@@ -164,8 +164,8 @@ async def AeonCallback(_, query):
                 if ind == len(logFileLines): 
                     break
                 ind += 1
-            startLine = f"<b>Showing last {ind} lines from log.txt:</b> \n\n----------<b>START LOG</b>----------\n\n"
-            endLine = "\n----------<b>END LOG</b>----------"
+            startLine = "<pre language='python'>"
+            endLine = "</pre>"
             btn = ButtonMaker()
             btn.ibutton('Close', f'aeon {user_id} close')
             reply_message = await sendMessage(message, startLine + escape(Loglines) + endLine, btn.build_menu(1))
@@ -212,8 +212,7 @@ help_string = f'''<b>NOTE: Try each command without any arguments to see more de
 /{BotCommands.YtdlLeechCommand[0]} - Leech links supported by yt-dlp.
 /{BotCommands.CloneCommand[0]} - Copy files/folders to Google Drive.
 /{BotCommands.CountCommand} - Count files/folders in Google Drive.
-/{BotCommands.UserSetCommand[0]} - User settings.
-/{BotCommands.BtSelectCommand} - Select files from torrents by gid or reply.
+/{BotCommands.UserSetCommand[0]} - Open settings panel.
 /{BotCommands.StopAllCommand[0]} - Cancel all [status] tasks.
 /{BotCommands.ListCommand} - Search in Google Drive(s).
 /{BotCommands.SearchCommand} - Search for torrents with API or plugins.
@@ -233,12 +232,8 @@ async def restart_notification():
     if await aiopath.isfile(".restartmsg"):
         with open(".restartmsg") as f:
             chat_id, msg_id = map(int, f)
-    else:
-        chat_id, msg_id = 0, 0
-    if await aiopath.isfile(".restartmsg"):
-        rmsg = 'Restarted Successfully!'
         try:
-            await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text=rmsg)
+            await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text='Restarted Successfully!')
         except:
             pass
         await aioremove(".restartmsg")
@@ -247,7 +242,6 @@ async def restart_notification():
 async def main():
     await gather(start_cleanup(), torrent_search.initiate_search_tools(), restart_notification(), set_commands(bot))
     await sync_to_async(start_aria2_listener, wait=False)
-    
     bot.add_handler(MessageHandler(start, filters=command(BotCommands.StartCommand)))
     bot.add_handler(MessageHandler(log, filters=command(BotCommands.LogCommand) & CustomFilters.sudo))
     bot.add_handler(MessageHandler(restart, filters=command(BotCommands.RestartCommand) & CustomFilters.sudo))

@@ -23,13 +23,11 @@ from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.ext_utils.task_manager import start_from_queued
 from bot.helper.ext_utils.text_utils import bset_display_dict
 from bot.modules.torrent_search import initiate_search_tools
-from bot.modules.rss import addJob
 
 START = 0
 STATE = 'view'
 handler_dict = {}
 default_values = {'DEFAULT_UPLOAD': 'gd',
-                  'RSS_DELAY': 900,
                   'SEARCH_LIMIT': 0,
                   'UPSTREAM_BRANCH': 'main',
                   'TORRENT_TIMEOUT': 3000}
@@ -37,9 +35,7 @@ bool_vars = ['AS_DOCUMENT',
              'DELETE_LINKS',
              'STOP_DUPLICATE',
              'SET_COMMANDS',
-             'SHOW_MEDIAINFO',
-             'USE_SERVICE_ACCOUNTS',
-             'WEB_PINCODE']
+             'SHOW_MEDIAINFO']
 
 
 async def load_config():
@@ -141,12 +137,6 @@ async def load_config():
     if len(LEECH_DUMP_ID) == 0: 
         LEECH_DUMP_ID = ''
 
-    RSS_CHAT_ID = environ.get('RSS_CHAT_ID', '')
-    RSS_CHAT_ID = '' if len(RSS_CHAT_ID) == 0 else int(RSS_CHAT_ID)
-
-    RSS_DELAY = environ.get('RSS_DELAY', '')
-    RSS_DELAY = 900 if len(RSS_DELAY) == 0 else int(RSS_DELAY)
-
     CMD_SUFFIX = environ.get('CMD_SUFFIX', '')
 
     USER_SESSION_STRING = environ.get('USER_SESSION_STRING', '')
@@ -192,12 +182,6 @@ async def load_config():
 
     STOP_DUPLICATE = environ.get('STOP_DUPLICATE', '')
     STOP_DUPLICATE = STOP_DUPLICATE.lower() == 'true'
-
-    USE_SERVICE_ACCOUNTS = environ.get('USE_SERVICE_ACCOUNTS', '')
-    USE_SERVICE_ACCOUNTS = USE_SERVICE_ACCOUNTS.lower() == 'true'
-
-    WEB_PINCODE = environ.get('WEB_PINCODE', '')
-    WEB_PINCODE = WEB_PINCODE.lower() == 'true'
 
     AS_DOCUMENT = environ.get('AS_DOCUMENT', '')
     AS_DOCUMENT = AS_DOCUMENT.lower() == 'true'
@@ -342,8 +326,6 @@ async def load_config():
                         'QUEUE_UPLOAD': QUEUE_UPLOAD,
                         'RCLONE_FLAGS': RCLONE_FLAGS,
                         'RCLONE_PATH': RCLONE_PATH,
-                        'RSS_CHAT_ID': RSS_CHAT_ID,
-                        'RSS_DELAY': RSS_DELAY,
                         'SEARCH_API_LINK': SEARCH_API_LINK,
                         'SEARCH_LIMIT': SEARCH_LIMIT,
                         'SET_COMMANDS': SET_COMMANDS,
@@ -357,8 +339,6 @@ async def load_config():
                         'UPSTREAM_BRANCH': UPSTREAM_BRANCH,
                         'USER_SESSION_STRING': USER_SESSION_STRING,
                         'GROUPS_EMAIL': GROUPS_EMAIL,
-                        'USE_SERVICE_ACCOUNTS': USE_SERVICE_ACCOUNTS,
-                        'WEB_PINCODE': WEB_PINCODE,
                         'YT_DLP_OPTIONS': YT_DLP_OPTIONS})
 
     if DATABASE_URL:
@@ -385,7 +365,7 @@ async def get_buttons(key=None, edit_type=None, edit_mode=None, mess=None):
     elif key == 'private':
         buttons.ibutton('Back', "botset back")
         buttons.ibutton('Close', "botset close")
-        msg = "Send private files: config.env, token.pickle, accounts.zip, list_drives.txt, cookies.txt, terabox.txt, .netrc, or any other files!\n\nTo delete a private file, send only the file name as a text message.\n\n<b>Please note:</b> Changes to .netrc will not take effect for aria2c until it's restarted.\n\n<b>Timeout:</b> 60 seconds"
+        msg = "Send private files: config.env, token.pickle, cookies.txt, terabox.txt, .netrc, or any other files!\n\nTo delete a private file, send only the file name as a text message.\n\n<b>Please note:</b> Changes to .netrc will not take effect for aria2c until it's restarted.\n\n<b>Timeout:</b> 60 seconds"
     elif edit_type == 'editvar':
         msg = f'<b>Variable:</b> <code>{key}</code>\n\n'
         msg += f'<b>Description:</b> {bset_display_dict.get(key, "No Description Provided")}\n\n'
@@ -428,10 +408,7 @@ async def update_buttons(message, key=None, edit_type=None, edit_mode=None):
 async def edit_variable(_, message, pre_message, key):
     handler_dict[message.chat.id] = False
     value = message.text
-    if key == 'RSS_DELAY':
-        value = int(value)
-        addJob(value)
-    elif key in ['LEECH_LOG_ID', 'RSS_CHAT_ID']:
+    if key == 'LEECH_LOG_ID':
         value = int(value)
     elif key == 'TORRENT_TIMEOUT':
         value = int(value)
@@ -474,15 +451,7 @@ async def update_private_file(_, message, pre_message):
         fn = file_name.rsplit('.zip', 1)[0]
         if await aiopath.isfile(fn) and file_name != 'config.env':
             await remove(fn)
-        if fn == 'accounts':
-            if await aiopath.exists('accounts'):
-                await aiormtree('accounts')
-            if await aiopath.exists('rclone_sa'):
-                await aiormtree('rclone_sa')
-            config_dict['USE_SERVICE_ACCOUNTS'] = False
-            if DATABASE_URL:
-                await DbManager().update_config({'USE_SERVICE_ACCOUNTS': False})
-        elif file_name in ['.netrc', 'netrc']:
+        if file_name in ['.netrc', 'netrc']:
             await (await create_subprocess_exec("touch", ".netrc")).wait()
             await (await create_subprocess_exec("chmod", "600", ".netrc")).wait()
             await (await create_subprocess_exec("cp", ".netrc", "/root/.netrc")).wait()
@@ -492,14 +461,7 @@ async def update_private_file(_, message, pre_message):
     elif doc := message.document:
         file_name = doc.file_name
         await message.download(file_name=f'{getcwd()}/{file_name}')
-        if file_name == 'accounts.zip':
-            if await aiopath.exists('accounts'):
-                await aiormtree('accounts')
-            if await aiopath.exists('rclone_sa'):
-                await aiormtree('rclone_sa')
-            await (await create_subprocess_exec("7z", "x", "-o.", "-aoa", "accounts.zip", "accounts/*.json")).wait()
-            await (await create_subprocess_exec("chmod", "-R", "777", "accounts")).wait()
-        elif file_name == 'list_drives.txt':
+        if file_name == 'list_drives.txt':
             list_drives_dict.clear()
             if GDRIVE_ID := config_dict['GDRIVE_ID']:
                 list_drives_dict['Main'] = {"drive_id": GDRIVE_ID, "index_link": config_dict['INDEX_URL']}
@@ -541,8 +503,6 @@ async def update_private_file(_, message, pre_message):
     await update_buttons(pre_message)
     if DATABASE_URL:
         await DbManager().update_private_file(file_name)
-    if await aiopath.exists('accounts.zip'):
-        await remove('accounts.zip')
 
 
 async def event_handler(client, query, pfunc, rfunc, document=False):

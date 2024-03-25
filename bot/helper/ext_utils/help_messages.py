@@ -67,33 +67,6 @@ MIRROR_HELP_MESSAGE = """
 
 <b>main:dump/ubuntu.iso</b> or <b>rcl:</b> Treat a path as an rclone download."""
 
-RSS_HELP_MESSAGE = """
-Use this format to add feed URL:
-Title1 link (required)
-Title2 link -c cmd -inf xx -exf xx
-Title3 link -c cmd -d ratio:time -z password
-
--c command + any arg
--inf: For included words filter.
--exf: For excluded words filter.
-
-Example: Title <code>https://www.rss-url.com</code> inf: 1080 or 720 or 144p|mkv or mp4|hevc exf: flv or web|xxx opt: up: mrcc:remote:path/subdir rcf: --buffer-size:8M|key|key:value
-This filter will parse links that have titles containing "(1080 or 720 or 144p) and (mkv or mp4) and hevc" and don't contain (flv or web) and xxx words. You can add whatever you want.
-
-Another example: inf: 1080 or 720p|.web. or .webrip.|hevc or x264
-This will parse titles that contain (1080 or 720p) and (.web. or .webrip.) and (hevc or x264). 
-Note: I added spaces before and after "1080" to avoid wrong matching. If there is a number like "10805695" in the title, it won't match "1080" without spaces after it.
-
-<b>Filter Notes:</b>
-1. | means "and."
-2. Add "or" between similar keys. For example, you can add it between qualities or between extensions. Avoid filters like "f: 1080|mp4 or 720|web" because this will parse "1080" and (mp4 or 720) and web, instead of (1080 and mp4) or (720 and web).
-3. You can add "or" and "|" as much as you want.
-4. Check the title for static special characters before or after the qualities, extensions, or other elements, and use them in the filter to avoid wrong matches.
-
-<b>Timeout:</b> 60 sec.
-
-<b>Please apply the same formatting to this message:</b>
-"""
 
 CLONE_HELP_MESSAGE = """
 Send Gdrive link or rclone path along with command or by replying to the link/rc_path by command.

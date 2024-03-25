@@ -19,7 +19,7 @@ class _BotCommands:
         self.UnAuthorizeCommand = f'unauthorize{CMD_SUFFIX}'
         self.AddSudoCommand = f'addsudo{CMD_SUFFIX}'
         self.RmSudoCommand = f'rmsudo{CMD_SUFFIX}'
-        self.PingCommand = [f'ping{CMD_SUFFIX}', 'pingall']
+        self.PingCommand = 'ping'
         self.RestartCommand = [f'restart{CMD_SUFFIX}', 'restartall']
         self.StatsCommand = [f'stats{CMD_SUFFIX}', 'statsall']
         self.HelpCommand = f'help{CMD_SUFFIX}'
@@ -28,11 +28,9 @@ class _BotCommands:
         self.EvalCommand = f'eval{CMD_SUFFIX}'
         self.ExecCommand = f'exec{CMD_SUFFIX}'
         self.ClearLocalsCommand = f'clearlocals{CMD_SUFFIX}'
-        self.BotSetCommand = f'bsetting{CMD_SUFFIX}'
-        self.UserSetCommand = [f'usetting{CMD_SUFFIX}', f'us{CMD_SUFFIX}']
-        self.BtSelectCommand = f'btsel{CMD_SUFFIX}'
+        self.BotSetCommand = f'botsetting{CMD_SUFFIX}'
+        self.UserSetCommand = [f'setting{CMD_SUFFIX}', f'us{CMD_SUFFIX}']
         self.SpeedCommand = f'speedtest{CMD_SUFFIX}'
-        self.RssCommand = f'rss{CMD_SUFFIX}'
         self.AddImageCommand = f'addimg{CMD_SUFFIX}'
         self.ImagesCommand = f'images{CMD_SUFFIX}'
         self.MediaInfoCommand = f'mediainfo{CMD_SUFFIX}'

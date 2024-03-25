@@ -7,7 +7,6 @@ data*
 *.pickle
 .netrc
 log.txt
-accounts/*
 MediaInfo/*
 Images/*
 Thumbnails/*

@@ -221,7 +221,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     if error_msg:
         final_msg = f'Hey, <b>{tag}</b>!\n'
         for __i, __msg in enumerate(error_msg, 1):
-            final_msg += f'\n<b>{__i}</b>: {__msg}\n'
+            final_msg += f'\n<blockquote><b>{__i}</b>: {__msg}</blockquote>\n'
         if error_button is not None:
             error_button = error_button.build_menu(2)
         await delete_links(message)
