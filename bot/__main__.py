@@ -164,7 +164,7 @@ async def AeonCallback(_, query):
                 if ind == len(logFileLines): 
                     break
                 ind += 1
-            startLine = "<pre language='python'>\n"
+            startLine = "<pre language='python'>"
             endLine = "</pre>"
             btn = ButtonMaker()
             btn.ibutton('Close', f'aeon {user_id} close')
