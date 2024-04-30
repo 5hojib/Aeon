@@ -91,10 +91,10 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
                 isQbit = True
     if reply_to := message.reply_to_message:
         if x := reply_to.media:
-            if x != 'WebPagePreview':
-                file_ = getattr(reply_to, reply_to.media.value)
-            else:
+            if x == 'WebPagePreview':
                 file_ = None
+            else:
+                file_ = getattr(reply_to, reply_to.media.value)
         else:
             file_ = None
         if reply_to.document and (file_.mime_type == 'application/x-bittorrent' or file_.file_name.endswith('.torrent')):
@@ -203,10 +203,10 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
 
     if reply_to:
         if x := reply_to.media:
-            if x != 'WebPagePreview':
-                file_ = getattr(reply_to, reply_to.media.value)
-            else:
+            if x == 'WebPagePreview':
                 file_ = None
+            else:
+                file_ = getattr(reply_to, reply_to.media.value)
         else:
             file_ = None
         if file_ is None:
