@@ -203,6 +203,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
 
     if reply_to:
         if x := reply_to.media:
+            LOGGER.info(x)
             if x == 'MessageMediaType.WEB_PAGE_PREVIEW':
                 file_ = None
             else:
