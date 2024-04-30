@@ -91,7 +91,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
                 isQbit = True
     if reply_to := message.reply_to_message:
         if x := reply_to.media:
-            if x != 'MessageMediaType.WEB_PAGE_PREVIEW':
+            if x != 'WebPagePreview':
                 file_ = getattr(reply_to, reply_to.media.value)
             else:
                 file_ = None
@@ -203,7 +203,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
 
     if reply_to:
         if x := reply_to.media:
-            if x != 'MessageMediaType.WEB_PAGE_PREVIEW':
+            if x != 'WebPagePreview':
                 file_ = getattr(reply_to, reply_to.media.value)
             else:
                 file_ = None
