@@ -20,7 +20,7 @@ async def mirror_status(_, message):
         free = get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)
         quote = Quote.print().split('―', 1)[0].strip().replace("“", "").replace("”", "")
 
-        msg = f'<b>{quote}</b>\n\n'
+        msg = f''
         msg += 'No downloads are currently in progress.\n'
         msg += f"\n<b>• Bot uptime</b>: {currentTime}"
         msg += f"\n<b>• Free disk space</b>: {free}"
