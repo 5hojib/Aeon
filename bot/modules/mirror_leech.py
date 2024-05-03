@@ -90,14 +90,8 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             if reply_text and is_magnet(reply_text):
                 isQbit = True
     if reply_to := message.reply_to_message:
-        if x := reply_to.media:
-            if x == 'MessageMediaType.WEB_PAGE_PREVIEW':
-                file_ = None
-            else:
-                file_ = getattr(reply_to, reply_to.media.value)
-        else:
-            file_ = None
-        if reply_to.document and (file_.mime_type == 'application/x-bittorrent' or file_.file_name.endswith('.torrent')):
+    	  file_ = getattr(reply_to, reply_to.media.value) if reply_to.media else None
+    	  if reply_to.document and (file_.mime_type == 'application/x-bittorrent' or file_.file_name.endswith('.torrent')):
     	      isQbit = True
     if not isinstance(seed, bool):
         dargs = seed.split(':')
@@ -202,14 +196,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
                     return
 
     if reply_to:
-        if x := reply_to.media:
-            LOGGER.info(x)
-            if x == 'MessageMediaType.WEB_PAGE_PREVIEW':
-                file_ = None
-            else:
-                file_ = getattr(reply_to, reply_to.media.value)
-        else:
-            file_ = None
+        file_ = getattr(reply_to, reply_to.media.value) if reply_to.media else None
         if file_ is None:
             reply_text = reply_to.text.split('\n', 1)[0].strip()
             if is_url(reply_text) or is_magnet(reply_text) or is_rclone_path(reply_text):
