@@ -102,7 +102,6 @@ domain_dict = {
     'pcloud':       ['u.pcloud.link']
 }
 
-
 def direct_link_generator(link):
     domain = urlparse(link).hostname
     if not domain:
@@ -675,7 +674,6 @@ def linkBox(url:str):
         raise e
     return details
 
-
 def gofile(url):
     try:
         if "::" in url:
@@ -689,36 +687,47 @@ def gofile(url):
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
 
     def __get_token(session):
-        if 'gofile_token' in _caches:
-            __url = f"https://api.gofile.io/getAccountDetails?token={_caches['gofile_token']}"
-        else:
-            __url = 'https://api.gofile.io/createAccount'
+        headers = {
+            "User-Agent": user_agent,
+            "Accept-Encoding": "gzip, deflate, br",
+            "Accept": "*/*",
+            "Connection": "keep-alive",
+        }
+        __url = f"https://api.gofile.io/accounts"
         try:
-            __res = session.get(__url, verify=False).json()
-            if __res["status"] != 'ok':
-                if 'gofile_token' in _caches:
-                    del _caches['gofile_token']
-                return __get_token(session)
-            _caches['gofile_token'] = __res["data"]["token"]
-            return _caches['gofile_token']
+            __res = session.post(__url, headers=headers).json()
+            if __res["status"] != "ok":
+                raise DirectDownloadLinkException(f"ERROR: Failed to get token.")
+            return __res["data"]["token"]
         except Exception as e:
             raise e
 
-    def __fetch_links(session, _id, folderPath=''):
-        _url = f"https://api.gofile.io/getContent?contentId={_id}&token={token}&websiteToken=7fd94ds12fds4&cache=true"
+    def __fetch_links(session, _id, folderPath=""):
+        _url = f"https://api.gofile.io/contents/{_id}?wt=4fd6sg89d7s6&cache=true"
+        headers = {
+            "User-Agent": user_agent,
+            "Accept-Encoding": "gzip, deflate, br",
+            "Accept": "*/*",
+            "Connection": "keep-alive",
+            "Authorization": "Bearer" + " " + token,
+        }
         if _password:
             _url += f"&password={_password}"
         try:
-            _json = session.get(_url, verify=False).json()
+            _json = session.get(_url, headers=headers).json()
         except Exception as e:
             raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
-        if _json['status'] in 'error-passwordRequired':
-            raise DirectDownloadLinkException(f"ERROR:\n{PASSWORD_ERROR_MESSAGE.format(url)}")
-        if _json['status'] in 'error-passwordWrong':
-            raise DirectDownloadLinkException('ERROR: This password is wrong !')
-        if _json['status'] in 'error-notFound':
-            raise DirectDownloadLinkException("ERROR: File not found on gofile's server")
-        if _json['status'] in 'error-notPublic':
+        if _json["status"] in "error-passwordRequired":
+            raise DirectDownloadLinkException(
+                f"ERROR:\n{PASSWORD_ERROR_MESSAGE.format(url)}"
+            )
+        if _json["status"] in "error-passwordWrong":
+            raise DirectDownloadLinkException("ERROR: This password is wrong !")
+        if _json["status"] in "error-notFound":
+            raise DirectDownloadLinkException(
+                "ERROR: File not found on gofile's server"
+            )
+        if _json["status"] in "error-notPublic":
             raise DirectDownloadLinkException("ERROR: This folder is not public")
 
         data = _json["data"]
@@ -726,7 +735,7 @@ def gofile(url):
         if not details['title']:
             details['title'] = data['name'] if data['type'] == "folder" else _id
 
-        contents = data["contents"]
+        contents = data["children"]
         for content in contents.values():
             if content["type"] == "folder":
                 if not content['public']:
@@ -766,7 +775,6 @@ def gofile(url):
     if len(details['contents']) == 1:
         return (details['contents'][0]['url'], details['header'])
     return details
-
 
 def mediafireFolder(url):
     try:
@@ -879,7 +887,6 @@ def mediafireFolder(url):
         return (details['contents'][0]['url'], details['header'])
     return details
 
-
 def cf_bypass(url):
     "DO NOT ABUSE THIS"
     try:
@@ -894,7 +901,6 @@ def cf_bypass(url):
     except Exception as e:
         e
     raise DirectDownloadLinkException("ERROR: Con't bypass cloudflare")
-
 
 def send_cm_file(url, file_id=None):
     if "::" in url:
@@ -926,7 +932,6 @@ def send_cm_file(url, file_id=None):
         if _passwordNeed:
             raise DirectDownloadLinkException(f"ERROR:\n{PASSWORD_ERROR_MESSAGE.format(url)}")
         raise DirectDownloadLinkException("ERROR: Direct link not found")
-
 
 def send_cm(url):
     if '/d/' in url:
@@ -1005,7 +1010,6 @@ def send_cm(url):
     if len(details['contents']) == 1:
         return (details['contents'][0]['url'], details['header'])
     return details
-
 
 def doods(url):
     if "/e/" in url:
@@ -1086,7 +1090,6 @@ def easyupload(url):
         raise DirectDownloadLinkException(f"ERROR: Failed to generate direct link due to {json_resp['data']}")
     raise DirectDownloadLinkException("ERROR: Failed to generate direct link from EasyUpload.")
 
-
 def filewish(url):
     parsed_url = urlparse(url)
     hostname = parsed_url.hostname
@@ -1131,7 +1134,6 @@ def filewish(url):
         error +=f" <code>{url}_{version['name']}</code>"
     raise DirectDownloadLinkException(f'ERROR: {error}')
 
-
 def streamvid(url):
     file_code = url.split('/')[-1]
     parsed_url = urlparse(url)
@@ -1168,7 +1170,6 @@ def streamvid(url):
         elif error:= html.xpath('//div[@class="not-found-text"]/text()'):
             raise DirectDownloadLinkException(f'ERROR: {error[0]}')
         raise DirectDownloadLinkException('ERROR: Something went wrong')
-
 
 def streamhub(url):
     file_code = url.split('/')[-1]
@@ -1217,7 +1218,6 @@ def jiodrive(url):
         if resp['code'] != '200':
             raise DirectDownloadLinkException("ERROR: The user's Drive storage quota has been exceeded.")
         return resp['file']
-
 
 def pcloud(url):
     with create_scraper() as session:
