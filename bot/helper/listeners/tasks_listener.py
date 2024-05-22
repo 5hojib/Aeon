@@ -55,7 +55,6 @@ class MirrorLeechListener:
         self.sameDir = sameDir
         self.rcFlags = rcFlags
         self.upPath = upPath
-        self.random_pic = 'IMAGES'
         self.join = join
         self.linkslogmsg = None
         self.botpmmsg = None
@@ -348,7 +347,7 @@ class MirrorLeechListener:
         LOGGER.info(f'Task Done: {name}')
         buttons = ButtonMaker()
         iButton = ButtonMaker()
-        iButton.ibutton('View in inbox', f"aeon {user_id} botpm", 'header')
+        iButton.ibutton('View in inbox', f"aeon {user_id} private", 'header')
         iButton = extra_btns(iButton)
         if self.isLeech:
             if folders > 1:
@@ -421,7 +420,7 @@ class MirrorLeechListener:
                 log_msg = list((await sendMultiMessage(config_dict['MIRROR_LOG_ID'], msg, button)).values())[0]
                 if self.linkslogmsg:
                     await deleteMessage(self.linkslogmsg)
-            await sendMessage(self.botpmmsg, msg, button, self.random_pic)
+            await sendMessage(self.botpmmsg, msg, button, True)
             await deleteMessage(self.botpmmsg)
             if self.isSuperGroup:
                 await sendMessage(self.message, f'{msg} <b>Links has been sent to your inbox</b>', iButton.build_menu(1))

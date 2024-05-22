@@ -133,7 +133,7 @@ class DbManager:
         await self.__db.access_token.update_one({'_id': user_id}, {'$set': {'token': token}}, upsert=True)
         self.__conn.close
 
-    async def get_token_expire_time(self, user_id):
+    async def get_token_expiry(self, user_id):
         if self.__err:
             return None
         user_data = await self.__db.access_token.find_one({'_id': user_id})
@@ -141,6 +141,11 @@ class DbManager:
             return user_data.get('time')
         self.__conn.close
         return None
+
+    async def delete_user_token(self, user_id):
+        if self.__err:
+            return None
+        await self.__db.access_token.delete_one({'_id': user_id})
 
     async def get_user_token(self, user_id):
         if self.__err:

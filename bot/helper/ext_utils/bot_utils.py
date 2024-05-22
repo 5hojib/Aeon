@@ -410,13 +410,15 @@ async def checking_access(user_id, button=None):
     user_data.setdefault(user_id, {})
     data = user_data[user_id]
     if DATABASE_URL:
-        data['time'] = await DbManager().get_token_expire_time(user_id)
+        data['time'] = await DbManager().get_token_expiry(user_id)
     expire = data.get('time')
     isExpired = (expire is None or expire is not None and (time() - expire) > token_timeout)
     if isExpired:
         token = data['token'] if expire is None and 'token' in data else str(uuid4())
         if expire is not None:
             del data['time']
+            #if DATABASE_URL:
+             #   await DbManager().delete_user_token(user_id)
         data['token'] = token
         if DATABASE_URL:
             await DbManager().update_user_token(user_id, token)
@@ -443,7 +445,7 @@ async def set_commands(client):
             BotCommand(f'{BotCommands.YtdlLeechCommand[0]}', '- Leech through yt-dlp supported link'),
             BotCommand(f'{BotCommands.MediaInfoCommand}', '- Get MediaInfo'),
             BotCommand(f'{BotCommands.SearchCommand}', '- Search in Torrent'),
-            BotCommand(f'{BotCommands.UserSetCommand[0]}', '- User settings'),
+            BotCommand(f'{BotCommands.UserSetCommand}', '- User settings'),
             BotCommand(f'{BotCommands.StatusCommand[0]}', '- Get mirror status message'),
             BotCommand(f'{BotCommands.StatsCommand[0]}', '- Check Bot & System stats'),
             BotCommand(f'{BotCommands.StopAllCommand[0]}', '- Cancel all tasks added by you to the bot.'),

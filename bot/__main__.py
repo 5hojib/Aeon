@@ -71,7 +71,7 @@ async def stats(_, message):
         limitations += f'<code>• {k:<11}:</code> {v}\n'
 
     stats = system_info + limitations
-    reply_message = await sendMessage(message, stats, photo='IMAGES')
+    reply_message = await sendMessage(message, stats, photo=True)
     await deleteMessage(message)
     await one_minute_del(reply_message)
 
@@ -79,10 +79,7 @@ async def stats(_, message):
 async def start(client, message):
     buttons = ButtonMaker()
     reply_markup = buttons.build_menu(2)
-    if len(message.command) > 1 and message.command[1] == "aeon":
-        await deleteMessage(message)
-    elif len(message.command) > 1 and message.command[1] == "pmc":
-        await sendMessage(message, 'Bot started')
+    if len(message.command) > 1 and message.command[1] == "private":
         await deleteMessage(message)
     elif len(message.command) > 1 and len(message.command[1]) == 36:
         userid = message.from_user.id
@@ -98,10 +95,8 @@ async def start(client, message):
         data = user_data[userid]
         if 'token' not in data or data['token'] != input_token:
             return await sendMessage(message, '<b>This token has already been used!</b>\n\nPlease get a new one.')
-        token = str(uuid4())
-        token_time = time()
-        data['token'] = token
-        data['time'] = token_time
+        data['token'] = str(uuid4())
+        data['time'] = time()
         user_data[userid].update(data)
         if DATABASE_URL:
             await DbManager().update_user_tdata(userid, token, token_time)
@@ -111,9 +106,9 @@ async def start(client, message):
     elif await CustomFilters.authorized(client, message):
         help_command = f"/{BotCommands.HelpCommand}"
         start_string = f'This bot can mirror all your links|files|torrents to Google Drive or any rclone cloud or to telegram.\n<b>Type {help_command} to get a list of available commands</b>'
-        await sendMessage(message, start_string, photo='IMAGES')
+        await sendMessage(message, start_string, photo=True)
     else:
-        await sendMessage(message, 'You are not a authorized user!', photo='IMAGES')
+        await sendMessage(message, 'You are not a authorized user!', photo=True)
     await DbManager().update_pm_users(message.from_user.id)
 
 
@@ -186,10 +181,8 @@ async def AeonCallback(_, query):
             await query.edit_message_reply_markup(btn.build_menu(1))
         else:
         	  LOGGER.error(f"Web paste failed : {str(err)}")
-    elif data[2] == "botpm":
-        await query.answer(url=f"https://t.me/{bot_name}?start=aeon")
-    elif data[2] == "pmc":
-        await query.answer(url=f"https://t.me/{bot_name}?start=pmc")
+    elif data[2] == "private":
+        await query.answer(url=f"https://t.me/{bot_name}?start=private")
     else:
         await query.answer()
         await deleteMessage(message)
@@ -206,20 +199,22 @@ async def log(_, message):
 
 help_string = f'''<b>NOTE: Try each command without any arguments to see more details.</b>
 
-/{BotCommands.MirrorCommand[0]} - Start mirroring to Google Drive.
-/{BotCommands.LeechCommand[0]} - Start leeching to Telegram.
-/{BotCommands.YtdlCommand[0]} - Mirror links supported by yt-dlp.
-/{BotCommands.YtdlLeechCommand[0]} - Leech links supported by yt-dlp.
-/{BotCommands.CloneCommand[0]} - Copy files/folders to Google Drive.
-/{BotCommands.CountCommand} - Count files/folders in Google Drive.
-/{BotCommands.UserSetCommand[0]} - Open settings panel.
-/{BotCommands.StopAllCommand[0]} - Cancel all [status] tasks.
-/{BotCommands.ListCommand} - Search in Google Drive(s).
-/{BotCommands.SearchCommand} - Search for torrents with API or plugins.
-/{BotCommands.StatusCommand[0]} - Show status of all downloads.
-/{BotCommands.StatsCommand[0]} - Show stats of the machine hosting the bot.
+<blockquote>/{BotCommands.LeechCommand[0]} - Start leeching to Telegram.</blockquote>
+<blockquote>/{BotCommands.YtdlLeechCommand[0]} - Leech links supported by yt-dlp.</blockquote>
+<blockquote>/{BotCommands.UserSetCommand} - Open the settings panel.</blockquote>
+<blockquote>/{BotCommands.StopAllCommand[0]} - Cancel all active tasks.</blockquote>
+<blockquote>/{BotCommands.SearchCommand} - Search for torrents using API or plugins.</blockquote>
+<blockquote>/{BotCommands.StatusCommand[0]} - Show the status of all downloads.</blockquote>
+<blockquote>/{BotCommands.StatsCommand[0]} - Display machine stats hosting the bot.</blockquote>
 '''
 
+'''
+/{BotCommands.YtdlCommand[0]} - Mirror links supported by yt-dlp.
+/{BotCommands.CloneCommand[0]} - Copy files/folders to Google Drive.
+/{BotCommands.CountCommand} - Count files/folders in Google Drive.
+/{BotCommands.ListCommand} - Search in Google Drive(s).
+/{BotCommands.MirrorCommand[0]} - Start mirroring to Google Drive.
+'''
 
 @new_task
 async def bot_help(client, message):
