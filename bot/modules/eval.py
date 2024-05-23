@@ -41,7 +41,7 @@ async def send(msg, message):
         if not msg or msg == '\n':
             msg = "MessageEmpty"
         elif not bool(match(r'<(spoiler|b|i|code|s|u|/a)>', msg)):
-            msg = f"<code>{msg}</code>"
+            msg = f"<pre language='python'>{msg}</pre>"
         await sendMessage(message, msg)
 
 
