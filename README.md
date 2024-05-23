@@ -8,22 +8,24 @@
    - Once the repository is forked, navigate to your forked repository.
 
 3. **Access the Settings**
-   - Access the settings of your forked repository.
+   - Go to the settings of your forked repository.
+   - Enable all actions in the settings.
 
-4. **Populate Secret Variables in GitHub**
-   - Find "Secrets and Variables" in the repository settings and access "Actions."
-   - Populate the following secret variables in GitHub:
-     * `BOT_TOKEN`
-     * `OWNER_ID`
-     * `DATABASE_URL`
-     * `TELEGRAM_API`
-     * `TELEGRAM_HASH`
-     * `HEROKU_APP_NAME`
-     * `HEROKU_EMAIL`
-     * `HEROKU_API_KEY`
+4. **Run Action Workflow**
+   - Go to the **Actions** tab.
+   - Select the `Deploy to Heroku` action from the list of workflows.
+   - Click on **Run workflow**.
+   - Fill in the following variables in the form:
+     - `BOT_TOKEN`
+     - `OWNER_ID`
+     - `DATABASE_URL`
+     - `TELEGRAM_API`
+     - `TELEGRAM_HASH`
+     - `HEROKU_APP_NAME`
+     - `HEROKU_EMAIL`
+     - `HEROKU_API_KEY`
+   - Run the action workflow.
 
-5. **Run Action Workflow**
-   - Run the action workflow but with the deploy branch.
-
-6. **Finalize the Deployment**
-   - After the deployment is complete, finalize the remaining variables and upload sensitive files like `token.pickle` using the `/botsettings` command.
+5. **Finalize the Deployment**
+   - After the deployment is complete, finalize the remaining variables.
+   - Upload sensitive files like `token.pickle` using the `/botsettings` command.

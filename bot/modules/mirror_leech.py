@@ -28,7 +28,7 @@ from bot.helper.listeners.tasks_listener import MirrorLeechListener
 from bot.helper.ext_utils.help_messages import MIRROR_HELP_MESSAGE
 from bot.helper.ext_utils.bulk_links import extract_bulk_links
 from bot.helper.mirror_utils.download_utils.direct_downloader import add_direct_download
-from bot.helper.ext_utils.aeon_utils import nsfw_precheck
+from bot.helper.aeon_utils.nsfw_check import nsfw_precheck
 
 @new_task
 async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=None, bulk=[]):

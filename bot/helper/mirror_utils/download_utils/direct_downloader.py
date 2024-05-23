@@ -8,7 +8,7 @@ from bot.helper.listeners.direct_listener import DirectListener
 from bot.helper.mirror_utils.status_utils.direct_status import DirectStatus
 from bot.helper.mirror_utils.status_utils.queue_status import QueueStatus
 from bot.helper.telegram_helper.message_utils import delete_links, sendMessage, sendStatusMessage, one_minute_del
-from bot.helper.ext_utils.aeon_utils import isNSFWdata
+from bot.helper.aeon_utils.nsfw_check import isNSFWdata
 
 async def add_direct_download(details, path, listener, foldername):
     if not (contents:= details.get('contents')):
