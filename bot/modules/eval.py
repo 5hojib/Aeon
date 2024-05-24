@@ -1,6 +1,6 @@
 from pyrogram.handlers import MessageHandler
 from pyrogram.filters import command
-from os import getcwd, chdir
+from os import getcwd, chdir, path
 from aiofiles import open as aiopen
 from traceback import format_exc
 from textwrap import indent
@@ -66,7 +66,7 @@ async def execute_code(func, message):
     env = create_namespace(message)
 
     chdir(getcwd())
-    async with aiopen(ospath.join(getcwd(), 'bot/modules/temp.txt'), 'w') as temp_file:
+    async with aiopen(path.join(getcwd(), 'bot/modules/temp.txt'), 'w') as temp_file:
         await temp_file.write(code)
 
     stdout = StringIO()
