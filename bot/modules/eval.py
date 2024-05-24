@@ -1,4 +1,4 @@
-from pyrogram.handlers import MessageHandler
+from pyrogram.handlers import MessageHandler, EditedMessageHandler
 from pyrogram.filters import command
 from os import getcwd, chdir, path
 from aiofiles import open as aiopen
@@ -14,7 +14,7 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.message_utils import sendFile, sendMessage
 from bot.helper.ext_utils.bot_utils import new_task
 
-def create_namespace(message):
+def create_execution_environment(message):
     return {
         '__builtins__': globals()['__builtins__'],
         'bot': bot,
@@ -63,7 +63,7 @@ async def execute_code(func, message):
     log_input(message)
     content = message.text.split(maxsplit=1)[-1]
     code = cleanup_code(content)
-    env = create_namespace(message)
+    env = create_execution_environment(message)
 
     chdir(getcwd())
     async with aiopen(path.join(getcwd(), 'bot/modules/temp.txt'), 'w') as temp_file:
@@ -95,3 +95,5 @@ async def execute_code(func, message):
 
 bot.add_handler(MessageHandler(evaluate, filters=command(BotCommands.EvalCommand) & CustomFilters.sudo))
 bot.add_handler(MessageHandler(execute, filters=command(BotCommands.ExecCommand) & CustomFilters.sudo))
+bot.add_handler(EditedMessageHandler(evaluate, filters=command(BotCommands.EvalCommand) & CustomFilters.sudo))
+bot.add_handler(EditedMessageHandler(execute, filters=command(BotCommands.ExecCommand) & CustomFilters.sudo))

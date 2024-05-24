@@ -19,12 +19,10 @@ async def shell(_, message):
     reply = ''
 
     if len(stdout) != 0:
-        reply += f"<b>Stdout</b>\n<pre language='python'>{stdout}</pre>\n"
-        LOGGER.info(f"Shell - {cmd} - {stdout}")
+        reply += f"<b>Stdout</b>\n<pre>{stdout}</pre>\n"
 
     if len(stderr) != 0:
-        reply += f"<b>Stderr</b>\n<pre language='python'>{stderr}</pre>"
-        LOGGER.error(f"Shell - {cmd} - {stderr}")
+        reply += f"<b>Stderr</b>\n<pre>{stderr}</pre>"
 
     if len(reply) > 3000:
         with BytesIO(str.encode(reply)) as out_file:
