@@ -16,7 +16,7 @@ from bot.helper.ext_utils.bot_utils import new_task
 
 namespaces = {}
 
-def namespace_of(message):
+def get_namespace(message):
     if message.chat.id not in namespaces:
         namespaces[message.chat.id] = {
             '__builtins__': globals()['__builtins__'],
@@ -26,12 +26,10 @@ def namespace_of(message):
         }
     return namespaces[message.chat.id]
 
-
 def log_input(message):
-    LOGGER.info(f"INPUT: {message.text} (User ID ={message.from_user.id} | Chat ID ={message.chat.id})")
+    LOGGER.info(f"INPUT: {message.text} (User ID={message.from_user.id} | Chat ID={message.chat.id})")
 
-
-async def send(msg, message):
+async def send_response(msg, message):
     if len(str(msg)) > 2000:
         with BytesIO(str.encode(msg)) as out_file:
             out_file.name = "output.txt"
@@ -40,40 +38,43 @@ async def send(msg, message):
         LOGGER.info(f"OUTPUT: '{msg}'")
         if not msg or msg == '\n':
             msg = "MessageEmpty"
-        elif not bool(match(r'<(spoiler|b|i|code|s|u|/a)>', msg)):
-            msg = f"<pre language='python'>{msg}</pre>"
+        elif not bool(match(r'<(spoiler|b|i|code|s|u)>', msg)):
+            msg = f"<pre>{msg}</pre>"
         await sendMessage(message, msg)
-
 
 @new_task
 async def evaluate(client, message):
-    await send(await do(eval, message), message)
-
+    content = message.text.split(maxsplit=1)
+    if len(content) == 1:
+        await send_response("No command to execute.", message)
+    else:
+        await send_response(await execute_code(eval, message), message)
 
 @new_task
 async def execute(client, message):
-    await send(await do(exec, message), message)
-
+    content = message.text.split(maxsplit=1)
+    if len(content) == 1:
+        await send_response("No command to execute.", message)
+    else:
+        await send_response(await execute_code(exec, message), message)
 
 def cleanup_code(code):
     if code.startswith('```') and code.endswith('```'):
         return '\n'.join(code.split('\n')[1:-1])
     return code.strip('` \n')
 
-
-async def do(func, message):
+async def execute_code(func, message):
     log_input(message)
     content = message.text.split(maxsplit=1)[-1]
-    body = cleanup_code(content)
-    env = namespace_of(message)
+    code = cleanup_code(content)
+    env = get_namespace(message)
 
     chdir(getcwd())
-    async with aiopen(ospath.join(getcwd(), 'bot/modules/temp.txt'), 'w') as temp:
-        await temp.write(body)
+    async with aiopen(ospath.join(getcwd(), 'bot/modules/temp.txt'), 'w') as temp_file:
+        await temp_file.write(code)
 
     stdout = StringIO()
-
-    to_compile = f'async def func():\n{indent(body, "  ")}'
+    to_compile = f'async def func():\n{indent(code, "  ")}'
 
     try:
         exec(to_compile, env)
@@ -86,36 +87,24 @@ async def do(func, message):
         with redirect_stdout(stdout):
             func_return = await func()
     except Exception as e:
-        value = stdout.getvalue()
-        return f'{value}{format_exc()}'
+        return f'{stdout.getvalue()}{format_exc()}'
     else:
-        value = stdout.getvalue()
-        result = None
-        if func_return is None:
-            if value:
-                result = f'{value}'
-            else:
-                with suppress(Exception):
-                    result = f'{repr(eval(body, env))}'
-        else:
-            result = f'{value}{func_return}'
-        if result:
-            return result
+        result = stdout.getvalue()
+        if func_return is not None:
+            result += str(func_return)
+        elif not result:
+            with suppress(Exception):
+                result = repr(eval(code, env))
+        return result
 
-
-async def clear(client, message):
+async def clear_cache(client, message):
     log_input(message)
-    global namespaces
     if message.chat.id in namespaces:
         del namespaces[message.chat.id]
-        await send("<b>Cached locals cleared!</b>", message)
+        await send_response("<b>Cached locals cleared!</b>", message)
     else:
-        await send("<b>No cache locals found!</b>", message)
+        await send_response("<b>No cached locals found!</b>", message)
 
-
-bot.add_handler(MessageHandler(evaluate, filters=command(
-    BotCommands.EvalCommand) & CustomFilters.sudo))
-bot.add_handler(MessageHandler(execute, filters=command(
-    BotCommands.ExecCommand) & CustomFilters.sudo))
-bot.add_handler(MessageHandler(clear, filters=command(
-    BotCommands.ClearLocalsCommand) & CustomFilters.sudo))
+bot.add_handler(MessageHandler(evaluate, filters=command(BotCommands.EvalCommand) & CustomFilters.sudo))
+bot.add_handler(MessageHandler(execute, filters=command(BotCommands.ExecCommand) & CustomFilters.sudo))
+bot.add_handler(MessageHandler(clear_cache, filters=command(BotCommands.ClearLocalsCommand) & CustomFilters.sudo))
