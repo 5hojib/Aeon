@@ -181,8 +181,8 @@ class TgUploader:
     async def __prepare_file(self, prefile_, dirpath):
         file_, cap_mono = await format_filename(prefile_, self.__user_id, dirpath)
         if prefile_ != file_:
-            if self.__listener.seed and not self.__listener.newDir and not dirpath.endswith("/splited_files_mltb"):
-                dirpath = f'{dirpath}/copied_mltb'
+            if self.__listener.seed and not self.__listener.newDir and not dirpath.endswith("/splited_files"):
+                dirpath = f'{dirpath}/copied'
                 await makedirs(dirpath, exist_ok=True)
                 new_path = ospath.join(dirpath, file_)
                 self.__up_path = await copy(self.__up_path, new_path)

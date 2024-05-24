@@ -71,7 +71,7 @@ async def stats(_, message):
         limitations += f'<code>• {k:<11}:</code> {v}\n'
 
     stats = system_info + limitations
-    reply_message = await sendMessage(message, stats, photo=True)
+    reply_message = await sendMessage(message, stats, photo='Random')
     await deleteMessage(message)
     await one_minute_del(reply_message)
 
@@ -106,9 +106,9 @@ async def start(client, message):
     elif await CustomFilters.authorized(client, message):
         help_command = f"/{BotCommands.HelpCommand}"
         start_string = f'This bot can mirror all your links|files|torrents to Google Drive or any rclone cloud or to telegram.\n<b>Type {help_command} to get a list of available commands</b>'
-        await sendMessage(message, start_string, photo=True)
+        await sendMessage(message, start_string, photo='Random')
     else:
-        await sendMessage(message, 'You are not a authorized user!', photo=True)
+        await sendMessage(message, 'You are not a authorized user!', photo='Random')
     await DbManager().update_pm_users(message.from_user.id)
 
 

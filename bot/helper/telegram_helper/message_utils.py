@@ -1,7 +1,7 @@
 from traceback import format_exc
 from asyncio import sleep
 from aiofiles.os import remove as aioremove
-from random import choice as rchoice
+from random import choice
 from time import time
 from re import match as re_match
 
@@ -14,11 +14,12 @@ from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.exceptions import TgLinkException
 
 
-async def sendMessage(message, text, buttons=None, photo=False):
+async def sendMessage(message, text, buttons=None, photo=None):
     try:
         if photo:
             try:
-                photo = rchoice(IMAGES)
+                if photo == 'Random':
+                    photo = choice(IMAGES)
                 return await message.reply_photo(photo=photo, reply_to_message_id=message.id, caption=text, reply_markup=buttons, disable_notification=True)
             except IndexError:
                 pass
@@ -41,11 +42,12 @@ async def sendMessage(message, text, buttons=None, photo=False):
         return str(e)
 
 
-async def sendCustomMsg(chat_id, text, buttons=None, photo=False):
+async def sendCustomMsg(chat_id, text, buttons=None, photo=None):
     try:
         if photo:
             try:
-                photo = rchoice(IMAGES)
+                if photo == 'Random':
+                    photo = choice(IMAGES)
                 return await bot.send_photo(chat_id=chat_id, photo=photo, caption=text, reply_markup=buttons, disable_notification=True)
             except IndexError:
                 pass
@@ -90,14 +92,15 @@ async def isAdmin(message, user_id=None):
         member = await message.chat.get_member(message.from_user.id)
     return member.status in [member.status.ADMINISTRATOR, member.status.OWNER]
 
-async def sendMultiMessage(chat_ids, text, buttons=None, photo=False):
+async def sendMultiMessage(chat_ids, text, buttons=None, photo=None):
     msg_dict = {}
     for channel_id in chat_ids.split():
         chat = await chat_info(channel_id)
         try:
             if photo:
                 try:
-                    photo = rchoice(IMAGES)
+                    if photo == 'Random':
+                        photo = choice(IMAGES)
                     sent = await bot.send_photo(chat_id=chat.id, photo=photo, caption=text, reply_markup=buttons, disable_notification=True)
                     msg_dict[chat.id] = sent
                     continue
