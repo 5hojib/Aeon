@@ -1,10 +1,6 @@
-<p align="center">
-    <a href="https://github.com/5hojib/Aeon-MLTB">
-        <kbd>
-            [](https://github.com/jubayerprantor/designresources/blob/main/cover.gif)
-        </kbd>
-    </a>
-</p>
+***
+![](https://github.com/jubayerprantor/designresources/blob/main/cover.gif)
+***
 
 ### Heroku Deployment Instructions
 
