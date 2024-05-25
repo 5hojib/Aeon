@@ -1,5 +1,5 @@
 ***
-![](https://github.com/jubayerprantor/designresources/blob/main/cover.gif)
+![](https://github.com/5hojib/5hojib/raw/main/images/Aeon-MLTB.gif)
 ***
 
 ### Heroku Deployment Instructions
@@ -33,3 +33,13 @@
 5. **Finalize the Deployment**
    - After the deployment is complete, finalize the remaining variables.
    - Upload sensitive files like `token.pickle` using the `/botsettings` command.
+
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Acknowledgements
+
+- Thanks to the original developers of the Mirror-Leech-Telegram-Bot.
+- Contributions and feature integrations from various repositories.
