@@ -1,3 +1,11 @@
+<p align="center">
+    <a href="https://github.com/5hojib/Aeon-MLTB">
+        <kbd>
+            <img width="250" src="https://github.com/jubayerprantor/designresources/blob/main/cover.gif" alt="Aeon-MLTB animation">
+        </kbd>
+    </a>
+</p>
+
 ### Heroku Deployment Instructions
 
 1. **Fork and Star the Repository**
