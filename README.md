@@ -1,7 +1,7 @@
 <p align="center">
     <a href="https://github.com/5hojib/Aeon-MLTB">
         <kbd>
-            <gif width="250" src="https://github.com/jubayerprantor/designresources/blob/main/cover.gif" alt="Aeon-MLTB animation">
+            ![](https://github.com/jubayerprantor/designresources/blob/main/cover.gif)
         </kbd>
     </a>
 </p>
