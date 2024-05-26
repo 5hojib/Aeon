@@ -30,7 +30,7 @@ fname_dict = {'rcc': 'RClone',
               'user_tds': 'User Custom TDs',
               'lcaption': 'Caption',
               'thumb': 'Thumbnail',
-              'metadata': 'Metadata'
+              'metadata': 'Metadata',
               'yt_opt': 'YT-DLP Options'}
 
 async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None):
