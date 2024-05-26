@@ -235,7 +235,7 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
     prefile_ = file_
     file_ = re_sub(r'www\S+', '', file_)
 
-    if metadata and dirpath:
+    if metadata and dirpath and file_.lower().endswith('.mkv'):
         file_ = await change_metadata(file_, dirpath, metadata)
   
     if remname:
@@ -335,7 +335,12 @@ def get_md5_hash(up_path):
 async def change_metadata(file, dirpath, key):
     LOGGER.info(f"Processing file: {file}")
     temp_file = f"{file}.temp.mkv"
-    cmd = ['render', '-y', '-i', f'{dirpath}/{file}', '-c', 'copy', '-metadata:s:v', f'title={key}', '-metadata:s:a', f'title={key}', '-metadata:s:s', f'title={key}', f'{dirpath}/{temp_file}']
+    cmd = [
+        'render', '-y', '-i', f'{dirpath}/{file}', '-c', 'copy',
+        '-metadata:s:v', f'title={key}',
+        '-metadata:s:a', f'title={key}',
+        '-metadata:s:s', f'title={key}',
+        f'{dirpath}/{temp_file}']
     process = await create_subprocess_exec(*cmd, stderr=PIPE)
     await process.wait()
     
