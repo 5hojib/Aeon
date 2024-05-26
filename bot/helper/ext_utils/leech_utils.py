@@ -224,6 +224,7 @@ async def split_file(path, size, file_, dirpath, split_size, listener, start_tim
     return True
 
 async def format_filename(file_, user_id, dirpath=None, isMirror=False):
+    LOGGER.info(dirpath)
     user_dict = user_data.get(user_id, {})
     prefix = user_dict.get('prefix', '')
     remname = user_dict.get('remname', '')
