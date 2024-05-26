@@ -1,3 +1,5 @@
+import os
+
 from hashlib import md5
 from time import strftime, gmtime, time
 from re import sub as re_sub, search as re_search
@@ -332,7 +334,8 @@ def get_md5_hash(up_path):
 
 async def change_metadata(file, key):
     LOGGER.info(f"Processing file: {file}")
-    cmd = ['render', '-y', '-i', file, '-c', 'copy', '-metadata:s:v', f'title={key}', '-metadata:s:a', f'title={key}', '-metadata:s:s', f'title={key}', file]
+    temp_file = file + ".temp"
+    cmd = ['render', '-y', '-i', file, '-c', 'copy', '-metadata:s:v', f'title={key}', '-metadata:s:a', f'title={key}', '-metadata:s:s', f'title={key}', temp_file]
     process = await create_subprocess_exec(*cmd, stderr=PIPE)
     await process.wait()
     
@@ -341,6 +344,6 @@ async def change_metadata(file, key):
         LOGGER.error(f"Error changing metadata: {err}")
         return file
     
+    os.replace(temp_file, file)
     LOGGER.info(f"Metadata changed successfully for file: {file}")
     return file
-
