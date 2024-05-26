@@ -335,7 +335,7 @@ def get_md5_hash(up_path):
 async def change_metadata(file, l, key):
     f = f'{l}/{file}'
     LOGGER.info(f"Processing file: {file}")
-    temp_file = f"{file}.temp.mkv"
+    temp_file = f"{key} {file}"
     cmd = ['render', '-y', '-i', f, '-c', 'copy', '-metadata:s:v', f'title={key}', '-metadata:s:a', f'title={key}', '-metadata:s:s', f'title={key}', temp_file]
     process = await create_subprocess_exec(*cmd, stderr=PIPE)
     await process.wait()
@@ -345,6 +345,5 @@ async def change_metadata(file, l, key):
         LOGGER.error(f"Error changing metadata: {err}")
         return file
     
-    os.replace(temp_file, file)
     LOGGER.info(f"Metadata changed successfully for file: {file}")
-    return file
+    return temp_file
