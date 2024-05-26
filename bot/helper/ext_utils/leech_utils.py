@@ -234,7 +234,7 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
     file_ = re_sub(r'www\S+', '', file_)
 
     if metadata:
-        await change_metadata(file_, metadata)
+        file_ = await change_metadata(file_, metadata)
   
     if remname:
         if not remname.startswith('|'):
@@ -331,7 +331,5 @@ def get_md5_hash(up_path):
 
 
 async def change_metadata(file, key):
-    LOGGER.info(file)
-    LOGGER.info(key)
     cmd = ['render', '-i', file, '-c', 'copy', '-metadata:s:v', f'title={key}', '-metadata:s:a', f'title={key}', '-metadata:s:s', f'title={key}', file]
     await create_subprocess_exec(*cmd, stderr=PIPE)
