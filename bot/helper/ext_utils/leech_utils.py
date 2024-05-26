@@ -236,7 +236,7 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
     file_ = re_sub(r'www\S+', '', file_)
 
     if metadata and dirpath:
-        file_ = await change_metadata(file, dirpath, metadata)
+        file_ = await change_metadata(file_, dirpath, metadata)
   
     if remname:
         if not remname.startswith('|'):
