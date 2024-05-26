@@ -236,7 +236,7 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
     file_ = re_sub(r'www\S+', '', file_)
 
     if metadata and dirpath:
-        file_ = await change_metadata(file_, dirpath, metadata)
+        file_ = await change_metadata(f'{dirpath}/{file_}', metadata)
   
     if remname:
         if not remname.startswith('|'):
@@ -332,11 +332,10 @@ def get_md5_hash(up_path):
         return md5_hash.hexdigest()
 
 
-async def change_metadata(file, l, key):
-    f = f'{l}/{file}'
+async def change_metadata(file, key):
     LOGGER.info(f"Processing file: {file}")
-    temp_file = f"{key} {file}"
-    cmd = ['render', '-y', '-i', f, '-c', 'copy', '-metadata:s:v', f'title={key}', '-metadata:s:a', f'title={key}', '-metadata:s:s', f'title={key}', temp_file]
+    temp_file = f"{file}.temp.mkv"
+    cmd = ['render', '-y', '-i', file, '-c', 'copy', '-metadata:s:v', f'title={key}', '-metadata:s:a', f'title={key}', '-metadata:s:s', f'title={key}', temp_file]
     process = await create_subprocess_exec(*cmd, stderr=PIPE)
     await process.wait()
     
@@ -345,5 +344,6 @@ async def change_metadata(file, l, key):
         LOGGER.error(f"Error changing metadata: {err}")
         return file
     
+    os.replace(temp_file, file)
     LOGGER.info(f"Metadata changed successfully for file: {file}")
-    return temp_file
+    return file
