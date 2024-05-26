@@ -235,6 +235,7 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
 
     if metadata:
         await change_metadata(file_, metadata)
+        LOGGER.info('Zzz')
     
     if remname:
         if not remname.startswith('|'):
