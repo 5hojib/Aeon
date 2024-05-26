@@ -44,7 +44,7 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         buttons.ibutton("Universal", f"userset {user_id} universal")
         buttons.ibutton("Mirror", f"userset {user_id} mirror")
         buttons.ibutton("Leech", f"userset {user_id} leech")
-        if user_dict and any(key in user_dict for key in ['prefix', 'suffix', 'remname', 'ldump', 'yt_opt', 'media_group', 'rclone', 'thumb', 'as_doc']):
+        if user_dict and any(key in user_dict for key in ['prefix', 'suffix', 'remname', 'ldump', 'yt_opt', 'media_group', 'rclone', 'thumb', 'as_doc', 'metadata']):
             buttons.ibutton("Reset", f"userset {user_id} reset_all")
         buttons.ibutton("Close", f"userset {user_id} close")
         text = f'<b>User Settings for {name}</b>'
@@ -141,7 +141,7 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
             text += f"<b>YT-DLP Options :</b> <code>{escape(set_exist)}</code>\n\n"
         elif key in ['prefix', 'remname', 'suffix', 'lcaption', 'ldump', 'metadata']:
             set_exist = 'Not Exists' if (val:=user_dict.get(key, '')) == '' else val
-            text += f"<b>Filename {fname_dict[key]} :</b> {set_exist}\n\n"
+            text += f"<b>{fname_dict[key]}:</b> {set_exist}\n\n"
         elif key == 'user_tds':
             set_exist = len(val) if (val:=user_dict.get(key, False)) else 'Not Exists'
             tds_mode = "Enabled" if user_dict.get('td_mode') else "Disabled"
