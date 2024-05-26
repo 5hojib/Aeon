@@ -2,7 +2,15 @@
 ![](https://github.com/5hojib/5hojib/raw/main/images/Aeon-MLTB.gif)
 ***
 
-### Heroku Deployment Instructions
+
+## Features
+
+- **Streamlined Code**: Unnecessary features and code have been removed for a more efficient and minimalistic bot.
+- **Heroku Deployment**: Fully configured for easy deployment on Heroku.
+- **Enhanced Functionality**: Includes additional features from various sources, improving the bot's overall capabilities.
+
+
+## Heroku Deployment Instructions
 
 1. **Fork and Star the Repository**
    - Start by forking and starring this repository.
@@ -35,9 +43,15 @@
    - Upload sensitive files like `token.pickle` using the `/botsettings` command.
 
 
+## Contributing
+
+Feel free to submit pull requests and open issues for any bugs or feature requests. Contributions are always welcome!
+
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
 
 ## Acknowledgements
 

@@ -135,10 +135,6 @@ GDRIVE_ID = environ.get('GDRIVE_ID', '')
 if len(GDRIVE_ID) == 0:
     GDRIVE_ID = ''
 
-JIODRIVE_TOKEN = environ.get('JIODRIVE_TOKEN', '')
-if len(JIODRIVE_TOKEN) == 0:
-    JIODRIVE_TOKEN = ''
-
 RCLONE_PATH = environ.get('RCLONE_PATH', '')
 if len(RCLONE_PATH) == 0:
     RCLONE_PATH = ''
@@ -323,7 +319,6 @@ config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
                'EXTENSION_FILTER': EXTENSION_FILTER,
                'GDRIVE_ID': GDRIVE_ID,
                'INDEX_URL': INDEX_URL,
-               'JIODRIVE_TOKEN': JIODRIVE_TOKEN,
                'LEECH_LOG_ID': LEECH_LOG_ID,
                'TOKEN_TIMEOUT': TOKEN_TIMEOUT,
                'MEDIA_GROUP': MEDIA_GROUP,

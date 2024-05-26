@@ -229,9 +229,13 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
     remname = user_dict.get('remname', '')
     suffix = user_dict.get('suffix', '')
     lcaption = user_dict.get('lcaption', '')
+    metadata = user_dict.get('metadata', '')
     prefile_ = file_
     file_ = re_sub(r'www\S+', '', file_)
 
+    if metadata:
+        await change_metadata(file_, metadata)
+    
     if remname:
         if not remname.startswith('|'):
             remname = f"|{remname}"
@@ -261,19 +265,14 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
         sufLen = len(suffix)
         fileDict = file_.split('.')
         _extIn = 1 + len(fileDict[-1])
-        _extOutName = '.'.join(
-            fileDict[:-1]).replace('.', ' ').replace('-', ' ')
+        _extOutName = '.'.join(fileDict[:-1]).replace('.', ' ').replace('-', ' ')
         _newExtFileName = f"{_extOutName}{suffix}.{fileDict[-1]}"
         if len(_extOutName) > (64 - (sufLen + _extIn)):
-            _newExtFileName = (
-                _extOutName[: 64 - (sufLen + _extIn)]
-                + f"{suffix}.{fileDict[-1]}"
-            )
+            _newExtFileName = (_extOutName[:64 - (sufLen + _extIn)] + f"{suffix}.{fileDict[-1]}")
         file_ = _newExtFileName
     elif suffix:
         suffix = suffix.replace('\s', ' ')
         file_ = f"{ospath.splitext(file_)[0]}{suffix}{ospath.splitext(file_)[1]}" if '.' in file_ else f"{file_}{suffix}"
-
 
     cap_mono = nfile_
     if lcaption and dirpath and not isMirror:
@@ -285,13 +284,13 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
         up_path = ospath.join(dirpath, prefile_)
         dur, qual, lang, subs = await get_media_info(up_path, True)
         cap_mono = slit[0].format(
-            filename = nfile_,
-            size = get_readable_file_size(await aiopath.getsize(up_path)),
-            duration = get_readable_time(dur, True),
-            quality = qual,
-            languages = lang,
-            subtitles = subs,
-            md5_hash = get_md5_hash(up_path))
+            filename=nfile_,
+            size=get_readable_file_size(await aiopath.getsize(up_path)),
+            duration=get_readable_time(dur, True),
+            quality=qual,
+            languages=lang,
+            subtitles=subs,
+            md5_hash=get_md5_hash(up_path))
         if len(slit) > 1:
             for rep in range(1, len(slit)):
                 args = slit[rep].split(":")
@@ -329,3 +328,10 @@ def get_md5_hash(up_path):
         for byte_block in iter(lambda: f.read(4096), b""):
             md5_hash.update(byte_block)
         return md5_hash.hexdigest()
+
+
+async def change_metadata(file, key):
+    if not file.lower().endswith('.mkv'):
+        return
+    cmd = ['render', '-i', file, '-c', 'copy', '-metadata:s:v', f'title={key}', '-metadata:s:a', f'title={key}', '-metadata:s:s', f'title={key}', file]
+    await create_subprocess_exec(*cmd, stderr=PIPE)

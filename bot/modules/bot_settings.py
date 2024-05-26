@@ -104,10 +104,6 @@ async def load_config():
     if len(INDEX_URL) == 0:
         INDEX_URL = ''
 
-    JIODRIVE_TOKEN = environ.get('JIODRIVE_TOKEN', '')
-    if len(JIODRIVE_TOKEN) == 0:
-        JIODRIVE_TOKEN = ''
-
     SEARCH_API_LINK = environ.get('SEARCH_API_LINK', '').rstrip("/")
     if len(SEARCH_API_LINK) == 0:
         SEARCH_API_LINK = ''
@@ -314,7 +310,6 @@ async def load_config():
                         'EXTENSION_FILTER': EXTENSION_FILTER,
                         'GDRIVE_ID': GDRIVE_ID,
                         'INDEX_URL': INDEX_URL,
-                        'JIODRIVE_TOKEN': JIODRIVE_TOKEN,
                         'LEECH_LOG_ID': LEECH_LOG_ID,
                         'TOKEN_TIMEOUT': TOKEN_TIMEOUT,
                         'MEDIA_GROUP': MEDIA_GROUP,

@@ -46,7 +46,6 @@ domain_dict = {
     'streamhub':    ['streamhub.ink'],
     'appflix':      ['appdrive',
                       'gdflix'],
-    'jiodrive':     ['jiodrive'],
     'akmfiles':     ['akmfiles.com',
                      'akmfls.xyz'],
     'doods':        ['dood.watch',
@@ -1200,27 +1199,6 @@ def streamhub(url):
         if error := html.xpath('//div[@class="alert alert-danger"]/text()[2]'):
             raise DirectDownloadLinkException(f"ERROR: {error[0]}")
         raise DirectDownloadLinkException("ERROR: direct link not found!")
-
-
-def jiodrive(url):
-    with create_scraper() as session:
-        try:
-            url = session.get(url).url
-            cookies = {
-                    'access_token': config_dict['JIODRIVE_TOKEN']
-            }
-
-            data = {
-                'id': url.split("/")[-1]
-            }
-
-            resp = session.post('https://www.jiodrive.xyz/ajax.php?ajax=download', cookies=cookies, data=data).json()
-
-        except Exception as e:
-            raise DirectDownloadLinkException(f'ERROR: {e.__class__.__name__}') from e
-        if resp['code'] != '200':
-            raise DirectDownloadLinkException("ERROR: The user's Drive storage quota has been exceeded.")
-        return resp['file']
 
 def pcloud(url):
     with create_scraper() as session:
