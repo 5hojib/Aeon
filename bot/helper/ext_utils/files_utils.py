@@ -400,14 +400,18 @@ async def change_metadata(file, dirpath, key):
     
     cmd = ['render', '-y', '-i', full_file_path, '-c', 'copy']
     
-    for stream in streams:
-        stream_index = stream['index']
-        if stream['codec_type'] == 'video':
-            cmd.extend(['-metadata:s:v:' + str(stream_index), f'title={key}'])
-        elif stream['codec_type'] == 'audio':
-            cmd.extend(['-metadata:s:a:' + str(stream_index), f'title={key}'])
-        elif stream['codec_type'] == 'subtitle':
-            cmd.extend(['-metadata:s:s:' + str(stream_index), f'title={key}'])
+    video_streams = [s for s in streams if s['codec_type'] == 'video']
+    audio_streams = [s for s in streams if s['codec_type'] == 'audio']
+    subtitle_streams = [s for s in streams if s['codec_type'] == 'subtitle']
+    
+    for i, stream in enumerate(video_streams):
+        cmd.extend(['-metadata:s:v:' + str(i), f'title={key}'])
+    
+    for i, stream in enumerate(audio_streams):
+        cmd.extend(['-metadata:s:a:' + str(i), f'title={key}'])
+    
+    for i, stream in enumerate(subtitle_streams):
+        cmd.extend(['-metadata:s:s:' + str(i), f'title={key}'])
     
     cmd.append(temp_file_path)
     
@@ -422,7 +426,6 @@ async def change_metadata(file, dirpath, key):
     os.replace(temp_file_path, full_file_path)
     LOGGER.info(f"Metadata changed successfully for file: {file}")
     return file
-
 
 def is_first_archive_split(file):
     return bool(re_search(FIRST_SPLIT_REGEX, file))
