@@ -44,6 +44,7 @@ bset_display_dict = {
     'UPSTREAM_REPO': "Your GitHub repository link. If your repo is private, add https://username:{githubtoken}@github.com/{username}/{reponame} format. Get the token from GitHub settings. So you can update your bot from the filled repository on each restart.",
     'UPSTREAM_BRANCH': 'Upstream branch for updates. Default is main.',
     'SET_COMMANDS': 'Set bot commands automatically. Bool',
+    'USE_SERVICE_ACCOUNTS': 'Whether to use Service Accounts or not, with google-api-python-client. For this to work see Using Service Accounts section below. Default is False',
     'USER_SESSION_STRING': "To download/upload from your Telegram account. To generate a session string, use this command <code>python3 generate_string_session.py</code> after mounting the repo folder for sure.\n\n<b>NOTE:</b> You can't use the bot with private messages. Use it with superGroup.",
     'YT_DLP_OPTIONS': 'Default yt-dlp options. Check all possible options HERE or use this script to convert CLI arguments to API options. Format: key:value|key:value|key:value. Add ^ before an integer or float, some numbers must be numeric and some strings. \nExample: "format:bv*+mergeall[vcodec=none]|nocheckcertificate:True".'
 }

@@ -223,6 +223,9 @@ QUEUE_UPLOAD = '' if len(QUEUE_UPLOAD) == 0 else int(QUEUE_UPLOAD)
 STOP_DUPLICATE = environ.get('STOP_DUPLICATE', '')
 STOP_DUPLICATE = STOP_DUPLICATE.lower() == 'true'
 
+USE_SERVICE_ACCOUNTS = environ.get('USE_SERVICE_ACCOUNTS', '')
+USE_SERVICE_ACCOUNTS = USE_SERVICE_ACCOUNTS.lower() == 'true'
+
 AS_DOCUMENT = environ.get('AS_DOCUMENT', '')
 AS_DOCUMENT = AS_DOCUMENT.lower() == 'true'
 
@@ -294,56 +297,59 @@ SET_COMMANDS = SET_COMMANDS.lower() == 'true'
 TOKEN_TIMEOUT = environ.get('TOKEN_TIMEOUT', '')
 TOKEN_TIMEOUT = int(TOKEN_TIMEOUT) if TOKEN_TIMEOUT.isdigit() else ''
 
-config_dict = {'AS_DOCUMENT': AS_DOCUMENT,
-               'BASE_URL': BASE_URL,
-               'BOT_TOKEN': BOT_TOKEN,
-               'BOT_MAX_TASKS': BOT_MAX_TASKS,
-               'CMD_SUFFIX': CMD_SUFFIX,
-               'DATABASE_URL': DATABASE_URL,
-               'DELETE_LINKS': DELETE_LINKS,
-               'DEFAULT_UPLOAD': DEFAULT_UPLOAD,
-               'FILELION_API': FILELION_API,
-               'TORRENT_LIMIT': TORRENT_LIMIT,
-               'DIRECT_LIMIT': DIRECT_LIMIT,
-               'YTDLP_LIMIT': YTDLP_LIMIT,
-               'GDRIVE_LIMIT': GDRIVE_LIMIT,
-               'CLONE_LIMIT': CLONE_LIMIT,
-               'MEGA_LIMIT': MEGA_LIMIT,
-               'LEECH_LIMIT': LEECH_LIMIT,
-               'FSUB_IDS': FSUB_IDS,
-               'USER_MAX_TASKS': USER_MAX_TASKS,
-               'PLAYLIST_LIMIT': PLAYLIST_LIMIT,
-               'MIRROR_LOG_ID': MIRROR_LOG_ID,
-               'LEECH_DUMP_ID': LEECH_DUMP_ID,
-               'IMAGES': IMAGES,
-               'EXTENSION_FILTER': EXTENSION_FILTER,
-               'GDRIVE_ID': GDRIVE_ID,
-               'INDEX_URL': INDEX_URL,
-               'LEECH_LOG_ID': LEECH_LOG_ID,
-               'TOKEN_TIMEOUT': TOKEN_TIMEOUT,
-               'MEDIA_GROUP': MEDIA_GROUP,
-               'MEGA_EMAIL': MEGA_EMAIL,
-               'MEGA_PASSWORD': MEGA_PASSWORD,
-               'OWNER_ID': OWNER_ID,
-               'QUEUE_ALL': QUEUE_ALL,
-               'QUEUE_DOWNLOAD': QUEUE_DOWNLOAD,
-               'QUEUE_UPLOAD': QUEUE_UPLOAD,
-               'RCLONE_FLAGS': RCLONE_FLAGS,
-               'RCLONE_PATH': RCLONE_PATH,
-               'SEARCH_API_LINK': SEARCH_API_LINK,
-               'SEARCH_LIMIT': SEARCH_LIMIT,
-               'SET_COMMANDS': SET_COMMANDS,
-               'SHOW_MEDIAINFO': SHOW_MEDIAINFO,
-               'STOP_DUPLICATE': STOP_DUPLICATE,
-               'STREAMWISH_API': STREAMWISH_API,
-               'TELEGRAM_API': TELEGRAM_API,
-               'TELEGRAM_HASH': TELEGRAM_HASH,
-               'TORRENT_TIMEOUT': TORRENT_TIMEOUT,
-               'UPSTREAM_REPO': UPSTREAM_REPO,
-               'UPSTREAM_BRANCH': UPSTREAM_BRANCH,
-               'USER_SESSION_STRING': USER_SESSION_STRING,
-               'GROUPS_EMAIL': GROUPS_EMAIL,
-               'YT_DLP_OPTIONS': YT_DLP_OPTIONS}
+config_dict = {
+    'AS_DOCUMENT': AS_DOCUMENT,
+    'BASE_URL': BASE_URL,
+    'BOT_TOKEN': BOT_TOKEN,
+    'BOT_MAX_TASKS': BOT_MAX_TASKS,
+    'CMD_SUFFIX': CMD_SUFFIX,
+    'DATABASE_URL': DATABASE_URL,
+    'DELETE_LINKS': DELETE_LINKS,
+    'DEFAULT_UPLOAD': DEFAULT_UPLOAD,
+    'FILELION_API': FILELION_API,
+    'TORRENT_LIMIT': TORRENT_LIMIT,
+    'DIRECT_LIMIT': DIRECT_LIMIT,
+    'YTDLP_LIMIT': YTDLP_LIMIT,
+    'GDRIVE_LIMIT': GDRIVE_LIMIT,
+    'CLONE_LIMIT': CLONE_LIMIT,
+    'MEGA_LIMIT': MEGA_LIMIT,
+    'LEECH_LIMIT': LEECH_LIMIT,
+    'FSUB_IDS': FSUB_IDS,
+    'USER_MAX_TASKS': USER_MAX_TASKS,
+    'PLAYLIST_LIMIT': PLAYLIST_LIMIT,
+    'MIRROR_LOG_ID': MIRROR_LOG_ID,
+    'LEECH_DUMP_ID': LEECH_DUMP_ID,
+    'IMAGES': IMAGES,
+    'EXTENSION_FILTER': EXTENSION_FILTER,
+    'GDRIVE_ID': GDRIVE_ID,
+    'INDEX_URL': INDEX_URL,
+    'LEECH_LOG_ID': LEECH_LOG_ID,
+    'TOKEN_TIMEOUT': TOKEN_TIMEOUT,
+    'MEDIA_GROUP': MEDIA_GROUP,
+    'MEGA_EMAIL': MEGA_EMAIL,
+    'MEGA_PASSWORD': MEGA_PASSWORD,
+    'OWNER_ID': OWNER_ID,
+    'QUEUE_ALL': QUEUE_ALL,
+    'QUEUE_DOWNLOAD': QUEUE_DOWNLOAD,
+    'QUEUE_UPLOAD': QUEUE_UPLOAD,
+    'RCLONE_FLAGS': RCLONE_FLAGS,
+    'RCLONE_PATH': RCLONE_PATH,
+    'SEARCH_API_LINK': SEARCH_API_LINK,
+    'SEARCH_LIMIT': SEARCH_LIMIT,
+    'SET_COMMANDS': SET_COMMANDS,
+    'SHOW_MEDIAINFO': SHOW_MEDIAINFO,
+    'STOP_DUPLICATE': STOP_DUPLICATE,
+    'STREAMWISH_API': STREAMWISH_API,
+    'TELEGRAM_API': TELEGRAM_API,
+    'TELEGRAM_HASH': TELEGRAM_HASH,
+    'TORRENT_TIMEOUT': TORRENT_TIMEOUT,
+    'UPSTREAM_REPO': UPSTREAM_REPO,
+    'UPSTREAM_BRANCH': UPSTREAM_BRANCH,
+    'USER_SESSION_STRING': USER_SESSION_STRING,
+    'GROUPS_EMAIL': GROUPS_EMAIL,
+    'USE_SERVICE_ACCOUNTS': USE_SERVICE_ACCOUNTS,
+    'YT_DLP_OPTIONS': YT_DLP_OPTIONS
+}
 
 if GDRIVE_ID:
     list_drives_dict['Main'] = {"drive_id": GDRIVE_ID, "index_link": INDEX_URL}
@@ -392,6 +398,14 @@ with open("a2c.conf", "a+") as a:
     a.write(f"bt-tracker=[{trackers}]")
 srun(["buffet", "--conf-path=/usr/src/app/a2c.conf"])
 
+if ospath.exists('accounts.zip'):
+    if ospath.exists('accounts'):
+        srun(["rm", "-rf", "accounts"])
+    srun(["7z", "x", "-o.", "-bd", "-aoa", "accounts.zip", "accounts/*.json"])
+    srun(["chmod", "-R", "777", "accounts"])
+    osremove('accounts.zip')
+if not ospath.exists('accounts'):
+    config_dict['USE_SERVICE_ACCOUNTS'] = False
 alive = Popen(['python3', 'alive.py'])
 sleep(0.5)
 

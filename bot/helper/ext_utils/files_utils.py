@@ -1,3 +1,8 @@
+
+import asyncio
+import logging
+import json
+
 import os
 from os import path as ospath, walk
 from shutil import rmtree, disk_usage
@@ -378,16 +383,39 @@ def get_md5_hash(up_path):
         return md5_hash.hexdigest()
 
 
+async def get_stream_counts(file, dirpath):
+    cmd = ['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-show_entries', 
+           'stream=index', '-of', 'json', f'{dirpath}/{file}']
+    process = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
+    stdout, _ = await process.communicate()
+    video_streams = len(json.loads(stdout)['streams'])
+
+    cmd = ['ffprobe', '-v', 'error', '-select_streams', 'a', '-show_entries', 
+           'stream=index', '-of', 'json', f'{dirpath}/{file}']
+    process = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
+    stdout, _ = await process.communicate()
+    audio_streams = len(json.loads(stdout)['streams'])
+
+    cmd = ['ffprobe', '-v', 'error', '-select_streams', 's', '-show_entries', 
+           'stream=index', '-of', 'json', f'{dirpath}/{file}']
+    process = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
+    stdout, _ = await process.communicate()
+    subtitle_streams = len(json.loads(stdout)['streams'])
+
+    return video_streams, audio_streams, subtitle_streams
+
 async def change_metadata(file, dirpath, key):
     LOGGER.info(f"Processing file: {file}")
     temp_file = f"{file}.temp.mkv"
-    cmd = [
-        'render', '-y', '-i', f'{dirpath}/{file}', '-c', 'copy',
-        '-metadata:s:v', f'title={key}',
-        '-metadata:s:a', f'title={key}',
-        '-metadata:s:s', f'title={key}',
-        f'{dirpath}/{temp_file}'
-    ]
+
+    video_streams, audio_streams, subtitle_streams = await get_stream_counts(file, dirpath)
+    
+    cmd = ['render', '-y', '-i', f'{dirpath}/{file}', '-c', 'copy']
+    cmd += [f'-metadata:s:v:{i}', f'title={key}' for i in range(video_streams)]
+    cmd += [f'-metadata:s:a:{i}', f'title={key}' for i in range(audio_streams)]
+    cmd += [f'-metadata:s:s:{i}', f'title={key}' for i in range(subtitle_streams)]
+    cmd.append(f'{dirpath}/{temp_file}')
+    
     process = await create_subprocess_exec(*cmd, stderr=PIPE)
     await process.wait()
     
