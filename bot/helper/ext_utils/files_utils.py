@@ -382,7 +382,7 @@ def get_md5_hash(up_path):
 
 
 async def change_metadata(file, dirpath, key):
-    LOGGER.info(f"Processing file: {file}")
+    LOGGER.info(f"Trying to change metadata for file: {file}")
     temp_file = f"{file}.temp.mkv"
     
     full_file_path = os.path.join(dirpath, file)
@@ -424,8 +424,7 @@ async def change_metadata(file, dirpath, key):
     await process.wait()
     
     if process.returncode != 0:
-        err = (await process.stderr.read()).decode().strip()
-        LOGGER.error(f"Error changing metadata: {err}")
+        LOGGER.error(f"Error changing metadata for file: {file}")
         return file
     
     os.replace(temp_file_path, full_file_path)
