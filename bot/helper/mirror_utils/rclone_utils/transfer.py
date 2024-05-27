@@ -10,7 +10,7 @@ from logging import getLogger
 
 from bot import config_dict, GLOBAL_EXTENSION_FILTER
 from bot.helper.ext_utils.bot_utils import cmd_exec, sync_to_async
-from bot.helper.ext_utils.fs_utils import get_mime_type, count_files_and_folders
+from bot.helper.ext_utils.files_utils import get_mime_type, count_files_and_folders
 
 
 LOGGER = getLogger(__name__)

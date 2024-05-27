@@ -15,9 +15,8 @@ from aioshutil import copy
 from bot import config_dict, user_data, GLOBAL_EXTENSION_FILTER, bot, user, IS_PREMIUM_USER
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import sendCustomMsg, sendMultiMessage, chat_info, deleteMessage, get_tg_link_content
-from bot.helper.ext_utils.fs_utils import clean_unwanted, is_archive, get_base_name
+from bot.helper.ext_utils.files_utils import clean_unwanted, is_archive, get_base_name, get_media_info, get_document_type, take_ss, get_ss, get_mediainfo_link, format_filename, get_audio_thumb
 from bot.helper.ext_utils.bot_utils import get_readable_file_size, sync_to_async, is_telegram_link, is_url, download_image_url
-from bot.helper.ext_utils.leech_utils import get_media_info, get_document_type, take_ss, get_ss, get_mediainfo_link, format_filename, get_audio_thumb
 
 LOGGER = getLogger(__name__)
 getLogger("pyrogram").setLevel(ERROR)
@@ -51,7 +50,7 @@ class TgUploader:
         self.__bot_pm = False
         self.__user_id = listener.message.from_user.id
         self.__leechmsg = {}
-        self.__leech_utils = self.__listener.leech_utils
+        self.__files_utils = self.__listener.files_utils
         self.__thumb = f"Thumbnails/{listener.message.from_user.id}.jpg"
 
     async def get_custom_thumb(self, thumb):
@@ -84,8 +83,8 @@ class TgUploader:
     async def __buttons(self, up_path, is_video=False):
         buttons = ButtonMaker()
         try:
-            if is_video and bool(self.__leech_utils['screenshots']):
-                buttons.ubutton('SCREENSHOTS', await get_ss(up_path, self.__leech_utils['screenshots']))
+            if is_video and bool(self.__files_utils['screenshots']):
+                buttons.ubutton('SCREENSHOTS', await get_ss(up_path, self.__files_utils['screenshots']))
         except Exception as e:
             LOGGER.error(f"ScreenShots Error: {e}")
         try:
@@ -153,7 +152,7 @@ class TgUploader:
         self.__bot_pm = True
         self.__mediainfo = config_dict['SHOW_MEDIAINFO'] or user_dict.get('mediainfo')
         self.__ldump = user_dict.get('ldump', '') or ''
-        self.__has_buttons = bool(self.__mediainfo or self.__leech_utils['screenshots'])
+        self.__has_buttons = bool(self.__mediainfo or self.__files_utils['screenshots'])
         if not await aiopath.exists(self.__thumb):
             self.__thumb = None
 
@@ -348,8 +347,8 @@ class TgUploader:
         try:
             is_video, is_audio, is_image = await get_document_type(self.__up_path)
 
-            if self.__leech_utils['thumb']:
-                thumb = await self.get_custom_thumb(self.__leech_utils['thumb'])
+            if self.__files_utils['thumb']:
+                thumb = await self.get_custom_thumb(self.__files_utils['thumb'])
             if not is_image and thumb is None:
                 file_name = ospath.splitext(file)[0]
                 thumb_path = f"{self.__path}/yt-dlp-thumb/{file_name}.jpg"
