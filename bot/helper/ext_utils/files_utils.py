@@ -385,7 +385,10 @@ async def change_metadata(file, dirpath, key):
     LOGGER.info(f"Processing file: {file}")
     temp_file = f"{file}.temp.mkv"
     
-    cmd = ['ffprobe', '-hide_banner', '-loglevel', 'error', '-print_format', 'json', '-show_streams', f'{dirpath}/{file}']
+    full_file_path = os.path.join(dirpath, file)
+    temp_file_path = os.path.join(dirpath, temp_file)
+    
+    cmd = ['ffprobe', '-hide_banner', '-loglevel', 'error', '-print_format', 'json', '-show_streams', full_file_path]
     process = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
     stdout, stderr = await process.communicate()
     
@@ -395,7 +398,7 @@ async def change_metadata(file, dirpath, key):
     
     streams = json.loads(stdout)['streams']
     
-    cmd = ['render', '-y', '-i', f'{dirpath}/{file}', '-c', 'copy']
+    cmd = ['render', '-y', '-i', full_file_path, '-c', 'copy']
     
     for stream in streams:
         stream_index = stream['index']
@@ -406,7 +409,7 @@ async def change_metadata(file, dirpath, key):
         elif stream['codec_type'] == 'subtitle':
             cmd.extend(['-metadata:s:s:' + str(stream_index), f'title={key}'])
     
-    cmd.append(f'{dirpath}/{temp_file}')
+    cmd.append(temp_file_path)
     
     process = await create_subprocess_exec(*cmd, stderr=PIPE)
     await process.wait()
@@ -416,7 +419,7 @@ async def change_metadata(file, dirpath, key):
         LOGGER.error(f"Error changing metadata: {err}")
         return file
     
-    os.replace(f'{dirpath}/{temp_file}', f'{dirpath}/{file}')
+    os.replace(temp_file_path, full_file_path)
     LOGGER.info(f"Metadata changed successfully for file: {file}")
     return file
 
