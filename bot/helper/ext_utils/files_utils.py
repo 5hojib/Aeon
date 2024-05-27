@@ -402,9 +402,9 @@ async def change_metadata(file, dirpath, key):
     video_streams, audio_streams, subtitle_streams = await get_stream_counts(file, dirpath)
     
     cmd = ['render', '-y', '-i', f'{dirpath}/{file}', '-c', 'copy']
-    cmd += [f'-metadata:s:v:{i}', f'title={key}' for i in range(video_streams)]
-    cmd += [f'-metadata:s:a:{i}', f'title={key}' for i in range(audio_streams)]
-    cmd += [f'-metadata:s:s:{i}', f'title={key}' for i in range(subtitle_streams)]
+    cmd += [item for i in range(video_streams) for item in (f'-metadata:s:v:{i}', f'title={key}')]
+    cmd += [item for i in range(audio_streams) for item in (f'-metadata:s:a:{i}', f'title={key}')]
+    cmd += [item for i in range(subtitle_streams) for item in (f'-metadata:s:s:{i}', f'title={key}')]
     cmd.append(f'{dirpath}/{temp_file}')
     
     process = await create_subprocess_exec(*cmd, stderr=PIPE)
