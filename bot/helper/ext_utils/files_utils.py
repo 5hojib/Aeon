@@ -1,6 +1,4 @@
 
-import asyncio
-import logging
 import json
 
 import os
@@ -383,28 +381,31 @@ def get_md5_hash(up_path):
         return md5_hash.hexdigest()
 
 
-async def get_stream_counts(file, dirpath):
-    async def count_streams(stream_type):
-        cmd = ['ffprobe', '-v', 'error', f'-select_streams', f'{stream_type}', '-show_entries', 'stream=index', '-of', 'json', f'{dirpath}/{file}']
-        process = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
-        stdout, _ = await process.communicate()
-        return len(json.loads(stdout)['streams'])
-    
-    video_streams = await count_streams('v')
-    audio_streams = await count_streams('a')
-    subtitle_streams = await count_streams('s')
-    return video_streams, audio_streams, subtitle_streams
-
 async def change_metadata(file, dirpath, key):
     LOGGER.info(f"Processing file: {file}")
     temp_file = f"{file}.temp.mkv"
-
-    video_streams, audio_streams, subtitle_streams = await get_stream_counts(file, dirpath)
+    
+    cmd = ['ffprobe', '-hide_banner', '-loglevel', 'error', '-print_format', 'json', '-show_streams', f'{dirpath}/{file}']
+    process = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = await process.communicate()
+    
+    if process.returncode != 0:
+        LOGGER.error(f"Error getting stream info: {stderr.decode().strip()}")
+        return file
+    
+    streams = json.loads(stdout)['streams']
     
     cmd = ['render', '-y', '-i', f'{dirpath}/{file}', '-c', 'copy']
-    cmd += [item for i in range(video_streams) for item in (f'-metadata:s:v:{i}', f'title={key}')]
-    cmd += [item for i in range(audio_streams) for item in (f'-metadata:s:a:{i}', f'title={key}')]
-    cmd += [item for i in range(subtitle_streams) for item in (f'-metadata:s:s:{i}', f'title={key}')]
+    
+    for stream in streams:
+        stream_index = stream['index']
+        if stream['codec_type'] == 'video':
+            cmd.extend(['-metadata:s:v:' + str(stream_index), f'title={key}'])
+        elif stream['codec_type'] == 'audio':
+            cmd.extend(['-metadata:s:a:' + str(stream_index), f'title={key}'])
+        elif stream['codec_type'] == 'subtitle':
+            cmd.extend(['-metadata:s:s:' + str(stream_index), f'title={key}'])
+    
     cmd.append(f'{dirpath}/{temp_file}')
     
     process = await create_subprocess_exec(*cmd, stderr=PIPE)
