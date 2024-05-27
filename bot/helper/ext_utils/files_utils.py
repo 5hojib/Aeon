@@ -400,18 +400,23 @@ async def change_metadata(file, dirpath, key):
     
     cmd = ['render', '-y', '-i', full_file_path, '-c', 'copy']
     
-    for stream in streams:
-        cmd.extend(['-map', f'0:{stream["index"]}'])
+    audio_index = 0
+    subtitle_index = 0
     
     for stream in streams:
         stream_index = stream['index']
         stream_type = stream['codec_type']
+        
+        cmd.extend(['-map', f'0:{stream_index}'])
+        
         if stream_type == 'video':
             cmd.extend([f'-metadata:s:v:{stream_index}', f'title={key}'])
         elif stream_type == 'audio':
-            cmd.extend([f'-metadata:s:a:{stream_index}', f'title={key}'])
+            cmd.extend([f'-metadata:s:a:{audio_index}', f'title={key}'])
+            audio_index += 1
         elif stream_type == 'subtitle':
-            cmd.extend([f'-metadata:s:s:{stream_index}', f'title={key}'])
+            cmd.extend([f'-metadata:s:s:{subtitle_index}', f'title={key}'])
+            subtitle_index += 1
     
     cmd.append(temp_file_path)
     
