@@ -95,8 +95,10 @@ async def start(client, message):
         data = user_data[userid]
         if 'token' not in data or data['token'] != input_token:
             return await sendMessage(message, '<b>This token has already been used!</b>\n\nPlease get a new one.')
-        data['token'] = str(uuid4())
-        data['time'] = time()
+        token = str(uuid4())
+        token_time = time()
+        data['token'] = token
+        data['time'] = token_time
         user_data[userid].update(data)
         if DATABASE_URL:
             await DbManager().update_user_tdata(userid, token, token_time)
