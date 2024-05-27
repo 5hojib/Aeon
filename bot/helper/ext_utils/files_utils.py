@@ -384,24 +384,15 @@ def get_md5_hash(up_path):
 
 
 async def get_stream_counts(file, dirpath):
-    cmd = ['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-show_entries', 
-           'stream=index', '-of', 'json', f'{dirpath}/{file}']
-    process = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
-    stdout, _ = await process.communicate()
-    video_streams = len(json.loads(stdout)['streams'])
-
-    cmd = ['ffprobe', '-v', 'error', '-select_streams', 'a', '-show_entries', 
-           'stream=index', '-of', 'json', f'{dirpath}/{file}']
-    process = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
-    stdout, _ = await process.communicate()
-    audio_streams = len(json.loads(stdout)['streams'])
-
-    cmd = ['ffprobe', '-v', 'error', '-select_streams', 's', '-show_entries', 
-           'stream=index', '-of', 'json', f'{dirpath}/{file}']
-    process = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
-    stdout, _ = await process.communicate()
-    subtitle_streams = len(json.loads(stdout)['streams'])
-
+    async def count_streams(stream_type):
+        cmd = ['ffprobe', '-v', 'error', f'-select_streams', f'{stream_type}', '-show_entries', 'stream=index', '-of', 'json', f'{dirpath}/{file}']
+        process = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
+        stdout, _ = await process.communicate()
+        return len(json.loads(stdout)['streams'])
+    
+    video_streams = await count_streams('v')
+    audio_streams = await count_streams('a')
+    subtitle_streams = await count_streams('s')
     return video_streams, audio_streams, subtitle_streams
 
 async def change_metadata(file, dirpath, key):
