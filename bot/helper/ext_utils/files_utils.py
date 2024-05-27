@@ -401,9 +401,6 @@ async def change_metadata(file, dirpath, key):
     cmd = ['render', '-y', '-i', full_file_path, '-c', 'copy']
     
     for stream in streams:
-        cmd.extend(['-map', f'0:{stream["index"]}'])
-    
-    for stream in streams:
         stream_index = stream['index']
         stream_type = stream['codec_type']
         if stream_type == 'video':
