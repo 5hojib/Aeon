@@ -381,7 +381,6 @@ def get_md5_hash(up_path):
         return md5_hash.hexdigest()
 
 
-"""
 async def change_metadata(file, dirpath, key):
     LOGGER.info(f"Processing file: {file}")
     temp_file = f"{file}.temp.mkv"
@@ -400,6 +399,9 @@ async def change_metadata(file, dirpath, key):
     streams = json.loads(stdout)['streams']
     
     cmd = ['render', '-y', '-i', full_file_path, '-c', 'copy']
+    
+    for stream in streams:
+        cmd.extend(['-map', f'0:{stream["index"]}'])
     
     for stream in streams:
         stream_index = stream['index']
@@ -424,31 +426,6 @@ async def change_metadata(file, dirpath, key):
     os.replace(temp_file_path, full_file_path)
     LOGGER.info(f"Metadata changed successfully for file: {file}")
     return file
-"""
-
-async def change_metadata(file, dirpath, key):
-    LOGGER.info(f"Processing file: {file}")
-    temp_file = f"{file}.temp.mkv"
-    
-    full_file_path = os.path.join(dirpath, file)
-    temp_file_path = os.path.join(dirpath, temp_file)
-    
-    cmd = ['render', '-y', '-i', full_file_path]
-    cmd.extend(['-metadata', f'title={key}'])
-    cmd.append(temp_file_path)
-    
-    process = await create_subprocess_exec(*cmd, stderr=PIPE)
-    await process.wait()
-    
-    if process.returncode != 0:
-        err = (await process.stderr.read()).decode().strip()
-        LOGGER.error(f"Error changing metadata: {err}")
-        return file
-    
-    os.replace(temp_file_path, full_file_path)
-    LOGGER.info(f"Metadata changed successfully for file: {file}")
-    return file
-
 
 def is_first_archive_split(file):
     return bool(re_search(FIRST_SPLIT_REGEX, file))
