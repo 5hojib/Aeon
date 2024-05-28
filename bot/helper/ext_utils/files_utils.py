@@ -401,10 +401,14 @@ async def change_metadata(file, dirpath, key):
     
     cmd = ['render', '-y', '-i', full_file_path, '-c', 'copy', '-metadata', f'title={key}']
     
-    unset_metadata_keys = ['LICENCE', 'author', 'description', 'Description', 'AUTHOR', 'filename', 'mimetype', 'SUMMARY', 'WEBSITE', 'COMMENT', 'ENCODER', 'Copyright', 'copyright']
+    # Unset unwanted metadata at the container level
+    unset_metadata_keys = ['LICENCE', 'author', 'filename', 'mimetype', 'SUMMARY', 'WEBSITE', 'COMMENT', 'ENCODER']
     for unset_key in unset_metadata_keys:
         if unset_key in format_metadata:
             cmd.extend(['-metadata', f'{unset_key}='])
+
+    # Explicitly unset description and copyright
+    cmd.extend(['-metadata', 'description=', '', '-metadata', 'copyright=', ''])
     
     audio_index = 0
     subtitle_index = 0
@@ -424,7 +428,8 @@ async def change_metadata(file, dirpath, key):
             cmd.extend([f'-metadata:s:s:{subtitle_index}', f'title={key}'])
             subtitle_index += 1
         
-        for unset_key in unset_metadata_keys:
+        # Unset unwanted metadata at the stream level
+        for unset_key in unset_metadata_keys + ['description', 'copyright']:
             if 'tags' in stream and unset_key in stream['tags']:
                 cmd.extend([f'-metadata:s:{stream_index}:{unset_key}=', ''])
     
