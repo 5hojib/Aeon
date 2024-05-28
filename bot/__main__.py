@@ -34,51 +34,35 @@ from .modules import authorize, cancel_mirror, mirror_leech, status, torrent_sea
 from .helper.mirror_utils.gdrive_utils import count, delete, list, clone
 
 
-def get_command_name(cmd):
-    command = getattr(BotCommands, cmd, None)
-    if command is None:
-        raise ValueError(f"Command {cmd} not found in BotCommands")
-    if isinstance(command, list):
-        return command[0]
-    elif isinstance(command, str):
-        return command
-    else:
-        raise TypeError(f"Unexpected type for command {cmd}: {type(command)}")
+if config_dict['GDRIVE_ID']:
+    help_string = f'''<b>NOTE: Try each command without any arguments to see more details.</b>
 
-command_descriptions = {
-    'MirrorCommand': '- Start mirroring to Google Drive.',
-    'LeechCommand': '- Start leeching to Telegram.',
-    'YtdlCommand': '- Mirror links supported by yt-dlp.',
-    'YtdlLeechCommand': '- Leech links supported by yt-dlp.',
-    'CloneCommand': '- Copy files/folders to Google Drive.',
-    'CountCommand': '- Count files/folders in Google Drive.',
-    'ListCommand': '- Search in Google Drive(s).',
-    'UserSetCommand': '- Open the settings panel.',
-    'MediaInfoCommand': '- View MediaInfo from a file or link.',
-    'StopAllCommand': '- Cancel all active tasks.',
-    'SearchCommand': '- Search for torrents using API or plugins.',
-    'StatusCommand': '- Show the status of all downloads.',
-    'StatsCommand': '- Display machine stats hosting the bot.'
-}
+<blockquote>/{BotCommands.MirrorCommand[0]} - Start mirroring to Google Drive.</blockquote>
+<blockquote>/{BotCommands.LeechCommand[0]} - Start leeching to Telegram.</blockquote>
+<blockquote>/{BotCommands.YtdlCommand[0]} - Mirror links supported by yt-dlp.</blockquote>
+<blockquote>/{BotCommands.YtdlLeechCommand[0]} - Leech links supported by yt-dlp.</blockquote>
+<blockquote>/{BotCommands.CloneCommand[0]} - Copy files/folders to Google Drive.</blockquote>
+<blockquote>/{BotCommands.CountCommand} - Count files/folders in Google Drive.</blockquote>
+<blockquote>/{BotCommands.ListCommand} - Search in Google Drive(s).</blockquote>
+<blockquote>/{BotCommands.UserSetCommand} - Open the settings panel.</blockquote>
+<blockquote>/{BotCommands.MediaInfoCommand} - View MediaInfo from a file or link.</blockquote>
+<blockquote>/{BotCommands.StopAllCommand[0]} - Cancel all active tasks.</blockquote>
+<blockquote>/{BotCommands.SearchCommand} - Search for torrents using API or plugins.</blockquote>
+<blockquote>/{BotCommands.StatusCommand[0]} - Show the status of all downloads.</blockquote>
+<blockquote>/{BotCommands.StatsCommand[0]} - Display machine stats hosting the bot.</blockquote>
+'''
+else:
+    help_string = f'''<b>NOTE: Try each command without any arguments to see more details.</b>
 
-commands = [
-    'MirrorCommand', 'LeechCommand', 'YtdlCommand', 'YtdlLeechCommand', 
-    'CloneCommand', 'MediaInfoCommand', 'CountCommand', 'ListCommand', 
-    'SearchCommand', 'UserSetCommand', 'StatusCommand', 'StatsCommand', 'StopAllCommand'
-]
-
-if not config_dict.get('GDRIVE_ID'):
-    commands = [
-        'LeechCommand', 'YtdlLeechCommand', 'MediaInfoCommand', 
-        'SearchCommand', 'UserSetCommand', 'StatusCommand', 
-        'StatsCommand', 'StopAllCommand'
-    ]
-
-help_string = "<b>NOTE: Try each command without any arguments to see more details.</b>\n\n"
-help_string += "\n".join([
-    f"<blockquote>/{get_command_name(cmd)} - {command_descriptions[cmd]}</blockquote>" 
-    for cmd in commands
-])
+<blockquote>/{BotCommands.LeechCommand[0]} - Start leeching to Telegram.</blockquote>
+<blockquote>/{BotCommands.YtdlLeechCommand[0]} - Leech links supported by yt-dlp.</blockquote>
+<blockquote>/{BotCommands.UserSetCommand} - Open the settings panel.</blockquote>
+<blockquote>/{BotCommands.MediaInfoCommand} - View MediaInfo from a file or link.</blockquote>
+<blockquote>/{BotCommands.StopAllCommand[0]} - Cancel all active tasks.</blockquote>
+<blockquote>/{BotCommands.SearchCommand} - Search for torrents using API or plugins.</blockquote>
+<blockquote>/{BotCommands.StatusCommand[0]} - Show the status of all downloads.</blockquote>
+<blockquote>/{BotCommands.StatsCommand[0]} - Display machine stats hosting the bot.</blockquote>
+'''
 
 
 @new_thread
