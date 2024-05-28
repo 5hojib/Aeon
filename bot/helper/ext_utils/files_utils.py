@@ -387,7 +387,7 @@ async def change_metadata(file, dirpath, key):
     full_file_path = os.path.join(dirpath, file)
     temp_file_path = os.path.join(dirpath, temp_file)
     
-    cmd = ['ffprobe', '-hide_banner', '-loglevel', 'error', '-print_format', 'json', '-show_streams', full_file_path]
+    cmd = ['ffprobe', '-hide_banner', '-loglevel', 'error', '-print_format', 'json', '-show_streams', '-show_format', full_file_path]
     process = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
     stdout, stderr = await process.communicate()
     
@@ -395,16 +395,23 @@ async def change_metadata(file, dirpath, key):
         LOGGER.error(f"Error getting stream info: {stderr.decode().strip()}")
         return file
     
-    streams = json.loads(stdout)['streams']
-    
-    cmd = ['render', '-y', '-i', full_file_path, '-c', 'copy', '-metadata', f'title={key}']
+    metadata = json.loads(stdout)
+    streams = metadata['streams']
+    format_metadata = metadata['format']['tags'] if 'tags' in metadata['format'] else {}
+
+    # Base ffmpeg command to copy streams and set media title
+    cmd = [
+        'render', '-y', '-i', full_file_path, '-c', 'copy', 
+        '-metadata', f'title={key}'
+    ]
     
     # Unset unwanted metadata at the container level
     unset_metadata_keys = [
         'LICENCE', 'author', 'description', 'filename', 'mimetype', 'SUMMARY', 'WEBSITE', 'COMMENT', 'ENCODER'
     ]
     for key in unset_metadata_keys:
-        cmd.extend(['-metadata', f'{key}='])
+        if key in format_metadata:
+            cmd.extend(['-metadata', f'{key}='])
 
     audio_index = 0
     subtitle_index = 0
@@ -424,9 +431,9 @@ async def change_metadata(file, dirpath, key):
             cmd.extend([f'-metadata:s:s:{subtitle_index}', f'title={key}'])
             subtitle_index += 1
         
-        # Unset unwanted metadata at the stream level
         for unset_key in unset_metadata_keys:
-            cmd.extend([f'-metadata:s:{stream_index}:{unset_key}=', ''])
+            if unset_key in stream.get('tags', {}):
+                cmd.extend([f'-metadata:s:{stream_index}:{unset_key}=', ''])
     
     cmd.append(temp_file_path)
     
