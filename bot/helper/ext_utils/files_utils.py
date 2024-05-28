@@ -401,7 +401,7 @@ async def change_metadata(file, dirpath, key):
     
     cmd = ['render', '-y', '-i', full_file_path, '-c', 'copy', '-metadata', f'title={key}']
     
-    unset_metadata_keys = ['LICENCE', 'author', 'description', 'Description', 'AUTHOR', 'filename', 'mimetype', 'SUMMARY', 'WEBSITE', 'COMMENT', 'ENCODER']
+    unset_metadata_keys = ['LICENCE', 'author', 'description', 'Description', 'AUTHOR', 'filename', 'mimetype', 'SUMMARY', 'WEBSITE', 'COMMENT', 'ENCODER', 'Copyright']
     for unset_key in unset_metadata_keys:
         if unset_key in format_metadata:
             cmd.extend(['-metadata', f'{unset_key}='])
