@@ -12,15 +12,15 @@ from bot.helper.ext_utils.task_manager import task_utils
 from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, delete_links, deleteMessage, one_minute_del, five_minute_del, isAdmin
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.bot_utils import get_readable_file_size, fetch_user_tds, is_url, is_gdrive_link, new_task, sync_to_async, new_task, is_rclone_path, new_thread, get_readable_time, arg_parser
-from bot.helper.mirror_utils.download_utils.yt_dlp_download import YoutubeDLHelper
-from bot.helper.mirror_utils.rclone_utils.list import RcloneList
+from bot.helper.mirror_leech_utils.download_utils.yt_dlp_download import YoutubeDLHelper
+from bot.helper.mirror_leech_utils.rclone_utils.list import RcloneList
 from bot.helper.telegram_helper.bot_commands import BotCommands
-from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
+from bot.helper.mirror_leech_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
-from bot.helper.ext_utils.help_messages import YT_HELP_MESSAGE
+from bot.helper.ext_utils.help_strings import YT_HELP_MESSAGE
 from bot.helper.ext_utils.bulk_links import extract_bulk_links
-from bot.helper.ext_utils.aeon_utils import nsfw_precheck
+from bot.helper.aeon_utils.nsfw_check import nsfw_precheck
 
 
 @new_task
@@ -373,7 +373,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
     if error_msg:
         final_msg = f'Hey, <b>{tag}</b>!\n'
         for __i, __msg in enumerate(error_msg, 1):
-            final_msg += f'\n<b>{__i}</b>: {__msg}\n'
+            final_msg += f'\n<blockquote><b>{__i}</b>: {__msg}</blockquote>'
         if error_button is not None:
             error_button = error_button.build_menu(2)
         await delete_links(message)
@@ -420,7 +420,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
             await delete_links(message)
             return
 
-    listener = MirrorLeechListener(message, compress, isLeech=isLeech, tag=tag, sameDir=sameDir, rcFlags=rcf, upPath=up, drive_id=drive_id, index_link=index_link, isYtdlp=True, leech_utils={'screenshots': sshots, 'thumb': thumb})
+    listener = MirrorLeechListener(message, compress, isLeech=isLeech, tag=tag, sameDir=sameDir, rcFlags=rcf, upPath=up, drive_id=drive_id, index_link=index_link, isYtdlp=True, files_utils={'screenshots': sshots, 'thumb': thumb})
 
     if 'mdisk.me' in link:
         name, link = await _mdisk(link, name)

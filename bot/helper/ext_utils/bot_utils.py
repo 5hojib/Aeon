@@ -29,7 +29,43 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.telegraph_helper import telegraph
 from bot.helper.ext_utils.shorteners import short_url
-from bot.helper.ext_utils.aeon_utils import tinyfy
+from bot.helper.aeon_utils.tinyfy import tinyfy
+
+
+if config_dict.get('GDRIVE_ID'):
+    commands = [
+        'MirrorCommand', 'LeechCommand', 'YtdlCommand', 'YtdlLeechCommand', 
+        'CloneCommand', 'MediaInfoCommand', 'CountCommand', 'ListCommand', 'SearchCommand', 
+        'UserSetCommand', 'StatusCommand', 'StatsCommand', 'StopAllCommand', 
+        'HelpCommand', 'BotSetCommand', 'LogCommand', 'RestartCommand'
+    ]
+else:
+    commands = [
+        'LeechCommand', 'YtdlLeechCommand', 'MediaInfoCommand', 'SearchCommand', 
+        'UserSetCommand', 'StatusCommand', 'StatsCommand', 'StopAllCommand', 
+        'HelpCommand', 'BotSetCommand', 'LogCommand', 'RestartCommand'
+    ]
+
+command_descriptions = {
+    'MirrorCommand': '- Start mirroring',
+    'LeechCommand': '- Start leeching',
+    'YtdlCommand': '- Mirror yt-dlp supported link',
+    'YtdlLeechCommand': '- Leech through yt-dlp supported link',
+    'CloneCommand': '- Copy file/folder to Drive',
+    'MediaInfoCommand': '- Get MediaInfo',
+    'CountCommand': '- Count file/folder on Google Drive.',
+    'ListCommand': '- Search in Drive',
+    'SearchCommand': '- Search in Torrent',
+    'UserSetCommand': '- User settings',
+    'StatusCommand': '- Get mirror status message',
+    'StatsCommand': '- Check Bot & System stats',
+    'StopAllCommand': '- Cancel all tasks added by you to the bot.',
+    'HelpCommand': '- Get detailed help',
+    'BotSetCommand': '- [ADMIN] Open Bot settings',
+    'LogCommand': '- [ADMIN] View log',
+    'RestartCommand': '- [ADMIN] Restart the bot'
+}
+
 
 THREADPOOL = ThreadPoolExecutor(max_workers = 1000)
 MAGNET_REGEX = r'magnet:\?xt=urn:(btih|btmh):[a-zA-Z0-9]*\s*'
@@ -106,11 +142,8 @@ def bt_selection_buttons(id_):
     pincode = ''.join([n for n in id_ if n.isdigit()][:4])
     buttons = ButtonMaker()
     BASE_URL = config_dict['BASE_URL']
-    if config_dict['WEB_PINCODE']:
-        buttons.ubutton("Select Files", f"{BASE_URL}/app/files/{id_}")
-        buttons.ibutton("Pincode", f"btsel pin {gid} {pincode}")
-    else:
-        buttons.ubutton("Select Files", f"{BASE_URL}/app/files/{id_}?pin_code={pincode}")
+    buttons.ubutton("Select", f"{BASE_URL}/app/files/{id_}")
+    buttons.ibutton("Pincode", f"btsel pin {gid} {pincode}")
     buttons.ibutton("Cancel", f"btsel rm {gid} {id_}")
     buttons.ibutton("Done Selecting", f"btsel done {gid} {id_}")
     return buttons.build_menu(2)
@@ -170,11 +203,10 @@ def get_readable_message():
         globals()['STATUS_START'] = STATUS_LIMIT * (PAGES - 1)
         globals()['PAGE_NO'] = PAGES
     for download in list(download_dict.values())[STATUS_START:STATUS_LIMIT+STATUS_START]:
-        msg += f"{escape(f'{download.name()}')}\n"
-        msg += f"by {source(download)}\n\n"
-        msg += f"<b>{download.status()}...</b>"
+        msg += f"<b>{download.status()}:</b> {escape(f'{download.name()}')}\n"
+        msg += f"by {source(download)}\n"
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING]:
-            msg += f"\n<code>{progress_bar(download.progress())}</code> {download.progress()}"
+            msg += f"<blockquote><code>{progress_bar(download.progress())}</code> {download.progress()}"
             msg += f"\n{download.processed_bytes()} of {download.size()}"
             msg += f"\nSpeed: {download.speed()}"
             msg += f'\nEstimated: {download.eta()}'
@@ -184,15 +216,15 @@ def get_readable_message():
                 except:
                     pass
         elif download.status() == MirrorStatus.STATUS_SEEDING:
-            msg += f"\nSize: {download.size()}"
+            msg += f"<blockquote>\nSize: {download.size()}"
             msg += f"\nSpeed: {download.upload_speed()}"
             msg += f"\nUploaded: {download.uploaded_bytes()}"
             msg += f"\nRatio: {download.ratio()}"
             msg += f"\nTime: {download.seeding_time()}"
         else:
-            msg += f"\nSize: {download.size()}"
-        msg += f"\nElapsed: {get_readable_time(time() - download.message.date.timestamp())}"
-        msg += f"\n/stop_{download.gid()[:8]}\n\n"
+            msg += f"<blockquote>\nSize: {download.size()}"
+        msg += f"\nElapsed: {get_readable_time(time() - download.message.date.timestamp())}</blockquote>"
+        msg += f"\n<blockquote>/stop_{download.gid()[:8]}</blockquote>\n\n"
     if len(msg) == 0:
         return None, None
     dl_speed = 0
@@ -279,7 +311,7 @@ def is_telegram_link(url):
 
 def is_share_link(url):
     domain = urlparse(url).hostname
-    return any(x in domain for x in ['appdirve', 'hubdrive', 'jiodrive', 'gdflix', 'filepress'])
+    return any(x in domain for x in ['appdirve', 'hubdrive', 'gdflix', 'filepress'])
 
 
 def is_mega_link(url):
@@ -414,13 +446,15 @@ async def checking_access(user_id, button=None):
     user_data.setdefault(user_id, {})
     data = user_data[user_id]
     if DATABASE_URL:
-        data['time'] = await DbManager().get_token_expire_time(user_id)
+        data['time'] = await DbManager().get_token_expiry(user_id)
     expire = data.get('time')
     isExpired = (expire is None or expire is not None and (time() - expire) > token_timeout)
     if isExpired:
         token = data['token'] if expire is None and 'token' in data else str(uuid4())
         if expire is not None:
             del data['time']
+            #if DATABASE_URL:
+             #   await DbManager().delete_user_token(user_id)
         data['token'] = token
         if DATABASE_URL:
             await DbManager().update_user_token(user_id, token)
@@ -440,25 +474,8 @@ def extra_btns(buttons):
     return buttons
 
 
-async def set_commands(client):
+commands = [BotCommand(getattr(BotCommands, cmd)[0] if isinstance(getattr(BotCommands, cmd), list) else getattr(BotCommands, cmd), command_descriptions[cmd]) for cmd in commands]
+
+async def set_commands(bot):
     if config_dict['SET_COMMANDS']:
-        commands = [
-            BotCommand(f'{BotCommands.MirrorCommand[0]}', '- Start mirroring'),
-            BotCommand(f'{BotCommands.LeechCommand[0]}', '- Start leeching'),
-            BotCommand(f'{BotCommands.YtdlCommand[0]}', '- Mirror yt-dlp supported link'),
-            BotCommand(f'{BotCommands.YtdlLeechCommand[0]}', '- Leech through yt-dlp supported link'),
-            BotCommand(f'{BotCommands.CloneCommand[0]}', '- Copy file/folder to Drive'),
-            BotCommand(f'{BotCommands.CountCommand}', '- Count file/folder on Google Drive.'),
-            BotCommand(f'{BotCommands.MediaInfoCommand}', '- Get MediaInfo'),
-            BotCommand(f'{BotCommands.ListCommand}', '- Search in Drive'),
-            BotCommand(f'{BotCommands.SearchCommand}', '- Search in Torrent'),
-            BotCommand(f'{BotCommands.UserSetCommand[0]}', '- User settings'),
-            BotCommand(f'{BotCommands.StatusCommand[0]}', '- Get mirror status message'),
-            BotCommand(f'{BotCommands.StatsCommand[0]}', '- Check Bot & System stats'),
-            BotCommand(f'{BotCommands.StopAllCommand[0]}', '- Cancel all tasks added by you to the bot.'),
-            BotCommand(f'{BotCommands.HelpCommand}', '- Get detailed help'),
-            BotCommand(f'{BotCommands.BotSetCommand}', '- Open Bot settings'),
-            BotCommand(f'{BotCommands.LogCommand}', '- View log'),
-            BotCommand(f'{BotCommands.RestartCommand[0]}', '- Restart the bot')
-        ]
-        await client.set_bot_commands(commands)
+        await bot.set_bot_commands(commands)

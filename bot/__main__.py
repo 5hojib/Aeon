@@ -22,7 +22,7 @@ from pyrogram.filters import command, private, regex
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot import bot, config_dict, user_data, botStartTime, LOGGER, Interval, DATABASE_URL, QbInterval, scheduler, bot_name
-from .helper.ext_utils.fs_utils import start_cleanup, clean_all, exit_clean_up
+from .helper.ext_utils.files_utils import start_cleanup, clean_all, exit_clean_up
 from .helper.ext_utils.bot_utils import get_readable_file_size, get_readable_time, cmd_exec, sync_to_async, set_commands, update_user_ldata, new_thread, new_task
 from .helper.ext_utils.db_handler import DbManager
 from .helper.telegram_helper.bot_commands import BotCommands
@@ -30,8 +30,40 @@ from .helper.telegram_helper.message_utils import sendMessage, editMessage, send
 from .helper.telegram_helper.filters import CustomFilters
 from .helper.telegram_helper.button_build import ButtonMaker
 from .helper.listeners.aria2_listener import start_aria2_listener
-from .modules import authorize, cancel_mirror, mirror_leech, status, torrent_search, torrent_select, ytdlp, rss, shell, eval, users_settings, bot_settings, speedtest, images, mediainfo, broadcast
-from .helper.mirror_utils.gdrive_utils import count, delete, list, clone
+from .modules import authorize, cancel_mirror, mirror_leech, status, torrent_search, ytdlp, shell, eval, users_settings, bot_settings, speedtest, images, mediainfo, broadcast
+from .helper.mirror_leech_utils.gdrive_utils import count, delete, list, clone
+
+
+if config_dict['GDRIVE_ID']:
+    help_string = f'''<b>NOTE: Try each command without any arguments to see more details.</b>
+
+<blockquote>/{BotCommands.MirrorCommand[0]} - Start mirroring to Google Drive.</blockquote>
+<blockquote>/{BotCommands.LeechCommand[0]} - Start leeching to Telegram.</blockquote>
+<blockquote>/{BotCommands.YtdlCommand[0]} - Mirror links supported by yt-dlp.</blockquote>
+<blockquote>/{BotCommands.YtdlLeechCommand[0]} - Leech links supported by yt-dlp.</blockquote>
+<blockquote>/{BotCommands.CloneCommand[0]} - Copy files/folders to Google Drive.</blockquote>
+<blockquote>/{BotCommands.CountCommand} - Count files/folders in Google Drive.</blockquote>
+<blockquote>/{BotCommands.ListCommand} - Search in Google Drive(s).</blockquote>
+<blockquote>/{BotCommands.UserSetCommand} - Open the settings panel.</blockquote>
+<blockquote>/{BotCommands.MediaInfoCommand} - View MediaInfo from a file or link.</blockquote>
+<blockquote>/{BotCommands.StopAllCommand[0]} - Cancel all active tasks.</blockquote>
+<blockquote>/{BotCommands.SearchCommand} - Search for torrents using API or plugins.</blockquote>
+<blockquote>/{BotCommands.StatusCommand[0]} - Show the status of all downloads.</blockquote>
+<blockquote>/{BotCommands.StatsCommand[0]} - Display machine stats hosting the bot.</blockquote>
+'''
+else:
+    help_string = f'''<b>NOTE: Try each command without any arguments to see more details.</b>
+
+<blockquote>/{BotCommands.LeechCommand[0]} - Start leeching to Telegram.</blockquote>
+<blockquote>/{BotCommands.YtdlLeechCommand[0]} - Leech links supported by yt-dlp.</blockquote>
+<blockquote>/{BotCommands.UserSetCommand} - Open the settings panel.</blockquote>
+<blockquote>/{BotCommands.MediaInfoCommand} - View MediaInfo from a file or link.</blockquote>
+<blockquote>/{BotCommands.StopAllCommand[0]} - Cancel all active tasks.</blockquote>
+<blockquote>/{BotCommands.SearchCommand} - Search for torrents using API or plugins.</blockquote>
+<blockquote>/{BotCommands.StatusCommand[0]} - Show the status of all downloads.</blockquote>
+<blockquote>/{BotCommands.StatsCommand[0]} - Display machine stats hosting the bot.</blockquote>
+'''
+
 
 @new_thread
 async def stats(_, message):
@@ -71,7 +103,7 @@ async def stats(_, message):
         limitations += f'<code>• {k:<11}:</code> {v}\n'
 
     stats = system_info + limitations
-    reply_message = await sendMessage(message, stats, photo='IMAGES')
+    reply_message = await sendMessage(message, stats, photo='Random')
     await deleteMessage(message)
     await one_minute_del(reply_message)
 
@@ -79,10 +111,7 @@ async def stats(_, message):
 async def start(client, message):
     buttons = ButtonMaker()
     reply_markup = buttons.build_menu(2)
-    if len(message.command) > 1 and message.command[1] == "aeon":
-        await deleteMessage(message)
-    elif len(message.command) > 1 and message.command[1] == "pmc":
-        await sendMessage(message, 'Bot started')
+    if len(message.command) > 1 and message.command[1] == "private":
         await deleteMessage(message)
     elif len(message.command) > 1 and len(message.command[1]) == 36:
         userid = message.from_user.id
@@ -111,9 +140,9 @@ async def start(client, message):
     elif await CustomFilters.authorized(client, message):
         help_command = f"/{BotCommands.HelpCommand}"
         start_string = f'This bot can mirror all your links|files|torrents to Google Drive or any rclone cloud or to telegram.\n<b>Type {help_command} to get a list of available commands</b>'
-        await sendMessage(message, start_string, photo='IMAGES')
+        await sendMessage(message, start_string, photo='Random')
     else:
-        await sendMessage(message, 'You are not a authorized user!', photo='IMAGES')
+        await sendMessage(message, 'You are not a authorized user!', photo='Random')
     await DbManager().update_pm_users(message.from_user.id)
 
 
@@ -164,8 +193,8 @@ async def AeonCallback(_, query):
                 if ind == len(logFileLines): 
                     break
                 ind += 1
-            startLine = f"<b>Showing last {ind} lines from log.txt:</b> \n\n----------<b>START LOG</b>----------\n\n"
-            endLine = "\n----------<b>END LOG</b>----------"
+            startLine = "<pre language='python'>"
+            endLine = "</pre>"
             btn = ButtonMaker()
             btn.ibutton('Close', f'aeon {user_id} close')
             reply_message = await sendMessage(message, startLine + escape(Loglines) + endLine, btn.build_menu(1))
@@ -186,14 +215,13 @@ async def AeonCallback(_, query):
             await query.edit_message_reply_markup(btn.build_menu(1))
         else:
         	  LOGGER.error(f"Web paste failed : {str(err)}")
-    elif data[2] == "botpm":
-        await query.answer(url=f"https://t.me/{bot_name}?start=aeon")
-    elif data[2] == "pmc":
-        await query.answer(url=f"https://t.me/{bot_name}?start=pmc")
+    elif data[2] == "private":
+        await query.answer(url=f"https://t.me/{bot_name}?start=private")
     else:
         await query.answer()
         await deleteMessage(message)
-    
+
+
 @new_task
 async def log(_, message):
     buttons = ButtonMaker()
@@ -202,24 +230,6 @@ async def log(_, message):
     reply_message = await sendFile(message, 'log.txt', buttons=buttons.build_menu(1))
     await deleteMessage(message)
     await five_minute_del(reply_message)
-
-
-help_string = f'''<b>NOTE: Try each command without any arguments to see more details.</b>
-
-/{BotCommands.MirrorCommand[0]} - Start mirroring to Google Drive.
-/{BotCommands.LeechCommand[0]} - Start leeching to Telegram.
-/{BotCommands.YtdlCommand[0]} - Mirror links supported by yt-dlp.
-/{BotCommands.YtdlLeechCommand[0]} - Leech links supported by yt-dlp.
-/{BotCommands.CloneCommand[0]} - Copy files/folders to Google Drive.
-/{BotCommands.CountCommand} - Count files/folders in Google Drive.
-/{BotCommands.UserSetCommand[0]} - User settings.
-/{BotCommands.BtSelectCommand} - Select files from torrents by gid or reply.
-/{BotCommands.StopAllCommand[0]} - Cancel all [status] tasks.
-/{BotCommands.ListCommand} - Search in Google Drive(s).
-/{BotCommands.SearchCommand} - Search for torrents with API or plugins.
-/{BotCommands.StatusCommand[0]} - Show status of all downloads.
-/{BotCommands.StatsCommand[0]} - Show stats of the machine hosting the bot.
-'''
 
 
 @new_task
@@ -233,12 +243,8 @@ async def restart_notification():
     if await aiopath.isfile(".restartmsg"):
         with open(".restartmsg") as f:
             chat_id, msg_id = map(int, f)
-    else:
-        chat_id, msg_id = 0, 0
-    if await aiopath.isfile(".restartmsg"):
-        rmsg = 'Restarted Successfully!'
         try:
-            await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text=rmsg)
+            await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text='Restarted Successfully!')
         except:
             pass
         await aioremove(".restartmsg")
@@ -247,7 +253,6 @@ async def restart_notification():
 async def main():
     await gather(start_cleanup(), torrent_search.initiate_search_tools(), restart_notification(), set_commands(bot))
     await sync_to_async(start_aria2_listener, wait=False)
-    
     bot.add_handler(MessageHandler(start, filters=command(BotCommands.StartCommand)))
     bot.add_handler(MessageHandler(log, filters=command(BotCommands.LogCommand) & CustomFilters.sudo))
     bot.add_handler(MessageHandler(restart, filters=command(BotCommands.RestartCommand) & CustomFilters.sudo))

@@ -1,14 +1,11 @@
-from os import environ
-
 from aiofiles import open as aiopen
 from aiofiles.os import makedirs
 from aiofiles.os import path as aiopath
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import PyMongoError
 from time import time
-from dotenv import dotenv_values
 
-from bot import DATABASE_URL, LOGGER, aria2_options, bot_id, bot_loop, bot_name, config_dict, qbit_options, rss_dict, user_data
+from bot import DATABASE_URL, LOGGER, aria2_options, bot_id, bot_loop, config_dict, qbit_options, user_data
 
 class DbManager:
     def __init__(self):
@@ -53,14 +50,6 @@ class DbManager:
                         await f.write(row['rclone'])
                     row['rclone'] = rclone_path
                 user_data[uid] = row
-            LOGGER.info("Users data has been imported from Database")
-        if await self.__db.rss[bot_id].find_one():
-            rows = self.__db.rss[bot_id].find({})
-            async for row in rows:
-                user_id = row['_id']
-                del row['_id']
-                rss_dict[user_id] = row
-            LOGGER.info("Rss data has been imported from Database.")
         self.__conn.close
 
     async def update_config(self, dict_):
@@ -132,31 +121,6 @@ class DbManager:
         await self.__db.pm_users[bot_id].delete_one({'_id': user_id})
         self.__conn.close
         
-    async def rss_update_all(self):
-        if self.__err:
-            return
-        for user_id in list(rss_dict.keys()):
-            await self.__db.rss[bot_id].replace_one({'_id': user_id}, rss_dict[user_id], upsert=True)
-        self.__conn.close
-
-    async def rss_update(self, user_id):
-        if self.__err:
-            return
-        await self.__db.rss[bot_id].replace_one({'_id': user_id}, rss_dict[user_id], upsert=True)
-        self.__conn.close
-
-    async def rss_delete(self, user_id):
-        if self.__err:
-            return
-        await self.__db.rss[bot_id].delete_one({'_id': user_id})
-        self.__conn.close
-
-    async def trunc_table(self, name):
-        if self.__err:
-            return
-        await self.__db[name][bot_id].drop()
-        self.__conn.close
-
     async def update_user_tdata(self, user_id, token, time):
         if self.__err:
             return
@@ -169,7 +133,7 @@ class DbManager:
         await self.__db.access_token.update_one({'_id': user_id}, {'$set': {'token': token}}, upsert=True)
         self.__conn.close
 
-    async def get_token_expire_time(self, user_id):
+    async def get_token_expiry(self, user_id):
         if self.__err:
             return None
         user_data = await self.__db.access_token.find_one({'_id': user_id})
@@ -177,6 +141,11 @@ class DbManager:
             return user_data.get('time')
         self.__conn.close
         return None
+
+    async def delete_user_token(self, user_id):
+        if self.__err:
+            return None
+        await self.__db.access_token.delete_one({'_id': user_id})
 
     async def get_user_token(self, user_id):
         if self.__err:

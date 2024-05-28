@@ -13,27 +13,26 @@ from pyrogram.enums import ChatType
 
 from bot import OWNER_ID, Interval, aria2, download_dict, download_dict_lock, LOGGER, bot_name, DATABASE_URL, MAX_SPLIT_SIZE, config_dict, status_reply_dict_lock, user_data, non_queued_up, non_queued_dl, queued_up, queued_dl, queue_dict_lock, bot, GLOBAL_EXTENSION_FILTER
 from bot.helper.ext_utils.bot_utils import extra_btns, sync_to_async, get_readable_file_size, get_readable_time, is_mega_link, new_thread
-from bot.helper.ext_utils.fs_utils import get_base_name, get_path_size, clean_download, clean_target, is_first_archive_split, is_archive, is_archive_split, join_files
-from bot.helper.ext_utils.leech_utils import split_file, format_filename
+from bot.helper.ext_utils.files_utils import get_base_name, get_path_size, clean_download, split_file, format_filename, clean_target, is_first_archive_split, is_archive, is_archive_split, join_files
 from bot.helper.ext_utils.exceptions import NotSupportedExtractionArchive
 from bot.helper.ext_utils.task_manager import start_from_queued
-from bot.helper.mirror_utils.status_utils.extract_status import ExtractStatus
-from bot.helper.mirror_utils.status_utils.zip_status import ZipStatus
-from bot.helper.mirror_utils.status_utils.split_status import SplitStatus
-from bot.helper.mirror_utils.status_utils.gdrive_status import GdriveStatus
-from bot.helper.mirror_utils.status_utils.telegram_status import TelegramStatus
-from bot.helper.mirror_utils.status_utils.rclone_status import RcloneStatus
-from bot.helper.mirror_utils.status_utils.queue_status import QueueStatus
-from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
-from bot.helper.mirror_utils.upload_utils.pyrogramEngine import TgUploader
-from bot.helper.mirror_utils.rclone_utils.transfer import RcloneTransferHelper
+from bot.helper.mirror_leech_utils.status_utils.extract_status import ExtractStatus
+from bot.helper.mirror_leech_utils.status_utils.zip_status import ZipStatus
+from bot.helper.mirror_leech_utils.status_utils.split_status import SplitStatus
+from bot.helper.mirror_leech_utils.status_utils.gdrive_status import GdriveStatus
+from bot.helper.mirror_leech_utils.status_utils.telegram_status import TelegramStatus
+from bot.helper.mirror_leech_utils.status_utils.rclone_status import RcloneStatus
+from bot.helper.mirror_leech_utils.status_utils.queue_status import QueueStatus
+from bot.helper.mirror_leech_utils.upload_utils.gdriveTools import GoogleDriveHelper
+from bot.helper.mirror_leech_utils.upload_utils.pyrogramEngine import TgUploader
+from bot.helper.mirror_leech_utils.rclone_utils.transfer import RcloneTransferHelper
 from bot.helper.telegram_helper.message_utils import sendCustomMsg, sendMessage, editMessage, delete_all_messages, delete_links, sendMultiMessage, update_all_messages, deleteMessage, five_minute_del
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.db_handler import DbManager
 
 
 class MirrorLeechListener:
-    def __init__(self, message, compress=False, extract=False, isQbit=False, isLeech=False, tag=None, select=False, seed=False, sameDir=None, rcFlags=None, upPath=None, isClone=False, join=False, isYtdlp=False, drive_id=None, index_link=None, leech_utils={}):
+    def __init__(self, message, compress=False, extract=False, isQbit=False, isLeech=False, tag=None, select=False, seed=False, sameDir=None, rcFlags=None, upPath=None, isClone=False, join=False, isYtdlp=False, drive_id=None, index_link=None, files_utils={}):
         if sameDir is None:
             sameDir = {}
         self.message = message
@@ -55,13 +54,12 @@ class MirrorLeechListener:
         self.sameDir = sameDir
         self.rcFlags = rcFlags
         self.upPath = upPath
-        self.random_pic = 'IMAGES'
         self.join = join
         self.linkslogmsg = None
         self.botpmmsg = None
         self.drive_id = drive_id
         self.index_link = index_link
-        self.leech_utils = leech_utils
+        self.files_utils = files_utils
 
     async def clean(self):
         try:
@@ -343,12 +341,12 @@ class MirrorLeechListener:
         name, _ = await format_filename(name, user_id, isMirror=not self.isLeech)
         user_dict = user_data.get(user_id, {})
         msg = f'{escape(name)}\n\n'
-        msg += f'<b>• Size: </b>{get_readable_file_size(size)}\n'
+        msg += f'<blockquote><b>• Size: </b>{get_readable_file_size(size)}\n'
         msg += f'<b>• Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n'
         LOGGER.info(f'Task Done: {name}')
         buttons = ButtonMaker()
         iButton = ButtonMaker()
-        iButton.ibutton('View in inbox', f"aeon {user_id} botpm", 'header')
+        iButton.ibutton('View in inbox', f"aeon {user_id} private", 'header')
         iButton = extra_btns(iButton)
         if self.isLeech:
             if folders > 1:
@@ -356,7 +354,7 @@ class MirrorLeechListener:
             if mime_type != 0:
                 msg += f'<b>• Corrupted files: </b>{mime_type}\n'
             msg += f'<b>• Uploaded by: </b>{self.tag}\n'
-            msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n\n'
+            msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code></blockquote>\n\n'
             if not files:
                 if self.isPrivate:
                     msg += '<b>Files have not been sent for an unspecified reason</b>'
@@ -415,13 +413,13 @@ class MirrorLeechListener:
                 buttons = extra_btns(buttons)
                 button = buttons.build_menu(2)
             msg += f'<b>• Uploaded by: </b>{self.tag}\n'
-            msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n\n'
+            msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code></blockquote>\n\n'
 
             if config_dict['MIRROR_LOG_ID']:
                 log_msg = list((await sendMultiMessage(config_dict['MIRROR_LOG_ID'], msg, button)).values())[0]
                 if self.linkslogmsg:
                     await deleteMessage(self.linkslogmsg)
-            await sendMessage(self.botpmmsg, msg, button, self.random_pic)
+            await sendMessage(self.botpmmsg, msg, button, 'Random')
             await deleteMessage(self.botpmmsg)
             if self.isSuperGroup:
                 await sendMessage(self.message, f'{msg} <b>Links has been sent to your inbox</b>', iButton.build_menu(1))
@@ -465,8 +463,8 @@ class MirrorLeechListener:
                 self.sameDir['total'] -= 1
         msg = f'Hey, {self.tag}!\n'
         msg += 'Your download has been stopped!\n\n'
-        msg += f'<b>Reason:</b> {escape(error)}\n'
-        msg += f'<b>Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}'
+        msg += f'<blockquote><b>Reason:</b> {escape(error)}\n'
+        msg += f'<b>Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}</blockquote>'
         x = await sendMessage(self.message, msg, button)
         await delete_links(self.message)
         if self.botpmmsg:
@@ -506,8 +504,8 @@ class MirrorLeechListener:
             count = len(download_dict)
         msg = f'Hey, {self.tag}!\n'
         msg += 'Your upload has been stopped!\n\n'
-        msg += f'<b>Reason:</b> {escape(error)}\n'
-        msg += f'<b>Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}'
+        msg += f'<blockquote><b>Reason:</b> {escape(error)}\n'
+        msg += f'<b>Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}</blockquote>'
         x = await sendMessage(self.message, msg)
         if self.linkslogmsg:
             await deleteMessage(self.linkslogmsg)

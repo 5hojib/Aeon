@@ -1,41 +1,38 @@
-from bot import CMD_SUFFIX
+from bot import CMD_SUFFIX as i
 
 class _BotCommands:
     def __init__(self):
         self.StartCommand = 'start'
-        self.MirrorCommand = [f'mirror{CMD_SUFFIX}', f'm{CMD_SUFFIX}']
-        self.YtdlCommand = [f'ytdl{CMD_SUFFIX}', f'y{CMD_SUFFIX}']
-        self.LeechCommand = [f'leech{CMD_SUFFIX}', f'l{CMD_SUFFIX}']
-        self.YtdlLeechCommand = [f'ytdlleech{CMD_SUFFIX}', f'yl{CMD_SUFFIX}']
-        self.CloneCommand = [f'clone{CMD_SUFFIX}', f'c{CMD_SUFFIX}']
-        self.CountCommand = f'count{CMD_SUFFIX}'
-        self.DeleteCommand = f'del{CMD_SUFFIX}'
-        self.StopAllCommand = [f'stopall{CMD_SUFFIX}', 'stopallbot']
-        self.ListCommand = f'list{CMD_SUFFIX}'
-        self.SearchCommand = f'search{CMD_SUFFIX}'
-        self.StatusCommand = [f'status{CMD_SUFFIX}', 'statusall']
-        self.UsersCommand = f'users{CMD_SUFFIX}'
-        self.AuthorizeCommand = f'authorize{CMD_SUFFIX}'
-        self.UnAuthorizeCommand = f'unauthorize{CMD_SUFFIX}'
-        self.AddSudoCommand = f'addsudo{CMD_SUFFIX}'
-        self.RmSudoCommand = f'rmsudo{CMD_SUFFIX}'
-        self.PingCommand = [f'ping{CMD_SUFFIX}', 'pingall']
-        self.RestartCommand = [f'restart{CMD_SUFFIX}', 'restartall']
-        self.StatsCommand = [f'stats{CMD_SUFFIX}', 'statsall']
-        self.HelpCommand = f'help{CMD_SUFFIX}'
-        self.LogCommand = f'log{CMD_SUFFIX}'
-        self.ShellCommand = f'shell{CMD_SUFFIX}'
-        self.EvalCommand = f'eval{CMD_SUFFIX}'
-        self.ExecCommand = f'exec{CMD_SUFFIX}'
-        self.ClearLocalsCommand = f'clearlocals{CMD_SUFFIX}'
-        self.BotSetCommand = f'bsetting{CMD_SUFFIX}'
-        self.UserSetCommand = [f'usetting{CMD_SUFFIX}', f'us{CMD_SUFFIX}']
-        self.BtSelectCommand = f'btsel{CMD_SUFFIX}'
-        self.SpeedCommand = f'speedtest{CMD_SUFFIX}'
-        self.RssCommand = f'rss{CMD_SUFFIX}'
-        self.AddImageCommand = f'addimg{CMD_SUFFIX}'
-        self.ImagesCommand = f'images{CMD_SUFFIX}'
-        self.MediaInfoCommand = f'mediainfo{CMD_SUFFIX}'
-        self.BroadcastCommand = [f'broadcast{CMD_SUFFIX}', 'broadcastall']
+        self.MirrorCommand = [f'mirror{i}', f'm{i}']
+        self.YtdlCommand = [f'ytdl{i}', f'y{i}']
+        self.LeechCommand = [f'leech{i}', f'l{i}']
+        self.YtdlLeechCommand = [f'ytdlleech{i}', f'yl{i}']
+        self.CloneCommand = [f'clone{i}', f'c{i}']
+        self.CountCommand = f'count{i}'
+        self.DeleteCommand = f'del{i}'
+        self.StopAllCommand = [f'stopall{i}', 'stopallbot']
+        self.ListCommand = f'list{i}'
+        self.SearchCommand = f'search{i}'
+        self.StatusCommand = [f'status{i}', 'statusall']
+        self.UsersCommand = f'users{i}'
+        self.AuthorizeCommand = f'authorize{i}'
+        self.UnAuthorizeCommand = f'unauthorize{i}'
+        self.AddSudoCommand = f'addsudo{i}'
+        self.RmSudoCommand = f'rmsudo{i}'
+        self.PingCommand = 'ping'
+        self.RestartCommand = [f'restart{i}', 'restartall']
+        self.StatsCommand = [f'stats{i}', 'statsall']
+        self.HelpCommand = f'help{i}'
+        self.LogCommand = f'log{i}'
+        self.ShellCommand = f'shell{i}'
+        self.EvalCommand = f'eval{i}'
+        self.ExecCommand = f'exec{i}'
+        self.BotSetCommand = f'botsettings{i}'
+        self.UserSetCommand = f'settings{i}'
+        self.SpeedCommand = f'speedtest{i}'
+        self.AddImageCommand = f'addimg{i}'
+        self.ImagesCommand = f'images{i}'
+        self.MediaInfoCommand = f'mediainfo{i}'
+        self.BroadcastCommand = [f'broadcast{i}', 'broadcastall']
 
 BotCommands = _BotCommands()

@@ -5,13 +5,14 @@ from telegraph import upload_file
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.filters import command, regex
 
-from bot import bot, LOGGER, config_dict, DATABASE_URL
+from bot import bot, LOGGER, DATABASE_URL, IMAGES
 from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, deleteMessage
 from bot.helper.ext_utils.bot_utils import handleIndex, new_task
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.telegram_helper.button_build import ButtonMaker
+
 
 @new_task
 async def picture_add(_, message):
@@ -45,16 +46,16 @@ async def picture_add(_, message):
         help_msg = f"Add an image using /{BotCommands.AddImageCommand} followed by IMAGE_LINK, or reply to an image with /{BotCommands.AddImageCommand}."
         return await editMessage(msg, help_msg)
 
-    config_dict['IMAGES'].append(graph_url)
+    IMAGES.append(graph_url)
 
     if DATABASE_URL:
-        await DbManager().update_config({'IMAGES': config_dict['IMAGES']})
+        await DbManager().update_config({'IMAGES': IMAGES})
 
     await asleep(1.5)
-    await editMessage(msg, f"<b>Successfully added to the images list!</b>\n\n<b>Total images: {len(config_dict['IMAGES'])}</b>")
+    await editMessage(msg, f"<b>Successfully added to the images list!</b>\n\n<b>Total images: {len(IMAGES)}</b>")
 
 async def pictures(_, message):
-    if not config_dict['IMAGES']:
+    if not IMAGES:
         await sendMessage(message, f"No images to display! Add images using /{BotCommands.AddImageCommand}.")
     else:
         to_edit = await sendMessage(message, "Generating a grid of your images...")
@@ -66,7 +67,7 @@ async def pictures(_, message):
         buttons.ibutton("Close", f"images {user_id} close")
         buttons.ibutton("Remove all", f"images {user_id} removeall", 'footer')
         await deleteMessage(to_edit)
-        await sendMessage(message, f'<b>Image No. : 1 / {len(config_dict["IMAGES"])}</b>', buttons.build_menu(2), config_dict['IMAGES'][0])
+        await sendMessage(message, f'<b>Image No. : 1 / {len(IMAGES)}</b>', buttons.build_menu(2), IMAGES[0])
 
 @new_task
 async def pics_callback(_, query):
@@ -80,43 +81,43 @@ async def pics_callback(_, query):
 
     if data[2] == "turn":
         await query.answer()
-        ind = handleIndex(int(data[3]), config_dict['IMAGES'])
-        no = len(config_dict['IMAGES']) - abs(ind+1) if ind < 0 else ind + 1
-        pic_info = f'<b>Image No. : {no} / {len(config_dict["IMAGES"])}</b>'
+        ind = handleIndex(int(data[3]), IMAGES)
+        no = len(IMAGES) - abs(ind+1) if ind < 0 else ind + 1
+        pic_info = f'<b>Image No. : {no} / {len(IMAGES)}</b>'
         buttons = ButtonMaker()
         buttons.ibutton("<<", f"images {data[1]} turn {ind-1}")
         buttons.ibutton(">>", f"images {data[1]} turn {ind+1}")
         buttons.ibutton("Remove Image", f"images {data[1]} remove {ind}")
         buttons.ibutton("Close", f"images {data[1]} close")
         buttons.ibutton("Remove all", f"images {data[1]} removeall", 'footer')
-        await editMessage(message, pic_info, buttons.build_menu(2), config_dict['IMAGES'][ind])
+        await editMessage(message, pic_info, buttons.build_menu(2), IMAGES[ind])
 
     elif data[2] == "remove":
-        config_dict['IMAGES'].pop(int(data[3]))
+        IMAGES.pop(int(data[3]))
         if DATABASE_URL:
-            await DbManager().update_config({'IMAGES': config_dict['IMAGES']})
+            await DbManager().update_config({'IMAGES': IMAGES})
         query.answer("Image has been successfully deleted", show_alert=True)
 
-        if len(config_dict['IMAGES']) == 0:
+        if len(IMAGES) == 0:
             await query.message.delete()
             await sendMessage(message, f"No images to display! Add images using /{BotCommands.AddImageCommand}.")
             return
 
         ind = int(data[3]) + 1
-        ind = len(config_dict['IMAGES']) - abs(ind) if ind < 0 else ind
-        pic_info = f'<b>Image No. : {ind+1} / {len(config_dict["IMAGES"])}</b>'
+        ind = len(IMAGES) - abs(ind) if ind < 0 else ind
+        pic_info = f'<b>Image No. : {ind+1} / {len(IMAGES)}</b>'
         buttons = ButtonMaker()
         buttons.ibutton("<<", f"images {data[1]} turn {ind-1}")
         buttons.ibutton(">>", f"images {data[1]} turn {ind+1}")
         buttons.ibutton("Remove image", f"images {data[1]} remove {ind}")
         buttons.ibutton("Close", f"images {data[1]} close")
         buttons.ibutton("Remove all", f"images {data[1]} removeall", 'footer')
-        await editMessage(message, pic_info, buttons.build_menu(2), config_dict['IMAGES'][ind])
+        await editMessage(message, pic_info, buttons.build_menu(2), IMAGES[ind])
 
     elif data[2] == 'removeall':
-        config_dict['IMAGES'].clear()
+        IMAGES.clear()
         if DATABASE_URL:
-            await DbManager().update_config({'IMAGES': config_dict['IMAGES']})
+            await DbManager().update_config({'IMAGES': IMAGES})
         await query.answer("All images have been successfully deleted.", show_alert=True)
         await sendMessage(message, f"No images to display! Add images using /{BotCommands.AddImageCommand}.")
         await message.delete()

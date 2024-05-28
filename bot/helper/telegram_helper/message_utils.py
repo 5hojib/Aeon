@@ -1,14 +1,14 @@
 from traceback import format_exc
 from asyncio import sleep
 from aiofiles.os import remove as aioremove
-from random import choice as rchoice
+from random import choice
 from time import time
 from re import match as re_match
 
 from pyrogram.types import InputMediaPhoto
 from pyrogram.errors import ReplyMarkupInvalid, FloodWait, PeerIdInvalid, RPCError, UserNotParticipant, MessageNotModified, MessageEmpty, PhotoInvalidDimensions, WebpageCurlFailed, MediaEmpty
 
-from bot import config_dict, LOGGER, bot_name, status_reply_dict, status_reply_dict_lock, Interval, bot, user, download_dict_lock
+from bot import DELETE_LINKS, IMAGES, LOGGER, bot_name, status_reply_dict, status_reply_dict_lock, Interval, bot, user, download_dict_lock
 from bot.helper.ext_utils.bot_utils import get_readable_message, setInterval, sync_to_async, download_image_url
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.exceptions import TgLinkException
@@ -18,8 +18,8 @@ async def sendMessage(message, text, buttons=None, photo=None):
     try:
         if photo:
             try:
-                if photo == 'IMAGES':
-                    photo = rchoice(config_dict['IMAGES'])
+                if photo == 'Random':
+                    photo = choice(IMAGES)
                 return await message.reply_photo(photo=photo, reply_to_message_id=message.id, caption=text, reply_markup=buttons, disable_notification=True)
             except IndexError:
                 pass
@@ -46,8 +46,8 @@ async def sendCustomMsg(chat_id, text, buttons=None, photo=None):
     try:
         if photo:
             try:
-                if photo == 'IMAGES':
-                    photo = rchoice(config_dict['IMAGES'])
+                if photo == 'Random':
+                    photo = choice(IMAGES)
                 return await bot.send_photo(chat_id=chat_id, photo=photo, caption=text, reply_markup=buttons, disable_notification=True)
             except IndexError:
                 pass
@@ -99,8 +99,8 @@ async def sendMultiMessage(chat_ids, text, buttons=None, photo=None):
         try:
             if photo:
                 try:
-                    if photo == 'IMAGES':
-                        photo = rchoice(config_dict['IMAGES'])
+                    if photo == 'Random':
+                        photo = choice(IMAGES)
                     sent = await bot.send_photo(chat_id=chat.id, photo=photo, caption=text, reply_markup=buttons, disable_notification=True)
                     msg_dict[chat.id] = sent
                     continue
@@ -155,21 +155,6 @@ async def sendFile(message, file, caption=None, buttons=None):
         return str(e)
 
 
-async def sendRss(text):
-    try:
-        if user:
-            return await user.send_message(chat_id=config_dict['RSS_CHAT_ID'], text=text, disable_web_page_preview=True, disable_notification=True)
-        else:
-            return await bot.send_message(chat_id=config_dict['RSS_CHAT_ID'], text=text, disable_web_page_preview=True, disable_notification=True)
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
-        return await sendRss(text)
-    except Exception as e:
-        LOGGER.error(str(e))
-        return str(e)
-
-
 async def deleteMessage(message):
     try:
         await message.delete()
@@ -185,7 +170,7 @@ async def five_minute_del(message):
     await deleteMessage(message)
 
 async def delete_links(message):
-    if config_dict['DELETE_LINKS']:
+    if DELETE_LINKS:
         if reply_to := message.reply_to_message:
             await deleteMessage(reply_to)
         await deleteMessage(message)
@@ -321,5 +306,5 @@ async def BotPm_check(message, button=None):
         if button is None:
             button = ButtonMaker()
         _msg = "You haven't initiated the bot in a private message!"
-        button.ibutton("Start", f"aeon {user_id} pmc", 'header')
+        button.ibutton("Start", f"aeon {user_id} private", 'header')
         return _msg, button

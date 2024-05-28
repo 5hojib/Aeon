@@ -13,12 +13,12 @@ from asyncio import sleep
 
 from bot import OWNER_ID, bot, user_data, config_dict, DATABASE_URL, IS_PREMIUM_USER, MAX_SPLIT_SIZE
 from bot.helper.telegram_helper.message_utils import sendMessage, sendCustomMsg, editMessage, deleteMessage, sendFile, chat_info, user_info, five_minute_del
-from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
+from bot.helper.mirror_leech_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.db_handler import DbManager
-from bot.helper.ext_utils.text_utils import uset_display_dict
+from bot.helper.ext_utils.help_strings import uset_display_dict
 from bot.helper.ext_utils.bot_utils import update_user_ldata, get_readable_file_size, sync_to_async, new_thread, is_gdrive_link
 
 handler_dict = {}
@@ -30,6 +30,7 @@ fname_dict = {'rcc': 'RClone',
               'user_tds': 'User Custom TDs',
               'lcaption': 'Caption',
               'thumb': 'Thumbnail',
+              'metadata': 'Metadata',
               'yt_opt': 'YT-DLP Options'}
 
 async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None):
@@ -43,8 +44,8 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         buttons.ibutton("Universal", f"userset {user_id} universal")
         buttons.ibutton("Mirror", f"userset {user_id} mirror")
         buttons.ibutton("Leech", f"userset {user_id} leech")
-        if user_dict and any(key in user_dict for key in ['prefix', 'suffix', 'remname', 'ldump', 'yt_opt', 'media_group', 'rclone', 'thumb', 'as_doc']):
-            buttons.ibutton("Reset Setting", f"userset {user_id} reset_all")
+        if user_dict and any(key in user_dict for key in ['prefix', 'suffix', 'remname', 'ldump', 'yt_opt', 'media_group', 'rclone', 'thumb', 'as_doc', 'metadata']):
+            buttons.ibutton("Reset", f"userset {user_id} reset_all")
         buttons.ibutton("Close", f"userset {user_id} close")
         text = f'<b>User Settings for {name}</b>'
         button = buttons.build_menu(2)
@@ -59,12 +60,16 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
 
         buttons.ibutton("Remname", f"userset {user_id} remname")
         remname = user_dict.get('remname', 'Not Exists')
+        
+        buttons.ibutton("Metadata", f"userset {user_id} metadata")
+        metadata = user_dict.get('metadata', 'Not Exists')
 
 
         text = f'<b>Universal Settings for {name}</b>\n\n'
         text += f'<b>• YT-DLP Options:</b> <b><code>{ytopt}</code></b>\n'
         text += f'<b>• Prefix:</b> <code>{prefix}</code>\n'
         text += f'<b>• Suffix:</b> <code>{suffix}</code>\n'
+        text += f'<b>• Metadata:</b> <code>{metadata}</code>\n'
         text += f'<b>• Remname:</b> <code>{remname}</code>'
         buttons.ibutton("Back", f"userset {user_id} back", "footer")
         buttons.ibutton("Close", f"userset {user_id} close", "footer")
@@ -134,9 +139,9 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         elif key == 'yt_opt':
             set_exist = 'Not Exists' if (val:=user_dict.get('yt_opt', config_dict.get('YT_DLP_OPTIONS', ''))) == '' else val
             text += f"<b>YT-DLP Options :</b> <code>{escape(set_exist)}</code>\n\n"
-        elif key in ['prefix', 'remname', 'suffix', 'lcaption', 'ldump']:
+        elif key in ['prefix', 'remname', 'suffix', 'lcaption', 'ldump', 'metadata']:
             set_exist = 'Not Exists' if (val:=user_dict.get(key, '')) == '' else val
-            text += f"<b>Filename {fname_dict[key]} :</b> {set_exist}\n\n"
+            text += f"<b>{fname_dict[key]}:</b> {set_exist}\n\n"
         elif key == 'user_tds':
             set_exist = len(val) if (val:=user_dict.get(key, False)) else 'Not Exists'
             tds_mode = "Enabled" if user_dict.get('td_mode') else "Disabled"
@@ -147,12 +152,12 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         text += f"<b>Description :</b> {uset_display_dict[key][0]}"
         if edit_mode:
             text += '\n\n' + uset_display_dict[key][1]
-            buttons.ibutton("Stop Change", f"userset {user_id} {key}")
+            buttons.ibutton("Stop", f"userset {user_id} {key}")
         elif key != 'user_tds' or set_exist == 'Not Exists':
-            buttons.ibutton(f"Change {fname_dict[key]}" if set_exist and set_exist != 'Not Exists' else f"Set {fname_dict[key]}", f"userset {user_id} {key} edit")
+            buttons.ibutton("Change" if set_exist and set_exist != 'Not Exists' else "Set", f"userset {user_id} {key} edit")
         if set_exist and set_exist != 'Not Exists':
             if key == 'user_tds':
-                buttons.ibutton('Show UserTDs', f"userset {user_id} show_tds", "header")
+                buttons.ibutton('Show', f"userset {user_id} show_tds", "header")
             buttons.ibutton("Delete", f"userset {user_id} d{key}")
         buttons.ibutton("Back", f"userset {user_id} back {edit_type}", "footer")
         buttons.ibutton("Close", f"userset {user_id} close", "footer")
@@ -403,7 +408,7 @@ async def edit_user_settings(client, query):
         pfunc = partial(set_custom, pre_event=query, key=data[2])
         rfunc = partial(update_user_settings, query, data[2], 'mirror')
         await event_handler(client, query, pfunc, rfunc)
-    elif data[2] in ['prefix', 'suffix', 'remname']:
+    elif data[2] in ['prefix', 'suffix', 'remname', 'metadata']:
         handler_dict[user_id] = False
         await query.answer()
         edit_mode = len(data) == 4
@@ -428,7 +433,7 @@ async def edit_user_settings(client, query):
         await update_user_settings(query, data[2][1:], 'leech')
         if DATABASE_URL:
             await DbManager().update_user_data(user_id)
-    elif data[2] in ['dprefix', 'dsuffix', 'dremname']:
+    elif data[2] in ['dprefix', 'dsuffix', 'dremname', 'dmetadata']:
         handler_dict[user_id] = False
         await query.answer()
         update_user_ldata(user_id, data[2][1:], '')
@@ -530,7 +535,7 @@ async def send_users_settings(client, message):
         msg = f'{await getUserInfo(client, userid)} ( <code>{userid}</code> ):'
         if data := user_data[int(userid)]:
             buttons = ButtonMaker()
-            buttons.ibutton("Delete Data", f"userset {message.from_user.id} user_del {userid}")
+            buttons.ibutton("Delete", f"userset {message.from_user.id} user_del {userid}")
             buttons.ibutton("Close", f"userset {message.from_user.id} close")
             button = buttons.build_menu(1)
             for key, value in data.items():
@@ -545,8 +550,6 @@ async def send_users_settings(client, message):
         await sendMessage(message, f'{userid} have not saved anything..')
 
 
-bot.add_handler(MessageHandler(send_users_settings, filters=command(
-    BotCommands.UsersCommand) & CustomFilters.sudo))
-bot.add_handler(MessageHandler(user_settings, filters=command(
-    BotCommands.UserSetCommand) & CustomFilters.authorized_uset))
+bot.add_handler(MessageHandler(send_users_settings, filters=command(BotCommands.UsersCommand) & CustomFilters.sudo))
+bot.add_handler(MessageHandler(user_settings, filters=command(BotCommands.UserSetCommand) & CustomFilters.authorized_uset))
 bot.add_handler(CallbackQueryHandler(edit_user_settings, filters=regex("^userset")))

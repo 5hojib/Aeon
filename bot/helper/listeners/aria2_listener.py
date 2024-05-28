@@ -4,10 +4,10 @@ from aiofiles.os import path as aiopath
 from aiofiles.os import remove as aioremove
 from bot import LOGGER, aria2, config_dict, download_dict, download_dict_lock
 from bot.helper.ext_utils.bot_utils import bt_selection_buttons, get_telegraph_list, getDownloadByGid, new_thread, sync_to_async
-from bot.helper.ext_utils.fs_utils import clean_unwanted, get_base_name
+from bot.helper.ext_utils.files_utils import clean_unwanted, get_base_name
 from bot.helper.ext_utils.task_manager import limit_checker
-from bot.helper.mirror_utils.status_utils.aria2_status import Aria2Status
-from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
+from bot.helper.mirror_leech_utils.status_utils.aria2_status import Aria2Status
+from bot.helper.mirror_leech_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.message_utils import deleteMessage, delete_links, sendMessage, update_all_messages
 
 
