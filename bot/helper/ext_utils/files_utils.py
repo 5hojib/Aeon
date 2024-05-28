@@ -425,7 +425,7 @@ async def change_metadata(file, dirpath, key):
             subtitle_index += 1
         
         for unset_key in unset_metadata_keys:
-            if 'tags' in stream and unset_key in stream['tags']:
+            if 'tags' in stream and unset_key.lower() in stream['tags']:
                 cmd.extend([f'-metadata:s:{stream_index}:{unset_key.lower()}=', ''])
     
     cmd.append(temp_file_path)
