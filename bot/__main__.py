@@ -35,7 +35,9 @@ from .helper.mirror_utils.gdrive_utils import count, delete, list, clone
 
 
 def get_command_name(cmd):
-    command = getattr(BotCommands, cmd)
+    command = getattr(BotCommands, cmd, None)
+    if command is None:
+        raise ValueError(f"Command {cmd} not found in BotCommands")
     return command[0] if isinstance(command, list) else command
 
 command_descriptions = {
