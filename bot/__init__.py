@@ -18,12 +18,12 @@ from uvloop import install
 faulthandler_enable()
 install()
 setdefaulttimeout(600)
-
+getLogger("telegraph").setLevel(ERROR)
 botStartTime = time()
 
 class CustomFormatter(Formatter):
     def format(self, record):
-        return super().format(record).replace(record.levelname, record.levelname[:4])
+        return super().format(record).replace(record.levelname, record.levelname[:1])
 
 formatter = CustomFormatter("[%(asctime)s] [%(levelname)s] - %(message)s", datefmt="%d-%b-%y %I:%M:%S %p")
 
