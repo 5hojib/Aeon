@@ -408,7 +408,7 @@ async def change_metadata(file, dirpath, key):
             cmd.extend(['-metadata', f'{unset_key}='])
 
     # Explicitly unset description and copyright
-    cmd.extend(['-metadata', 'description=', '', '-metadata', 'copyright=', ''])
+    cmd.extend(['-metadata', 'description=', '-metadata', 'copyright='])
     
     audio_index = 0
     subtitle_index = 0
