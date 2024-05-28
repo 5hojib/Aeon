@@ -409,7 +409,11 @@ async def change_metadata(file, dirpath, key):
         'SUMMARY',
         'WEBSITE',
         'COMMENT',
-        'ENCODER'
+        'ENCODER',
+        'ARTIST',
+        'DATE',
+        'PARL',
+        'Comment'
     ]
     for unset_key in unset_metadata_keys:
         if unset_key in format_metadata:
