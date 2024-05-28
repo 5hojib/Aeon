@@ -6,9 +6,9 @@ from bot import download_dict, download_dict_lock, queue_dict_lock, non_queued_d
 from bot.helper.ext_utils.bot_utils import cmd_exec
 from bot.helper.telegram_helper.message_utils import sendMessage, sendStatusMessage
 from bot.helper.ext_utils.task_manager import is_queued, stop_duplicate_check
-from bot.helper.mirror_utils.status_utils.rclone_status import RcloneStatus
-from bot.helper.mirror_utils.status_utils.queue_status import QueueStatus
-from bot.helper.mirror_utils.rclone_utils.transfer import RcloneTransferHelper
+from bot.helper.mirror_leech_utils.status_utils.rclone_status import RcloneStatus
+from bot.helper.mirror_leech_utils.status_utils.queue_status import QueueStatus
+from bot.helper.mirror_leech_utils.rclone_utils.transfer import RcloneTransferHelper
 
 
 async def add_rclone_download(rc_path, config_path, path, name, listener):

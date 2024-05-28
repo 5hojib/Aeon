@@ -5,8 +5,8 @@ from bot import config_dict, LOGGER, aria2_options, aria2c_global, download_dict
 from bot.helper.ext_utils.bot_utils import sync_to_async
 from bot.helper.ext_utils.task_manager import is_queued, stop_duplicate_check, limit_checker
 from bot.helper.listeners.direct_listener import DirectListener
-from bot.helper.mirror_utils.status_utils.direct_status import DirectStatus
-from bot.helper.mirror_utils.status_utils.queue_status import QueueStatus
+from bot.helper.mirror_leech_utils.status_utils.direct_status import DirectStatus
+from bot.helper.mirror_leech_utils.status_utils.queue_status import QueueStatus
 from bot.helper.telegram_helper.message_utils import delete_links, sendMessage, sendStatusMessage, one_minute_del
 from bot.helper.aeon_utils.nsfw_check import isNSFWdata
 

@@ -19,7 +19,7 @@ from urllib3.util.retry import Retry
 from bot import config_dict, LOGGER
 from bot.helper.ext_utils.bot_utils import text_to_bytes
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
-from bot.helper.ext_utils.help_messages import PASSWORD_ERROR_MESSAGE
+from bot.helper.ext_utils.help_strings import PASSWORD_ERROR_MESSAGE
 
 _caches = {}
 user_agent = (

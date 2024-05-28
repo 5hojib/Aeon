@@ -21,7 +21,7 @@ from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.bot_utils import setInterval, sync_to_async, new_thread
 from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.ext_utils.task_manager import start_from_queued
-from bot.helper.ext_utils.text_utils import bset_display_dict
+from bot.helper.ext_utils.help_strings import bset_display_dict
 from bot.modules.torrent_search import initiate_search_tools
 
 START = 0
