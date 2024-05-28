@@ -401,7 +401,7 @@ async def change_metadata(file, dirpath, key):
     
     # Unset unwanted metadata at the container level
     unset_metadata_keys = [
-        'LICENCE', 'author', 'description', 'filename', 'mimetype'
+        'LICENCE', 'author', 'description', 'filename', 'mimetype', 'SUMMARY', 'WEBSITE', 'COMMENT', 'ENCODER'
     ]
     for key in unset_metadata_keys:
         cmd.extend(['-metadata', f'{key}='])
@@ -415,10 +415,6 @@ async def change_metadata(file, dirpath, key):
         
         cmd.extend(['-map', f'0:{stream_index}'])
         
-        # Unset unwanted metadata at the stream level
-        for key in unset_metadata_keys:
-            cmd.extend([f'-metadata:s:{stream_index}:{key}=', ''])
-        
         if stream_type == 'video':
             cmd.extend([f'-metadata:s:v:{stream_index}', f'title={key}'])
         elif stream_type == 'audio':
@@ -427,6 +423,10 @@ async def change_metadata(file, dirpath, key):
         elif stream_type == 'subtitle':
             cmd.extend([f'-metadata:s:s:{subtitle_index}', f'title={key}'])
             subtitle_index += 1
+        
+        # Unset unwanted metadata at the stream level
+        for unset_key in unset_metadata_keys:
+            cmd.extend([f'-metadata:s:{stream_index}:{unset_key}=', ''])
     
     cmd.append(temp_file_path)
     
@@ -442,6 +442,8 @@ async def change_metadata(file, dirpath, key):
     os.replace(temp_file_path, full_file_path)
     LOGGER.info(f"Metadata changed successfully for file: {file}")
     return file
+
+
 def is_first_archive_split(file):
     return bool(re_search(FIRST_SPLIT_REGEX, file))
 
