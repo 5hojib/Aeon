@@ -399,7 +399,7 @@ async def change_metadata(file, dirpath, key):
     streams = metadata['streams']
     format_metadata = metadata['format'].get('tags', {})
     
-    cmd = ['render', '-y', '-i', full_file_path, '-c', 'copy', '-metadata', f'title={key}']
+    cmd = ['render', '-y', '-i', full_file_path, '-map', '-0:t', '-c', 'copy', '-metadata', f'title={key}']
     
     unset_metadata_keys = [
         'LICENCE',
