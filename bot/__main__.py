@@ -34,50 +34,44 @@ from .modules import authorize, cancel_mirror, mirror_leech, status, torrent_sea
 from .helper.mirror_utils.gdrive_utils import count, delete, list, clone
 
 
+def get_command_name(cmd):
+    command = getattr(BotCommands, cmd)
+    return command[0] if isinstance(command, list) else command
+
+command_descriptions = {
+    'MirrorCommand': '- Start mirroring to Google Drive.',
+    'LeechCommand': '- Start leeching to Telegram.',
+    'YtdlCommand': '- Mirror links supported by yt-dlp.',
+    'YtdlLeechCommand': '- Leech links supported by yt-dlp.',
+    'CloneCommand': '- Copy files/folders to Google Drive.',
+    'CountCommand': '- Count files/folders in Google Drive.',
+    'ListCommand': '- Search in Google Drive(s).',
+    'UserSetCommand': '- Open the settings panel.',
+    'MediaInfoCommand': '- View MediaInfo from a file or link.',
+    'StopAllCommand': '- Cancel all active tasks.',
+    'SearchCommand': '- Search for torrents using API or plugins.',
+    'StatusCommand': '- Show the status of all downloads.',
+    'StatsCommand': '- Display machine stats hosting the bot.'
+}
+
 commands = [
-    'LeeChCommand[0]',
-    'YtdlLeechCommand[0]',
-    'UserSetCommand',
-    'MediaInfoCommand',
-    'StopAllCommand[0]',
-    'SearchCommand',
-    'StatusCommand[0]',
-    'StatsCommand[0]'
+    'MirrorCommand', 'LeechCommand', 'YtdlCommand', 'YtdlLeechCommand', 
+    'CloneCommand', 'MediaInfoCommand', 'CountCommand', 'ListCommand', 
+    'SearchCommand', 'UserSetCommand', 'StatusCommand', 'StatsCommand', 'StopAllCommand'
 ]
 
-if config_dict['GDRIVE_ID']:
+if not config_dict.get('GDRIVE_ID'):
     commands = [
-        'MirrorCommand[0]',
-        'LeechCommand[0]',
-        'YtdlCommand[0]',
-        'YtdlLeechCommand[0]', 
-        'CloneCommand[0]',
-        'CountCommand',
-        'ListCommand',
-        'UserSetCommand', 
-        'MediaInfoCommand',
-        'StopAllCommand[0]',
-        'SearchCommand',
-        'StatusCommand[0]', 
-        'StatsCommand[0]'
+        'LeechCommand', 'YtdlLeechCommand', 'MediaInfoCommand', 
+        'SearchCommand', 'UserSetCommand', 'StatusCommand', 
+        'StatsCommand', 'StopAllCommand'
     ]
 
 help_string = "<b>NOTE: Try each command without any arguments to see more details.</b>\n\n"
-help_string += "\n".join([f"<blockquote>/{getattr(BotCommands, cmd)} - {desc}</blockquote>" for cmd, desc in {
-    'MirrorCommand[0]': 'Start mirroring to Google Drive.',
-    'LeechCommand[0]': 'Start leeching to Telegram.',
-    'YtdlCommand[0]': 'Mirror links supported by yt-dlp.',
-    'YtdlLeechCommand[0]': 'Leech links supported by yt-dlp.',
-    'CloneCommand[0]': 'Copy files/folders to Google Drive.',
-    'CountCommand': 'Count files/folders in Google Drive.',
-    'ListCommand': 'Search in Google Drive(s).',
-    'UserSetCommand': 'Open the settings panel.',
-    'MediaInfoCommand': 'View MediaInfo from a file or link.',
-    'StopAllCommand[0]': 'Cancel all active tasks.',
-    'SearchCommand': 'Search for torrents using API or plugins.',
-    'StatusCommand[0]': 'Show the status of all downloads.',
-    'StatsCommand[0]': 'Display machine stats hosting the bot.'
-}.items() if cmd in commands])
+help_string += "\n".join([
+    f"<blockquote>/{get_command_name(cmd)} - {command_descriptions[cmd]}</blockquote>" 
+    for cmd in commands
+])
 
 
 @new_thread
