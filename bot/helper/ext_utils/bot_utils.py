@@ -31,6 +31,63 @@ from bot.helper.ext_utils.telegraph_helper import telegraph
 from bot.helper.ext_utils.shorteners import short_url
 from bot.helper.aeon_utils.tinyfy import tinyfy
 
+
+commands = [
+    'LeechCommand[0]',
+    'YtdlLeechCommand[0]',
+    'MediaInfoCommand',
+    'SearchCommand', 
+    'UserSetCommand',
+    'StatusCommand[0]',
+    'StatsCommand[0]',
+    'StopAllCommand[0]', 
+    'HelpCommand',
+    'BotSetCommand',
+    'LogCommand',
+    'RestartCommand[0]'
+]
+
+if config_dict['GDRIVE_ID']:
+    commands = [
+        'MirrorCommand[0]',
+        'LeechCommand[0]',
+        'YtdlCommand[0]',
+        'YtdlLeechCommand[0]', 
+        'CloneCommand[0]',
+        'MediaInfoCommand',
+        'CountCommand',
+        'ListCommand',
+        'SearchCommand', 
+        'UserSetCommand',
+        'StatusCommand[0]',
+        'StatsCommand[0]',
+        'StopAllCommand[0]', 
+        'HelpCommand',
+        'BotSetCommand',
+        'LogCommand',
+        'RestartCommand[0]'
+    ]
+
+command_descriptions = {
+    'MirrorCommand[0]': '- Start mirroring',
+    'LeechCommand[0]': '- Start leeching',
+    'YtdlCommand[0]': '- Mirror yt-dlp supported link',
+    'YtdlLeechCommand[0]': '- Leech through yt-dlp supported link',
+    'CloneCommand[0]': '- Copy file/folder to Drive',
+    'MediaInfoCommand': '- Get MediaInfo',
+    'CountCommand': '- Count file/folder on Google Drive.',
+    'ListCommand': '- Search in Drive',
+    'SearchCommand': '- Search in Torrent',
+    'UserSetCommand': '- User settings',
+    'StatusCommand[0]': '- Get mirror status message',
+    'StatsCommand[0]': '- Check Bot & System stats',
+    'StopAllCommand[0]': '- Cancel all tasks added by you.',
+    'HelpCommand': '- Get detailed help',
+    'BotSetCommand': '- [ADMIN] Open Bot settings',
+    'LogCommand': '- [ADMIN] View log',
+    'RestartCommand[0]': '- [ADMIN] Restart the bot'
+}
+
 THREADPOOL = ThreadPoolExecutor(max_workers = 1000)
 MAGNET_REGEX = r'magnet:\?xt=urn:(btih|btmh):[a-zA-Z0-9]*\s*'
 URL_REGEX = r'^(?!\/)(rtmps?:\/\/|mms:\/\/|rtsp:\/\/|https?:\/\/|ftp:\/\/)?([^\/:]+:[^\/@]+@)?(www\.)?(?=[^\/:\s]+\.[^\/:\s]+)([^\/:\s]+\.[^\/:\s]+)(:\d+)?(\/[^#\s]*[\s\S]*)?(\?[^#\s]*)?(#.*)?$'
@@ -438,29 +495,8 @@ def extra_btns(buttons):
     return buttons
 
 
-async def set_commands(client):
+commands = [BotCommand(f'{getattr(BotCommands, cmd)}', command_descriptions[cmd]) for cmd in commands]
+
+async def set_commands(bot):
     if config_dict['SET_COMMANDS']:
-        commands = [
-            BotCommand(f'{BotCommands.LeechCommand[0]}', '- Start leeching'),
-            BotCommand(f'{BotCommands.YtdlLeechCommand[0]}', '- Leech through yt-dlp supported link'),
-            BotCommand(f'{BotCommands.MediaInfoCommand}', '- Get MediaInfo'),
-            BotCommand(f'{BotCommands.SearchCommand}', '- Search in Torrent'),
-            BotCommand(f'{BotCommands.UserSetCommand}', '- User settings'),
-            BotCommand(f'{BotCommands.StatusCommand[0]}', '- Get mirror status message'),
-            BotCommand(f'{BotCommands.StatsCommand[0]}', '- Check Bot & System stats'),
-            BotCommand(f'{BotCommands.StopAllCommand[0]}', '- Cancel all tasks added by you to the bot.'),
-            BotCommand(f'{BotCommands.HelpCommand}', '- Get detailed help'),
-            BotCommand(f'{BotCommands.BotSetCommand}', '- [ADMIN] Open Bot settings'),
-            BotCommand(f'{BotCommands.LogCommand}', '- [ADMIN] View log'),
-            BotCommand(f'{BotCommands.RestartCommand[0]}', '- [ADMIN] Restart the bot')
-        ]
-        await client.set_bot_commands(commands)
-
-
-"""
-BotCommand(f'{BotCommands.MirrorCommand[0]}', '- Start mirroring'),
-BotCommand(f'{BotCommands.YtdlCommand[0]}', '- Mirror yt-dlp supported link'),
-BotCommand(f'{BotCommands.CountCommand}', '- Count file/folder on Google Drive.'),
-BotCommand(f'{BotCommands.CloneCommand[0]}', '- Copy file/folder to Drive'),
-BotCommand(f'{BotCommands.ListCommand}', '- Search in Drive'),
-"""
+        await bot.set_bot_commands(commands)

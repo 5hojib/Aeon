@@ -398,7 +398,7 @@ async def change_metadata(file, dirpath, key):
     
     streams = json.loads(stdout)['streams']
     
-    cmd = ['render', '-y', '-i', full_file_path, '-c', 'copy']
+    cmd = ['render', '-y', '-i', full_file_path, '-c', 'copy', '-metadata', f'title={key}']
     
     audio_index = 0
     subtitle_index = 0

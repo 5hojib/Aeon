@@ -477,7 +477,14 @@ async def update_private_file(_, message, pre_message):
     elif doc := message.document:
         file_name = doc.file_name
         await message.download(file_name=f'{getcwd()}/{file_name}')
-        if file_name == 'list_drives.txt':
+        if file_name == 'accounts.zip':
+            if await aiopath.exists('accounts'):
+                await aiormtree('accounts')
+            if await aiopath.exists('rclone_sa'):
+                await aiormtree('rclone_sa')
+            await (await create_subprocess_exec("7z", "x", "-o.", "-aoa", "accounts.zip", "accounts/*.json")).wait()
+            await (await create_subprocess_exec("chmod", "-R", "777", "accounts")).wait()
+        elif file_name == 'list_drives.txt':
             list_drives_dict.clear()
             if GDRIVE_ID := config_dict['GDRIVE_ID']:
                 list_drives_dict['Main'] = {"drive_id": GDRIVE_ID, "index_link": config_dict['INDEX_URL']}
