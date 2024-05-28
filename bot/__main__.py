@@ -38,7 +38,12 @@ def get_command_name(cmd):
     command = getattr(BotCommands, cmd, None)
     if command is None:
         raise ValueError(f"Command {cmd} not found in BotCommands")
-    return command[0] if isinstance(command, list) else command
+    if isinstance(command, list):
+        return command[0]
+    elif isinstance(command, str):
+        return command
+    else:
+        raise TypeError(f"Unexpected type for command {cmd}: {type(command)}")
 
 command_descriptions = {
     'MirrorCommand': '- Start mirroring to Google Drive.',
