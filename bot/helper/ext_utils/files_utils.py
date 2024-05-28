@@ -397,22 +397,17 @@ async def change_metadata(file, dirpath, key):
     
     metadata = json.loads(stdout)
     streams = metadata['streams']
-    format_metadata = metadata['format']['tags'] if 'tags' in metadata['format'] else {}
-
+    format_metadata = metadata['format'].get('tags', {})
+    
     # Base ffmpeg command to copy streams and set media title
-    cmd = [
-        'render', '-y', '-i', full_file_path, '-c', 'copy', 
-        '-metadata', f'title={key}'
-    ]
+    cmd = ['ffmpeg', '-y', '-i', full_file_path, '-c', 'copy', '-metadata', f'title={key}']
     
     # Unset unwanted metadata at the container level
-    unset_metadata_keys = [
-        'LICENCE', 'author', 'description', 'filename', 'mimetype', 'SUMMARY', 'WEBSITE', 'COMMENT', 'ENCODER'
-    ]
-    for key in unset_metadata_keys:
-        if key in format_metadata:
-            cmd.extend(['-metadata', f'{key}='])
-
+    unset_metadata_keys = ['LICENCE', 'author', 'description', 'filename', 'mimetype', 'SUMMARY', 'WEBSITE', 'COMMENT', 'ENCODER']
+    for unset_key in unset_metadata_keys:
+        if unset_key in format_metadata:
+            cmd.extend(['-metadata', f'{unset_key}='])
+    
     audio_index = 0
     subtitle_index = 0
     
@@ -432,7 +427,7 @@ async def change_metadata(file, dirpath, key):
             subtitle_index += 1
         
         for unset_key in unset_metadata_keys:
-            if unset_key in stream.get('tags', {}):
+            if 'tags' in stream and unset_key in stream['tags']:
                 cmd.extend([f'-metadata:s:{stream_index}:{unset_key}=', ''])
     
     cmd.append(temp_file_path)
@@ -449,7 +444,6 @@ async def change_metadata(file, dirpath, key):
     os.replace(temp_file_path, full_file_path)
     LOGGER.info(f"Metadata changed successfully for file: {file}")
     return file
-
 
 def is_first_archive_split(file):
     return bool(re_search(FIRST_SPLIT_REGEX, file))
