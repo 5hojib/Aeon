@@ -15,6 +15,15 @@ from bot.helper.telegram_helper.message_utils import editMessage, sendMessage
 from bot.helper.ext_utils.bot_utils import cmd_exec
 from bot.helper.ext_utils.telegraph_helper import telegraph
 
+
+section_dict = {
+    'General',
+    'Video',
+    'Audio',
+    'Text',
+    'Menu'
+}
+
 async def gen_mediainfo(message, link=None, media=None, msg=None):
     temp_send = await sendMessage(message, 'Generating MediaInfo...')
     try:
@@ -55,9 +64,8 @@ async def gen_mediainfo(message, link=None, media=None, msg=None):
         await aioremove(des_path)
 
     link_id = (await telegraph.create_page(title='MediaInfo', content=tc))["path"]
-    await temp_send.edit(f"<b>MediaInfo:</b>\n\n<b>Link :</b> https://graph.org/{link_id}", disable_web_page_preview=False)
+    await temp_send.edit(f"<blockquote>MediaInfo generated successfully<a href='https://graph.org/{link_id}'>.<a></blockquote>", disable_web_page_preview=False)
 
-section_dict = {'General', 'Video', 'Audio', 'Text', 'Menu'}
 
 def parseinfo(out):
     tc = ''
