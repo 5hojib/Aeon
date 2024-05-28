@@ -1,7 +1,6 @@
-
+import os
 import json
 
-import os
 from os import path as ospath, walk
 from shutil import rmtree, disk_usage
 from sys import exit as sexit
