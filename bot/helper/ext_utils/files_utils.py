@@ -400,7 +400,7 @@ async def change_metadata(file, dirpath, key):
     format_metadata = metadata['format'].get('tags', {})
     
     # Base ffmpeg command to copy streams and set media title
-    cmd = ['ffmpeg', '-y', '-i', full_file_path, '-c', 'copy', '-metadata', f'title={key}']
+    cmd = ['render', '-y', '-i', full_file_path, '-c', 'copy', '-metadata', f'title={key}']
     
     # Unset unwanted metadata at the container level
     unset_metadata_keys = ['LICENCE', 'author', 'description', 'filename', 'mimetype', 'SUMMARY', 'WEBSITE', 'COMMENT', 'ENCODER']
