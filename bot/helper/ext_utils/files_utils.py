@@ -401,9 +401,9 @@ async def change_metadata(file, dirpath, key):
         'render', '-y', '-i', full_file_path, '-c', 'copy',
         '-metadata', f'title={key}',
         '-metadata', 'copyright=',
-        '-metadata', 'description='
-        '-metadata', 'SUMMARY='
-        '-metadata', 'AUTHOR='
+        '-metadata', 'description=',
+        '-metadata', 'SUMMARY=',
+        '-metadata', 'AUTHOR=',
         '-metadata', 'WEBSITE='
     ]
     
