@@ -89,7 +89,9 @@ class TgUploader:
             LOGGER.error(f"ScreenShots Error: {e}")
         try:
             if self.__mediainfo:
-                buttons.ubutton('MediaInfo', await get_mediainfo_link(up_path))
+                m =  await get_mediainfo_link(up_path)
+                buttons.ubutton('MediaInfo', m)
+                LOGGER.info(m)
         except Exception as e:
             LOGGER.error(f"MediaInfo Error: {str(e)}")
         return buttons.build_menu(1) if self.__has_buttons else None
