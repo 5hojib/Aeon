@@ -402,6 +402,9 @@ async def change_metadata(file, dirpath, key):
         '-metadata', f'title={key}',
         '-metadata', 'copyright=',
         '-metadata', 'description='
+        '-metadata', 'SUMMARY='
+        '-metadata', 'AUTHOR='
+        '-metadata', 'WEBSITE='
     ]
     
     audio_index = 0
