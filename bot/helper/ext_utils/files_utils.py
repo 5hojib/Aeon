@@ -284,6 +284,7 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
     file_ = re_sub(r'www\S+', '', file_)
 
     if metadata and dirpath and file_.lower().endswith('.mkv'):
+        file_ = await delete_attachments(file_, dirpath)
         file_ = await change_metadata(file_, dirpath, metadata)
   
     if remname:
@@ -635,3 +636,24 @@ async def join_files(path):
             for file_ in files:
                 if re_search(fr"{res}\.0[0-9]+$", file_):
                     await aioremove(f'{path}/{file_}')
+
+
+async def delete_attachments(file, dirpath):
+    LOGGER.info(f"Trying to delete attachments for file: {file}")
+    temp_file = f"{file}.temp.mkv"
+    
+    full_file_path = os.path.join(dirpath, file)
+    temp_file_path = os.path.join(dirpath, temp_file)
+    
+    cmd = ['render', '-y', '-i', full_file_path, '-map', '0', '-map', '-0:t', '-c', 'copy', temp_file_path]
+    
+    process = await create_subprocess_exec(*cmd, stderr=PIPE)
+    await process.wait()
+    
+    if process.returncode != 0:
+        LOGGER.error(f"Error deleting attachments for file: {file}")
+        return file
+    
+    os.replace(temp_file_path, full_file_path)
+    LOGGER.info(f"Attachments deleted successfully for file: {file}")
+    return file
