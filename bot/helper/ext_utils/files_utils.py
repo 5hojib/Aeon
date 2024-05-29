@@ -286,6 +286,7 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
     if metadata and dirpath and file_.lower().endswith('.mkv'):
         file_ = await delete_attachments(file_, dirpath)
         file_ = await change_metadata(file_, dirpath, metadata)
+        file_ = await delete_extra_video_streams(file_, dirpath)
   
     if remname:
         if not remname.startswith('|'):
@@ -404,6 +405,7 @@ async def change_metadata(file, dirpath, key):
     cmd = [
         'render', '-y', '-i', full_file_path, '-c', 'copy',
         '-metadata', f'title={key}',
+        '-metadata:s:v:0', f'title={key}',
         '-metadata', 'copyright=',
         '-metadata', 'description=',
         '-metadata', 'license=',
@@ -430,7 +432,6 @@ async def change_metadata(file, dirpath, key):
 
     audio_index = 0
     subtitle_index = 0
-    video_index = 0
 
     for stream in streams:
         stream_index = stream['index']
@@ -461,10 +462,7 @@ async def change_metadata(file, dirpath, key):
             f'-metadata:s:{stream_type[0]}:{stream_index}', 'creation_time='
         ])
         
-        if stream_type == 'video':
-            cmd.extend([f'-metadata:s:v:{video_index}', f'title={key}'])
-            video_index += 1
-        elif stream_type == 'audio':
+        if stream_type == 'audio':
             cmd.extend([f'-metadata:s:a:{audio_index}', f'title={key}'])
             audio_index += 1
         elif stream_type == 'subtitle':
@@ -656,4 +654,54 @@ async def delete_attachments(file, dirpath):
     
     os.replace(temp_file_path, full_file_path)
     LOGGER.info(f"Attachments deleted successfully for file: {file}")
+    return file
+
+
+async def delete_extra_video_streams(file, dirpath):
+    LOGGER.info(f"Trying to delete extra video streams for file: {file}")
+    temp_file = f"{file}.temp.mkv"
+    
+    full_file_path = os.path.join(dirpath, file)
+    temp_file_path = os.path.join(dirpath, temp_file)
+    
+    # Get stream information
+    cmd = ['ffprobe', '-hide_banner', '-loglevel', 'error', '-print_format', 'json', '-show_streams', full_file_path]
+    process = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = await process.communicate()
+    
+    if process.returncode != 0:
+        LOGGER.error(f"Error getting stream info: {stderr.decode().strip()}")
+        return file
+    
+    streams = json.loads(stdout)['streams']
+    
+    # Command to copy streams
+    cmd = ['render', '-y', '-i', full_file_path]
+    
+    first_video = False
+    
+    for stream in streams:
+        stream_index = stream['index']
+        stream_type = stream['codec_type']
+        
+        if stream_type == 'video':
+            if not first_video:
+                cmd.extend(['-map', f'0:{stream_index}'])
+                first_video = True
+        else:
+            cmd.extend(['-map', f'0:{stream_index}'])
+    
+    cmd.extend(['-c', 'copy', temp_file_path])
+    
+    # Execute the ffmpeg command to remove extra video streams
+    process = await create_subprocess_exec(*cmd, stderr=PIPE)
+    await process.wait()
+    
+    if process.returncode != 0:
+        LOGGER.error(f"Error deleting extra video streams for file: {file}")
+        return file
+    
+    # Replace original file with the temp file
+    os.replace(temp_file_path, full_file_path)
+    LOGGER.info(f"Extra video streams deleted successfully for file: {file}")
     return file
