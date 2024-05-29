@@ -431,6 +431,8 @@ async def change_metadata(file, dirpath, key):
     await process.wait()
     
     if process.returncode != 0:
+        err = (await process.stderr.read()).decode().strip()
+        LOGGER.error(err)
         LOGGER.error(f"Error changing metadata for file: {file}")
         return file
     
