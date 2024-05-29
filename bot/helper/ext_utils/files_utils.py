@@ -436,9 +436,32 @@ async def change_metadata(file, dirpath, key):
         stream_type = stream['codec_type']
 
         cmd.extend(['-map', f'0:{stream_index}'])
-
+        cmd.extend([
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'title=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'author=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'AUTHOR=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'description=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'DESCRIPTION=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'copyright=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'COPYRIGHT=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'summary=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'SUMMARY=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'comment=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'COMMENT=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'author=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'WEBSITE=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'ENCODER=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'FILENAME=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'MIMETYPE=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'language=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'publisher=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'genre=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'date=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'creation_time='
+        ])
+        
         if stream_type == 'video':
-            cmd.extend([f'-metadata:s:v:{stream_index}', f'title={key}'])
+            cmd.extend([f'-metadata:s:v:{video_index}', f'title={key}'])
             video_index += 1
         elif stream_type == 'audio':
             cmd.extend([f'-metadata:s:a:{audio_index}', f'title={key}'])
