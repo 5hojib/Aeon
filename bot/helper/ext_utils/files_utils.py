@@ -429,6 +429,10 @@ async def change_metadata(file, dirpath, key):
         stream_index = stream['index']
         stream_type = stream['codec_type']
         
+        # Skip attached pictures
+        if stream_type == 'video' and 'attached_pic' in stream and stream['attached_pic']:
+            continue
+
         cmd.extend(['-map', f'0:{stream_index}'])
         
         if stream_type == 'video':
@@ -442,10 +446,11 @@ async def change_metadata(file, dirpath, key):
         
         for unset_key in unset_metadata_keys + ['description', 'copyright']:
             if 'tags' in stream and unset_key in stream['tags']:
-                # Avoid attached picture stream metadata modification
-                if stream_type == 'video' and 'attached_pic' in stream and stream['attached_pic']:
-                    continue
-                cmd.extend([f'-metadata:s:{stream_index}:{unset_key}='])
+                metadata_value = stream['tags'][unset_key]
+                if metadata_value:
+                    cmd.extend([f'-metadata:s:{stream_index}:{unset_key}={metadata_value}'])
+                else:
+                    cmd.extend([f'-metadata:s:{stream_index}:{unset_key}='])
 
     cmd.append(temp_file_path)
     
