@@ -387,7 +387,7 @@ async def change_metadata(file, dirpath, key):
     full_file_path = os.path.join(dirpath, file)
     temp_file_path = os.path.join(dirpath, temp_file)
     
-    cmd = ['ffprobe', '-hide_banner', '-loglevel', 'error', '-print_format', 'json', '-show_streams', '-show_format', full_file_path]
+    cmd = ['ffprobe', '-hide_banner', '-loglevel', 'error', '-print_format', 'json', '-show_streams', full_file_path]
     process = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
     stdout, stderr = await process.communicate()
     
@@ -395,32 +395,14 @@ async def change_metadata(file, dirpath, key):
         LOGGER.error(f"Error getting stream info: {stderr.decode().strip()}")
         return file
     
-    metadata = json.loads(stdout)
-    streams = metadata['streams']
-    format_metadata = metadata['format'].get('tags', {})
-
-    cmd = ['render', '-y', '-i', full_file_path, '-c', 'copy', '-metadata', f'title={key}']
+    streams = json.loads(stdout)['streams']
     
-    unset_metadata_keys = [
-        'LICENCE',
-        'AUTHOR',
-        'filename',
-        'mimetype',
-        'SUMMARY',
-        'WEBSITE',
-        'COMMENT',
-        'ENCODER',
-        'ARTIST',
-        'DATE',
-        'PARL',
-        'Comment'
+    cmd = [
+        'render', '-y', '-i', full_file_path, '-c', 'copy',
+        '-metadata', f'title={key}',
+        '-metadata', 'copyright=',
+        '-metadata', 'description='
     ]
-
-    for unset_key in unset_metadata_keys:
-        if unset_key in format_metadata:
-            cmd.extend(['-metadata', f'{unset_key}='])
-
-    cmd.extend(['-metadata', 'description=', '-metadata', 'copyright='])
     
     audio_index = 0
     subtitle_index = 0
@@ -429,10 +411,6 @@ async def change_metadata(file, dirpath, key):
         stream_index = stream['index']
         stream_type = stream['codec_type']
         
-        # Skip attached pictures
-        if stream_type == 'video' and 'attached_pic' in stream and stream['attached_pic']:
-            continue
-
         cmd.extend(['-map', f'0:{stream_index}'])
         
         if stream_type == 'video':
@@ -443,23 +421,13 @@ async def change_metadata(file, dirpath, key):
         elif stream_type == 'subtitle':
             cmd.extend([f'-metadata:s:s:{subtitle_index}', f'title={key}'])
             subtitle_index += 1
-        
-        for unset_key in unset_metadata_keys + ['description', 'copyright']:
-            if 'tags' in stream and unset_key in stream['tags']:
-                metadata_value = stream['tags'][unset_key]
-                if metadata_value:
-                    cmd.extend([f'-metadata:s:{stream_index}:{unset_key}={metadata_value}'])
-                else:
-                    cmd.extend([f'-metadata:s:{stream_index}:{unset_key}='])
-
+    
     cmd.append(temp_file_path)
     
     process = await create_subprocess_exec(*cmd, stderr=PIPE)
     await process.wait()
     
     if process.returncode != 0:
-        err = (await process.stderr.read()).decode().strip()
-        LOGGER.error(err)
         LOGGER.error(f"Error changing metadata for file: {file}")
         return file
     
