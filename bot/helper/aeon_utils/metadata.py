@@ -51,7 +51,9 @@ async def change_metadata(file, dirpath, key):
         '-metadata', 'COMMENT=',
         '-metadata', 'ENCODER=',
         '-metadata', 'FILENAME=',
-        '-metadata', 'MIMETYPE='
+        '-metadata', 'MIMETYPE=',
+        '-metadata', 'PURL=',
+        '-metadata', 'ALBUM='
     ]
 
     audio_index = 0
@@ -79,11 +81,11 @@ async def change_metadata(file, dirpath, key):
             f'-metadata:s:{stream_type[0]}:{stream_index}', 'ENCODER=',
             f'-metadata:s:{stream_type[0]}:{stream_index}', 'FILENAME=',
             f'-metadata:s:{stream_type[0]}:{stream_index}', 'MIMETYPE=',
-            f'-metadata:s:{stream_type[0]}:{stream_index}', 'language=',
             f'-metadata:s:{stream_type[0]}:{stream_index}', 'publisher=',
             f'-metadata:s:{stream_type[0]}:{stream_index}', 'genre=',
             f'-metadata:s:{stream_type[0]}:{stream_index}', 'date=',
-            f'-metadata:s:{stream_type[0]}:{stream_index}', 'creation_time='
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'creation_time=',
+            f'-metadata:s:{stream_type[0]}:{stream_index}', 'VENDOR_ID='
         ])
         
         if stream_type == 'audio':

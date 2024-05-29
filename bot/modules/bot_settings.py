@@ -99,6 +99,10 @@ async def load_config():
                 x = x.lstrip('.')
             GLOBAL_EXTENSION_FILTER.append(x.strip().lower())
 
+    METADATA_KEY = environ.get('METADATA_KEY', '')
+    if len(METADATA_KEY) == 0:
+        METADATA_KEY = ''
+
     MEGA_EMAIL = environ.get('MEGA_EMAIL', '')
     MEGA_PASSWORD = environ.get('MEGA_PASSWORD', '')
     if len(MEGA_EMAIL) == 0 or len(MEGA_PASSWORD) == 0:
@@ -325,6 +329,7 @@ async def load_config():
             'MEDIA_GROUP': MEDIA_GROUP,
             'MEGA_EMAIL': MEGA_EMAIL,
             'MEGA_PASSWORD': MEGA_PASSWORD,
+            'METADATA_KEY': METADATA_KEY,
             'OWNER_ID': OWNER_ID,
             'QUEUE_ALL': QUEUE_ALL,
             'QUEUE_DOWNLOAD': QUEUE_DOWNLOAD,

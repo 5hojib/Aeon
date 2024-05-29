@@ -230,13 +230,13 @@ def get_readable_message():
     dl_speed = 0
     up_speed = 0
     for download in download_dict.values():
-            tstatus = download.status()
-            if tstatus == MirrorStatus.STATUS_DOWNLOADING:
-                dl_speed += text_to_bytes(download.speed())
-            elif tstatus == MirrorStatus.STATUS_UPLOADING:
-                up_speed += text_to_bytes(download.speed())
-            elif tstatus == MirrorStatus.STATUS_SEEDING:
-                up_speed += text_to_bytes(download.upload_speed())
+        tstatus = download.status()
+        if tstatus == MirrorStatus.STATUS_DOWNLOADING:
+            dl_speed += text_to_bytes(download.speed())
+        elif tstatus == MirrorStatus.STATUS_UPLOADING:
+            up_speed += text_to_bytes(download.speed())
+        elif tstatus == MirrorStatus.STATUS_SEEDING:
+            up_speed += text_to_bytes(download.upload_speed())
     if tasks > STATUS_LIMIT:
         buttons = ButtonMaker()
         buttons.ibutton("Prev", "status pre")

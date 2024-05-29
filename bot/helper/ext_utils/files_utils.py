@@ -277,13 +277,15 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
     remname = user_dict.get('remname', '')
     suffix = user_dict.get('suffix', '')
     lcaption = user_dict.get('lcaption', '')
-    metadata = user_dict.get('metadata', '')
+    metadata_key = config_dict['METADATA_KEY'] if (
+        users_key := user_dict.get('metadata', '')
+    ) == '' else users_key
     prefile_ = file_
-    file_ = re_sub(r'www\S+', '', file_)
+    file_ = re_sub(r'^www\S+\s*[-_]*\s*', '', file_)
 
     if metadata and dirpath and file_.lower().endswith('.mkv'):
         file_ = await delete_attachments(file_, dirpath)
-        file_ = await change_metadata(file_, dirpath, metadata)
+        file_ = await change_metadata(file_, dirpath, metadata_key)
         file_ = await delete_extra_video_streams(file_, dirpath)
   
     if remname:
