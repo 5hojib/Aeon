@@ -283,7 +283,7 @@ async def format_filename(file_, user_id, dirpath=None, isMirror=False):
     prefile_ = file_
     file_ = re_sub(r'^www\S+\s*[-_]*\s*', '', file_)
 
-    if metadata and dirpath and file_.lower().endswith('.mkv'):
+    if metadata_key and dirpath and file_.lower().endswith('.mkv'):
         file_ = await delete_attachments(file_, dirpath)
         file_ = await change_metadata(file_, dirpath, metadata_key)
         file_ = await delete_extra_video_streams(file_, dirpath)
