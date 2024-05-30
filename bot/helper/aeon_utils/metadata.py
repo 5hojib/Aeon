@@ -149,6 +149,7 @@ async def add_attachment(file, dirpath, attachment_path):
         '-attach', attachment_path, '-metadata:s:t', f'mimetype={mime_type}',
         '-metadata:s:t', 'title=cover_art',
         '-metadata:s:t', 'handler_name=Cover Art (Front)',
+        '-disposition:v:1', 'attached_pic',
         '-c', 'copy', temp_file_path
     ]
 
