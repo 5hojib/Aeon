@@ -129,17 +129,18 @@ async def delete_extra_strings(file, dirpath):
     os.replace(temp_file_path, full_file_path)
     return file
 
+
 async def add_attachment(file, dirpath, attachment_path):
     LOGGER.info(f"Adding photo attachment to file: {file}")
 
-    temp_file = f"{file}.temp.mkv"
     full_file_path = os.path.join(dirpath, file)
-    temp_file_path = os.path.join(dirpath, temp_file)
+    output_file_path = os.path.join(dirpath, f"output_{file}")
 
     cmd = [
-        'render', '-i', full_file_path, '-i', attachment_path,
-        '-map', '0', '-map', '1', '-map_metadata', '0', '-c', 'copy',
-        '-disposition:v:1', 'attached_pic', temp_file_path
+        'render', '-y', '-i', full_file_path, '-i', attachment_path,
+        '-map', '0', '-map', '1', '-c', 'copy',
+        '-metadata:s:t', 'mimetype=image/png', '-metadata:s:t', 'title=cover',
+        '-disposition:t', 'attached_pic', output_file_path
     ]
 
     process = await create_subprocess_exec(*cmd, stderr=PIPE, stdout=PIPE)
@@ -151,7 +152,7 @@ async def add_attachment(file, dirpath, attachment_path):
         LOGGER.error(f"Error adding photo attachment to file: {file}")
         return file
 
-    os.replace(temp_file_path, full_file_path)
+    os.replace(output_file_path, full_file_path)
     LOGGER.info(f"Photo attachment added successfully to file: {file}")
     return file
 
