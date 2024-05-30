@@ -121,7 +121,7 @@ async def delete_extra_strings(file, dirpath):
     full_file_path = os.path.join(dirpath, file)
     temp_file_path = os.path.join(dirpath, temp_file)
     
-    cmd = ['render', '-y', '-i', full_file_path, '-map_metadata', '-1', '-c', 'copy', temp_file_path]
+    cmd = ['render', '-y', '-i', full_file_path, '-map_metadata', '-1', '-dn', '-cn', '-c', 'copy', temp_file_path]
     
     process = await create_subprocess_exec(*cmd, stderr=PIPE)
     await process.wait()
