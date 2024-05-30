@@ -302,7 +302,9 @@ class TgUploader:
                     await self.__switching_client()
                     await self.__upload_file(cap_mono, file_)
                     if not isDeleted:
-                        await deleteMessage(list(self.__leechmsg.values())[0])
+                        values_list = list(self.__leechmsg.values())
+                        if values_list:
+                            await deleteMessage(values_list.[0])
                         isDeleted = True
                     if self.__is_cancelled:
                         return
