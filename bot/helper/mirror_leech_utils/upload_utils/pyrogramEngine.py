@@ -406,10 +406,10 @@ class TgUploader:
                         dirpath = f"{dirpath}/copied"
                         await makedirs(dirpath, exist_ok=True)
                         new_path = ospath.join(
-                            dirpath, f"{ospath.splitext(file_)[0]}.mp4")
+                            dirpath, f"{ospath.splitext(file_)[0]}.mkv")
                         self.__up_path = await copy(self.__up_path, new_path)
                     else:
-                        new_path = f"{ospath.splitext(self.__up_path)[0]}.mp4"
+                        new_path = f"{ospath.splitext(self.__up_path)[0]}.mkv"
                         await aiorename(self.__up_path, new_path)
                         self.__up_path = new_path
                 if self.__is_cancelled:
