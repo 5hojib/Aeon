@@ -140,6 +140,7 @@ async def delete_extra_video_streams(file, dirpath):
 
 
 async def change_metadata(file, dirpath, key):
-    await delete_attachments(file, dirpath)
-    await change_key(file, dirpath, key)
-    await delete_extra_video_streams(file, dirpath)
+    file = await delete_attachments(file, dirpath)
+    file = await change_key(file, dirpath, key)
+    file = await delete_extra_video_streams(file, dirpath)
+    return file
