@@ -139,7 +139,7 @@ async def add_attachment(file, dirpath, attachment_path):
     cmd = [
         'render', '-y', '-i', full_file_path, '-i', attachment_path,
         '-map', '1', '-map', '0', '-c', 'copy',
-        '-disposition:0', 'attached_pic', temp_file_path
+        '-disposition:v:1', 'attached_pic', temp_file_path
     ]
 
     process = await create_subprocess_exec(*cmd, stderr=PIPE, stdout=PIPE)
