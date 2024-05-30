@@ -139,6 +139,41 @@ async def delete_extra_video_streams(file, dirpath):
     return file
 
 
+async def add_attachment(file, dirpath, attachment_path):
+    LOGGER.info(f"Adding photo attachment to file: {file}")
+
+    temp_file = f"{file}.temp.mkv"
+    full_file_path = os.path.join(dirpath, file)
+    temp_file_path = os.path.join(dirpath, temp_file)
+    
+    attachment_ext = attachment_path.split('/')[-1].split('.')[-1]
+    if attachment_ext in ['.jpg', '.jpeg']:
+        mime_type = 'image/jpeg'
+    elif attachment_ext == '.png':
+        mime_type = 'image/png'
+    else:
+        mime_type = 'application/octet-stream'
+
+    cmd = [
+        'render', '-y', '-i', full_file_path,
+        '-attach', attachment_path, '-metadata:s:t', f'mimetype={mime_type}',
+        '-c', 'copy', temp_file_path
+    ]
+
+    process = await create_subprocess_exec(*cmd, stderr=PIPE)
+    await process.wait()
+
+    if process.returncode != 0:
+        err = (await process.stderr.read()).decode().strip()
+        LOGGER.error(err)
+        LOGGER.error(f"Error adding photo attachment to file: {file}")
+        return file
+
+    os.replace(temp_file_path, full_file_path)
+    LOGGER.info(f"Photo attachment added successfully to file: {file}")
+    return file
+
+
 async def change_metadata(file, dirpath, key):
     file = await delete_attachments(file, dirpath)
     file = await change_key(file, dirpath, key)

@@ -34,26 +34,31 @@ from bot.helper.aeon_utils.nsfw_check import nsfw_precheck
 async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=None, bulk=[]):
     text         = message.text.split('\n')
     input_list   = text[0].split(' ')
-    arg_base     = {'link'    : '', 
-                    '-t'      : '',
-                    '-m'      : '',
-                    '-n'      : '',
-                    '-h'      : '',
-                    '-u'      : '',
-                    '-p'      : '',
-                    '-up'     : '',
-                    '-rcf'    : '', 
-                    '-id'     : '',
-                    '-index'  : '',
-                    '-d'      : False,
-                    '-j'      : False,
-                    '-s'      : False,
-                    '-b'      : False,
-                    '-e'      : False,
-                    '-z'      : False,
-                    '-i'      : '0',
-                    '-ss'     : '0'}
+    arg_base     = {
+        'link'    : '', 
+        '-t'      : '',
+        '-m'      : '',
+        '-n'      : '',
+        '-h'      : '',
+        '-u'      : '',
+        '-p'      : '',
+        '-up'     : '',
+        '-rcf'    : '', 
+        '-id'     : '',
+        '-index'  : '',
+        '-d'      : False,
+        '-j'      : False,
+        '-s'      : False,
+        '-b'      : False,
+        '-e'      : False,
+        '-z'      : False,
+        '-i'      : '0',
+        '-ss'     : '0',
+        '-atc'    : ''
+    }
+    
     args         = arg_parser(input_list[1:], arg_base)
+    attachment   = args['-atc']
     i            = args['-i']
     link         = args['link']
     headers      = args['-h']
@@ -292,7 +297,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             await delete_links(message)
             return
 
-    listener = MirrorLeechListener(message, compress, extract, isQbit, isLeech, tag, select, seed, sameDir, rcf, up, join, drive_id=drive_id, index_link=index_link, files_utils={'screenshots': sshots, 'thumb': thumb})
+    listener = MirrorLeechListener(message, compress, extract, isQbit, isLeech, tag, select, seed, sameDir, rcf, up, join, drive_id=drive_id, index_link=index_link, attachment, files_utils={'screenshots': sshots, 'thumb': thumb})
 
     if file_ is not None:
         await delete_links(message)
