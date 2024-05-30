@@ -147,8 +147,7 @@ uset_display_dict = {
     'attachment': [
         'Attachment url, it will added in mkv as thumbnail or cover photo, whetever you say.',
         'Send raw photo url, example from imgbb.com . Timeout: 60 sec'
-      ]
-    
+    ],
     'lcaption': [
         'Leech Caption is the custom caption on the leech files uploaded by the bot.', 
         'Send leech caption. You can add HTML tags. Timeout: 60 sec'
