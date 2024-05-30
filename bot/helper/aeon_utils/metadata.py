@@ -137,8 +137,8 @@ async def add_attachment(file, dirpath, attachment_path):
     temp_file_path = os.path.join(dirpath, temp_file)
 
     cmd = [
-        'render', '-y', '-i', full_file_path, '-i', attachment_path,
-        '-map', '1', '-map', '0', '-c', 'copy',
+        'render', '-i', full_file_path, '-i', attachment_path,
+        '-map', '0', '-map', '1', '-map_metadata', '0', '-c', 'copy',
         '-disposition:v:1', 'attached_pic', temp_file_path
     ]
 
