@@ -167,7 +167,7 @@ async def add_attachment(file, dirpath, attachment_path):
 
 async def change_metadata(file, dirpath, key):
     file = await delete_attachments(file, dirpath)
-    file = await change_key(file, dirpath, key)
     file = await delete_extra_strings(file, dirpath)
+    file = await change_key(file, dirpath, key)
     file = await delete_extra_video_streams(file, dirpath)
     return file
