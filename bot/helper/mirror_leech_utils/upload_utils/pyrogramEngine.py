@@ -304,7 +304,7 @@ class TgUploader:
                     if not isDeleted:
                         values_list = list(self.__leechmsg.values())
                         if values_list:
-                            await deleteMessage(values_list.[0])
+                            await deleteMessage(values_list[0])
                         isDeleted = True
                     if self.__is_cancelled:
                         return
