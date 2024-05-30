@@ -145,11 +145,13 @@ async def add_attachment(file, dirpath, attachment_path):
         mime_type = 'application/octet-stream'
 
     cmd = [
-        'render', '-y', '-i', full_file_path,
-        '-attach', attachment_path, '-map', '0',
-        '-c', 'copy', '-metadata:s:t', f'mimetype={mime_type}',
-        '-metadata:s:t:0', f'filename=cover_art.{attachment_ext}',
-        temp_file_path
+        'ffmpeg', '-y', '-i', full_file_path, '-attach',
+        attachment_path, '-metadata:s:t', f'mimetype={mime_type}',
+        '-metadata:s:t', 'title=Cover Art',
+        '-metadata:s:t', 'comment=Cover Art',
+        '-metadata:s:t', 'description=Cover Art',
+        '-metadata:s:t', f'filename=Cover.{attachment_ext}',
+        '-c', 'copy', temp_file_path
     ]
 
     process = await create_subprocess_exec(*cmd, stderr=PIPE)
