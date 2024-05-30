@@ -247,6 +247,10 @@ async def load_config():
     if len(MIRROR_LOG_ID) == 0:
         MIRROR_LOG_ID = ''
 
+    ATTACHMENT_URL = environ.get('ATTACHMENT_URL', '')
+    if len(ATTACHMENT_URL) == 0:
+        ATTACHMENT_URL = ''
+    
     USER_MAX_TASKS = environ.get('USER_MAX_TASKS', '')
     USER_MAX_TASKS = '' if len(USER_MAX_TASKS) == 0 else int(USER_MAX_TASKS)
 
@@ -322,6 +326,7 @@ async def load_config():
             'LEECH_DUMP_ID': LEECH_DUMP_ID,
             'IMAGES': IMAGES,
             'EXTENSION_FILTER': EXTENSION_FILTER,
+            'ATTACHMENT_URL': ATTACHMENT_URL,
             'GDRIVE_ID': GDRIVE_ID,
             'INDEX_URL': INDEX_URL,
             'LEECH_LOG_ID': LEECH_LOG_ID,

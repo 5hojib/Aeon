@@ -14,7 +14,7 @@ from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_excep
 
 from bot import config_dict, list_drives_dict, GLOBAL_EXTENSION_FILTER
 from bot.helper.aeon_utils.metadata import add_attachment
-from bot.helper.ext_utils.bot_utils import setInterval, async_to_sync, get_readable_file_size
+from bot.helper.ext_utils.bot_utils import setInterval, async_to_sync, get_readable_file_size, isMkv
 from bot.helper.ext_utils.files_utils import get_mime_type, process_file
 
 LOGGER = getLogger(__name__)
@@ -266,7 +266,7 @@ class GoogleDriveHelper:
     def __upload_file(self, file_path, file_name, mime_type, dest_id, is_dir=True):
         location = ospath.dirname(file_path)
         file_name, _ = async_to_sync(process_file, file_name, self.__user_id, location, True)
-        if atc:=self.__listener.attachment:
+        if atc:=self.__listener.attachment and if isMkv(file_name):
             file_name = async_to_sync(add_attachment, file_name, location, atc)
         file_metadata = {
             'name': file_name,

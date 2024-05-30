@@ -32,6 +32,8 @@ from bot.helper.aeon_utils.nsfw_check import nsfw_precheck
 
 @new_task
 async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=None, bulk=[]):
+    user_id      = message.from_user.id
+    user_dict    = user_data.get(user_id, {})
     text         = message.text.split('\n')
     input_list   = text[0].split(' ')
     arg_base     = {
@@ -58,7 +60,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     }
     
     args         = arg_parser(input_list[1:], arg_base)
-    attachment   = args['-atc']
+    attachment   = args['-atc'] if args['-atc'] else user_dict['attachment'] if user_dict['attachment'] else config_dict['ATTACHMENT_URL']
     i            = args['-i']
     link         = args['link']
     headers      = args['-h']

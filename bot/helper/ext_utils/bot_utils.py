@@ -105,6 +105,10 @@ class setInterval:
         self.task.cancel()
 
 
+def isMkv(file):
+    return file.lower().endswith('mkv')
+
+
 def get_readable_file_size(size_in_bytes):
     if size_in_bytes is None:
         return '0B'

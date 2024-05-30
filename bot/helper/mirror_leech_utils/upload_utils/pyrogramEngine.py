@@ -17,7 +17,7 @@ from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import sendCustomMsg, sendMultiMessage, chat_info, deleteMessage, get_tg_link_content
 from bot.helper.aeon_utils.metadata import add_attachment
 from bot.helper.ext_utils.files_utils import clean_unwanted, is_archive, get_base_name, get_media_info, get_document_type, take_ss, get_ss, get_mediainfo_link, process_file, get_audio_thumb
-from bot.helper.ext_utils.bot_utils import get_readable_file_size, sync_to_async, is_telegram_link, is_url, download_image_url
+from bot.helper.ext_utils.bot_utils import get_readable_file_size, sync_to_async, is_telegram_link, is_url, download_image_url, isMkv
 
 LOGGER = getLogger(__name__)
 getLogger("pyrogram").setLevel(ERROR)
@@ -182,7 +182,7 @@ class TgUploader:
 
     async def __prepare_file(self, prefile_, dirpath):
         file_, cap_mono = await process_file(prefile_, self.__user_id, dirpath)
-        if atc:=self.__listener.attachment:
+        if atc:=self.__listener.attachment and isMkv(file_):
             file_ = await add_attachment(file_, dirpath, atc)
         if prefile_ != file_:
             if self.__listener.seed and not self.__listener.newDir and not dirpath.endswith("/splited_files"):

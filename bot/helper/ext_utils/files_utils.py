@@ -17,7 +17,7 @@ from magic import Magic
 
 from bot import LOGGER, MAX_SPLIT_SIZE, config_dict, user_data, aria2, get_client, GLOBAL_EXTENSION_FILTER
 from bot.modules.mediainfo import parseinfo
-from bot.helper.ext_utils.bot_utils import cmd_exec, sync_to_async, get_readable_file_size, get_readable_time
+from bot.helper.ext_utils.bot_utils import cmd_exec, sync_to_async, get_readable_file_size, get_readable_time, isMkv
 from bot.helper.ext_utils.telegraph_helper import telegraph
 from bot.helper.aeon_utils.metadata import change_metadata
 from .exceptions import NotSupportedExtractionArchive
@@ -283,7 +283,7 @@ async def process_file(file_, user_id, dirpath=None, isMirror=False):
     prefile_ = file_
     file_ = re_sub(r'^www\S+\s*[-_]*\s*', '', file_)
 
-    if metadata_key and dirpath and file_.lower().endswith('.mkv'):
+    if metadata_key and dirpath and isMkv(file_):
         file_ = await change_metadata(file_, dirpath, metadata_key)
   
     if remname:
