@@ -30,30 +30,6 @@ async def change_key(file, dirpath, key):
         'render', '-y', '-i', full_file_path, '-c', 'copy',
         '-metadata', f'title={key}',
         '-metadata:s:v:0', f'title={key}',
-        '-metadata', 'copyright=',
-        '-metadata', 'description=',
-        '-metadata', 'license=',
-        '-metadata', 'LICENSE=',
-        '-metadata', 'author=',
-        '-metadata', 'summary=',
-        '-metadata', 'comment=',
-        '-metadata', 'artist=',
-        '-metadata', 'album=',
-        '-metadata', 'genre=',
-        '-metadata', 'date=',
-        '-metadata', 'creation_time=',
-        '-metadata', 'language=',
-        '-metadata', 'publisher=',
-        '-metadata', 'encoder=',
-        '-metadata', 'SUMMARY=',
-        '-metadata', 'AUTHOR=',
-        '-metadata', 'WEBSITE=',
-        '-metadata', 'COMMENT=',
-        '-metadata', 'ENCODER=',
-        '-metadata', 'FILENAME=',
-        '-metadata', 'MIMETYPE=',
-        '-metadata', 'PURL=',
-        '-metadata', 'ALBUM='
     ]
 
     audio_index = 0
@@ -139,6 +115,20 @@ async def delete_extra_video_streams(file, dirpath):
     return file
 
 
+async def delete_extra_strings(file, dirpath):
+    temp_file = f"{file}.temp.mkv"
+    
+    full_file_path = os.path.join(dirpath, file)
+    temp_file_path = os.path.join(dirpath, temp_file)
+    
+    cmd = ['ffmpeg', '-y', '-i', full_file_path, '-map_metadata', '-1', '-c', 'copy', temp_file_path]
+    
+    process = await create_subprocess_exec(*cmd, stderr=PIPE)
+    await process.wait()
+    
+    os.replace(temp_file_path, full_file_path)
+    return file
+
 async def add_attachment(file, dirpath, attachment_path):
     LOGGER.info(f"Adding photo attachment to file: {file}")
 
@@ -179,5 +169,6 @@ async def add_attachment(file, dirpath, attachment_path):
 async def change_metadata(file, dirpath, key):
     file = await delete_attachments(file, dirpath)
     file = await change_key(file, dirpath, key)
+    file = await delete_extra_strings(file, dirpath)
     file = await delete_extra_video_streams(file, dirpath)
     return file
