@@ -135,30 +135,18 @@ async def add_attachment(file, dirpath, attachment_path):
     temp_file = f"{file}.temp.mkv"
     full_file_path = os.path.join(dirpath, file)
     temp_file_path = os.path.join(dirpath, temp_file)
-    
-    attachment_ext = attachment_path.split('/')[-1].split('.')[-1]
-    if attachment_ext in ['.jpg', '.jpeg']:
-        mime_type = 'image/jpeg'
-    elif attachment_ext == '.png':
-        mime_type = 'image/png'
-    else:
-        mime_type = 'application/octet-stream'
 
     cmd = [
-        'render', '-y', '-i', full_file_path, '-attach',
-        attachment_path, '-metadata:s:t', f'mimetype={mime_type}',
-        '-metadata:s:t', 'title=Cover Art',
-        '-metadata:s:t', 'comment=Cover Art',
-        '-metadata:s:t', 'description=Cover Art',
-        '-metadata:s:t', f'filename=Cover.{attachment_ext}',
-        '-c', 'copy', temp_file_path
+        'render', '-y', '-i', full_file_path, '-i', attachment_path,
+        '-map', '1', '-map', '0', '-c', 'copy',
+        '-disposition:0', 'attached_pic', temp_file_path
     ]
 
-    process = await create_subprocess_exec(*cmd, stderr=PIPE)
-    await process.wait()
+    process = await create_subprocess_exec(*cmd, stderr=PIPE, stdout=PIPE)
+    stdout, stderr = await process.communicate()
 
     if process.returncode != 0:
-        err = (await process.stderr.read()).decode().strip()
+        err = stderr.decode().strip()
         LOGGER.error(err)
         LOGGER.error(f"Error adding photo attachment to file: {file}")
         return file
