@@ -14,7 +14,7 @@ from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_excep
 
 from bot import config_dict, list_drives_dict, GLOBAL_EXTENSION_FILTER
 from bot.helper.ext_utils.bot_utils import setInterval, async_to_sync, get_readable_file_size
-from bot.helper.ext_utils.files_utils import get_mime_type, prepare_file
+from bot.helper.ext_utils.files_utils import get_mime_type, process_file
 
 LOGGER = getLogger(__name__)
 getLogger('googleapiclient.discovery').setLevel(ERROR)
@@ -247,7 +247,7 @@ class GoogleDriveHelper:
 
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(3), retry=retry_if_exception_type(Exception))
     def __create_directory(self, directory_name, dest_id):
-        directory_name, _ = async_to_sync(prepare_file, directory_name, self.__user_id, isMirror=True)
+        directory_name, _ = async_to_sync(process_file, directory_name, self.__user_id, isMirror=True)
         file_metadata = {
             "name": directory_name,
             "description": 'Uploaded by Aeon',
@@ -264,7 +264,7 @@ class GoogleDriveHelper:
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(3), retry=(retry_if_exception_type(Exception)))
     def __upload_file(self, file_path, file_name, mime_type, dest_id, is_dir=True):
         location = ospath.dirname(file_path)
-        file_name, _ = async_to_sync(prepare_file, file_name, self.__user_id, location, True)
+        file_name, _ = async_to_sync(process_file, file_name, self.__user_id, location, True)
         file_metadata = {
             'name': file_name,
             'description': 'Uploaded by Aeon',
@@ -408,7 +408,7 @@ class GoogleDriveHelper:
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(3),
            retry=retry_if_exception_type(Exception))
     def __copyFile(self, file_id, dest_id, file_name):
-        file_name, _ = async_to_sync(prepare_file, file_name, self.__user_id, isMirror=True)
+        file_name, _ = async_to_sync(process_file, file_name, self.__user_id, isMirror=True)
         body = {'name': file_name,
                 'parents': [dest_id]}
         try:
