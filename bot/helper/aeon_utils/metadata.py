@@ -148,9 +148,6 @@ async def add_attachment(file, dirpath, attachment_path):
     cmd = [
         'render', '-y', '-i', full_file_path,
         '-attach', attachment_path, '-metadata:s:t', f'mimetype={mime_type}',
-        '-metadata:s:t', 'title=Cover Art',
-        '-metadata:s:t', 'comment=Cover Art',
-        '-metadata:s:t', 'description=Cover Art',
         '-c', 'copy', '-map', '0', '-map', '-0:s', temp_file_path
     ]
 
