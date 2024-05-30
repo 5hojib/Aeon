@@ -68,7 +68,7 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         metadata = user_dict.get('metadata', 'Not Exists')
         
         buttons.ibutton("Attachment", f"userset {user_id} attachment")
-        metadata = user_dict.get('attachment', 'Not Exists')
+        attachment = user_dict.get('attachment', 'Not Exists')
 
 
         text = f'<b>Universal Settings for {name}</b>\n\n'
