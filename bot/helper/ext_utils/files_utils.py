@@ -277,13 +277,13 @@ async def process_file(file_, user_id, dirpath=None, isMirror=False):
     remname = user_dict.get('remname', '')
     suffix = user_dict.get('suffix', '')
     lcaption = user_dict.get('lcaption', '')
-    metadata_key =  user_dict.get('metadata', '') or config_dict['METADATA_KEY']
+    metadata_key = user_dict.get('metadata', '') or config_dict['METADATA_KEY']
     prefile_ = file_
     file_ = re_sub(r'^www\S+\s*[-_]*\s*', '', file_)
 
     if metadata_key and dirpath and isMkv(file_):
         file_ = await change_metadata(file_, dirpath, metadata_key)
-  
+
     if remname:
         if not remname.startswith('|'):
             remname = f"|{remname}"
