@@ -19,7 +19,7 @@ from bot import LOGGER, MAX_SPLIT_SIZE, config_dict, user_data, aria2, get_clien
 from bot.modules.mediainfo import parseinfo
 from bot.helper.ext_utils.bot_utils import cmd_exec, sync_to_async, get_readable_file_size, get_readable_time, isMkv
 from bot.helper.ext_utils.telegraph_helper import telegraph
-from bot.helper.aeon_utils.metadata import change_metadata
+from bot.helper.aeon_utils.metadata import change_metadata, add_attachment
 from .exceptions import NotSupportedExtractionArchive
 
 FIRST_SPLIT_REGEX = r'(\.|_)part0*1\.rar$|(\.|_)7z\.0*1$|(\.|_)zip\.0*1$|^(?!.*(\.|_)part\d+\.rar$).*\.rar$'
@@ -271,7 +271,7 @@ async def split_file(path, size, file_, dirpath, split_size, listener, start_tim
             LOGGER.error(err)
     return True
 
-async def process_file(file_, user_id, dirpath=None, isMirror=False):
+async def process_file(file_, user_id, dirpath=None, isMirror=False, attachment=Nene):
     user_dict = user_data.get(user_id, {})
     prefix = user_dict.get('prefix', '')
     remname = user_dict.get('remname', '')
@@ -283,6 +283,9 @@ async def process_file(file_, user_id, dirpath=None, isMirror=False):
     if metadata_key and dirpath and isMkv(file_):
         file_ = await change_metadata(file_, dirpath, metadata_key)
 
+    if attachment:
+        file_ = await add_attachment(file_, dirpath, attachment)
+    
     file_ = re_sub(r'^www\S+\s*[-_]*\s*', '', file_)
 
     if remname:
