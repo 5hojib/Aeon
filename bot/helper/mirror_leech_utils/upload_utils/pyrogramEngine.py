@@ -52,7 +52,6 @@ class TgUploader:
         self.__user_id = listener.message.from_user.id
         self.__leechmsg = {}
         self.__files_utils = self.__listener.files_utils
-        self.__attachment = self.__listener.attachment
         self.__thumb = f"Thumbnails/{listener.message.from_user.id}.jpg"
 
     async def get_custom_thumb(self, thumb):
@@ -350,9 +349,8 @@ class TgUploader:
     @retry(wait=wait_exponential(multiplier=2, min=4, max=8), stop=stop_after_attempt(3),
            retry=retry_if_exception_type(Exception))
     async def __upload_file(self, cap_mono, file, force_document=False):
-        attachment = self.__attachment
         if not await aiopath.exists(self.__thumb):
-            self.__thumb = attachment
+            self.__thumb = None
         thumb = self.__thumb
         self.__is_corrupted = False
         try:
