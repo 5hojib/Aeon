@@ -15,6 +15,7 @@ from aioshutil import copy
 from bot import config_dict, user_data, GLOBAL_EXTENSION_FILTER, bot, user, IS_PREMIUM_USER
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import sendCustomMsg, sendMultiMessage, chat_info, deleteMessage, get_tg_link_content
+from bot.helper.aeon_utils.metadata import add_attachment
 from bot.helper.ext_utils.files_utils import clean_unwanted, is_archive, get_base_name, get_media_info, get_document_type, take_ss, get_ss, get_mediainfo_link, process_file, get_audio_thumb
 from bot.helper.ext_utils.bot_utils import get_readable_file_size, sync_to_async, is_telegram_link, is_url, download_image_url, isMkv
 
@@ -180,8 +181,9 @@ class TgUploader:
         return True
 
     async def __prepare_file(self, prefile_, dirpath):
-        attachment = self.__listener.attachment
-        file_, cap_mono = await process_file(prefile_, self.__user_id, dirpath, attachment=attachment)
+        if (atc:=self.__listener.attachment) and isMkv(prefile_):
+            file_ = await add_attachment(prefile_, dirpath, atc)
+        file_, cap_mono = await process_file(prefile_, self.__user_id, dirpath)
         if prefile_ != file_:
             if self.__listener.seed and not self.__listener.newDir and not dirpath.endswith("/splited_files"):
                 dirpath = f'{dirpath}/copied'
@@ -189,7 +191,6 @@ class TgUploader:
                 new_path = ospath.join(dirpath, file_)
                 self.__up_path = await copy(self.__up_path, new_path)
             else:
-                LOGGER.info('Hello')
                 new_path = ospath.join(dirpath, file_)
                 await aiorename(self.__up_path, new_path)
                 self.__up_path = new_path
@@ -346,7 +347,7 @@ class TgUploader:
     @retry(wait=wait_exponential(multiplier=2, min=4, max=8), stop=stop_after_attempt(3),
            retry=retry_if_exception_type(Exception))
     async def __upload_file(self, cap_mono, file, force_document=False):
-        if not await aiopath.exists(self.__thumb):
+        if self.__thumb is not None and not await aiopath.exists(self.__thumb):
             self.__thumb = None
         thumb = self.__thumb
         self.__is_corrupted = False
