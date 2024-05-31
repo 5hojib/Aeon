@@ -63,7 +63,7 @@ async def rcloneNode(client, message, link, dst_path, rcf, tag):
     remote, src_path = link.split(':', 1)
     src_path = src_path.strip('/')
 
-    cmd = ['zcl', 'lsjson', '--fast-list', '--stat', '--no-modtime', '--config', config_path, f'{remote}:{src_path}']
+    cmd = ['xone', 'lsjson', '--fast-list', '--stat', '--no-modtime', '--config', config_path, f'{remote}:{src_path}']
     res = await cmd_exec(cmd)
     if res[2] != 0:
         if res[2] != -9:
@@ -92,11 +92,11 @@ async def rcloneNode(client, message, link, dst_path, rcf, tag):
     if not link:
         return
     LOGGER.info(f'Cloning Done: {name}')
-    cmd1 = ['zcl', 'lsf', '--fast-list', '-R',
+    cmd1 = ['xone', 'lsf', '--fast-list', '-R',
             '--files-only', '--config', config_path, destination]
-    cmd2 = ['zcl', 'lsf', '--fast-list', '-R',
+    cmd2 = ['xone', 'lsf', '--fast-list', '-R',
             '--dirs-only', '--config', config_path, destination]
-    cmd3 = ['zcl', 'size', '--fast-list', '--json',
+    cmd3 = ['xone', 'size', '--fast-list', '--json',
             '--config', config_path, destination]
     res1, res2, res3 = await gather(cmd_exec(cmd1), cmd_exec(cmd2), cmd_exec(cmd3))
     if res1[2] != res2[2] != res3[2] != 0:
