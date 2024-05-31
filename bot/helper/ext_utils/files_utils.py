@@ -282,7 +282,10 @@ async def process_file(file_, user_id, dirpath=None, isMirror=False):
     file_ = re_sub(r'^www\S+\s*[-_]*\s*', '', file_)
 
     if metadata_key and dirpath and isMkv(file_):
-        file_ = await change_metadata(file_, dirpath, metadata_key)
+        try:
+            file_ = await change_metadata(file_, dirpath, metadata_key)
+        except Exception as e:
+            LOGGER.error(e)
 
     if remname:
         if not remname.startswith('|'):
