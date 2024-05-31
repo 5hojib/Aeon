@@ -17,6 +17,8 @@ class TelegramStatus:
 
     def status(self):
         if self.__status == 'up':
+            if self.__obj.processed_bytes == 0:
+                return MirrorStatus.STATUS_PROCESSING
             return MirrorStatus.STATUS_UPLOADING
         return MirrorStatus.STATUS_DOWNLOADING
 

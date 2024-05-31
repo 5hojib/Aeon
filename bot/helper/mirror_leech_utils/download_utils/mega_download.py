@@ -6,7 +6,7 @@ from mega import MegaApi, MegaListener, MegaRequest, MegaTransfer, MegaError
 from bot import LOGGER, config_dict, download_dict_lock, download_dict, non_queued_dl, queue_dict_lock
 from bot.helper.telegram_helper.message_utils import sendMessage, sendStatusMessage
 from bot.helper.ext_utils.bot_utils import get_mega_link_type, async_to_sync, sync_to_async
-from bot.helper.mirror_leech_utils.status_utils.mega_download_status import MegaDownloadStatus
+from bot.helper.mirror_leech_utils.status_utils.mega_status import MegaDownloadStatus
 from bot.helper.mirror_leech_utils.status_utils.queue_status import QueueStatus
 from bot.helper.ext_utils.task_manager import is_queued, limit_checker, stop_duplicate_check
 

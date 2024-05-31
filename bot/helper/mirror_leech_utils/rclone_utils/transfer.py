@@ -169,7 +169,7 @@ class RcloneTransferHelper:
             epath = f"{remote}:{rc_path}{self.name}"
             destination = epath
 
-        cmd = ['zcl', 'lsjson', '--fast-list', '--no-mimetype',
+        cmd = ['xone', 'lsjson', '--fast-list', '--no-mimetype',
                '--no-modtime', '--config', config_path, epath]
         res, err, code = await cmd_exec(cmd)
 
@@ -277,7 +277,7 @@ class RcloneTransferHelper:
             else:
                 destination = f"{oremote}:{self.name}"
 
-            cmd = ['zcl', 'link', '--config', oconfig_path, destination]
+            cmd = ['xone', 'link', '--config', oconfig_path, destination]
             res, err, code = await cmd_exec(cmd)
 
             if code == 0:
@@ -335,7 +335,7 @@ class RcloneTransferHelper:
                 if mime_type != 'Folder':
                     destination += f'/{self.name}' if dst_path else self.name
 
-                cmd = ['zcl', 'link', '--config', config_path, destination]
+                cmd = ['xone', 'link', '--config', config_path, destination]
                 res, err, code = await cmd_exec(cmd)
 
                 if self.__is_cancelled:
@@ -352,7 +352,7 @@ class RcloneTransferHelper:
     @staticmethod
     def __getUpdatedCommand(config_path, source, destination, rcflags, method):
         ext = '*.{' + ','.join(GLOBAL_EXTENSION_FILTER) + '}'
-        cmd = ['zcl', method, '--fast-list', '--config', config_path, '-P', source, destination,
+        cmd = ['xone', method, '--fast-list', '--config', config_path, '-P', source, destination,
                '--exclude', ext, '--ignore-case', '--low-level-retries', '1', '-M', '--log-file',
                'rlog.txt', '--log-level', 'DEBUG']
         if rcflags:

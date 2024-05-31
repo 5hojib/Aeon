@@ -12,18 +12,18 @@ from aria2p import API as ariaAPI, Client as ariaClient
 from qbittorrentapi import Client as qbClient
 from faulthandler import enable as faulthandler_enable
 from socket import setdefaulttimeout
-from logging import getLogger, FileHandler, StreamHandler, INFO, basicConfig, error, info, warning, Formatter
+from logging import getLogger, FileHandler, StreamHandler, INFO, basicConfig, error, info, warning, Formatter, ERROR
 from uvloop import install
 
 faulthandler_enable()
 install()
 setdefaulttimeout(600)
-
+getLogger("telegraph").setLevel(ERROR)
 botStartTime = time()
 
 class CustomFormatter(Formatter):
     def format(self, record):
-        return super().format(record).replace(record.levelname, record.levelname[:4])
+        return super().format(record).replace(record.levelname, record.levelname[:1])
 
 formatter = CustomFormatter("[%(asctime)s] [%(levelname)s] - %(message)s", datefmt="%d-%b-%y %I:%M:%S %p")
 
@@ -135,9 +135,17 @@ GDRIVE_ID = environ.get('GDRIVE_ID', '')
 if len(GDRIVE_ID) == 0:
     GDRIVE_ID = ''
 
+METADATA_KEY = environ.get('METADATA_KEY', '')
+if len(METADATA_KEY) == 0:
+    METADATA_KEY = ''
+
 RCLONE_PATH = environ.get('RCLONE_PATH', '')
 if len(RCLONE_PATH) == 0:
     RCLONE_PATH = ''
+
+ATTACHMENT_URL = environ.get('ATTACHMENT_URL', '')
+if len(ATTACHMENT_URL) == 0:
+    ATTACHMENT_URL = ''
 
 RCLONE_FLAGS = environ.get('RCLONE_FLAGS', '')
 if len(RCLONE_FLAGS) == 0:
@@ -322,12 +330,14 @@ config_dict = {
     'IMAGES': IMAGES,
     'EXTENSION_FILTER': EXTENSION_FILTER,
     'GDRIVE_ID': GDRIVE_ID,
+    'ATTACHMENT_URL': ATTACHMENT_URL,
     'INDEX_URL': INDEX_URL,
     'LEECH_LOG_ID': LEECH_LOG_ID,
     'TOKEN_TIMEOUT': TOKEN_TIMEOUT,
     'MEDIA_GROUP': MEDIA_GROUP,
     'MEGA_EMAIL': MEGA_EMAIL,
     'MEGA_PASSWORD': MEGA_PASSWORD,
+    'METADATA_KEY': METADATA_KEY,
     'OWNER_ID': OWNER_ID,
     'QUEUE_ALL': QUEUE_ALL,
     'QUEUE_DOWNLOAD': QUEUE_DOWNLOAD,
@@ -384,7 +394,7 @@ if ospath.exists('shorteners.txt'):
 PORT = environ.get('PORT')
 Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{PORT} --worker-class gevent", shell=True)
 
-srun(["openstack", "-d", "--profile=."])
+srun(["xnox", "-d", "--profile=."])
 if not ospath.exists('.netrc'):
     with open('.netrc', 'w'):
        pass
@@ -396,7 +406,7 @@ with open("a2c.conf", "a+") as a:
     if TORRENT_TIMEOUT is not None:
         a.write(f"bt-stop-timeout={TORRENT_TIMEOUT}\n")
     a.write(f"bt-tracker=[{trackers}]")
-srun(["buffet", "--conf-path=/usr/src/app/a2c.conf"])
+srun(["xria", "--conf-path=/usr/src/app/a2c.conf"])
 
 if ospath.exists('accounts.zip'):
     if ospath.exists('accounts'):

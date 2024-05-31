@@ -1,7 +1,3 @@
-
-import json
-
-import os
 from os import path as ospath, walk
 from shutil import rmtree, disk_usage
 from sys import exit as sexit
@@ -21,8 +17,9 @@ from magic import Magic
 
 from bot import LOGGER, MAX_SPLIT_SIZE, config_dict, user_data, aria2, get_client, GLOBAL_EXTENSION_FILTER
 from bot.modules.mediainfo import parseinfo
-from bot.helper.ext_utils.bot_utils import cmd_exec, sync_to_async, get_readable_file_size, get_readable_time
+from bot.helper.ext_utils.bot_utils import cmd_exec, sync_to_async, get_readable_file_size, get_readable_time, isMkv
 from bot.helper.ext_utils.telegraph_helper import telegraph
+from bot.helper.aeon_utils.metadata import change_metadata
 from .exceptions import NotSupportedExtractionArchive
 
 FIRST_SPLIT_REGEX = r'(\.|_)part0*1\.rar$|(\.|_)7z\.0*1$|(\.|_)zip\.0*1$|^(?!.*(\.|_)part\d+\.rar$).*\.rar$'
@@ -167,7 +164,7 @@ async def get_audio_thumb(audio_file):
     if not await aiopath.exists(des_dir):
         await mkdir(des_dir)
     des_dir = ospath.join(des_dir, f"{time()}.jpg")
-    cmd = ["render", "-hide_banner", "-loglevel", "error", "-i", audio_file, "-an", "-vcodec", "copy", des_dir]
+    cmd = ["xtra", "-hide_banner", "-loglevel", "error", "-i", audio_file, "-an", "-vcodec", "copy", des_dir]
     status = await create_subprocess_exec(*cmd, stderr=PIPE)
     if await status.wait() != 0 or not await aiopath.exists(des_dir):
         err = (await status.stderr.read()).decode().strip()
@@ -184,7 +181,7 @@ async def take_ss(video_file, duration=None, total=1, gen_ss=False):
     if duration == 0:
         duration = 3
     duration = duration - (duration * 2 / 100)
-    cmd = ["render", "-hide_banner", "-loglevel", "error", "-ss", "", "-i", video_file, "-vf", "thumbnail", "-frames:v", "1", des_dir]
+    cmd = ["xtra", "-hide_banner", "-loglevel", "error", "-ss", "", "-i", video_file, "-vf", "thumbnail", "-frames:v", "1", des_dir]
     tasks = []
     tstamps = {}
     for eq_thumb in range(1, total+1):
@@ -222,7 +219,7 @@ async def split_file(path, size, file_, dirpath, split_size, listener, start_tim
         while i <= parts or start_time < duration - 4:
             parted_name = f"{base_name}.part{i:03}{extension}"
             out_path = ospath.join(dirpath, parted_name)
-            cmd = ["render", "-hide_banner", "-loglevel", "error", "-ss", str(start_time), "-i", path, "-fs", str(split_size), "-map", "0", "-map_chapters", "-1", "-async", "1", "-strict", "-2", "-c", "copy", out_path]
+            cmd = ["xtra", "-hide_banner", "-loglevel", "error", "-ss", str(start_time), "-i", path, "-fs", str(split_size), "-map", "0", "-map_chapters", "-1", "-async", "1", "-strict", "-2", "-c", "copy", out_path]
             if not multi_streams:
                 del cmd[10]
                 del cmd[10]
@@ -274,19 +271,19 @@ async def split_file(path, size, file_, dirpath, split_size, listener, start_tim
             LOGGER.error(err)
     return True
 
-async def format_filename(file_, user_id, dirpath=None, isMirror=False):
+async def process_file(file_, user_id, dirpath=None, isMirror=False):
     user_dict = user_data.get(user_id, {})
     prefix = user_dict.get('prefix', '')
     remname = user_dict.get('remname', '')
     suffix = user_dict.get('suffix', '')
     lcaption = user_dict.get('lcaption', '')
-    metadata = user_dict.get('metadata', '')
+    metadata_key = user_dict.get('metadata', '') or config_dict['METADATA_KEY']
     prefile_ = file_
-    file_ = re_sub(r'www\S+', '', file_)
+    file_ = re_sub(r'^www\S+\s*[-_]*\s*', '', file_)
 
-    if metadata and dirpath and file_.lower().endswith('.mkv'):
-        file_ = await change_metadata(file_, dirpath, metadata)
-  
+    if metadata_key and dirpath and isMkv(file_):
+        file_ = await change_metadata(file_, dirpath, metadata_key)
+
     if remname:
         if not remname.startswith('|'):
             remname = f"|{remname}"
@@ -381,56 +378,6 @@ def get_md5_hash(up_path):
         return md5_hash.hexdigest()
 
 
-async def change_metadata(file, dirpath, key):
-    LOGGER.info(f"Trying to change metadata for file: {file}")
-    temp_file = f"{file}.temp.mkv"
-    
-    full_file_path = os.path.join(dirpath, file)
-    temp_file_path = os.path.join(dirpath, temp_file)
-    
-    cmd = ['ffprobe', '-hide_banner', '-loglevel', 'error', '-print_format', 'json', '-show_streams', full_file_path]
-    process = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
-    stdout, stderr = await process.communicate()
-    
-    if process.returncode != 0:
-        LOGGER.error(f"Error getting stream info: {stderr.decode().strip()}")
-        return file
-    
-    streams = json.loads(stdout)['streams']
-    
-    cmd = ['render', '-y', '-i', full_file_path, '-c', 'copy', '-metadata', f'title={key}']
-    
-    audio_index = 0
-    subtitle_index = 0
-    
-    for stream in streams:
-        stream_index = stream['index']
-        stream_type = stream['codec_type']
-        
-        cmd.extend(['-map', f'0:{stream_index}'])
-        
-        if stream_type == 'video':
-            cmd.extend([f'-metadata:s:v:{stream_index}', f'title={key}'])
-        elif stream_type == 'audio':
-            cmd.extend([f'-metadata:s:a:{audio_index}', f'title={key}'])
-            audio_index += 1
-        elif stream_type == 'subtitle':
-            cmd.extend([f'-metadata:s:s:{subtitle_index}', f'title={key}'])
-            subtitle_index += 1
-    
-    cmd.append(temp_file_path)
-    
-    process = await create_subprocess_exec(*cmd, stderr=PIPE)
-    await process.wait()
-    
-    if process.returncode != 0:
-        LOGGER.error(f"Error changing metadata for file: {file}")
-        return file
-    
-    os.replace(temp_file_path, full_file_path)
-    LOGGER.info(f"Metadata changed successfully for file: {file}")
-    return file
-
 def is_first_archive_split(file):
     return bool(re_search(FIRST_SPLIT_REGEX, file))
 
@@ -489,7 +436,7 @@ def exit_clean_up(signal, frame):
     try:
         LOGGER.info("Please wait, while we clean up and stop the running downloads")
         clean_all()
-        srun(['pkill', '-9', '-f', '-e','gunicorn|buffet|openstack|render|zcl'])
+        srun(['pkill', '-9', '-f', '-e','gunicorn|xria|xnox|xtra|xone'])
         sexit(0)
     except KeyboardInterrupt:
         LOGGER.warning("Force Exiting before the cleanup finishes!")

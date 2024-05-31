@@ -28,6 +28,7 @@ MIRROR_HELP_MESSAGE = """
 
 <b>OPTIONS:</b>
 <blockquote><b>-n new name:</b> Rename the file or folder.</blockquote>
+<blockquote><b>-atc attachment url:</b> Custom attachment for each mkv.(raw only)</blockquote>
 <blockquote><b>-t thumbnail url:</b> Custom thumbnail for each leech.(raw or tg image url)</blockquote>
 <blockquote><b>-ss value:</b> Generate ss for leech video, max 10 for each leach.</blockquote>
 <blockquote><b>-z or -z password:</b> Zip the file or folder with or without password.</blockquote>
@@ -143,6 +144,10 @@ uset_display_dict = {
     'metadata': [
         'Metadata will change MKV video files including all audio, streams, and subtitle titles.', 
         'Send metadata title. Timeout: 60 sec'
+    ],
+    'attachment': [
+        'Attachment url, it will added in mkv as thumbnail or cover photo, whetever you say.',
+        'Send raw photo url, example from imgbb.com . Timeout: 60 sec'
     ],
     'lcaption': [
         'Leech Caption is the custom caption on the leech files uploaded by the bot.', 

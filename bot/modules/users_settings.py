@@ -22,16 +22,19 @@ from bot.helper.ext_utils.help_strings import uset_display_dict
 from bot.helper.ext_utils.bot_utils import update_user_ldata, get_readable_file_size, sync_to_async, new_thread, is_gdrive_link
 
 handler_dict = {}
-fname_dict = {'rcc': 'RClone',
-              'prefix': 'Prefix',
-              'suffix': 'Suffix',
-              'remname': 'Remname',
-              'ldump': 'Dump',
-              'user_tds': 'User Custom TDs',
-              'lcaption': 'Caption',
-              'thumb': 'Thumbnail',
-              'metadata': 'Metadata',
-              'yt_opt': 'YT-DLP Options'}
+fname_dict = {
+    'rcc': 'RClone',
+    'prefix': 'Prefix',
+    'suffix': 'Suffix',
+    'remname': 'Remname',
+    'ldump': 'Dump',
+    'user_tds': 'User Custom TDs',
+    'lcaption': 'Caption',
+    'thumb': 'Thumbnail',
+    'metadata': 'Metadata',
+    'attachment': 'Attachment',
+    'yt_opt': 'YT-DLP Options'
+}
 
 async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None):
     user_id = from_user.id
@@ -44,7 +47,7 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         buttons.ibutton("Universal", f"userset {user_id} universal")
         buttons.ibutton("Mirror", f"userset {user_id} mirror")
         buttons.ibutton("Leech", f"userset {user_id} leech")
-        if user_dict and any(key in user_dict for key in ['prefix', 'suffix', 'remname', 'ldump', 'yt_opt', 'media_group', 'rclone', 'thumb', 'as_doc', 'metadata']):
+        if user_dict and any(key in user_dict for key in ['prefix', 'suffix', 'remname', 'ldump', 'yt_opt', 'media_group', 'rclone', 'thumb', 'as_doc', 'metadata', 'attachment']):
             buttons.ibutton("Reset", f"userset {user_id} reset_all")
         buttons.ibutton("Close", f"userset {user_id} close")
         text = f'<b>User Settings for {name}</b>'
@@ -63,6 +66,9 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         
         buttons.ibutton("Metadata", f"userset {user_id} metadata")
         metadata = user_dict.get('metadata', 'Not Exists')
+        
+        buttons.ibutton("Attachment", f"userset {user_id} attachment")
+        attachment = user_dict.get('attachment', 'Not Exists')
 
 
         text = f'<b>Universal Settings for {name}</b>\n\n'
@@ -70,6 +76,7 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         text += f'<b>• Prefix:</b> <code>{prefix}</code>\n'
         text += f'<b>• Suffix:</b> <code>{suffix}</code>\n'
         text += f'<b>• Metadata:</b> <code>{metadata}</code>\n'
+        text += f'<b>• Attachment:</b> <code>{attachment}</code>\n'
         text += f'<b>• Remname:</b> <code>{remname}</code>'
         buttons.ibutton("Back", f"userset {user_id} back", "footer")
         buttons.ibutton("Close", f"userset {user_id} close", "footer")
@@ -139,7 +146,7 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         elif key == 'yt_opt':
             set_exist = 'Not Exists' if (val:=user_dict.get('yt_opt', config_dict.get('YT_DLP_OPTIONS', ''))) == '' else val
             text += f"<b>YT-DLP Options :</b> <code>{escape(set_exist)}</code>\n\n"
-        elif key in ['prefix', 'remname', 'suffix', 'lcaption', 'ldump', 'metadata']:
+        elif key in ['prefix', 'remname', 'suffix', 'lcaption', 'ldump', 'metadata', 'attachment']:
             set_exist = 'Not Exists' if (val:=user_dict.get(key, '')) == '' else val
             text += f"<b>{fname_dict[key]}:</b> {set_exist}\n\n"
         elif key == 'user_tds':
@@ -408,7 +415,7 @@ async def edit_user_settings(client, query):
         pfunc = partial(set_custom, pre_event=query, key=data[2])
         rfunc = partial(update_user_settings, query, data[2], 'mirror')
         await event_handler(client, query, pfunc, rfunc)
-    elif data[2] in ['prefix', 'suffix', 'remname', 'metadata']:
+    elif data[2] in ['prefix', 'suffix', 'remname', 'attachment', 'metadata']:
         handler_dict[user_id] = False
         await query.answer()
         edit_mode = len(data) == 4
@@ -433,7 +440,7 @@ async def edit_user_settings(client, query):
         await update_user_settings(query, data[2][1:], 'leech')
         if DATABASE_URL:
             await DbManager().update_user_data(user_id)
-    elif data[2] in ['dprefix', 'dsuffix', 'dremname', 'dmetadata']:
+    elif data[2] in ['dprefix', 'dsuffix', 'dremname', 'dmetadata', 'dattachment']:
         handler_dict[user_id] = False
         await query.answer()
         update_user_ldata(user_id, data[2][1:], '')
