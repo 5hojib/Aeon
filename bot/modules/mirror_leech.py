@@ -73,7 +73,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     extract      = args['-e']
     compress     = args['-z']
     up           = args['-up']
-    thumb        = args['-t'] or args['-atc']
+    thumb        = args['-t'] or attachment
     rcf          = args['-rcf']
     drive_id     = args['-id']
     index_link   = args['-index']
