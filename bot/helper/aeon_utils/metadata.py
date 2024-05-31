@@ -27,7 +27,7 @@ async def change_key(file, dirpath, key):
     streams = json.loads(stdout)['streams']
 
     cmd = [
-        'xpeg', '-y', '-i', full_file_path, '-c', 'copy',
+        'xtra', '-y', '-i', full_file_path, '-c', 'copy',
         '-metadata', f'title={key}',
         '-metadata:s:v:0', f'title={key}',
         '-metadata', 'copyright=',
@@ -94,7 +94,7 @@ async def delete_attachments(file, dirpath):
     full_file_path = os.path.join(dirpath, file)
     temp_file_path = os.path.join(dirpath, temp_file)
     
-    cmd = ['xpeg', '-y', '-i', full_file_path, '-map', '0', '-map', '-0:t', '-c', 'copy', temp_file_path]
+    cmd = ['xtra', '-y', '-i', full_file_path, '-map', '0', '-map', '-0:t', '-c', 'copy', temp_file_path]
     
     process = await create_subprocess_exec(*cmd, stderr=PIPE)
     await process.wait()
@@ -115,7 +115,7 @@ async def delete_extra_video_streams(file, dirpath):
     
     streams = json.loads(stdout)['streams']
     
-    cmd = ['xpeg', '-y', '-i', full_file_path]
+    cmd = ['xtra', '-y', '-i', full_file_path]
     
     first_video = False
     
@@ -155,7 +155,7 @@ async def add_attachment(file, dirpath, attachment_path):
         mime_type = 'application/octet-stream'
 
     cmd = [
-        'xpeg', '-y', '-i', full_file_path,
+        'xtra', '-y', '-i', full_file_path,
         '-attach', attachment_path, '-metadata:s:t', f'mimetype={mime_type}',
         '-c', 'copy', '-map', '0', '-map', '-0:s', temp_file_path
     ]
