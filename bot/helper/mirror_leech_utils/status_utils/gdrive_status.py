@@ -17,11 +17,12 @@ class GdriveStatus:
 
     def status(self):
         if self.__status == 'up':
+            if self.__obj.processed_bytes == 0:
+                return MirrorStatus.STATUS_PROCESSING
             return MirrorStatus.STATUS_UPLOADING
         elif self.__status == 'dl':
             return MirrorStatus.STATUS_DOWNLOADING
-        else:
-            return MirrorStatus.STATUS_CLONING
+        return MirrorStatus.STATUS_CLONING
 
     def name(self):
         return self.__obj.name
