@@ -185,7 +185,8 @@ class TgUploader:
         file_, cap_mono = await process_file(prefile_, self.__user_id, dirpath)
         if (atc:=self.__listener.attachment) and isMkv(file_):
             try:
-                file_ = await add_attachment(file_, dirpath, atc)
+                new_file_ = await add_attachment(file_, dirpath, atc)
+                file_ = new_file_
             except Exception as e:
                 LOGGER.error(e)
         if prefile_ != file_:

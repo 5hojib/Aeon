@@ -283,7 +283,8 @@ async def process_file(file_, user_id, dirpath=None, isMirror=False):
 
     if metadata_key and dirpath and isMkv(file_):
         try:
-            file_ = await change_metadata(file_, dirpath, metadata_key)
+            new_file_ = await change_metadata(file_, dirpath, metadata_key)
+            file_ = new_file_
         except Exception as e:
             LOGGER.error(e)
 
