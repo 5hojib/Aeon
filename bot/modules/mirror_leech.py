@@ -60,7 +60,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
     }
     
     args         = arg_parser(input_list[1:], arg_base)
-    attachment   = args['-atc'] or user_dict['attachment'] or config_dict['ATTACHMENT_URL']
+    attachment   = args['-atc'] or user_dict.get('attachment', '') or config_dict['ATTACHMENT_URL']
     i            = args['-i']
     link         = args['link']
     headers      = args['-h']

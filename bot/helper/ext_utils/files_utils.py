@@ -273,11 +273,11 @@ async def split_file(path, size, file_, dirpath, split_size, listener, start_tim
 
 async def process_file(file_, user_id, dirpath=None, isMirror=False):
     user_dict = user_data.get(user_id, {})
-    prefix = user_dict['prefix']
-    remname = user_dict['remname']
-    suffix = user_dict['suffix']
-    lcaption = user_dict['lcaption']
-    metadata_key =  user_dict['metadata'] or config_dict['METADATA_KEY']
+    prefix = user_dict.get('prefix', '')
+    remname = user_dict.get('remname', '')
+    suffix = user_dict.get('suffix', '')
+    lcaption = user_dict.get('lcaption', '')
+    metadata_key =  user_dict.get('metadata', '') or config_dict['METADATA_KEY']
     prefile_ = file_
     file_ = re_sub(r'^www\S+\s*[-_]*\s*', '', file_)
 
