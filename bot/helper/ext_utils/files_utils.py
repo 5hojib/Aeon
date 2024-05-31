@@ -271,7 +271,7 @@ async def split_file(path, size, file_, dirpath, split_size, listener, start_tim
             LOGGER.error(err)
     return True
 
-async def process_file(file_, user_id, dirpath=None, isMirror=False, attachment=Nene):
+async def process_file(file_, user_id, dirpath=None, isMirror=False, attachment=None):
     user_dict = user_data.get(user_id, {})
     prefix = user_dict.get('prefix', '')
     remname = user_dict.get('remname', '')
