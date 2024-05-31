@@ -185,7 +185,7 @@ class TgUploader:
         file_ = prefile_
         if (atc:=self.__listener.attachment) and isMkv(file_):
             file_ = await add_attachment(file_, dirpath, atc)
-        file_, cap_mono = await process_file(prefile_, self.__user_id, dirpath)
+        file_, cap_mono = await process_file(file_, self.__user_id, dirpath)
         if prefile_ != file_:
             if self.__listener.seed and not self.__listener.newDir and not dirpath.endswith("/splited_files"):
                 dirpath = f'{dirpath}/copied'
@@ -193,6 +193,7 @@ class TgUploader:
                 new_path = ospath.join(dirpath, file_)
                 self.__up_path = await copy(self.__up_path, new_path)
             else:
+                LOGGER.info('Hello')
                 new_path = ospath.join(dirpath, file_)
                 await aiorename(self.__up_path, new_path)
                 self.__up_path = new_path
