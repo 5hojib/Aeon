@@ -279,15 +279,11 @@ async def process_file(file_, user_id, dirpath=None, isMirror=False):
     lcaption = user_dict.get('lcaption', '')
     metadata_key = user_dict.get('metadata', '') or config_dict['METADATA_KEY']
     prefile_ = file_
-    file_ = re_sub(r'^www\S+\s*[-_]*\s*', '', file_)
 
     if metadata_key and dirpath and isMkv(file_):
-        try:
-            new_file_ = await change_metadata(file_, dirpath, metadata_key)
-            if new_file_:
-                file_ = new_file_
-        except Exception as e:
-            LOGGER.error(e)
+        file_ = await change_metadata(file_, dirpath, metadata_key)
+
+    file_ = re_sub(r'^www\S+\s*[-_]*\s*', '', file_)
 
     if remname:
         if not remname.startswith('|'):
