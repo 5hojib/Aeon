@@ -24,7 +24,11 @@ async def change_key(file, dirpath, key):
         LOGGER.error(f"Error getting stream info: {stderr.decode().strip()}")
         return file
 
-    streams = json.loads(stdout)['streams']
+    try:
+        streams = json.loads(stdout)['streams']
+    except KeyError:
+        LOGGER.error(f"No streams found in the ffprobe output: {stdout.decode().strip()}")
+        return file
 
     cmd = [
         'xtra', '-y', '-i', full_file_path, '-c', 'copy',
@@ -113,7 +117,15 @@ async def delete_extra_video_streams(file, dirpath):
     process = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
     stdout, stderr = await process.communicate()
     
-    streams = json.loads(stdout)['streams']
+    if process.returncode != 0:
+        LOGGER.error(f"Error getting stream info: {stderr.decode().strip()}")
+        return file
+
+    try:
+        streams = json.loads(stdout)['streams']
+    except KeyError:
+        LOGGER.error(f"No streams found in the ffprobe output: {stdout.decode().strip()}")
+        return file
     
     cmd = ['xtra', '-y', '-i', full_file_path]
     
