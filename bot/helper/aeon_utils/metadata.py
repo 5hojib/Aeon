@@ -24,7 +24,11 @@ async def change_key(file, dirpath, key):
         LOGGER.error(f"Error getting stream info: {stderr.decode().strip()}")
         return file
 
-    streams = json.loads(stdout)['streams']
+    try:
+        streams = json.loads(stdout)['streams']
+    except KeyError:
+        LOGGER.error(f"No streams found in the ffprobe output: {stdout.decode().strip()}")
+        return file
 
     cmd = [
         'xtra', '-y', '-i', full_file_path, '-c', 'copy',
@@ -88,22 +92,7 @@ async def change_key(file, dirpath, key):
     return file
 
 
-async def delete_attachments(file, dirpath):
-    temp_file = f"{file}.temp.mkv"
-    
-    full_file_path = os.path.join(dirpath, file)
-    temp_file_path = os.path.join(dirpath, temp_file)
-    
-    cmd = ['xtra', '-y', '-i', full_file_path, '-map', '0', '-map', '-0:t', '-c', 'copy', temp_file_path]
-    
-    process = await create_subprocess_exec(*cmd, stderr=PIPE)
-    await process.wait()
-    
-    os.replace(temp_file_path, full_file_path)
-    return file
-
-
-async def delete_extra_video_streams(file, dirpath):
+async def delete_extra_streams(file, dirpath):
     temp_file = f"{file}.temp.mkv"
     
     full_file_path = os.path.join(dirpath, file)
@@ -113,7 +102,15 @@ async def delete_extra_video_streams(file, dirpath):
     process = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
     stdout, stderr = await process.communicate()
     
-    streams = json.loads(stdout)['streams']
+    if process.returncode != 0:
+        LOGGER.error(f"Error getting stream info: {stderr.decode().strip()}")
+        return file
+
+    try:
+        streams = json.loads(stdout)['streams']
+    except KeyError:
+        LOGGER.error(f"No streams found in the ffprobe output: {stdout.decode().strip()}")
+        return file
     
     cmd = ['xtra', '-y', '-i', full_file_path]
     
@@ -156,7 +153,8 @@ async def add_attachment(file, dirpath, attachment_path):
 
     cmd = [
         'xtra', '-y', '-i', full_file_path,
-        '-attach', attachment_path, '-metadata:s:t', f'mimetype={mime_type}',
+        '-attach', attachment_path,
+        '-metadata:s:t', f'mimetype={mime_type}',
         '-c', 'copy', '-map', '0', '-map', '-0:s', temp_file_path
     ]
 
@@ -175,7 +173,6 @@ async def add_attachment(file, dirpath, attachment_path):
 
 
 async def change_metadata(file, dirpath, key):
-    file = await delete_attachments(file, dirpath)
+    file = await delete_extra_streams(file, dirpath)
     file = await change_key(file, dirpath, key)
-    file = await delete_extra_video_streams(file, dirpath)
     return file
