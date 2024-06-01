@@ -92,7 +92,7 @@ async def change_key(file, dirpath, key):
     return file
 
 
-async def delete_extra_video_streams(file, dirpath):
+async def delete_extra_streams(file, dirpath):
     temp_file = f"{file}.temp.mkv"
     
     full_file_path = os.path.join(dirpath, file)
@@ -153,7 +153,8 @@ async def add_attachment(file, dirpath, attachment_path):
 
     cmd = [
         'xtra', '-y', '-i', full_file_path,
-        '-attach', attachment_path, '-metadata:s:t', f'mimetype={mime_type}',
+        '-attach', attachment_path,
+        '-metadata:s:t', f'mimetype={mime_type}',
         '-c', 'copy', '-map', '0', '-map', '-0:s', temp_file_path
     ]
 
@@ -172,6 +173,6 @@ async def add_attachment(file, dirpath, attachment_path):
 
 
 async def change_metadata(file, dirpath, key):
-    file = await delete_extra_video_streams(file, dirpath)
+    file = await delete_extra_streams(file, dirpath)
     file = await change_key(file, dirpath, key)
     return file
