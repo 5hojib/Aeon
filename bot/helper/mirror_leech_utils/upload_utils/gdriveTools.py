@@ -265,9 +265,9 @@ class GoogleDriveHelper:
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(3), retry=(retry_if_exception_type(Exception)))
     def __upload_file(self, file_path, file_name, mime_type, dest_id, is_dir=True):
         location = ospath.dirname(file_path)
+        file_name, _ = async_to_sync(process_file, file_name, self.__user_id, location, True)
         if (atc:=self.__listener.attachment) and isMkv(file_name):
             file_name = async_to_sync(add_attachment, file_name, location, atc)
-        file_name, _ = async_to_sync(process_file, file_name, self.__user_id, location, True)
         file_metadata = {
             'name': file_name,
             'description': 'Uploaded by Aeon',
