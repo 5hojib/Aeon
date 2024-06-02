@@ -181,9 +181,9 @@ class TgUploader:
         return True
 
     async def __prepare_file(self, prefile_, dirpath):
+        file_, cap_mono = await process_file(prefile_, self.__user_id, dirpath)
         if (atc:=self.__listener.attachment) and isMkv(prefile_):
             file_ = await add_attachment(prefile_, dirpath, atc)
-        file_, cap_mono = await process_file(prefile_, self.__user_id, dirpath)
         if prefile_ != file_:
             if self.__listener.seed and not self.__listener.newDir and not dirpath.endswith("/splited_files"):
                 dirpath = f'{dirpath}/copied'
