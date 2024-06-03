@@ -155,7 +155,7 @@ async def add_attachment(file, dirpath, attachment_path):
         'xtra', '-y', '-i', full_file_path,
         '-attach', attachment_path,
         '-metadata:s:t', f'mimetype={mime_type}',
-        '-c', 'copy', '-map', '0', '-map', '-0:s', temp_file_path
+        '-c', 'copy', '-map', '0', temp_file_path
     ]
 
     process = await create_subprocess_exec(*cmd, stderr=PIPE, stdout=PIPE)
