@@ -236,16 +236,6 @@ def get_readable_message():
         msg += f"\n<blockquote>/stop_{download.gid()[:8]}</blockquote>\n\n"
     if len(msg) == 0:
         return None, None
-    dl_speed = 0
-    up_speed = 0
-    for download in download_dict.values():
-        tstatus = download.status()
-        if tstatus == MirrorStatus.STATUS_DOWNLOADING:
-            dl_speed += text_to_bytes(download.speed())
-        elif tstatus == MirrorStatus.STATUS_UPLOADING:
-            up_speed += text_to_bytes(download.speed())
-        elif tstatus == MirrorStatus.STATUS_SEEDING:
-            up_speed += text_to_bytes(download.upload_speed())
     if tasks > STATUS_LIMIT:
         buttons = ButtonMaker()
         buttons.ibutton("Prev", "status pre")
@@ -255,8 +245,6 @@ def get_readable_message():
     msg += f"<b>• Tasks</b>: {tasks}{bmax_task}"
     msg += f"\n<b>• Bot uptime</b>: {currentTime}"
     msg += f"\n<b>• Free disk space</b>: {get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}"
-    msg += f"\n<b>• Uploading speed</b>: {get_readable_file_size(up_speed)}/s"
-    msg += f"\n<b>• Downloading speed</b>: {get_readable_file_size(dl_speed)}/s"
     return msg, button
 
 
