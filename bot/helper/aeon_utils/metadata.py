@@ -1,21 +1,19 @@
 import os
 import json
-
 from asyncio import create_subprocess_exec
 from asyncio.subprocess import PIPE
-
 from bot import LOGGER
 
-async def modify_file_metadata(file, dirpath, key):
-    LOGGER.info(f"Modifying metadata for file: {file}")
+async def change_metadata(file, dirpath, key):
+    LOGGER.info(f"Starting metadata modification for file: {file}")
     temp_file = f"{file}.temp.mkv"
-
     full_file_path = os.path.join(dirpath, file)
     temp_file_path = os.path.join(dirpath, temp_file)
 
     cmd = [
         'ffprobe', '-hide_banner', '-loglevel', 'error', '-print_format', 'json', '-show_streams', full_file_path
     ]
+    LOGGER.debug(f"Running ffprobe command: {' '.join(cmd)}")
 
     process = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
     stdout, stderr = await process.communicate()
@@ -26,6 +24,7 @@ async def modify_file_metadata(file, dirpath, key):
 
     try:
         streams = json.loads(stdout)['streams']
+        LOGGER.debug(f"Streams info: {json.dumps(streams, indent=2)}")
     except KeyError:
         LOGGER.error(f"No streams found in the ffprobe output: {stdout.decode().strip()}")
         return file
@@ -84,14 +83,18 @@ async def modify_file_metadata(file, dirpath, key):
 
     cmd.append(temp_file_path)
 
-    process = await create_subprocess_exec(*cmd, stderr=PIPE)
-    await process.wait()
+    LOGGER.debug(f"Running xtra command: {' '.join(cmd)}")
+
+    process = await create_subprocess_exec(*cmd, stderr=PIPE, stdout=PIPE)
+    stdout, stderr = await process.communicate()
 
     if process.returncode != 0:
-        err = (await process.stderr.read()).decode().strip()
+        err = stderr.decode().strip()
         LOGGER.error(err)
         LOGGER.error(f"Error modifying metadata for file: {file}")
         return file
+
+    LOGGER.debug(f"xtra command output: {stdout.decode().strip()}")
 
     os.replace(temp_file_path, full_file_path)
     LOGGER.info(f"Metadata modified successfully for file: {file}")
@@ -119,6 +122,8 @@ async def add_attachment(file, dirpath, attachment_path):
         '-c', 'copy', '-map', '0', temp_file_path
     ]
 
+    LOGGER.debug(f"Running xtra command: {' '.join(cmd)}")
+
     process = await create_subprocess_exec(*cmd, stderr=PIPE, stdout=PIPE)
     stdout, stderr = await process.communicate()
 
@@ -128,10 +133,8 @@ async def add_attachment(file, dirpath, attachment_path):
         LOGGER.error(f"Error adding photo attachment to file: {file}")
         return file
 
+    LOGGER.debug(f"xtra command output: {stdout.decode().strip()}")
+
     os.replace(temp_file_path, full_file_path)
     LOGGER.info(f"Photo attachment added successfully to file: {file}")
-    return file
-
-async def change_metadata(file, dirpath, key):
-    file = await modify_file_metadata(file, dirpath, key)
     return file
