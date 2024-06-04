@@ -495,7 +495,7 @@ class TgUploader:
     @property
     def speed(self):
         try:
-            return self.__processed_bytes / (time() - self.__start_time)
+            return (self.__processed_bytes * 4) / (time() - self.__start_time)
         except:
             return 0
 

@@ -30,7 +30,7 @@ from .helper.telegram_helper.message_utils import sendMessage, editMessage, send
 from .helper.telegram_helper.filters import CustomFilters
 from .helper.telegram_helper.button_build import ButtonMaker
 from .helper.listeners.aria2_listener import start_aria2_listener
-from .modules import authorize, cancel_mirror, mirror_leech, status, torrent_search, ytdlp, shell, eval, users_settings, bot_settings, speedtest, images, mediainfo, broadcast
+from .modules import authorize, cancel_mirror, mirror_leech, status, torrent_search, ytdlp, shell, executor, users_settings, torrent_select, bot_settings, speedtest, images, mediainfo, broadcast
 from .helper.mirror_leech_utils.gdrive_utils import count, delete, list, clone
 
 

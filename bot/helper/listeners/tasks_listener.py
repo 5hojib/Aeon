@@ -24,7 +24,7 @@ from bot.helper.mirror_leech_utils.status_utils.telegram_status import TelegramS
 from bot.helper.mirror_leech_utils.status_utils.rclone_status import RcloneStatus
 from bot.helper.mirror_leech_utils.status_utils.queue_status import QueueStatus
 from bot.helper.mirror_leech_utils.upload_utils.gdriveTools import GoogleDriveHelper
-from bot.helper.mirror_leech_utils.upload_utils.pyrogramEngine import TgUploader
+from bot.helper.mirror_leech_utils.upload_utils.telegramEngine import TgUploader
 from bot.helper.mirror_leech_utils.rclone_utils.transfer import RcloneTransferHelper
 from bot.helper.telegram_helper.message_utils import sendCustomMsg, sendMessage, editMessage, delete_all_messages, delete_links, sendMultiMessage, update_all_messages, deleteMessage, five_minute_del
 from bot.helper.telegram_helper.button_build import ButtonMaker

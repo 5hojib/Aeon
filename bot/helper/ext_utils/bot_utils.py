@@ -110,14 +110,18 @@ def isMkv(file):
     return file.lower().endswith('mkv')
 
 
-def get_readable_file_size(size_in_bytes):
+def get_readable_file_size(size_in_bytes: int):
     if size_in_bytes is None:
-        return '0B'
+        return "0B"
     index = 0
     while size_in_bytes >= 1024 and index < len(SIZE_UNITS) - 1:
         size_in_bytes /= 1024
         index += 1
-    return f'{size_in_bytes:.2f}{SIZE_UNITS[index]}' if index > 0 else f'{size_in_bytes}B'
+    return (
+        f"{size_in_bytes:.2f}{SIZE_UNITS[index]}"
+        if index > 0
+        else f"{size_in_bytes:.2f}B"
+    )
 
 
 async def getDownloadByGid(gid):
