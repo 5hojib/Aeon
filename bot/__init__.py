@@ -12,13 +12,14 @@ from aria2p import API as ariaAPI, Client as ariaClient
 from qbittorrentapi import Client as qbClient
 from faulthandler import enable as faulthandler_enable
 from socket import setdefaulttimeout
-from logging import getLogger, FileHandler, StreamHandler, INFO, basicConfig, error, info, warning, Formatter, ERROR, DEBUG
+from logging import getLogger, FileHandler, StreamHandler, INFO, basicConfig, error, info, warning, Formatter, ERROR
 from uvloop import install
 
 faulthandler_enable()
 install()
 setdefaulttimeout(600)
 getLogger("telegraph").setLevel(ERROR)
+getLogger("pymongo").setLevel(ERROR)
 botStartTime = time()
 
 class CustomFormatter(Formatter):
@@ -33,10 +34,9 @@ file_handler.setFormatter(formatter)
 stream_handler = StreamHandler()
 stream_handler.setFormatter(formatter)
 
-basicConfig(level=DEBUG)
+basicConfig(handlers=[file_handler, stream_handler], level=INFO)
+
 LOGGER = getLogger(__name__)
-LOGGER.addHandler(file_handler)
-LOGGER.addHandler(stream_handler)
 
 load_dotenv('config.env', override=True)
 
