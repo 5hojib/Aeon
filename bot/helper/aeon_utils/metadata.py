@@ -31,8 +31,8 @@ async def change_metadata(file, dirpath, key):
 
     cmd = [
         'xtra', '-y', '-i', full_file_path, '-c', 'copy',
-        '-metadata', f'title={key}',
         '-metadata:s:v:0', f'title={key}',
+        '-metadata', f'title={key}',
         '-metadata', 'copyright=',
         '-metadata', 'description=',
         '-metadata', 'license=',
@@ -79,7 +79,6 @@ async def change_metadata(file, dirpath, key):
             codec_name = stream.get('codec_name', 'unknown')
             if codec_name in ['webvtt', 'unknown']:
                 LOGGER.warning(f"Skipping unsupported subtitle metadata modification: {codec_name} for stream {stream_index}")
-                cmd.extend(['-map', f'0:{stream_index}'])
             else:
                 cmd.extend(['-map', f'0:{stream_index}', f'-metadata:s:s:{subtitle_index}', f'title={key}'])
                 subtitle_index += 1
