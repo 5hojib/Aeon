@@ -78,10 +78,11 @@ async def change_metadata(file, dirpath, key):
         elif stream_type == 'subtitle':
             codec_name = stream.get('codec_name', 'unknown')
             if codec_name in ['webvtt', 'unknown']:
-                LOGGER.warning(f"Skipping unsupported subtitle codec: {codec_name} for stream {stream_index}")
-                continue
-            cmd.extend(['-map', f'0:{stream_index}', f'-metadata:s:s:{subtitle_index}', f'title={key}'])
-            subtitle_index += 1
+                LOGGER.warning(f"Skipping unsupported subtitle metadata modification: {codec_name} for stream {stream_index}")
+                cmd.extend(['-map', f'0:{stream_index}'])
+            else:
+                cmd.extend(['-map', f'0:{stream_index}', f'-metadata:s:s:{subtitle_index}', f'title={key}'])
+                subtitle_index += 1
         else:
             cmd.extend(['-map', f'0:{stream_index}'])
 
