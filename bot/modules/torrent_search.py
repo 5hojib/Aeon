@@ -4,7 +4,7 @@ from aiohttp import ClientSession
 from html import escape
 from urllib.parse import quote
 
-from bot import bot, LOGGER, config_dict, get_client
+from bot import bot, LOGGER, config_dict, xnox_client
 from bot.helper.telegram_helper.message_utils import editMessage, sendMessage, delete_links, one_minute_del, five_minute_del, isAdmin
 from bot.helper.ext_utils.telegraph_helper import telegraph
 from bot.helper.telegram_helper.filters import CustomFilters
@@ -18,13 +18,11 @@ TELEGRAPH_LIMIT = 300
 src_plugins = {'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/piratebay.py', 'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/limetorrents.py', 'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/torrentscsv.py', 'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/torlock.py', 'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/eztv.py', 'https://raw.githubusercontent.com/qbittorrent/search-plugins/master/nova3/engines/solidtorrents.py', 'https://raw.githubusercontent.com/MaurizioRicci/qBittorrent_search_engines/master/yts_am.py', 'https://raw.githubusercontent.com/MadeOfMagicAndWires/qBit-plugins/master/engines/nyaasi.py', 'https://raw.githubusercontent.com/LightDestory/qBittorrent-Search-Plugins/master/src/engines/ettv.py', 'https://raw.githubusercontent.com/LightDestory/qBittorrent-Search-Plugins/master/src/engines/thepiratebay.py', 'https://raw.githubusercontent.com/nindogo/qbtSearchScripts/master/magnetdl.py', 'https://raw.githubusercontent.com/msagca/qbittorrent_plugins/main/uniondht.py', 'https://raw.githubusercontent.com/khensolomon/leyts/master/yts.py'}
 
 async def initiate_search_tools():
-    qbclient = await sync_to_async(get_client)
-    qb_plugins = await sync_to_async(qbclient.search_plugins)
+    qb_plugins = await sync_to_async(xnox_client.search_plugins)
     if qb_plugins:
         names = [plugin['name'] for plugin in qb_plugins]
-        await sync_to_async(qbclient.search_uninstall_plugin, names=names)
-    await sync_to_async(qbclient.search_install_plugin, src_plugins)
-    await sync_to_async(qbclient.auth_log_out)
+        await sync_to_async(xnox_client.search_uninstall_plugin, names=names)
+    await sync_to_async(xnox_client.search_install_plugin, src_plugins)
 
     if SEARCH_API_LINK := config_dict['SEARCH_API_LINK']:
         global SITES
@@ -81,15 +79,14 @@ async def __search(key, site, message, method):
             return
     else:
         LOGGER.info(f"PLUGINS Searching: {key} from {site}")
-        client = await sync_to_async(get_client)
-        search = await sync_to_async(client.search_start, pattern=key, plugins=site, category='all')
+        search = await sync_to_async(xnox_client.search_start, pattern=key, plugins=site, category='all')
         search_id = search.id
         while True:
-            result_status = await sync_to_async(client.search_status, search_id=search_id)
+            result_status = await sync_to_async(xnox_client.search_status, search_id=search_id)
             status = result_status[0].status
             if status != 'Running':
                 break
-        dict_search_results = await sync_to_async(client.search_results, search_id=search_id, limit=TELEGRAPH_LIMIT)
+        dict_search_results = await sync_to_async(xnox_client.search_results, search_id=search_id, limit=TELEGRAPH_LIMIT)
         search_results = dict_search_results.results
         total_results = dict_search_results.total
         if total_results == 0:
@@ -97,8 +94,7 @@ async def __search(key, site, message, method):
             return
         msg = f"<b>Found {min(total_results, TELEGRAPH_LIMIT)}</b>"
         msg += f" <b>result(s) for {key}\nTorrent Site:- {site.capitalize()}</b>"
-        await sync_to_async(client.search_delete, search_id=search_id)
-        await sync_to_async(client.auth_log_out)
+        await sync_to_async(xnox_client.search_delete, search_id=search_id)
     link = await __getResult(search_results, key, message, method)
     buttons = ButtonMaker()
     buttons.ubutton("View", link)
