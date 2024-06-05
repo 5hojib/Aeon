@@ -415,7 +415,7 @@ async def clean_download(path):
 
 
 async def start_cleanup():
-    xnox_client().torrents_delete(torrent_hashes="all")
+    xnox_client.torrents_delete(torrent_hashes="all")
     try:
         await aiormtree('/usr/src/app/downloads/')
     except:
@@ -425,7 +425,7 @@ async def start_cleanup():
 
 def clean_all():
     aria2.remove_all(True)
-    xnox_client().torrents_delete(torrent_hashes="all")
+    xnox_client.torrents_delete(torrent_hashes="all")
     try:
         rmtree('/usr/src/app/downloads/')
     except:
