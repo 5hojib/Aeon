@@ -33,9 +33,10 @@ file_handler.setFormatter(formatter)
 stream_handler = StreamHandler()
 stream_handler.setFormatter(formatter)
 
-basicConfig(handlers=[file_handler, stream_handler], level=INFO)
-
+basicConfig(level=DEBUG)
 LOGGER = getLogger(__name__)
+LOGGER.addHandler(file_handler)
+LOGGER.addHandler(stream_handler)
 
 load_dotenv('config.env', override=True)
 
