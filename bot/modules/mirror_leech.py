@@ -27,11 +27,13 @@ from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, g
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
 from bot.helper.ext_utils.help_strings import MIRROR_HELP_MESSAGE
 from bot.helper.ext_utils.bulk_links import extract_bulk_links
+from bot.helper.aeon_utils.react import react
 from bot.helper.mirror_leech_utils.download_utils.direct_downloader import add_direct_download
 from bot.helper.aeon_utils.nsfw_check import nsfw_precheck
 
 @new_task
 async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=None, bulk=[]):
+    await react(message)
     user_id      = message.from_user.id
     user_dict    = user_data.get(user_id, {})
     text         = message.text.split('\n')
