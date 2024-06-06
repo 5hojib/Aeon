@@ -13,8 +13,6 @@ async def change_metadata(file, dirpath, key):
     cmd = [
         'ffprobe', '-hide_banner', '-loglevel', 'error', '-print_format', 'json', '-show_streams', full_file_path
     ]
-    LOGGER.debug(f"Running ffprobe command: {' '.join(cmd)}")
-
     process = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
     stdout, stderr = await process.communicate()
 
@@ -24,7 +22,6 @@ async def change_metadata(file, dirpath, key):
 
     try:
         streams = json.loads(stdout)['streams']
-        LOGGER.debug(f"Streams info: {json.dumps(streams, indent=2)}")
     except KeyError:
         LOGGER.error(f"No streams found in the ffprobe output: {stdout.decode().strip()}")
         return file
@@ -87,8 +84,6 @@ async def change_metadata(file, dirpath, key):
 
     cmd.append(temp_file_path)
 
-    LOGGER.debug(f"Running xtra command: {' '.join(cmd)}")
-
     process = await create_subprocess_exec(*cmd, stderr=PIPE, stdout=PIPE)
     stdout, stderr = await process.communicate()
 
@@ -97,8 +92,6 @@ async def change_metadata(file, dirpath, key):
         LOGGER.error(err)
         LOGGER.error(f"Error modifying metadata for file: {file}")
         return file
-
-    LOGGER.debug(f"xtra command output: {stdout.decode().strip()}")
 
     os.replace(temp_file_path, full_file_path)
     LOGGER.info(f"Metadata modified successfully for file: {file}")
@@ -126,8 +119,6 @@ async def add_attachment(file, dirpath, attachment_path):
         '-c', 'copy', '-map', '0', temp_file_path
     ]
 
-    LOGGER.debug(f"Running xtra command: {' '.join(cmd)}")
-
     process = await create_subprocess_exec(*cmd, stderr=PIPE, stdout=PIPE)
     stdout, stderr = await process.communicate()
 
@@ -136,8 +127,6 @@ async def add_attachment(file, dirpath, attachment_path):
         LOGGER.error(err)
         LOGGER.error(f"Error adding photo attachment to file: {file}")
         return file
-
-    LOGGER.debug(f"xtra command output: {stdout.decode().strip()}")
 
     os.replace(temp_file_path, full_file_path)
     LOGGER.info(f"Photo attachment added successfully to file: {file}")
