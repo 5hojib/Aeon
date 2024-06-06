@@ -1,7 +1,7 @@
 from random import choice
 from bot import bot, LOGGER
 
-async def react(message):
+async def send_react(message):
     try:
         chat_id = int(message.chat.id)
         chat_info = await bot.get_chat(chat_id)

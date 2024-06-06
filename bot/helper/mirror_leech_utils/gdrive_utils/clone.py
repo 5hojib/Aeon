@@ -22,6 +22,7 @@ from bot.helper.ext_utils.help_strings import CLONE_HELP_MESSAGE
 from bot.helper.mirror_leech_utils.status_utils.rclone_status import RcloneStatus
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
 from bot.helper.aeon_utils.nsfw_check import nsfw_precheck
+from bot.helper.aeon_utils.send_react import send_react
 
 
 async def rcloneNode(client, message, link, dst_path, rcf, tag):
@@ -172,6 +173,7 @@ async def gdcloneNode(message, link, listen_up):
 
 @new_task
 async def clone(client, message):
+    await send_react(message)
     input_list = message.text.split(' ')
     arg_base   = {'link'   : '', 
                   '-i'     : '0', 
