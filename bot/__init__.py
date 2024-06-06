@@ -18,8 +18,8 @@ from uvloop import install
 faulthandler_enable()
 install()
 setdefaulttimeout(600)
-getLogger("telegraph").setLevel(ERROR)
 getLogger("pymongo").setLevel(ERROR)
+getLogger("httpx").setLevel(ERROR)
 botStartTime = time()
 
 class CustomFormatter(Formatter):
