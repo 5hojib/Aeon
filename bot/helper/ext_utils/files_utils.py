@@ -15,7 +15,7 @@ from langcodes import Language
 from natsort import natsorted
 from magic import Magic
 
-from bot import LOGGER, MAX_SPLIT_SIZE, config_dict, user_data, aria2, get_client, GLOBAL_EXTENSION_FILTER
+from bot import LOGGER, MAX_SPLIT_SIZE, config_dict, user_data, aria2, xnox_client, GLOBAL_EXTENSION_FILTER
 from bot.modules.mediainfo import parseinfo
 from bot.helper.ext_utils.bot_utils import cmd_exec, sync_to_async, get_readable_file_size, get_readable_time, isMkv
 from bot.helper.ext_utils.telegraph_helper import telegraph
@@ -415,7 +415,7 @@ async def clean_download(path):
 
 
 async def start_cleanup():
-    get_client().torrents_delete(torrent_hashes="all")
+    xnox_client.torrents_delete(torrent_hashes="all")
     try:
         await aiormtree('/usr/src/app/downloads/')
     except:
@@ -425,7 +425,7 @@ async def start_cleanup():
 
 def clean_all():
     aria2.remove_all(True)
-    get_client().torrents_delete(torrent_hashes="all")
+    xnox_client.torrents_delete(torrent_hashes="all")
     try:
         rmtree('/usr/src/app/downloads/')
     except:

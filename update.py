@@ -5,7 +5,8 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 from logging import FileHandler, StreamHandler, INFO, basicConfig, error, info, Formatter, ERROR, getLogger
 
-getLogger("telegraph").setLevel(ERROR)
+getLogger("pymongo").setLevel(ERROR)
+getLogger("httpx").setLevel(ERROR)
 
 if path.exists('log.txt'):
     with open('log.txt', 'r+') as f:

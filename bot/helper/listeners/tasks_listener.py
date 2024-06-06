@@ -354,8 +354,8 @@ class MirrorLeechListener:
                 msg += f'<b>• Total files: </b>{folders}\n'
             if mime_type != 0:
                 msg += f'<b>• Corrupted files: </b>{mime_type}\n'
-            msg += f'<b>• Uploaded by: </b>{self.tag}\n'
-            msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code></blockquote>\n\n'
+            msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n'
+            msg += f'<b>• By: </b>{self.tag}</blockquote>\n\n'
             if not files:
                 if self.isPrivate:
                     msg += '<b>Files have not been sent for an unspecified reason</b>'
@@ -413,8 +413,8 @@ class MirrorLeechListener:
                 button = None
                 buttons = extra_btns(buttons)
                 button = buttons.build_menu(2)
-            msg += f'<b>• Uploaded by: </b>{self.tag}\n'
-            msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code></blockquote>\n\n'
+            msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n'
+            msg += f'<b>• By: </b>{self.tag}</blockquote>\n\n'
 
             if config_dict['MIRROR_LOG_ID']:
                 log_msg = list((await sendMultiMessage(config_dict['MIRROR_LOG_ID'], msg, button)).values())[0]
