@@ -23,6 +23,7 @@ from pyrogram.enums import ChatType
 from pyrogram.types import BotCommand
 from pyrogram.errors import PeerIdInvalid
 
+from bot.helper.ext_utils.status_utils import get_readable_time
 from bot.helper.ext_utils.db_handler import DbManager
 from bot import OWNER_ID, bot_name, DATABASE_URL, LOGGER, aria2, download_dict, download_dict_lock, botStartTime, user_data, config_dict, bot_loop, extra_buttons, user
 from bot.helper.telegram_helper.bot_commands import BotCommands
