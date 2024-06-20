@@ -15,8 +15,8 @@ class _BotCommands:
         self.SearchCommand = f'search{i}'
         self.StatusCommand = [f'status{i}', 'statusall']
         self.UsersCommand = f'users{i}'
-        self.AuthorizeCommand = f'authorize{i}'
-        self.UnAuthorizeCommand = f'unauthorize{i}'
+        self.AuthorizeCommand = [f'authorize{i}',f'a{i}']
+        self.UnAuthorizeCommand = [f'unauthorize{i}',f'ua{i}']
         self.AddSudoCommand = f'addsudo{i}'
         self.RmSudoCommand = f'rmsudo{i}'
         self.PingCommand = 'ping'
