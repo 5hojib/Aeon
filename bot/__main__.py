@@ -3,7 +3,6 @@ from sys import executable
 from os import execl as osexecl
 from asyncio import create_subprocess_exec, gather
 from uuid import uuid4
-from quoters import Quote
 from html import escape
 from cloudscraper import create_scraper
 
@@ -64,7 +63,6 @@ async def stats(_, message):
     currentTime = get_readable_time(time() - botStartTime)
     osUptime = get_readable_time(time() - boot_time())
     cpuUsage = cpu_percent(interval=0.5)
-    quote = Quote.print().split('―', 1)[0].strip().replace("“", "").replace("”", "")
     limit_mapping = {
         'Torrent'  : config_dict.get('TORRENT_LIMIT',  '∞'),
         'Gdrive'   : config_dict.get('GDRIVE_LIMIT',   '∞'),
@@ -74,8 +72,7 @@ async def stats(_, message):
         'Clone'    : config_dict.get('CLONE_LIMIT',    '∞'),
         'Mega'     : config_dict.get('MEGA_LIMIT',     '∞'),
         'User task': config_dict.get('USER_MAX_TASKS', '∞')}
-    system_info = f'<b>{quote}</b>\n\n'\
-        f'<code>• Bot uptime :</code> {currentTime}\n'\
+    system_info = f'<code>• Bot uptime :</code> {currentTime}\n'\
         f'<code>• Sys uptime :</code> {osUptime}\n'\
         f'<code>• CPU usage  :</code> {cpuUsage}%\n'\
         f'<code>• RAM usage  :</code> {memory.percent}%\n'\
