@@ -1,30 +1,22 @@
 from urllib.parse import urlparse
-from base64 import b64encode
-from datetime import datetime
 from os import path as ospath
-from pkg_resources import get_distribution
 from aiofiles import open as aiopen
-from aiofiles.os import remove as aioremove, path as aiopath, mkdir
+from aiofiles.os import path as aiopath, mkdir
 from re import match as re_match
 from time import time
 from html import escape
 from uuid import uuid4
-from subprocess import run as srun
 from asyncio import create_subprocess_exec, create_subprocess_shell, run_coroutine_threadsafe, sleep
 from asyncio.subprocess import PIPE
 from functools import partial, wraps
 from concurrent.futures import ThreadPoolExecutor
 
 from aiohttp import ClientSession as aioClientSession
-from psutil import virtual_memory, cpu_percent, disk_usage
-from requests import get as rget
-from mega import MegaApi
-from pyrogram.enums import ChatType
+from psutil import disk_usage
 from pyrogram.types import BotCommand
-from pyrogram.errors import PeerIdInvalid
 
 from bot.helper.ext_utils.db_handler import DbManager
-from bot import OWNER_ID, bot_name, DATABASE_URL, LOGGER, aria2, download_dict, download_dict_lock, botStartTime, user_data, config_dict, bot_loop, extra_buttons, user
+from bot import bot_name, DATABASE_URL, LOGGER, download_dict, download_dict_lock, botStartTime, user_data, config_dict, bot_loop, extra_buttons
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.telegraph_helper import telegraph

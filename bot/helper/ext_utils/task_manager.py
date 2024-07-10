@@ -4,7 +4,7 @@ from bot import OWNER_ID, config_dict, queued_dl, queued_up, non_queued_up, non_
 from bot.helper.mirror_leech_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.ext_utils.files_utils import get_base_name, check_storage_threshold
 from bot.helper.ext_utils.bot_utils import get_user_tasks, sync_to_async, get_telegraph_list, get_readable_file_size, checking_access
-from bot.helper.telegram_helper.message_utils import forcesub, BotPm_check, user_info
+from bot.helper.telegram_helper.message_utils import forcesub, BotPm_check
 from bot.helper.telegram_helper.message_utils import isAdmin
 
 async def stop_duplicate_check(name, listener):

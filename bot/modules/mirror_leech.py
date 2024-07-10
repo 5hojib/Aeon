@@ -1,14 +1,11 @@
-from pyrogram.handlers import MessageHandler, CallbackQueryHandler
-from pyrogram.filters import command, regex
-from html import escape
+from pyrogram.handlers import MessageHandler
+from pyrogram.filters import command
 from base64 import b64encode
 from re import match as re_match
 from asyncio import sleep
-from aiofiles import open as aiopen
 from aiofiles.os import path as aiopath
-from cloudscraper import create_scraper
 
-from bot import bot, LOGGER, config_dict, bot_name, user_data
+from bot import bot, LOGGER, config_dict, user_data
 from bot.helper.ext_utils.bot_utils import is_url, is_magnet, is_mega_link, is_gdrive_link, get_content_type, new_task, sync_to_async, is_rclone_path, is_telegram_link, arg_parser, fetch_user_tds
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.task_manager import task_utils
@@ -23,7 +20,7 @@ from bot.helper.mirror_leech_utils.download_utils.direct_link_generator import d
 from bot.helper.mirror_leech_utils.download_utils.telegram_download import TelegramDownloadHelper
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, get_tg_link_content, delete_links, deleteMessage, one_minute_del, five_minute_del, isAdmin
+from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, get_tg_link_content, delete_links, deleteMessage, one_minute_del, five_minute_del
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
 from bot.helper.ext_utils.help_strings import MIRROR_HELP_MESSAGE
 from bot.helper.ext_utils.bulk_links import extract_bulk_links

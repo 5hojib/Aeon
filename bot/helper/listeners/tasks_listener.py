@@ -1,8 +1,4 @@
-from random import choice
 from time import time
-from pytz import timezone
-from datetime import datetime
-from urllib.parse import unquote, quote
 from requests import utils as rutils
 from aiofiles.os import path as aiopath, remove as aioremove, listdir, makedirs
 from os import walk, path as ospath
@@ -11,8 +7,8 @@ from aioshutil import move
 from asyncio import create_subprocess_exec, sleep, Event
 from pyrogram.enums import ChatType
 
-from bot import OWNER_ID, Interval, aria2, download_dict, download_dict_lock, LOGGER, bot_name, DATABASE_URL, MAX_SPLIT_SIZE, config_dict, status_reply_dict_lock, user_data, non_queued_up, non_queued_dl, queued_up, queued_dl, queue_dict_lock, bot, GLOBAL_EXTENSION_FILTER
-from bot.helper.ext_utils.bot_utils import extra_btns, sync_to_async, get_readable_file_size, get_readable_time, is_mega_link, new_thread
+from bot import Interval, aria2, download_dict, download_dict_lock, LOGGER, MAX_SPLIT_SIZE, config_dict, status_reply_dict_lock, user_data, non_queued_up, non_queued_dl, queued_up, queued_dl, queue_dict_lock, GLOBAL_EXTENSION_FILTER
+from bot.helper.ext_utils.bot_utils import extra_btns, sync_to_async, get_readable_file_size, get_readable_time
 from bot.helper.ext_utils.files_utils import get_base_name, get_path_size, clean_download, split_file, process_file, clean_target, is_first_archive_split, is_archive, is_archive_split, join_files
 from bot.helper.ext_utils.exceptions import NotSupportedExtractionArchive
 from bot.helper.ext_utils.task_manager import start_from_queued
@@ -28,7 +24,6 @@ from bot.helper.mirror_leech_utils.upload_utils.telegramEngine import TgUploader
 from bot.helper.mirror_leech_utils.rclone_utils.transfer import RcloneTransferHelper
 from bot.helper.telegram_helper.message_utils import sendCustomMsg, sendMessage, editMessage, delete_all_messages, delete_links, sendMultiMessage, update_all_messages, deleteMessage, five_minute_del
 from bot.helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.ext_utils.db_handler import DbManager
 
 
 class MirrorLeechListener:
@@ -75,7 +70,7 @@ class MirrorLeechListener:
 
     async def onDownloadStart(self):
         if config_dict['LEECH_LOG_ID']:
-            msg = f'<b>Task Started</b>\n\n'
+            msg = '<b>Task Started</b>\n\n'
             msg += f'<b>• Task by:</b> {self.tag}\n'
             msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>'
             self.linkslogmsg = await sendCustomMsg(config_dict['LEECH_LOG_ID'], msg)

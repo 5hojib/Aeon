@@ -1,7 +1,5 @@
-from datetime import datetime
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.filters import command, regex, create
-from aiofiles import open as aiopen
 from aiofiles.os import remove as aioremove, path as aiopath, mkdir
 from os import path as ospath, getcwd
 from PIL import Image
@@ -11,15 +9,15 @@ from html import escape
 from io import BytesIO
 from asyncio import sleep
 
-from bot import OWNER_ID, bot, user_data, config_dict, DATABASE_URL, IS_PREMIUM_USER, MAX_SPLIT_SIZE
-from bot.helper.telegram_helper.message_utils import sendMessage, sendCustomMsg, editMessage, deleteMessage, sendFile, chat_info, user_info, five_minute_del
+from bot import bot, user_data, config_dict, DATABASE_URL, IS_PREMIUM_USER
+from bot.helper.telegram_helper.message_utils import sendMessage, sendCustomMsg, editMessage, deleteMessage, sendFile, five_minute_del
 from bot.helper.mirror_leech_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.ext_utils.help_strings import uset_display_dict
-from bot.helper.ext_utils.bot_utils import update_user_ldata, get_readable_file_size, sync_to_async, new_thread, is_gdrive_link
+from bot.helper.ext_utils.bot_utils import update_user_ldata, sync_to_async, new_thread, is_gdrive_link
 
 handler_dict = {}
 fname_dict = {
@@ -315,7 +313,7 @@ async def edit_user_settings(client, query):
     elif data[2] == 'show_tds':
         handler_dict[user_id] = False
         user_tds = user_dict.get('user_tds', {})
-        msg = f'<b><u>User TD Details</u></b>\n\n'
+        msg = '<b><u>User TD Details</u></b>\n\n'
         for index_no, (drive_name, drive_dict) in enumerate(user_tds.items(), start=1):
             msg += f'{index_no}: <b>Name:</b> <code>{drive_name}</code>\n'
             msg += f"  <b>Drive ID:</b> <code>{drive_dict['drive_id']}</code>\n"

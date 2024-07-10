@@ -1,11 +1,11 @@
 from pyrogram.handlers import CallbackQueryHandler
-from pyrogram.filters import command, regex
+from pyrogram.filters import regex
 from aiofiles.os import remove as aioremove, path as aiopath
 
-from bot import bot, aria2, download_dict, download_dict_lock, OWNER_ID, user_data, LOGGER, xnox_client
+from bot import bot, aria2, LOGGER, xnox_client
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import sendMessage, sendStatusMessage
-from bot.helper.ext_utils.bot_utils import getDownloadByGid, MirrorStatus, bt_selection_buttons, sync_to_async
+from bot.helper.telegram_helper.message_utils import sendStatusMessage
+from bot.helper.ext_utils.bot_utils import getDownloadByGid, sync_to_async
 
 
 async def get_confirm(client, query):

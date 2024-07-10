@@ -82,7 +82,7 @@ async def execute_code(func, message):
     try:
         with redirect_stdout(stdout):
             func_return = await func()
-    except Exception as e:
+    except Exception:
         return f'{stdout.getvalue()}{format_exc()}'
     else:
         result = stdout.getvalue()

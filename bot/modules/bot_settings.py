@@ -1,4 +1,3 @@
-from random import choice
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.filters import command, regex, create
 from pyrogram.enums import ChatType
@@ -13,7 +12,7 @@ from time import time
 from io import BytesIO
 from aioshutil import rmtree as aiormtree
 
-from bot import config_dict, user_data, DATABASE_URL, MAX_SPLIT_SIZE, list_drives_dict, aria2, GLOBAL_EXTENSION_FILTER, status_reply_dict_lock, Interval, aria2_options, aria2c_global, IS_PREMIUM_USER, download_dict, qbit_options, LOGGER, bot, extra_buttons, shorteners_list
+from bot import config_dict, DATABASE_URL, list_drives_dict, aria2, GLOBAL_EXTENSION_FILTER, status_reply_dict_lock, Interval, aria2_options, download_dict, LOGGER, bot, extra_buttons, shorteners_list
 from bot.helper.telegram_helper.message_utils import sendMessage, sendFile, editMessage, update_all_messages
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands

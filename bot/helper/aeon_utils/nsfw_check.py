@@ -1,4 +1,3 @@
-from bot import LOGGER
 from re import IGNORECASE, search, escape
 
 

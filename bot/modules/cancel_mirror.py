@@ -89,6 +89,6 @@ async def cancel_all_update(_, query):
         if not res:
             await sendMessage(reply_to, f"No matching tasks for {data[1]}!")
 
-bot.add_handler(MessageHandler(cancel_mirror, filters=regex(f"^/stop(_\w+)?(?!all)") & CustomFilters.authorized))
+bot.add_handler(MessageHandler(cancel_mirror, filters=regex("^/stop(_\w+)?(?!all)") & CustomFilters.authorized))
 bot.add_handler(MessageHandler(cancell_all_buttons, filters=command(BotCommands.StopAllCommand) & CustomFilters.sudo))
 bot.add_handler(CallbackQueryHandler(cancel_all_update, filters=regex(r"^stopall")))

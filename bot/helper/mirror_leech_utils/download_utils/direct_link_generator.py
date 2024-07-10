@@ -6,7 +6,7 @@ from json import loads
 from os import path
 from re import findall, match, search
 from time import sleep
-from urllib.parse import parse_qs, quote, urlparse
+from urllib.parse import parse_qs, urlparse
 from uuid import uuid4
 
 from bs4 import BeautifulSoup
@@ -16,7 +16,7 @@ from requests import Session, post, session as req_session
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from bot import config_dict, LOGGER
+from bot import config_dict
 from bot.helper.ext_utils.bot_utils import text_to_bytes
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.help_strings import PASSWORD_ERROR_MESSAGE
@@ -695,11 +695,11 @@ def gofile(url):
             "Accept": "*/*",
             "Connection": "keep-alive",
         }
-        __url = f"https://api.gofile.io/accounts"
+        __url = "https://api.gofile.io/accounts"
         try:
             __res = session.post(__url, headers=headers).json()
             if __res["status"] != "ok":
-                raise DirectDownloadLinkException(f"ERROR: Failed to get token.")
+                raise DirectDownloadLinkException("ERROR: Failed to get token.")
             return __res["data"]["token"]
         except Exception as e:
             raise e
@@ -1043,7 +1043,7 @@ def hubdrive(url):
             gd_data = soup.select('a[class="btn btn-primary btn-user"]')
             gd_link = gd_data[0]['href']
         return gd_link
-    except Exception as e:
+    except Exception:
         raise DirectDownloadLinkException('ERROR: Download link not found try again')
 
 
@@ -1126,13 +1126,13 @@ def filewish(url):
         if quality == version['name']:
             return version['url']
         elif version['name'] == 'l':
-            error += f"\nLow"
+            error += "\nLow"
         elif version['name'] == 'n':
-            error += f"\nNormal"
+            error += "\nNormal"
         elif version['name'] == 'o':
-            error += f"\nOriginal"
+            error += "\nOriginal"
         elif version['name'] == "h":
-            error += f"\nHD"
+            error += "\nHD"
         error +=f" <code>{url}_{version['name']}</code>"
     raise DirectDownloadLinkException(f'ERROR: {error}')
 

@@ -1,5 +1,5 @@
 from asyncio import sleep as asleep
-from aiofiles.os import path as aiopath, remove as aioremove, mkdir
+from aiofiles.os import remove as aioremove
 from telegraph import upload_file
 
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler

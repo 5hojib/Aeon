@@ -25,7 +25,7 @@ async def speedtest(_, message):
         await editMessage(speed, "Speedtest failed to complete.")
         return
     
-    string_speed  = f"<b>SPEEDTEST INFO</b>\n\n"
+    string_speed  = "<b>SPEEDTEST INFO</b>\n\n"
     string_speed += f"<b>• Ping:</b> <code>{result.ping} ms</code>\n"
     string_speed += f"<b>• Upload:</b> <code>{get_readable_file_size(result.upload / 8)}/s</code>\n"
     string_speed += f"<b>• Download:</b> <code>{get_readable_file_size(result.download / 8)}/s</code>\n"

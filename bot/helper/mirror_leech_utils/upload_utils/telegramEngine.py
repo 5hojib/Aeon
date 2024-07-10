@@ -1,23 +1,23 @@
 from traceback import format_exc
 from logging import getLogger, ERROR
-from aiofiles.os import remove as aioremove, path as aiopath, rename as aiorename, makedirs, rmdir, mkdir
+from aiofiles.os import remove as aioremove, path as aiopath, rename as aiorename, makedirs, mkdir
 from os import walk, path as ospath
 from time import time
 from PIL import Image
-from pyrogram.types import InputMediaVideo, InputMediaDocument, InlineKeyboardMarkup
-from pyrogram.errors import FloodWait, RPCError, PeerIdInvalid, MessageNotModified, ChannelInvalid
+from pyrogram.types import InputMediaVideo, InputMediaDocument
+from pyrogram.errors import FloodWait, PeerIdInvalid, MessageNotModified, ChannelInvalid
 from asyncio import sleep
 from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type, RetryError
-from re import match as re_match, sub as re_sub
+from re import match as re_match
 from natsort import natsorted
 from aioshutil import copy
 
 from bot import config_dict, user_data, GLOBAL_EXTENSION_FILTER, bot, user, IS_PREMIUM_USER
 from bot.helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.telegram_helper.message_utils import sendCustomMsg, sendMultiMessage, chat_info, deleteMessage, get_tg_link_content
+from bot.helper.telegram_helper.message_utils import sendMultiMessage, chat_info, deleteMessage, get_tg_link_content
 from bot.helper.aeon_utils.metadata import add_attachment
 from bot.helper.ext_utils.files_utils import clean_unwanted, is_archive, get_base_name, get_media_info, get_document_type, take_ss, get_ss, get_mediainfo_link, process_file, get_audio_thumb
-from bot.helper.ext_utils.bot_utils import get_readable_file_size, sync_to_async, is_telegram_link, is_url, download_image_url, isMkv
+from bot.helper.ext_utils.bot_utils import sync_to_async, is_telegram_link, is_url, download_image_url, isMkv
 
 LOGGER = getLogger(__name__)
 getLogger("pyrogram").setLevel(ERROR)

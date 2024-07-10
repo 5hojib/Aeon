@@ -8,7 +8,7 @@ from re import match as re_match
 from pyrogram.types import InputMediaPhoto
 from pyrogram.errors import ReplyMarkupInvalid, FloodWait, PeerIdInvalid, RPCError, UserNotParticipant, MessageNotModified, MessageEmpty, PhotoInvalidDimensions, WebpageCurlFailed, MediaEmpty
 
-from bot import DELETE_LINKS, IMAGES, LOGGER, bot_name, status_reply_dict, status_reply_dict_lock, Interval, bot, user, download_dict_lock
+from bot import DELETE_LINKS, IMAGES, LOGGER, status_reply_dict, status_reply_dict_lock, Interval, bot, user, download_dict_lock
 from bot.helper.ext_utils.bot_utils import get_readable_message, setInterval, sync_to_async, download_image_url
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.exceptions import TgLinkException
@@ -28,7 +28,7 @@ async def sendMessage(message, text, buttons=None, photo=None):
                 await sendMessage(message, text, buttons, des_dir)
                 await aioremove(des_dir)
                 return
-            except Exception as e:
+            except Exception:
                 LOGGER.error(format_exc())
         return await message.reply(text=text, quote=True, disable_web_page_preview=True, disable_notification=True, reply_markup=buttons)
     except FloodWait as f:
@@ -56,7 +56,7 @@ async def sendCustomMsg(chat_id, text, buttons=None, photo=None):
                 await sendCustomMsg(chat_id, text, buttons, des_dir)
                 await aioremove(des_dir)
                 return
-            except Exception as e:
+            except Exception:
                 LOGGER.error(format_exc())
         return await bot.send_message(chat_id=chat_id, text=text, disable_web_page_preview=True, disable_notification=True, reply_markup=buttons)
     except FloodWait as f:
@@ -302,7 +302,7 @@ async def BotPm_check(message, button=None):
         temp_msg = await message._client.send_message(chat_id=message.from_user.id, text='<b>Checking Access...</b>')
         await temp_msg.delete()
         return None, button
-    except Exception as e:
+    except Exception:
         if button is None:
             button = ButtonMaker()
         _msg = "You haven't initiated the bot in a private message!"

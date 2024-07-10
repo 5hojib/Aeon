@@ -2,9 +2,9 @@ from time import time
 from quoters import Quote
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.filters import command, regex
-from psutil import cpu_percent, virtual_memory, disk_usage
+from psutil import disk_usage
 
-from bot import status_reply_dict_lock, download_dict, download_dict_lock, botStartTime, Interval, config_dict, bot
+from bot import status_reply_dict_lock, download_dict, download_dict_lock, botStartTime, Interval, bot
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.message_utils import sendMessage, deleteMessage, one_minute_del, sendStatusMessage, update_all_messages

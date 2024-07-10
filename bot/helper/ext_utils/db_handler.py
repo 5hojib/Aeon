@@ -3,7 +3,6 @@ from aiofiles.os import makedirs
 from aiofiles.os import path as aiopath
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import PyMongoError
-from time import time
 
 from bot import DATABASE_URL, LOGGER, aria2_options, bot_id, bot_loop, config_dict, qbit_options, user_data
 
