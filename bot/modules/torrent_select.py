@@ -2,7 +2,7 @@ from pyrogram.handlers import CallbackQueryHandler
 from pyrogram.filters import command, regex
 from aiofiles.os import remove as aioremove, path as aiopath
 
-from bot import bot, aria2, download_dict, download_dict_lock, OWNER_ID, user_data, LOGGER
+from bot import bot, aria2, download_dict, download_dict_lock, OWNER_ID, user_data, LOGGER, xnox_client
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import sendMessage, sendStatusMessage
 from bot.helper.ext_utils.bot_utils import getDownloadByGid, MirrorStatus, bt_selection_buttons, sync_to_async
@@ -30,7 +30,7 @@ async def get_confirm(client, query):
         await query.answer()
         id_ = data[3]
         if len(id_) > 20:
-            client = dl.client()
+            client = xnox_client
             tor_info = (await sync_to_async(client.torrents_info, torrent_hash=id_))[0]
             path = tor_info.content_path.rsplit('/', 1)[0]
             res = await sync_to_async(client.torrents_files, torrent_hash=id_)
