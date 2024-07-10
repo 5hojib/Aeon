@@ -32,12 +32,12 @@ async def handle_query(client, query):
     if action == "pin":
         await query.answer(data[3], show_alert=True)
     elif action == "done":
-        await handle_done_action(data[3], download, message)
+        await handle_done_action(data[3], download, message, query)
     elif action == "rm":
         await download.download().cancel_download()
         await message.delete()
 
-async def handle_done_action(id_, download, message):
+async def handle_done_action(id_, download, message, query):
     await query.answer()
     
     if len(id_) > 20:
