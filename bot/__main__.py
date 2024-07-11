@@ -4,7 +4,6 @@ from os import execl as osexecl
 from asyncio import create_subprocess_exec, gather
 from uuid import uuid4
 from html import escape
-from cloudscraper import create_scraper
 
 from signal import signal, SIGINT
 from aiofiles.os import path as aiopath, remove as aioremove
