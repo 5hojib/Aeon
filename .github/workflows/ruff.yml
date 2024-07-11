@@ -36,7 +36,7 @@ jobs:
         if git diff-index --quiet HEAD --; then
           echo "No changes to commit."
         else
-          git commit -m "Auto-format code using ruff"
+          git commit -m "Auto-format code using ruff [skip ci]"
           git push origin ${{ github.ref }}
         fi
       env:
