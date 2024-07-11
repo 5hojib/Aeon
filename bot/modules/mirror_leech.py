@@ -31,7 +31,8 @@ from bot.helper.aeon_utils.nsfw_check import nsfw_precheck
 @new_task
 async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=None, bulk=[]):
     await send_react(message)
-    user_id      = message.from_user.id
+    user         = message.from_user or message.sender_chat
+    user_id      = user.id
     user_dict    = user_data.get(user_id, {})
     text         = message.text.split('\n')
     input_list   = text[0].split(' ')
