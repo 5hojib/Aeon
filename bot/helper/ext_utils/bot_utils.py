@@ -143,11 +143,11 @@ def bt_selection_buttons(id_):
     pincode = ''.join([n for n in id_ if n.isdigit()][:4])
     buttons = ButtonMaker()
     BASE_URL = config_dict['BASE_URL']
-    buttons.ubutton("Select", f"{BASE_URL}/app/files/{id_}")
-    buttons.ibutton("Pincode", f"btsel pin {gid} {pincode}")
-    buttons.ibutton("Cancel", f"btsel rm {gid} {id_}")
-    buttons.ibutton("Done Selecting", f"btsel done {gid} {id_}")
-    return buttons.build_menu(2)
+    buttons.url("Select", f"{BASE_URL}/app/files/{id_}")
+    buttons.callback("Pincode", f"btsel pin {gid} {pincode}")
+    buttons.callback("Cancel", f"btsel rm {gid} {id_}")
+    buttons.callback("Done Selecting", f"btsel done {gid} {id_}")
+    return buttons.menu(2)
 
 
 async def get_telegraph_list(telegraph_content):
@@ -155,9 +155,9 @@ async def get_telegraph_list(telegraph_content):
     if len(path) > 1:
         await telegraph.edit_telegraph(path, telegraph_content)
     buttons = ButtonMaker()
-    buttons.ubutton("View", f"https://telegra.ph/{path[0]}")
+    buttons.url("View", f"https://telegra.ph/{path[0]}")
     buttons = extra_btns(buttons)
-    return buttons.build_menu(1)
+    return buttons.menu(1)
 
 
 def handleIndex(index, dic):
@@ -230,10 +230,10 @@ def get_readable_message():
         return None, None
     if tasks > STATUS_LIMIT:
         buttons = ButtonMaker()
-        buttons.ibutton("Prev", "status pre")
-        buttons.ibutton(f"{PAGE_NO}/{PAGES}", "status ref")
-        buttons.ibutton("Next", "status nex")
-        button = buttons.build_menu(3)
+        buttons.callback("Prev", "status pre")
+        buttons.callback(f"{PAGE_NO}/{PAGES}", "status ref")
+        buttons.callback("Next", "status nex")
+        button = buttons.menu(3)
     msg += f"<b>• Tasks</b>: {tasks}{bmax_task}"
     msg += f"\n<b>• Bot uptime</b>: {currentTime}"
     msg += f"\n<b>• Free disk space</b>: {get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}"
@@ -449,7 +449,7 @@ async def checking_access(user_id, button=None):
         time_str = get_readable_time(token_timeout, True)
         if button is None:
             button = ButtonMaker()
-        button.ubutton('Collect token', tinyfy(short_url(f'https://telegram.me/{bot_name}?start={token}')))
+        button.url('Collect token', tinyfy(short_url(f'https://telegram.me/{bot_name}?start={token}')))
         return f'Your token has expired, please collect a new token.\n<b>It will expire after {time_str}</b>!', button
     return None, button
 
@@ -457,7 +457,7 @@ async def checking_access(user_id, button=None):
 def extra_btns(buttons):
     if extra_buttons:
         for btn_name, btn_url in extra_buttons.items():
-            buttons.ubutton(btn_name, btn_url)
+            buttons.url(btn_name, btn_url)
     return buttons
 
 

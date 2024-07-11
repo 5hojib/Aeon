@@ -341,9 +341,9 @@ class MirrorLeechListener:
         msg += f'<b>• Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n'
         LOGGER.info(f'Task Done: {name}')
         buttons = ButtonMaker()
-        iButton = ButtonMaker()
-        iButton.ibutton('View in inbox', f"aeon {user_id} private", 'header')
-        iButton = extra_btns(iButton)
+        callback = ButtonMaker()
+        callback.callback('View in inbox', f"aeon {user_id} private", 'header')
+        callback = extra_btns(callback)
         if self.isLeech:
             if folders > 1:
                 msg += f'<b>• Total files: </b>{folders}\n'
@@ -377,7 +377,7 @@ class MirrorLeechListener:
                 await sendMessage(self.botpmmsg, msg + lmsg + fmsg)
                 await deleteMessage(self.botpmmsg)
                 if self.isSuperGroup:
-                    await sendMessage(self.message, f'{msg}<b>Files has been sent to your inbox</b>', iButton.build_menu(1))
+                    await sendMessage(self.message, f'{msg}<b>Files has been sent to your inbox</b>', callback.menu(1))
                 else:
                     await deleteMessage(self.botpmmsg)
             if self.seed:
@@ -392,7 +392,7 @@ class MirrorLeechListener:
             if mime_type == "Folder":
                 msg += f'<b>• Total files: </b>{files}\n'
             if link:
-                buttons.ubutton('Cloud link', link)
+                buttons.url('Cloud link', link)
                 INDEX_URL = self.index_link if self.drive_id else config_dict['INDEX_URL']
                 if not rclonePath:
                     if INDEX_URL:
@@ -400,14 +400,14 @@ class MirrorLeechListener:
                         share_url = f'{INDEX_URL}/{url_path}'
                         if mime_type == "Folder":
                             share_url += '/'
-                        buttons.ubutton('Index link', share_url)
+                        buttons.url('Index link', share_url)
                 buttons = extra_btns(buttons)
-                button = buttons.build_menu(2)
+                button = buttons.menu(2)
             elif rclonePath:
                 msg += f'<b>• Path: </b><code>{rclonePath}</code>\n'
                 button = None
                 buttons = extra_btns(buttons)
-                button = buttons.build_menu(2)
+                button = buttons.menu(2)
             msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n'
             msg += f'<b>• By: </b>{self.tag}</blockquote>\n\n'
 
@@ -418,7 +418,7 @@ class MirrorLeechListener:
             await sendMessage(self.botpmmsg, msg, button, 'Random')
             await deleteMessage(self.botpmmsg)
             if self.isSuperGroup:
-                await sendMessage(self.message, f'{msg} <b>Links has been sent to your inbox</b>', iButton.build_menu(1))
+                await sendMessage(self.message, f'{msg} <b>Links has been sent to your inbox</b>', callback.menu(1))
             else:
                 await deleteMessage(self.botpmmsg)
             if self.seed:

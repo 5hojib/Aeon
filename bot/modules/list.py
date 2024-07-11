@@ -11,12 +11,12 @@ from bot.helper.ext_utils.bot_utils import sync_to_async, new_task, get_telegrap
 
 async def list_buttons(user_id, isRecursive=True):
     buttons = ButtonMaker()
-    buttons.ibutton("Folders", f"list_types {user_id} folders {isRecursive}")
-    buttons.ibutton("Files", f"list_types {user_id} files {isRecursive}")
-    buttons.ibutton("Both", f"list_types {user_id} both {isRecursive}")
-    buttons.ibutton(f"Recursive: {isRecursive}", f"list_types {user_id} rec {isRecursive}")
-    buttons.ibutton("Cancel", f"list_types {user_id} cancel")
-    return buttons.build_menu(2)
+    buttons.callback("Folders", f"list_types {user_id} folders {isRecursive}")
+    buttons.callback("Files", f"list_types {user_id} files {isRecursive}")
+    buttons.callback("Both", f"list_types {user_id} both {isRecursive}")
+    buttons.callback(f"Recursive: {isRecursive}", f"list_types {user_id} rec {isRecursive}")
+    buttons.callback("Cancel", f"list_types {user_id} cancel")
+    return buttons.menu(2)
 
 async def _list_drive(key, message, item_type, isRecursive):
     LOGGER.info(f"listing: {key}")
@@ -67,7 +67,7 @@ async def drive_list(_, message):
         if message.chat.type != message.chat.type.PRIVATE:
             msg, btn = await checking_access(user_id)
             if msg is not None:
-                reply_message = await sendMessage(message, msg, btn.build_menu(1))
+                reply_message = await sendMessage(message, msg, btn.menu(1))
                 await delete_links(message)
                 await five_minute_del(reply_message)
                 return

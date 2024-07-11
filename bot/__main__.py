@@ -99,7 +99,7 @@ async def stats(_, message):
 @new_thread
 async def start(client, message):
     buttons = ButtonMaker()
-    reply_markup = buttons.build_menu(2)
+    reply_markup = buttons.menu(2)
     if len(message.command) > 1 and message.command[1] == "private":
         await deleteMessage(message)
     elif len(message.command) > 1 and len(message.command[1]) == 36:
@@ -185,25 +185,13 @@ async def AeonCallback(_, query):
             startLine = "<pre language='python'>"
             endLine = "</pre>"
             btn = ButtonMaker()
-            btn.ibutton('Close', f'aeon {user_id} close')
-            reply_message = await sendMessage(message, startLine + escape(Loglines) + endLine, btn.build_menu(1))
+            btn.callback('Close', f'aeon {user_id} close')
+            reply_message = await sendMessage(message, startLine + escape(Loglines) + endLine, btn.menu(1))
             await query.edit_message_reply_markup(None)
             await deleteMessage(message)
             await five_minute_del(reply_message)
         except Exception as err:
             LOGGER.error(f"TG Log Display : {str(err)}")
-    elif data[2] == "webpaste":
-        await query.answer()
-        async with aiopen('log.txt', 'r') as f:
-            logFile = await f.read()
-        cget = create_scraper().request
-        resp = cget('POST', 'https://spaceb.in/api/v1/documents', data={'content': logFile, 'extension': 'None'}).json()
-        if resp['status'] == 201:
-            btn = ButtonMaker()
-            btn.ubutton('Web paste', f"https://spaceb.in/{resp['payload']['id']}")
-            await query.edit_message_reply_markup(btn.build_menu(1))
-        else:
-        	  LOGGER.error(f"Web paste failed : {str(err)}")
     elif data[2] == "private":
         await query.answer(url=f"https://t.me/{bot_name}?start=private")
     else:
@@ -214,9 +202,8 @@ async def AeonCallback(_, query):
 @new_task
 async def log(_, message):
     buttons = ButtonMaker()
-    buttons.ibutton('Log display', f'aeon {message.from_user.id} logdisplay')
-    buttons.ibutton('Web paste', f'aeon {message.from_user.id} webpaste')
-    reply_message = await sendFile(message, 'log.txt', buttons=buttons.build_menu(1))
+    buttons.callback('Log display', f'aeon {message.from_user.id} logdisplay')
+    reply_message = await sendFile(message, 'log.txt', buttons=buttons.menu(1))
     await deleteMessage(message)
     await five_minute_del(reply_message)
 

@@ -85,17 +85,17 @@ class TgUploader:
         buttons = ButtonMaker()
         try:
             if is_video and bool(self.__files_utils['screenshots']):
-                buttons.ubutton('SCREENSHOTS', await get_ss(up_path, self.__files_utils['screenshots']))
+                buttons.url('SCREENSHOTS', await get_ss(up_path, self.__files_utils['screenshots']))
         except Exception as e:
             LOGGER.error(f"ScreenShots Error: {e}")
         try:
             if self.__mediainfo:
                 m =  await get_mediainfo_link(up_path)
-                buttons.ubutton('MediaInfo', m)
+                buttons.url('MediaInfo', m)
                 LOGGER.info(m)
         except Exception as e:
             LOGGER.error(f"MediaInfo Error: {str(e)}")
-        return buttons.build_menu(1) if self.__has_buttons else None
+        return buttons.menu(1) if self.__has_buttons else None
 
     async def __copy_file(self):
         try:
