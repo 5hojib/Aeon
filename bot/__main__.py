@@ -1,6 +1,3 @@
-from requests import get as rget
-from pytz import timezone
-from bs4 import BeautifulSoup
 from time import time
 from sys import executable
 from os import execl as osexecl
