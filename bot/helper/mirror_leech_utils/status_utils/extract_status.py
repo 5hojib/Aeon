@@ -24,7 +24,7 @@ class ExtractStatus:
     def progress_raw(self):
         try:
             return self.processed_raw() / self.__size * 100
-        except:
+        except Exception:
             return 0
 
     def progress(self):
@@ -43,7 +43,7 @@ class ExtractStatus:
         try:
             seconds = (self.__size - self.processed_raw()) / self.speed_raw()
             return get_readable_time(seconds)
-        except:
+        except Exception:
             return '-'
 
     def status(self):

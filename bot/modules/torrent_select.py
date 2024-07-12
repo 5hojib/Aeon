@@ -60,7 +60,7 @@ async def handle_torrent_done(torrent_hash, download):
                 if await aiopath.exists(file_path):
                     try:
                         await aioremove(file_path)
-                    except:
+                    except Exception:
                         pass
     
     if not download.queued:
@@ -73,7 +73,7 @@ async def handle_aria2_done(gid, download):
         if file['selected'] == 'false' and await aiopath.exists(file['path']):
             try:
                 await aioremove(file['path'])
-            except:
+            except Exception:
                 pass
     
     if not download.queued:

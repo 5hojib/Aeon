@@ -218,7 +218,7 @@ async def restart_notification():
             chat_id, msg_id = map(int, f)
         try:
             await bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text='Restarted Successfully!')
-        except:
+        except Exception:
             pass
         await aioremove(".restartmsg")
 

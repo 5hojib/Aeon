@@ -131,7 +131,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             bulk = await extract_bulk_links(message, bulk_start, bulk_end)
             if len(bulk) == 0:
                 raise ValueError('Bulk Empty!')
-        except:
+        except Exception:
             await sendMessage(message, 'Reply to text file or tg message that have links seperated by new line!')
             return
         b_msg = input_list[:1]
@@ -176,7 +176,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         message.from_user = await client.get_users(id_)
         try:
             await message.unpin()
-        except:
+        except Exception:
             pass
     elif sender_chat := message.sender_chat:
         tag = sender_chat.title

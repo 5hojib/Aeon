@@ -321,7 +321,7 @@ async def edit_user_settings(client, query):
         try:
             await sendCustomMsg(user_id, msg)
             await query.answer('User TDs Successfully Send in your PM', show_alert=True)
-        except:
+        except Exception:
             await query.answer('Start the Bot in PM (Private) and Try Again', show_alert=True)
         await update_user_settings(query, 'user_tds', 'mirror')
     elif data[2] == "dthumb":

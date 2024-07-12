@@ -385,7 +385,7 @@ class TgUploader:
                     try:
                         self.__sent_msg = await bot.copy_message(nrml_media.chat.id, nrml_media.chat.id, nrml_media.id, reply_to_message_id=self.__sent_msg.id, reply_markup=buttons)
                         if self.__sent_msg: await deleteMessage(nrml_media)
-                    except:
+                    except Exception:
                         self.__sent_msg = nrml_media
                 else:
                     self.__sent_msg = nrml_media
@@ -431,7 +431,7 @@ class TgUploader:
                     try:
                         self.__sent_msg = await bot.copy_message(nrml_media.chat.id, nrml_media.chat.id, nrml_media.id, reply_to_message_id=self.__sent_msg.id, reply_markup=buttons)
                         if self.__sent_msg: await deleteMessage(nrml_media)
-                    except:
+                    except Exception:
                         self.__sent_msg = nrml_media
                 else:
                     self.__sent_msg = nrml_media
@@ -496,7 +496,7 @@ class TgUploader:
     def speed(self):
         try:
             return self.__processed_bytes / (time() - self.__start_time)
-        except:
+        except Exception:
             return 0
 
     @property

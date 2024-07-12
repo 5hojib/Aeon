@@ -120,7 +120,7 @@ class RcloneList:
             pfunc, filters=regex('^rcq') & user(self.__user_id)), group=-1)
         try:
             await wait_for(self.event.wait(), timeout=self.__timeout)
-        except:
+        except Exception:
             self.path = ''
             self.remote = 'Timed Out. Task has been cancelled!'
             self.is_cancelled = True

@@ -36,7 +36,7 @@ class CustomFilters:
                     if await (await chat_info(str(channel_id))).get_member(uid):
                         isExists = True
                         break
-                except:
+                except Exception:
                     continue
         return isExists
         

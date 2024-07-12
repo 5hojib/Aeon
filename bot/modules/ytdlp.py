@@ -82,7 +82,7 @@ class YtSelection:
             pfunc, filters=regex('^ytq') & user(self.__user_id)), group=-1)
         try:
             await wait_for(self.event.wait(), timeout=self.__timeout)
-        except:
+        except Exception:
             await editMessage(self.__reply_to, 'Timed Out. Task has been cancelled!')
             self.qual = None
             self.is_cancelled = True
@@ -301,7 +301,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
             bulk = await extract_bulk_links(message, bulk_start, bulk_end)
             if len(bulk) == 0:
                 raise ValueError('Bulk Empty!')
-        except:
+        except Exception:
             await sendMessage(message, 'Reply to text file or tg message that have links seperated by new line!')
             return
         b_msg = input_list[:1]
@@ -344,7 +344,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
         message.from_user = await client.get_users(id_)
         try:
             await message.unpin()
-        except:
+        except Exception:
             pass
     
     user_id = message.from_user.id

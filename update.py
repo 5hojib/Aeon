@@ -39,7 +39,7 @@ try:
             error(f"Failed to download config.env {res.status_code}")
     except Exception as e:
         error(f"CONFIG_FILE_URL: {e}")
-except:
+except Exception:
     pass
 
 load_dotenv('config.env', override=True)

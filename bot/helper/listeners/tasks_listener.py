@@ -65,7 +65,7 @@ class MirrorLeechListener:
                     Interval.clear()
             await sync_to_async(aria2.purge)
             await delete_all_messages()
-        except:
+        except Exception:
             pass
 
     async def onDownloadStart(self):
@@ -171,7 +171,7 @@ class MirrorLeechListener:
                                     del_path = ospath.join(dirpath, file_)
                                     try:
                                         await aioremove(del_path)
-                                    except:
+                                    except Exception:
                                         return
                 else:
                     if self.seed:
@@ -191,7 +191,7 @@ class MirrorLeechListener:
                         if not self.seed:
                             try:
                                 await aioremove(dl_path)
-                            except:
+                            except Exception:
                                 return
                     else:
                         LOGGER.error(
@@ -268,12 +268,12 @@ class MirrorLeechListener:
                                     continue
                                 try:
                                     await aioremove(f_path)
-                                except:
+                                except Exception:
                                     return
                             elif not self.seed or self.newDir:
                                 try:
                                     await aioremove(f_path)
-                                except:
+                                except Exception:
                                     return
                             else:
                                 m_size.append(f_size)

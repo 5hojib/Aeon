@@ -214,7 +214,7 @@ def get_readable_message():
             if hasattr(download, 'seeders_num'):
                 try:
                     msg += f"\nSeeders: {download.seeders_num()} | Leechers: {download.leechers_num()}"
-                except:
+                except Exception:
                     pass
         elif download.status() == MirrorStatus.STATUS_SEEDING:
             msg += f"<blockquote>Size: {download.size()}"
@@ -358,7 +358,7 @@ async def get_content_type(url):
         async with aioClientSession(trust_env=True) as session:
             async with session.get(url, verify_ssl=False) as response:
                 return response.headers.get('Content-Type')
-    except:
+    except Exception:
         return None
 
 

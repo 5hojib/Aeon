@@ -58,7 +58,7 @@ class GoogleDriveHelper:
     def speed(self):
         try:
             return self.__processed_bytes / self.__total_time
-        except:
+        except Exception:
             return 0
 
     @property
@@ -123,7 +123,7 @@ class GoogleDriveHelper:
             meta = self.__service.files().get(fileId=file_id, supportsAllDrives=True).execute()
             if meta.get('mimeType', '') == self.__G_DRIVE_DIR_MIME_TYPE:
                 return meta.get('name')
-        except:
+        except Exception:
             return
 
     @retry(wait=wait_exponential(multiplier=2, min=3, max=6), stop=stop_after_attempt(3),
@@ -325,7 +325,7 @@ class GoogleDriveHelper:
         if not self.__listener.seed or self.__listener.newDir:
             try:
                 osremove(file_path)
-            except:
+            except Exception:
                 pass
         self.__file_processed_bytes = 0
         if not is_dir:
