@@ -206,8 +206,6 @@ async def split_file(path, size, file_, dirpath, split_size, listener, start_tim
         dirpath = f"{dirpath}/splited_files"
         if not await aiopath.exists(dirpath):
             await mkdir(dirpath)
-    user_id = listener.message.from_user.id
-    user_dict = user_data.get(user_id, {})
     leech_split_size = MAX_SPLIT_SIZE
     parts = -(-size // leech_split_size)
     if (await get_document_type(path))[0]:

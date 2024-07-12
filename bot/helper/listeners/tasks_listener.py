@@ -7,7 +7,7 @@ from aioshutil import move
 from asyncio import create_subprocess_exec, sleep, Event
 from pyrogram.enums import ChatType
 
-from bot import Interval, aria2, download_dict, download_dict_lock, LOGGER, MAX_SPLIT_SIZE, config_dict, status_reply_dict_lock, user_data, non_queued_up, non_queued_dl, queued_up, queued_dl, queue_dict_lock, GLOBAL_EXTENSION_FILTER
+from bot import Interval, aria2, download_dict, download_dict_lock, LOGGER, MAX_SPLIT_SIZE, config_dict, status_reply_dict_lock, non_queued_up, non_queued_dl, queued_up, queued_dl, queue_dict_lock, GLOBAL_EXTENSION_FILTER
 from bot.helper.ext_utils.bot_utils import extra_btns, sync_to_async, get_readable_file_size, get_readable_time
 from bot.helper.ext_utils.files_utils import get_base_name, get_path_size, clean_download, split_file, process_file, clean_target, is_first_archive_split, is_archive, is_archive_split, join_files
 from bot.helper.ext_utils.exceptions import NotSupportedExtractionArchive
@@ -74,7 +74,6 @@ class MirrorLeechListener:
             msg += f'<b>• Task by:</b> {self.tag}\n'
             msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>'
             self.linkslogmsg = await sendCustomMsg(config_dict['LEECH_LOG_ID'], msg)
-        user_dict = user_data.get(self.message.from_user.id, {})
         self.botpmmsg = await sendCustomMsg(self.message.from_user.id, '<b>Task started</b>')
 
     async def onDownloadComplete(self):
@@ -127,8 +126,7 @@ class MirrorLeechListener:
             if self.uid in non_queued_dl:
                 non_queued_dl.remove(self.uid)
         await start_from_queued()
-        user_dict = user_data.get(self.message.from_user.id, {})
-        
+
         if self.join:
             if await aiopath.isdir(dl_path):
                 await join_files(dl_path)
@@ -335,7 +333,6 @@ class MirrorLeechListener:
     async def onUploadComplete(self, link, size, files, folders, mime_type, name, rclonePath=''):
         user_id = self.message.from_user.id
         name, _ = await process_file(name, user_id, isMirror=not self.isLeech)
-        user_dict = user_data.get(user_id, {})
         msg = f'{escape(name)}\n\n'
         msg += f'<blockquote><b>• Size: </b>{get_readable_file_size(size)}\n'
         msg += f'<b>• Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n'
@@ -412,7 +409,7 @@ class MirrorLeechListener:
             msg += f'<b>• By: </b>{self.tag}</blockquote>\n\n'
 
             if config_dict['MIRROR_LOG_ID']:
-                log_msg = list((await sendMultiMessage(config_dict['MIRROR_LOG_ID'], msg, button)).values())[0]
+                await sendMultiMessage(config_dict['MIRROR_LOG_ID'], msg, button)
                 if self.linkslogmsg:
                     await deleteMessage(self.linkslogmsg)
             await sendMessage(self.botpmmsg, msg, button, 'Random')

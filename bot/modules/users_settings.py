@@ -83,7 +83,6 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         buttons.callback("RClone", f"userset {user_id} rcc")
         rccmsg = "Exists" if await aiopath.exists(rclone_path) else "Not Exists"
         tds_mode = "Enabled" if user_dict.get('td_mode') else "Disabled"
-        user_tds = len(val) if (val := user_dict.get('user_tds', False)) else 0
         buttons.callback("User TDs", f"userset {user_id} user_tds")
 
         text = f'<b>Mirror Settings for {name}</b>\n\n'

@@ -1016,7 +1016,6 @@ def send_cm(url):
 def doods(url):
     if "/e/" in url:
         url = url.replace("/e/", "/d/")
-    parsed_url = urlparse(url)
     api_url = f"https://api.pake.tk/dood?url={url}"
     response = requests.get(api_url)
     if response.status_code != 200:
@@ -1032,8 +1031,6 @@ def hubdrive(url):
     try:
         rs = Session()
         resp = rs.get(url)
-        title = findall(r'>(.*?)<\/h4>', resp.text)[0]
-        size = findall(r'>(.*?)<\/td>', resp.text)[1]
         p_url = urlparse(url)
         js_query = rs.post(f"{p_url.scheme}://{p_url.hostname}/ajax.php?ajax=direct-download", data={'id': str(url.split('/')[-1])}, headers={'x-requested-with': 'XMLHttpRequest'}).json()
         if str(js_query['code']) == '200':
