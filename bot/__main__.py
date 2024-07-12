@@ -97,8 +97,6 @@ async def stats(_, message):
 
 @new_thread
 async def start(client, message):
-    buttons = ButtonMaker()
-    reply_markup = buttons.column(2)
     if len(message.command) > 1 and message.command[1] == "private":
         await deleteMessage(message)
     elif len(message.command) > 1 and len(message.command[1]) == 36:
