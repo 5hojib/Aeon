@@ -377,7 +377,7 @@ class MirrorLeechListener:
                 await sendMessage(self.botpmmsg, msg + lmsg + fmsg)
                 await deleteMessage(self.botpmmsg)
                 if self.isSuperGroup:
-                    await sendMessage(self.message, f'{msg}<b>Files has been sent to your inbox</b>', inboxButton.menu(1))
+                    await sendMessage(self.message, f'{msg}<b>Files has been sent to your inbox</b>', inboxButton.column(1))
                 else:
                     await deleteMessage(self.botpmmsg)
             if self.seed:
@@ -402,12 +402,12 @@ class MirrorLeechListener:
                             share_url += '/'
                         buttons.url('Index link', share_url)
                 buttons = extra_btns(buttons)
-                button = buttons.menu(2)
+                button = buttons.column(2)
             elif rclonePath:
                 msg += f'<b>• Path: </b><code>{rclonePath}</code>\n'
                 button = None
                 buttons = extra_btns(buttons)
-                button = buttons.menu(2)
+                button = buttons.column(2)
             msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n'
             msg += f'<b>• By: </b>{self.tag}</blockquote>\n\n'
 
@@ -418,7 +418,7 @@ class MirrorLeechListener:
             await sendMessage(self.botpmmsg, msg, button, 'Random')
             await deleteMessage(self.botpmmsg)
             if self.isSuperGroup:
-                await sendMessage(self.message, f'{msg} <b>Links has been sent to your inbox</b>', inboxButton.menu(1))
+                await sendMessage(self.message, f'{msg} <b>Links has been sent to your inbox</b>', inboxButton.column(1))
             else:
                 await deleteMessage(self.botpmmsg)
             if self.seed:

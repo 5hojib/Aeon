@@ -70,7 +70,7 @@ async def cancell_all_buttons(_, message):
     buttons.callback("Paused", f"stopall {MirrorStatus.STATUS_PAUSED}")
     buttons.callback("All", "stopall all")
     buttons.callback("Close", "stopall close")
-    button = buttons.menu(2)
+    button = buttons.column(2)
     can_msg = await sendMessage(message, 'Choose tasks to cancel.', button)
     await deleteMessage(message)
     await one_minute_del(can_msg)

@@ -67,7 +67,7 @@ async def pictures(_, message):
         buttons.callback("Close", f"images {user_id} close")
         buttons.callback("Remove all", f"images {user_id} removeall", 'footer')
         await deleteMessage(to_edit)
-        await sendMessage(message, f'<b>Image No. : 1 / {len(IMAGES)}</b>', buttons.menu(2), IMAGES[0])
+        await sendMessage(message, f'<b>Image No. : 1 / {len(IMAGES)}</b>', buttons.column(2), IMAGES[0])
 
 @new_task
 async def pics_callback(_, query):
@@ -90,7 +90,7 @@ async def pics_callback(_, query):
         buttons.callback("Remove Image", f"images {data[1]} remove {ind}")
         buttons.callback("Close", f"images {data[1]} close")
         buttons.callback("Remove all", f"images {data[1]} removeall", 'footer')
-        await editMessage(message, pic_info, buttons.menu(2), IMAGES[ind])
+        await editMessage(message, pic_info, buttons.column(2), IMAGES[ind])
 
     elif data[2] == "remove":
         IMAGES.pop(int(data[3]))
@@ -112,7 +112,7 @@ async def pics_callback(_, query):
         buttons.callback("Remove image", f"images {data[1]} remove {ind}")
         buttons.callback("Close", f"images {data[1]} close")
         buttons.callback("Remove all", f"images {data[1]} removeall", 'footer')
-        await editMessage(message, pic_info, buttons.menu(2), IMAGES[ind])
+        await editMessage(message, pic_info, buttons.column(2), IMAGES[ind])
 
     elif data[2] == 'removeall':
         IMAGES.clear()

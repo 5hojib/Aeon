@@ -413,7 +413,7 @@ async def get_buttons(key=None, edit_type=None, edit_mode=None, mess=None):
             	  buttons.callback('Make it True', f"botset boolvar {key} on")
             else:
             	  buttons.callback('Make it False', f"botset boolvar {key} off")
-    button = buttons.menu(1) if key is None else buttons.menu(2)
+    button = buttons.column(1) if key is None else buttons.column(2)
     return msg, button
 
 

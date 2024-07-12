@@ -98,7 +98,7 @@ async def stats(_, message):
 @new_thread
 async def start(client, message):
     buttons = ButtonMaker()
-    reply_markup = buttons.menu(2)
+    reply_markup = buttons.column(2)
     if len(message.command) > 1 and message.command[1] == "private":
         await deleteMessage(message)
     elif len(message.command) > 1 and len(message.command[1]) == 36:
@@ -185,7 +185,7 @@ async def AeonCallback(_, query):
             endLine = "</pre>"
             btn = ButtonMaker()
             btn.callback('Close', f'aeon {user_id} close')
-            reply_message = await sendMessage(message, startLine + escape(Loglines) + endLine, btn.menu(1))
+            reply_message = await sendMessage(message, startLine + escape(Loglines) + endLine, btn.column(1))
             await query.edit_message_reply_markup(None)
             await deleteMessage(message)
             await five_minute_del(reply_message)
@@ -202,7 +202,7 @@ async def AeonCallback(_, query):
 async def log(_, message):
     buttons = ButtonMaker()
     buttons.callback('Log display', f'aeon {message.from_user.id} logdisplay')
-    reply_message = await sendFile(message, 'log.txt', buttons=buttons.menu(1))
+    reply_message = await sendFile(message, 'log.txt', buttons=buttons.column(1))
     await deleteMessage(message)
     await five_minute_del(reply_message)
 

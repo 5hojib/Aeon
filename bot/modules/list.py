@@ -16,7 +16,7 @@ async def list_buttons(user_id, isRecursive=True):
     buttons.callback("Both", f"list_types {user_id} both {isRecursive}")
     buttons.callback(f"Recursive: {isRecursive}", f"list_types {user_id} rec {isRecursive}")
     buttons.callback("Cancel", f"list_types {user_id} cancel")
-    return buttons.menu(2)
+    return buttons.column(2)
 
 async def _list_drive(key, message, item_type, isRecursive):
     LOGGER.info(f"listing: {key}")
@@ -67,7 +67,7 @@ async def drive_list(_, message):
         if message.chat.type != message.chat.type.PRIVATE:
             msg, btn = await checking_access(user_id)
             if msg is not None:
-                reply_message = await sendMessage(message, msg, btn.menu(1))
+                reply_message = await sendMessage(message, msg, btn.column(1))
                 await delete_links(message)
                 await five_minute_del(reply_message)
                 return

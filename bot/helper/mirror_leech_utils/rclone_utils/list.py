@@ -176,7 +176,7 @@ class RcloneList:
         if self.path:
             buttons.callback('Back To Root', 'rcq root', position='footer')
         buttons.callback('Cancel', 'rcq cancel', position='footer')
-        button = buttons.menu(f_cols=2)
+        button = buttons.column(f_cols=2)
         msg = 'Choose Path:' + ('\nTransfer Type: Download' if self.list_status ==
                                 'rcd' else '\nTransfer Type: Upload')
         if self.list_status == 'rcu':
@@ -239,7 +239,7 @@ class RcloneList:
             if self.__rc_user and self.__rc_owner:
                 buttons.callback('Back', 'rcq back re', position='footer')
             buttons.callback('Cancel', 'rcq cancel', position='footer')
-            button = buttons.menu(2)
+            button = buttons.column(2)
             await self.__send_list_message(msg, button)
 
     async def list_config(self):
@@ -252,7 +252,7 @@ class RcloneList:
             buttons.callback('Owner Config', 'rcq owner')
             buttons.callback('My Config', 'rcq user')
             buttons.callback('Cancel', 'rcq cancel')
-            button = buttons.menu(2)
+            button = buttons.column(2)
             await self.__send_list_message(msg, button)
         else:
             self.config_path = 'rcl.conf' if self.__rc_owner else self.user_rcc_path

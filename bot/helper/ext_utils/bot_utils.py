@@ -147,7 +147,7 @@ def bt_selection_buttons(id_):
     buttons.callback("Pincode", f"btsel pin {gid} {pincode}")
     buttons.callback("Cancel", f"btsel rm {gid} {id_}")
     buttons.callback("Done Selecting", f"btsel done {gid} {id_}")
-    return buttons.menu(2)
+    return buttons.column(2)
 
 
 async def get_telegraph_list(telegraph_content):
@@ -157,7 +157,7 @@ async def get_telegraph_list(telegraph_content):
     buttons = ButtonMaker()
     buttons.url("View", f"https://telegra.ph/{path[0]}")
     buttons = extra_btns(buttons)
-    return buttons.menu(1)
+    return buttons.column(1)
 
 
 def handleIndex(index, dic):
@@ -233,7 +233,7 @@ def get_readable_message():
         buttons.callback("Prev", "status pre")
         buttons.callback(f"{PAGE_NO}/{PAGES}", "status ref")
         buttons.callback("Next", "status nex")
-        button = buttons.menu(3)
+        button = buttons.column(3)
     msg += f"<b>• Tasks</b>: {tasks}{bmax_task}"
     msg += f"\n<b>• Bot uptime</b>: {currentTime}"
     msg += f"\n<b>• Free disk space</b>: {get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}"

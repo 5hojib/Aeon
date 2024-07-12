@@ -95,7 +95,7 @@ class TgUploader:
                 LOGGER.info(m)
         except Exception as e:
             LOGGER.error(f"MediaInfo Error: {str(e)}")
-        return buttons.menu(1) if self.__has_buttons else None
+        return buttons.column(1) if self.__has_buttons else None
 
     async def __copy_file(self):
         try:

@@ -109,7 +109,7 @@ class YtSelection:
             buttons.callback('Best Videos', 'ytq bv*+ba/b')
             buttons.callback('Best Audios', 'ytq ba/b')
             buttons.callback('Cancel', 'ytq cancel', 'footer')
-            self.__main_buttons = buttons.menu(3)
+            self.__main_buttons = buttons.column(3)
             msg = f'Choose Playlist Videos Quality:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}'
         else:
             format_dict = result.get('formats')
@@ -155,7 +155,7 @@ class YtSelection:
             buttons.callback('Best Video', 'ytq bv*+ba/b')
             buttons.callback('Best Audio', 'ytq ba/b')
             buttons.callback('Cancel', 'ytq cancel', 'footer')
-            self.__main_buttons = buttons.menu(2)
+            self.__main_buttons = buttons.column(2)
             msg = f'Choose Video Quality:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}'
         self.__reply_to = await sendMessage(self.__message, msg, self.__main_buttons)
         await wrap_future(future)
@@ -178,7 +178,7 @@ class YtSelection:
             buttons.callback(button_name, f'ytq sub {b_name} {tbr}')
         buttons.callback('Back', 'ytq back', 'footer')
         buttons.callback('Cancel', 'ytq cancel', 'footer')
-        subbuttons = buttons.menu(2)
+        subbuttons = buttons.column(2)
         msg = f'Choose Bit rate for <b>{b_name}</b>:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}'
         await editMessage(self.__reply_to, msg, subbuttons)
 
@@ -191,7 +191,7 @@ class YtSelection:
             buttons.callback(f'{q}K-mp3', f'ytq {audio_format}')
         buttons.callback('Back', 'ytq back')
         buttons.callback('Cancel', 'ytq cancel')
-        subbuttons = buttons.menu(3)
+        subbuttons = buttons.column(3)
         msg = f'Choose mp3 Audio{i} Bitrate:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}'
         await editMessage(self.__reply_to, msg, subbuttons)
 
@@ -203,7 +203,7 @@ class YtSelection:
             buttons.callback(frmt, f'ytq aq {audio_format}')
         buttons.callback('Back', 'ytq back', 'footer')
         buttons.callback('Cancel', 'ytq cancel', 'footer')
-        subbuttons = buttons.menu(3)
+        subbuttons = buttons.column(3)
         msg = f'Choose Audio{i} Format:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}'
         await editMessage(self.__reply_to, msg, subbuttons)
 
@@ -215,7 +215,7 @@ class YtSelection:
             buttons.callback(qual, f'ytq {audio_format}')
         buttons.callback('Back', 'ytq aq back')
         buttons.callback('Cancel', 'ytq aq cancel')
-        subbuttons = buttons.menu(5)
+        subbuttons = buttons.column(5)
         msg = f'Choose Audio{i} Qaulity:\n0 is best and 10 is worst\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}'
         await editMessage(self.__reply_to, msg, subbuttons)
 
@@ -377,7 +377,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
         for __i, __msg in enumerate(error_msg, 1):
             final_msg += f'\n<blockquote><b>{__i}</b>: {__msg}</blockquote>'
         if error_button is not None:
-            error_button = error_button.menu(2)
+            error_button = error_button.column(2)
         await delete_links(message)
         force_m = await sendMessage(message, final_msg, error_button)
         await five_minute_del(force_m)
