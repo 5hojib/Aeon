@@ -384,7 +384,8 @@ class TgUploader:
                 if self.__prm_media and (self.__has_buttons or not self.__leechmsg):
                     try:
                         self.__sent_msg = await bot.copy_message(nrml_media.chat.id, nrml_media.chat.id, nrml_media.id, reply_to_message_id=self.__sent_msg.id, reply_markup=buttons)
-                        if self.__sent_msg: await deleteMessage(nrml_media)
+                        if self.__sent_msg:
+                            await deleteMessage(nrml_media)
                     except Exception:
                         self.__sent_msg = nrml_media
                 else:
@@ -430,7 +431,8 @@ class TgUploader:
                 if self.__prm_media and (self.__has_buttons or not self.__leechmsg):
                     try:
                         self.__sent_msg = await bot.copy_message(nrml_media.chat.id, nrml_media.chat.id, nrml_media.id, reply_to_message_id=self.__sent_msg.id, reply_markup=buttons)
-                        if self.__sent_msg: await deleteMessage(nrml_media)
+                        if self.__sent_msg:
+                            await deleteMessage(nrml_media)
                     except Exception:
                         self.__sent_msg = nrml_media
                 else:

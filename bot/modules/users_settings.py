@@ -339,7 +339,8 @@ async def edit_user_settings(client, query):
         await query.answer()
         edit_mode = len(data) == 4
         await update_user_settings(query, data[2], 'leech', edit_mode)
-        if not edit_mode: return
+        if not edit_mode:
+            return
         pfunc = partial(set_thumb, pre_event=query, key=data[2])
         rfunc = partial(update_user_settings, query, data[2], 'leech')
         await event_handler(client, query, pfunc, rfunc, True)
@@ -347,7 +348,8 @@ async def edit_user_settings(client, query):
         await query.answer()
         edit_mode = len(data) == 4
         await update_user_settings(query, data[2], 'universal', edit_mode)
-        if not edit_mode: return
+        if not edit_mode:
+            return
         pfunc = partial(set_yt_options, pre_event=query)
         rfunc = partial(update_user_settings, query, data[2], 'universal')
         await event_handler(client, query, pfunc, rfunc)
@@ -387,7 +389,8 @@ async def edit_user_settings(client, query):
         await query.answer()
         edit_mode = len(data) == 4
         await update_user_settings(query, data[2], 'mirror', edit_mode)
-        if not edit_mode: return
+        if not edit_mode:
+            return
         pfunc = partial(add_rclone, pre_event=query)
         rfunc = partial(update_user_settings, query, data[2], 'mirror')
         await event_handler(client, query, pfunc, rfunc, document=True)
@@ -408,7 +411,8 @@ async def edit_user_settings(client, query):
         await query.answer()
         edit_mode = len(data) == 4
         await update_user_settings(query, data[2], 'mirror', edit_mode)
-        if not edit_mode: return
+        if not edit_mode:
+            return
         pfunc = partial(set_custom, pre_event=query, key=data[2])
         rfunc = partial(update_user_settings, query, data[2], 'mirror')
         await event_handler(client, query, pfunc, rfunc)
@@ -417,7 +421,8 @@ async def edit_user_settings(client, query):
         await query.answer()
         edit_mode = len(data) == 4
         await update_user_settings(query, data[2], 'universal', edit_mode)
-        if not edit_mode: return
+        if not edit_mode:
+            return
         pfunc = partial(set_custom, pre_event=query, key=data[2])
         rfunc = partial(update_user_settings, query, data[2], 'universal')
         await event_handler(client, query, pfunc, rfunc)
@@ -426,7 +431,8 @@ async def edit_user_settings(client, query):
         await query.answer()
         edit_mode = len(data) == 4
         await update_user_settings(query, data[2], 'leech', edit_mode)
-        if not edit_mode: return
+        if not edit_mode:
+            return
         pfunc = partial(set_custom, pre_event=query, key=data[2])
         rfunc = partial(update_user_settings, query, data[2], 'leech')
         await event_handler(client, query, pfunc, rfunc)
