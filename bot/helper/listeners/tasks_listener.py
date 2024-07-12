@@ -341,9 +341,9 @@ class MirrorLeechListener:
         msg += f'<b>• Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n'
         LOGGER.info(f'Task Done: {name}')
         buttons = ButtonMaker()
-        callback = ButtonMaker()
-        callback.callback('View in inbox', f"aeon {user_id} private", 'header')
-        callback = extra_btns(callback)
+        inboxButton = ButtonMaker()
+        inboxButton.callback('View in inbox', f"aeon {user_id} private", 'header')
+        inboxButton = extra_btns(inboxButton)
         if self.isLeech:
             if folders > 1:
                 msg += f'<b>• Total files: </b>{folders}\n'
@@ -377,7 +377,7 @@ class MirrorLeechListener:
                 await sendMessage(self.botpmmsg, msg + lmsg + fmsg)
                 await deleteMessage(self.botpmmsg)
                 if self.isSuperGroup:
-                    await sendMessage(self.message, f'{msg}<b>Files has been sent to your inbox</b>', callback.menu(1))
+                    await sendMessage(self.message, f'{msg}<b>Files has been sent to your inbox</b>', inboxButton.menu(1))
                 else:
                     await deleteMessage(self.botpmmsg)
             if self.seed:
@@ -418,7 +418,7 @@ class MirrorLeechListener:
             await sendMessage(self.botpmmsg, msg, button, 'Random')
             await deleteMessage(self.botpmmsg)
             if self.isSuperGroup:
-                await sendMessage(self.message, f'{msg} <b>Links has been sent to your inbox</b>', callback.menu(1))
+                await sendMessage(self.message, f'{msg} <b>Links has been sent to your inbox</b>', inboxButton.menu(1))
             else:
                 await deleteMessage(self.botpmmsg)
             if self.seed:
