@@ -59,12 +59,15 @@ async def nsfw_precheck(message):
     if not reply_to:
         return False
 
-    if any(
-        isNSFW(getattr(reply_to, attr).file_name)
-        for attr in ['document', 'video']
-        if hasattr(reply_to, attr) and getattr(reply_to, attr)
-    ):
-        return True
+    try:
+        if any(
+            isNSFW(getattr(reply_to, attr).file_name)
+            for attr in ['document', 'video']
+            if hasattr(reply_to, attr) and getattr(reply_to, attr)
+        ):
+            return True
+    except AttributeError:
+        pass
 
     return any(
         isNSFW(getattr(reply_to, attr))
