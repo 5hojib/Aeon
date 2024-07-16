@@ -10,6 +10,7 @@ bencoding
 cinemagoer
 cloudscraper
 dnspython
+electrogram
 feedparser
 flask
 gevent
@@ -38,7 +39,7 @@ speedtest-cli
 telegraph
 tenacity
 tgcrypto
+uv
 uvloop
 xattr
 yt-dlp
-git+https://github.com/5hojib/pyrogram.git
