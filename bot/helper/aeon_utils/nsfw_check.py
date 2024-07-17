@@ -1,4 +1,3 @@
-from bot import LOGGER
 from re import IGNORECASE, search, escape
 
 
@@ -60,12 +59,11 @@ async def nsfw_precheck(message):
     if not reply_to:
         return False
 
-    if any(
-        isNSFW(getattr(reply_to, attr).file_name)
-        for attr in ['document', 'video']
-        if hasattr(reply_to, attr) and getattr(reply_to, attr)
-    ):
-        return True
+    for attr in ['document', 'video']:
+        if hasattr(reply_to, attr) and getattr(reply_to, attr):
+            file_name = getattr(reply_to, attr).file_name
+            if file_name and isNSFW(file_name):
+                return True
 
     return any(
         isNSFW(getattr(reply_to, attr))

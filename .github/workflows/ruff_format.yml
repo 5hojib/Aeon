@@ -1,0 +1,43 @@
+name: Ruff
+
+on:
+  push:
+    branches: [dev]
+
+jobs:
+  ruff:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GX_TOKEN }}
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
+
+    - name: Install ruff
+      run: |
+        pip install ruff
+
+    - name: Run ruff and format code
+      run: |
+        ruff check . --fix --exit-zero
+        git add -u
+        git status
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        if git diff-index --quiet HEAD --; then
+          echo "No changes to commit."
+        else
+          git commit -m "Auto-format code using ruff [skip actions]"
+          git push origin ${{ github.ref }}
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GX_TOKEN }}

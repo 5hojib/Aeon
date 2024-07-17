@@ -66,7 +66,7 @@ async def add_qb_torrent(link, path, listener, ratio, seed_time):
                         if tor_info.state not in ["metaDL", "checkingResumeData", "pausedDL"]:
                             await deleteMessage(meta)
                             break
-                    except:
+                    except Exception:
                         await deleteMessage(meta)
                         return
 

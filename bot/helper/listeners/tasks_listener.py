@@ -1,8 +1,4 @@
-from random import choice
 from time import time
-from pytz import timezone
-from datetime import datetime
-from urllib.parse import unquote, quote
 from requests import utils as rutils
 from aiofiles.os import path as aiopath, remove as aioremove, listdir, makedirs
 from os import walk, path as ospath
@@ -11,8 +7,8 @@ from aioshutil import move
 from asyncio import create_subprocess_exec, sleep, Event
 from pyrogram.enums import ChatType
 
-from bot import OWNER_ID, Interval, aria2, download_dict, download_dict_lock, LOGGER, bot_name, DATABASE_URL, MAX_SPLIT_SIZE, config_dict, status_reply_dict_lock, user_data, non_queued_up, non_queued_dl, queued_up, queued_dl, queue_dict_lock, bot, GLOBAL_EXTENSION_FILTER
-from bot.helper.ext_utils.bot_utils import extra_btns, sync_to_async, get_readable_file_size, get_readable_time, is_mega_link, new_thread
+from bot import Interval, aria2, download_dict, download_dict_lock, LOGGER, MAX_SPLIT_SIZE, config_dict, status_reply_dict_lock, non_queued_up, non_queued_dl, queued_up, queued_dl, queue_dict_lock, GLOBAL_EXTENSION_FILTER
+from bot.helper.ext_utils.bot_utils import extra_btns, sync_to_async, get_readable_file_size, get_readable_time
 from bot.helper.ext_utils.files_utils import get_base_name, get_path_size, clean_download, split_file, process_file, clean_target, is_first_archive_split, is_archive, is_archive_split, join_files
 from bot.helper.ext_utils.exceptions import NotSupportedExtractionArchive
 from bot.helper.ext_utils.task_manager import start_from_queued
@@ -28,7 +24,6 @@ from bot.helper.mirror_leech_utils.upload_utils.telegramEngine import TgUploader
 from bot.helper.mirror_leech_utils.rclone_utils.transfer import RcloneTransferHelper
 from bot.helper.telegram_helper.message_utils import sendCustomMsg, sendMessage, editMessage, delete_all_messages, delete_links, sendMultiMessage, update_all_messages, deleteMessage, five_minute_del
 from bot.helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.ext_utils.db_handler import DbManager
 
 
 class MirrorLeechListener:
@@ -70,16 +65,15 @@ class MirrorLeechListener:
                     Interval.clear()
             await sync_to_async(aria2.purge)
             await delete_all_messages()
-        except:
+        except Exception:
             pass
 
     async def onDownloadStart(self):
         if config_dict['LEECH_LOG_ID']:
-            msg = f'<b>Task Started</b>\n\n'
+            msg = '<b>Task Started</b>\n\n'
             msg += f'<b>• Task by:</b> {self.tag}\n'
             msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>'
             self.linkslogmsg = await sendCustomMsg(config_dict['LEECH_LOG_ID'], msg)
-        user_dict = user_data.get(self.message.from_user.id, {})
         self.botpmmsg = await sendCustomMsg(self.message.from_user.id, '<b>Task started</b>')
 
     async def onDownloadComplete(self):
@@ -132,8 +126,7 @@ class MirrorLeechListener:
             if self.uid in non_queued_dl:
                 non_queued_dl.remove(self.uid)
         await start_from_queued()
-        user_dict = user_data.get(self.message.from_user.id, {})
-        
+
         if self.join:
             if await aiopath.isdir(dl_path):
                 await join_files(dl_path)
@@ -176,7 +169,7 @@ class MirrorLeechListener:
                                     del_path = ospath.join(dirpath, file_)
                                     try:
                                         await aioremove(del_path)
-                                    except:
+                                    except Exception:
                                         return
                 else:
                     if self.seed:
@@ -196,7 +189,7 @@ class MirrorLeechListener:
                         if not self.seed:
                             try:
                                 await aioremove(dl_path)
-                            except:
+                            except Exception:
                                 return
                     else:
                         LOGGER.error(
@@ -273,12 +266,12 @@ class MirrorLeechListener:
                                     continue
                                 try:
                                     await aioremove(f_path)
-                                except:
+                                except Exception:
                                     return
                             elif not self.seed or self.newDir:
                                 try:
                                     await aioremove(f_path)
-                                except:
+                                except Exception:
                                     return
                             else:
                                 m_size.append(f_size)
@@ -340,15 +333,14 @@ class MirrorLeechListener:
     async def onUploadComplete(self, link, size, files, folders, mime_type, name, rclonePath=''):
         user_id = self.message.from_user.id
         name, _ = await process_file(name, user_id, isMirror=not self.isLeech)
-        user_dict = user_data.get(user_id, {})
         msg = f'{escape(name)}\n\n'
         msg += f'<blockquote><b>• Size: </b>{get_readable_file_size(size)}\n'
         msg += f'<b>• Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n'
         LOGGER.info(f'Task Done: {name}')
         buttons = ButtonMaker()
-        iButton = ButtonMaker()
-        iButton.ibutton('View in inbox', f"aeon {user_id} private", 'header')
-        iButton = extra_btns(iButton)
+        inboxButton = ButtonMaker()
+        inboxButton.callback('View in inbox', f"aeon {user_id} private", 'header')
+        inboxButton = extra_btns(inboxButton)
         if self.isLeech:
             if folders > 1:
                 msg += f'<b>• Total files: </b>{folders}\n'
@@ -382,7 +374,7 @@ class MirrorLeechListener:
                 await sendMessage(self.botpmmsg, msg + lmsg + fmsg)
                 await deleteMessage(self.botpmmsg)
                 if self.isSuperGroup:
-                    await sendMessage(self.message, f'{msg}<b>Files has been sent to your inbox</b>', iButton.build_menu(1))
+                    await sendMessage(self.message, f'{msg}<b>Files has been sent to your inbox</b>', inboxButton.column(1))
                 else:
                     await deleteMessage(self.botpmmsg)
             if self.seed:
@@ -397,7 +389,7 @@ class MirrorLeechListener:
             if mime_type == "Folder":
                 msg += f'<b>• Total files: </b>{files}\n'
             if link:
-                buttons.ubutton('Cloud link', link)
+                buttons.url('Cloud link', link)
                 INDEX_URL = self.index_link if self.drive_id else config_dict['INDEX_URL']
                 if not rclonePath:
                     if INDEX_URL:
@@ -405,25 +397,25 @@ class MirrorLeechListener:
                         share_url = f'{INDEX_URL}/{url_path}'
                         if mime_type == "Folder":
                             share_url += '/'
-                        buttons.ubutton('Index link', share_url)
+                        buttons.url('Index link', share_url)
                 buttons = extra_btns(buttons)
-                button = buttons.build_menu(2)
+                button = buttons.column(2)
             elif rclonePath:
                 msg += f'<b>• Path: </b><code>{rclonePath}</code>\n'
                 button = None
                 buttons = extra_btns(buttons)
-                button = buttons.build_menu(2)
+                button = buttons.column(2)
             msg += f'<b>• User ID: </b><code>{self.message.from_user.id}</code>\n'
             msg += f'<b>• By: </b>{self.tag}</blockquote>\n\n'
 
             if config_dict['MIRROR_LOG_ID']:
-                log_msg = list((await sendMultiMessage(config_dict['MIRROR_LOG_ID'], msg, button)).values())[0]
+                await sendMultiMessage(config_dict['MIRROR_LOG_ID'], msg, button)
                 if self.linkslogmsg:
                     await deleteMessage(self.linkslogmsg)
             await sendMessage(self.botpmmsg, msg, button, 'Random')
             await deleteMessage(self.botpmmsg)
             if self.isSuperGroup:
-                await sendMessage(self.message, f'{msg} <b>Links has been sent to your inbox</b>', iButton.build_menu(1))
+                await sendMessage(self.message, f'{msg} <b>Links has been sent to your inbox</b>', inboxButton.column(1))
             else:
                 await deleteMessage(self.botpmmsg)
             if self.seed:

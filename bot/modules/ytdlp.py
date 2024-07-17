@@ -9,9 +9,9 @@ from time import time
 
 from bot import bot, config_dict, user_data, LOGGER
 from bot.helper.ext_utils.task_manager import task_utils
-from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, delete_links, deleteMessage, one_minute_del, five_minute_del, isAdmin
+from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, delete_links, deleteMessage, one_minute_del, five_minute_del
 from bot.helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.ext_utils.bot_utils import get_readable_file_size, fetch_user_tds, is_url, is_gdrive_link, new_task, sync_to_async, new_task, is_rclone_path, new_thread, get_readable_time, arg_parser
+from bot.helper.ext_utils.bot_utils import get_readable_file_size, fetch_user_tds, is_url, is_gdrive_link, sync_to_async, new_task, is_rclone_path, new_thread, get_readable_time, arg_parser
 from bot.helper.mirror_leech_utils.download_utils.yt_dlp_download import YoutubeDLHelper
 from bot.helper.mirror_leech_utils.rclone_utils.list import RcloneList
 from bot.helper.telegram_helper.bot_commands import BotCommands
@@ -82,7 +82,7 @@ class YtSelection:
             pfunc, filters=regex('^ytq') & user(self.__user_id)), group=-1)
         try:
             await wait_for(self.event.wait(), timeout=self.__timeout)
-        except:
+        except Exception:
             await editMessage(self.__reply_to, 'Timed Out. Task has been cancelled!')
             self.qual = None
             self.is_cancelled = True
@@ -99,17 +99,17 @@ class YtSelection:
                 video_format = f'bv*[height<=?{i}][ext=mp4]+ba[ext=m4a]/b[height<=?{i}]'
                 b_data = f'{i}|mp4'
                 self.formats[b_data] = video_format
-                buttons.ibutton(f'{i}-mp4', f'ytq {b_data}')
+                buttons.callback(f'{i}-mp4', f'ytq {b_data}')
                 video_format = f'bv*[height<=?{i}][ext=webm]+ba/b[height<=?{i}]'
                 b_data = f'{i}|webm'
                 self.formats[b_data] = video_format
-                buttons.ibutton(f'{i}-webm', f'ytq {b_data}')
-            buttons.ibutton('MP3', 'ytq mp3')
-            buttons.ibutton('Audio Formats', 'ytq audio')
-            buttons.ibutton('Best Videos', 'ytq bv*+ba/b')
-            buttons.ibutton('Best Audios', 'ytq ba/b')
-            buttons.ibutton('Cancel', 'ytq cancel', 'footer')
-            self.__main_buttons = buttons.build_menu(3)
+                buttons.callback(f'{i}-webm', f'ytq {b_data}')
+            buttons.callback('MP3', 'ytq mp3')
+            buttons.callback('Audio Formats', 'ytq audio')
+            buttons.callback('Best Videos', 'ytq bv*+ba/b')
+            buttons.callback('Best Audios', 'ytq ba/b')
+            buttons.callback('Cancel', 'ytq cancel', 'footer')
+            self.__main_buttons = buttons.column(3)
             msg = f'Choose Playlist Videos Quality:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}'
         else:
             format_dict = result.get('formats')
@@ -147,15 +147,15 @@ class YtSelection:
                     if len(tbr_dict) == 1:
                         tbr, v_list = next(iter(tbr_dict.items()))
                         buttonName = f'{b_name} ({get_readable_file_size(v_list[0])})'
-                        buttons.ibutton(buttonName, f'ytq sub {b_name} {tbr}')
+                        buttons.callback(buttonName, f'ytq sub {b_name} {tbr}')
                     else:
-                        buttons.ibutton(b_name, f'ytq dict {b_name}')
-            buttons.ibutton('MP3', 'ytq mp3')
-            buttons.ibutton('Audio Formats', 'ytq audio')
-            buttons.ibutton('Best Video', 'ytq bv*+ba/b')
-            buttons.ibutton('Best Audio', 'ytq ba/b')
-            buttons.ibutton('Cancel', 'ytq cancel', 'footer')
-            self.__main_buttons = buttons.build_menu(2)
+                        buttons.callback(b_name, f'ytq dict {b_name}')
+            buttons.callback('MP3', 'ytq mp3')
+            buttons.callback('Audio Formats', 'ytq audio')
+            buttons.callback('Best Video', 'ytq bv*+ba/b')
+            buttons.callback('Best Audio', 'ytq ba/b')
+            buttons.callback('Cancel', 'ytq cancel', 'footer')
+            self.__main_buttons = buttons.column(2)
             msg = f'Choose Video Quality:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}'
         self.__reply_to = await sendMessage(self.__message, msg, self.__main_buttons)
         await wrap_future(future)
@@ -175,10 +175,10 @@ class YtSelection:
         tbr_dict = self.formats[b_name]
         for tbr, d_data in tbr_dict.items():
             button_name = f'{tbr}K ({get_readable_file_size(d_data[0])})'
-            buttons.ibutton(button_name, f'ytq sub {b_name} {tbr}')
-        buttons.ibutton('Back', 'ytq back', 'footer')
-        buttons.ibutton('Cancel', 'ytq cancel', 'footer')
-        subbuttons = buttons.build_menu(2)
+            buttons.callback(button_name, f'ytq sub {b_name} {tbr}')
+        buttons.callback('Back', 'ytq back', 'footer')
+        buttons.callback('Cancel', 'ytq cancel', 'footer')
+        subbuttons = buttons.column(2)
         msg = f'Choose Bit rate for <b>{b_name}</b>:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}'
         await editMessage(self.__reply_to, msg, subbuttons)
 
@@ -188,10 +188,10 @@ class YtSelection:
         audio_qualities = [64, 128, 320]
         for q in audio_qualities:
             audio_format = f'ba/b-mp3-{q}'
-            buttons.ibutton(f'{q}K-mp3', f'ytq {audio_format}')
-        buttons.ibutton('Back', 'ytq back')
-        buttons.ibutton('Cancel', 'ytq cancel')
-        subbuttons = buttons.build_menu(3)
+            buttons.callback(f'{q}K-mp3', f'ytq {audio_format}')
+        buttons.callback('Back', 'ytq back')
+        buttons.callback('Cancel', 'ytq cancel')
+        subbuttons = buttons.column(3)
         msg = f'Choose mp3 Audio{i} Bitrate:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}'
         await editMessage(self.__reply_to, msg, subbuttons)
 
@@ -200,10 +200,10 @@ class YtSelection:
         buttons = ButtonMaker()
         for frmt in ['aac', 'alac', 'flac', 'm4a', 'opus', 'vorbis', 'wav']:
             audio_format = f'ba/b-{frmt}-'
-            buttons.ibutton(frmt, f'ytq aq {audio_format}')
-        buttons.ibutton('Back', 'ytq back', 'footer')
-        buttons.ibutton('Cancel', 'ytq cancel', 'footer')
-        subbuttons = buttons.build_menu(3)
+            buttons.callback(frmt, f'ytq aq {audio_format}')
+        buttons.callback('Back', 'ytq back', 'footer')
+        buttons.callback('Cancel', 'ytq cancel', 'footer')
+        subbuttons = buttons.column(3)
         msg = f'Choose Audio{i} Format:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}'
         await editMessage(self.__reply_to, msg, subbuttons)
 
@@ -212,10 +212,10 @@ class YtSelection:
         buttons = ButtonMaker()
         for qual in range(11):
             audio_format = f'{format}{qual}'
-            buttons.ibutton(qual, f'ytq {audio_format}')
-        buttons.ibutton('Back', 'ytq aq back')
-        buttons.ibutton('Cancel', 'ytq aq cancel')
-        subbuttons = buttons.build_menu(5)
+            buttons.callback(qual, f'ytq {audio_format}')
+        buttons.callback('Back', 'ytq aq back')
+        buttons.callback('Cancel', 'ytq aq cancel')
+        subbuttons = buttons.column(5)
         msg = f'Choose Audio{i} Qaulity:\n0 is best and 10 is worst\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}'
         await editMessage(self.__reply_to, msg, subbuttons)
 
@@ -301,7 +301,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
             bulk = await extract_bulk_links(message, bulk_start, bulk_end)
             if len(bulk) == 0:
                 raise ValueError('Bulk Empty!')
-        except:
+        except Exception:
             await sendMessage(message, 'Reply to text file or tg message that have links seperated by new line!')
             return
         b_msg = input_list[:1]
@@ -344,7 +344,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
         message.from_user = await client.get_users(id_)
         try:
             await message.unpin()
-        except:
+        except Exception:
             pass
     
     user_id = message.from_user.id
@@ -377,7 +377,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
         for __i, __msg in enumerate(error_msg, 1):
             final_msg += f'\n<blockquote><b>{__i}</b>: {__msg}</blockquote>'
         if error_button is not None:
-            error_button = error_button.build_menu(2)
+            error_button = error_button.column(2)
         await delete_links(message)
         force_m = await sendMessage(message, final_msg, error_button)
         await five_minute_del(force_m)

@@ -28,7 +28,7 @@ class TelegramStatus:
     def progress(self):
         try:
             progress_raw = self.__obj.processed_bytes / self.__size * 100
-        except:
+        except Exception:
             progress_raw = 0
         return f'{round(progress_raw, 2)}%'
 
@@ -40,7 +40,7 @@ class TelegramStatus:
             seconds = (self.__size - self.__obj.processed_bytes) / \
                 self.__obj.speed
             return get_readable_time(seconds)
-        except:
+        except Exception:
             return '-'
 
     def gid(self) -> str:

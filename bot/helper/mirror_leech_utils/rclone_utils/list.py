@@ -120,7 +120,7 @@ class RcloneList:
             pfunc, filters=regex('^rcq') & user(self.__user_id)), group=-1)
         try:
             await wait_for(self.event.wait(), timeout=self.__timeout)
-        except:
+        except Exception:
             self.path = ''
             self.remote = 'Timed Out. Task has been cancelled!'
             self.is_cancelled = True
@@ -152,31 +152,31 @@ class RcloneList:
             else:
                 ptype = 'fi'
                 name = f"[{get_readable_file_size(idict['Size'])}] {idict['Path']}"
-            buttons.ibutton(name, f'rcq pa {ptype} {orig_index}')
+            buttons.callback(name, f'rcq pa {ptype} {orig_index}')
         if items_no > LIST_LIMIT:
             for i in [1, 2, 4, 6, 10, 30, 50, 100]:
-                buttons.ibutton(i, f'rcq ps {i}', position='header')
-            buttons.ibutton('Previous', 'rcq pre', position='footer')
-            buttons.ibutton('Next', 'rcq nex', position='footer')
+                buttons.callback(i, f'rcq ps {i}', position='header')
+            buttons.callback('Previous', 'rcq pre', position='footer')
+            buttons.callback('Next', 'rcq nex', position='footer')
         if self.list_status == 'rcd':
             if self.item_type == '--dirs-only':
-                buttons.ibutton(
+                buttons.callback(
                     'Files', 'rcq itype --files-only', position='footer')
             else:
-                buttons.ibutton(
+                buttons.callback(
                     'Folders', 'rcq itype --dirs-only', position='footer')
         if self.list_status == 'rcu' or len(self.path_list) > 0:
-            buttons.ibutton('Choose Current Path',
+            buttons.callback('Choose Current Path',
                             'rcq cur', position='footer')
         if self.list_status == 'rcu':
-            buttons.ibutton('Set as Default Path',
+            buttons.callback('Set as Default Path',
                             'rcq def', position='footer')
         if self.path or len(self.__sections) > 1 or self.__rc_user and self.__rc_owner:
-            buttons.ibutton('Back', 'rcq back pa', position='footer')
+            buttons.callback('Back', 'rcq back pa', position='footer')
         if self.path:
-            buttons.ibutton('Back To Root', 'rcq root', position='footer')
-        buttons.ibutton('Cancel', 'rcq cancel', position='footer')
-        button = buttons.build_menu(f_cols=2)
+            buttons.callback('Back To Root', 'rcq root', position='footer')
+        buttons.callback('Cancel', 'rcq cancel', position='footer')
+        button = buttons.column(f_cols=2)
         msg = 'Choose Path:' + ('\nTransfer Type: Download' if self.list_status ==
                                 'rcd' else '\nTransfer Type: Upload')
         if self.list_status == 'rcu':
@@ -235,11 +235,11 @@ class RcloneList:
             msg += f'\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time))}'
             buttons = ButtonMaker()
             for remote in self.__sections:
-                buttons.ibutton(remote, f'rcq re {remote}:')
+                buttons.callback(remote, f'rcq re {remote}:')
             if self.__rc_user and self.__rc_owner:
-                buttons.ibutton('Back', 'rcq back re', position='footer')
-            buttons.ibutton('Cancel', 'rcq cancel', position='footer')
-            button = buttons.build_menu(2)
+                buttons.callback('Back', 'rcq back re', position='footer')
+            buttons.callback('Cancel', 'rcq cancel', position='footer')
+            button = buttons.column(2)
             await self.__send_list_message(msg, button)
 
     async def list_config(self):
@@ -249,10 +249,10 @@ class RcloneList:
                  'rcd' else '\nTransfer Type: Upload')
             msg += f'\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time))}'
             buttons = ButtonMaker()
-            buttons.ibutton('Owner Config', 'rcq owner')
-            buttons.ibutton('My Config', 'rcq user')
-            buttons.ibutton('Cancel', 'rcq cancel')
-            button = buttons.build_menu(2)
+            buttons.callback('Owner Config', 'rcq owner')
+            buttons.callback('My Config', 'rcq user')
+            buttons.callback('Cancel', 'rcq cancel')
+            button = buttons.column(2)
             await self.__send_list_message(msg, button)
         else:
             self.config_path = 'rcl.conf' if self.__rc_owner else self.user_rcc_path

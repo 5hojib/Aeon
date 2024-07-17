@@ -6,7 +6,7 @@ from json import loads
 from os import path
 from re import findall, match, search
 from time import sleep
-from urllib.parse import parse_qs, quote, urlparse
+from urllib.parse import parse_qs, urlparse
 from uuid import uuid4
 
 from bs4 import BeautifulSoup
@@ -16,7 +16,7 @@ from requests import Session, post, session as req_session
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from bot import config_dict, LOGGER
+from bot import config_dict
 from bot.helper.ext_utils.bot_utils import text_to_bytes
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.help_strings import PASSWORD_ERROR_MESSAGE
@@ -585,7 +585,7 @@ def linkBox(url:str):
     parsed_url = urlparse(url)
     try:
         shareToken = parsed_url.path.split('/')[-1]
-    except:
+    except Exception:
         raise DirectDownloadLinkException('ERROR: invalid URL')
 
     details = {'contents':[], 'title': '', 'total_size': 0}
@@ -695,11 +695,11 @@ def gofile(url):
             "Accept": "*/*",
             "Connection": "keep-alive",
         }
-        __url = f"https://api.gofile.io/accounts"
+        __url = "https://api.gofile.io/accounts"
         try:
             __res = session.post(__url, headers=headers).json()
             if __res["status"] != "ok":
-                raise DirectDownloadLinkException(f"ERROR: Failed to get token.")
+                raise DirectDownloadLinkException("ERROR: Failed to get token.")
             return __res["data"]["token"]
         except Exception as e:
             raise e
@@ -783,7 +783,7 @@ def mediafireFolder(url):
         raw = url.split('/', 4)[-1]
         folderkey = raw.split('/', 1)[0]
         folderkey = folderkey.split(',')
-    except:
+    except Exception:
         raise DirectDownloadLinkException('ERROR: Could not parse ')
     if len(folderkey) == 1:
         folderkey = folderkey[0]
@@ -833,7 +833,7 @@ def mediafireFolder(url):
     def __scraper(url):
         try:
             html = HTML(session.get(url).text)
-        except:
+        except Exception:
             return
         if final_link := html.xpath("//a[@id='downloadButton']/@href"):
             return final_link[0]
@@ -967,7 +967,7 @@ def send_cm(url):
                 'https://send.cm/', data={'op': 'download2', 'id': file_id}, allow_redirects=False)
             if 'Location' in _res.headers:
                 return _res.headers['Location']
-        except:
+        except Exception:
             pass
 
     def __getFiles(html):
@@ -1016,7 +1016,6 @@ def send_cm(url):
 def doods(url):
     if "/e/" in url:
         url = url.replace("/e/", "/d/")
-    parsed_url = urlparse(url)
     api_url = f"https://api.pake.tk/dood?url={url}"
     response = requests.get(api_url)
     if response.status_code != 200:
@@ -1031,9 +1030,6 @@ def doods(url):
 def hubdrive(url):
     try:
         rs = Session()
-        resp = rs.get(url)
-        title = findall(r'>(.*?)<\/h4>', resp.text)[0]
-        size = findall(r'>(.*?)<\/td>', resp.text)[1]
         p_url = urlparse(url)
         js_query = rs.post(f"{p_url.scheme}://{p_url.hostname}/ajax.php?ajax=direct-download", data={'id': str(url.split('/')[-1])}, headers={'x-requested-with': 'XMLHttpRequest'}).json()
         if str(js_query['code']) == '200':
@@ -1043,7 +1039,7 @@ def hubdrive(url):
             gd_data = soup.select('a[class="btn btn-primary btn-user"]')
             gd_link = gd_data[0]['href']
         return gd_link
-    except Exception as e:
+    except Exception:
         raise DirectDownloadLinkException('ERROR: Download link not found try again')
 
 
@@ -1126,13 +1122,13 @@ def filewish(url):
         if quality == version['name']:
             return version['url']
         elif version['name'] == 'l':
-            error += f"\nLow"
+            error += "\nLow"
         elif version['name'] == 'n':
-            error += f"\nNormal"
+            error += "\nNormal"
         elif version['name'] == 'o':
-            error += f"\nOriginal"
+            error += "\nOriginal"
         elif version['name'] == "h":
-            error += f"\nHD"
+            error += "\nHD"
         error +=f" <code>{url}_{version['name']}</code>"
     raise DirectDownloadLinkException(f'ERROR: {error}')
 

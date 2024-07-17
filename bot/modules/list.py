@@ -1,22 +1,22 @@
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.filters import command, regex
 
-from bot import LOGGER, bot, config_dict
+from bot import LOGGER, bot
 from bot.helper.mirror_leech_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, delete_links, one_minute_del, five_minute_del, isAdmin
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.ext_utils.bot_utils import sync_to_async, new_task, get_telegraph_list, checking_access, new_thread
+from bot.helper.ext_utils.bot_utils import sync_to_async, new_task, get_telegraph_list, checking_access
 
 async def list_buttons(user_id, isRecursive=True):
     buttons = ButtonMaker()
-    buttons.ibutton("Folders", f"list_types {user_id} folders {isRecursive}")
-    buttons.ibutton("Files", f"list_types {user_id} files {isRecursive}")
-    buttons.ibutton("Both", f"list_types {user_id} both {isRecursive}")
-    buttons.ibutton(f"Recursive: {isRecursive}", f"list_types {user_id} rec {isRecursive}")
-    buttons.ibutton("Cancel", f"list_types {user_id} cancel")
-    return buttons.build_menu(2)
+    buttons.callback("Folders", f"list_types {user_id} folders {isRecursive}")
+    buttons.callback("Files", f"list_types {user_id} files {isRecursive}")
+    buttons.callback("Both", f"list_types {user_id} both {isRecursive}")
+    buttons.callback(f"Recursive: {isRecursive}", f"list_types {user_id} rec {isRecursive}")
+    buttons.callback("Cancel", f"list_types {user_id} cancel")
+    return buttons.column(2)
 
 async def _list_drive(key, message, item_type, isRecursive):
     LOGGER.info(f"listing: {key}")
@@ -67,7 +67,7 @@ async def drive_list(_, message):
         if message.chat.type != message.chat.type.PRIVATE:
             msg, btn = await checking_access(user_id)
             if msg is not None:
-                reply_message = await sendMessage(message, msg, btn.build_menu(1))
+                reply_message = await sendMessage(message, msg, btn.column(1))
                 await delete_links(message)
                 await five_minute_del(reply_message)
                 return

@@ -2,7 +2,7 @@ from pyrogram.handlers import MessageHandler, EditedMessageHandler
 from pyrogram.filters import command
 from io import BytesIO
 
-from bot import LOGGER, bot
+from bot import bot
 from bot.helper.telegram_helper.message_utils import sendMessage, sendFile
 from bot.helper.ext_utils.bot_utils import cmd_exec, new_task
 from bot.helper.telegram_helper.filters import CustomFilters

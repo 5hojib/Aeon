@@ -206,8 +206,6 @@ async def split_file(path, size, file_, dirpath, split_size, listener, start_tim
         dirpath = f"{dirpath}/splited_files"
         if not await aiopath.exists(dirpath):
             await mkdir(dirpath)
-    user_id = listener.message.from_user.id
-    user_dict = user_data.get(user_id, {})
     leech_split_size = MAX_SPLIT_SIZE
     parts = -(-size // leech_split_size)
     if (await get_document_type(path))[0]:
@@ -233,7 +231,7 @@ async def split_file(path, size, file_, dirpath, split_size, listener, start_tim
                 err = (await listener.suproc.stderr.read()).decode().strip()
                 try:
                     await aioremove(out_path)
-                except:
+                except Exception:
                     pass
                 if multi_streams:
                     LOGGER.warning(
@@ -396,12 +394,12 @@ async def clean_target(path):
         if await aiopath.isdir(path):
             try:
                 await aiormtree(path)
-            except:
+            except Exception:
                 pass
         elif await aiopath.isfile(path):
             try:
                 await aioremove(path)
-            except:
+            except Exception:
                 pass
 
 
@@ -410,7 +408,7 @@ async def clean_download(path):
         LOGGER.info(f"Cleaning Download: {path}")
         try:
             await aiormtree(path)
-        except:
+        except Exception:
             pass
 
 
@@ -418,7 +416,7 @@ async def start_cleanup():
     xnox_client.torrents_delete(torrent_hashes="all")
     try:
         await aiormtree('/usr/src/app/downloads/')
-    except:
+    except Exception:
         pass
     await makedirs('/usr/src/app/downloads/', exist_ok = True)
 
@@ -428,7 +426,7 @@ def clean_all():
     xnox_client.torrents_delete(torrent_hashes="all")
     try:
         rmtree('/usr/src/app/downloads/')
-    except:
+    except Exception:
         pass
 
 

@@ -1,7 +1,5 @@
-from datetime import datetime
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.filters import command, regex, create
-from aiofiles import open as aiopen
 from aiofiles.os import remove as aioremove, path as aiopath, mkdir
 from os import path as ospath, getcwd
 from PIL import Image
@@ -11,15 +9,15 @@ from html import escape
 from io import BytesIO
 from asyncio import sleep
 
-from bot import OWNER_ID, bot, user_data, config_dict, DATABASE_URL, IS_PREMIUM_USER, MAX_SPLIT_SIZE
-from bot.helper.telegram_helper.message_utils import sendMessage, sendCustomMsg, editMessage, deleteMessage, sendFile, chat_info, user_info, five_minute_del
+from bot import bot, user_data, config_dict, DATABASE_URL, IS_PREMIUM_USER
+from bot.helper.telegram_helper.message_utils import sendMessage, sendCustomMsg, editMessage, deleteMessage, sendFile, five_minute_del
 from bot.helper.mirror_leech_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.ext_utils.help_strings import uset_display_dict
-from bot.helper.ext_utils.bot_utils import update_user_ldata, get_readable_file_size, sync_to_async, new_thread, is_gdrive_link
+from bot.helper.ext_utils.bot_utils import update_user_ldata, sync_to_async, new_thread, is_gdrive_link
 
 handler_dict = {}
 fname_dict = {
@@ -44,30 +42,30 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
     rclone_path = f'tanha/{user_id}.conf'
     user_dict = user_data.get(user_id, {})
     if key is None:
-        buttons.ibutton("Universal", f"userset {user_id} universal")
-        buttons.ibutton("Mirror", f"userset {user_id} mirror")
-        buttons.ibutton("Leech", f"userset {user_id} leech")
+        buttons.callback("Universal", f"userset {user_id} universal")
+        buttons.callback("Mirror", f"userset {user_id} mirror")
+        buttons.callback("Leech", f"userset {user_id} leech")
         if user_dict and any(key in user_dict for key in ['prefix', 'suffix', 'remname', 'ldump', 'yt_opt', 'media_group', 'rclone', 'thumb', 'as_doc', 'metadata', 'attachment']):
-            buttons.ibutton("Reset", f"userset {user_id} reset_all")
-        buttons.ibutton("Close", f"userset {user_id} close")
+            buttons.callback("Reset", f"userset {user_id} reset_all")
+        buttons.callback("Close", f"userset {user_id} close")
         text = f'<b>User Settings for {name}</b>'
-        button = buttons.build_menu(2)
+        button = buttons.column(2)
     elif key == 'universal':
-        buttons.ibutton("YT-DLP Options", f"userset {user_id} yt_opt")
+        buttons.callback("YT-DLP Options", f"userset {user_id} yt_opt")
         ytopt = 'Not Exists' if (val:=user_dict.get('yt_opt', config_dict.get('YT_DLP_OPTIONS', ''))) == '' else val
-        buttons.ibutton("Prefix", f"userset {user_id} prefix")
+        buttons.callback("Prefix", f"userset {user_id} prefix")
         prefix = user_dict.get('prefix', 'Not Exists')
 
-        buttons.ibutton("Suffix", f"userset {user_id} suffix")
+        buttons.callback("Suffix", f"userset {user_id} suffix")
         suffix = user_dict.get('suffix', 'Not Exists')
 
-        buttons.ibutton("Remname", f"userset {user_id} remname")
+        buttons.callback("Remname", f"userset {user_id} remname")
         remname = user_dict.get('remname', 'Not Exists')
         
-        buttons.ibutton("Metadata", f"userset {user_id} metadata")
+        buttons.callback("Metadata", f"userset {user_id} metadata")
         metadata = user_dict.get('metadata', 'Not Exists')
         
-        buttons.ibutton("Attachment", f"userset {user_id} attachment")
+        buttons.callback("Attachment", f"userset {user_id} attachment")
         attachment = user_dict.get('attachment', 'Not Exists')
 
 
@@ -78,48 +76,47 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         text += f'<b>• Metadata:</b> <code>{metadata}</code>\n'
         text += f'<b>• Attachment:</b> <code>{attachment}</code>\n'
         text += f'<b>• Remname:</b> <code>{remname}</code>'
-        buttons.ibutton("Back", f"userset {user_id} back", "footer")
-        buttons.ibutton("Close", f"userset {user_id} close", "footer")
-        button = buttons.build_menu(2)
+        buttons.callback("Back", f"userset {user_id} back", "footer")
+        buttons.callback("Close", f"userset {user_id} close", "footer")
+        button = buttons.column(2)
     elif key == 'mirror':
-        buttons.ibutton("RClone", f"userset {user_id} rcc")
+        buttons.callback("RClone", f"userset {user_id} rcc")
         rccmsg = "Exists" if await aiopath.exists(rclone_path) else "Not Exists"
         tds_mode = "Enabled" if user_dict.get('td_mode') else "Disabled"
-        user_tds = len(val) if (val := user_dict.get('user_tds', False)) else 0
-        buttons.ibutton("User TDs", f"userset {user_id} user_tds")
+        buttons.callback("User TDs", f"userset {user_id} user_tds")
 
         text = f'<b>Mirror Settings for {name}</b>\n\n'
         text += f'<b>• Rclone Config:</b> {rccmsg}\n'
         text += f'<b>• User TD Mode:</b> {tds_mode}'
 
-        buttons.ibutton("Back", f"userset {user_id} back", "footer")
-        buttons.ibutton("Close", f"userset {user_id} close", "footer")
-        button = buttons.build_menu(2)
+        buttons.callback("Back", f"userset {user_id} back", "footer")
+        buttons.callback("Close", f"userset {user_id} close", "footer")
+        button = buttons.column(2)
     elif key == 'leech':
         if user_dict.get('as_doc', False) or 'as_doc' not in user_dict and config_dict['AS_DOCUMENT']:
             ltype = "DOCUMENT"
-            buttons.ibutton("Send As Media", f"userset {user_id} doc")
+            buttons.callback("Send As Media", f"userset {user_id} doc")
         else:
             ltype = "MEDIA"
-            buttons.ibutton("Send As Document", f"userset {user_id} doc")
+            buttons.callback("Send As Document", f"userset {user_id} doc")
 
         mediainfo = "Enabled" if user_dict.get('mediainfo', config_dict['SHOW_MEDIAINFO']) else "Disabled"
-        buttons.ibutton('Disable MediaInfo' if mediainfo == 'Enabled' else 'Enable MediaInfo', f"userset {user_id} mediainfo")
+        buttons.callback('Disable MediaInfo' if mediainfo == 'Enabled' else 'Enable MediaInfo', f"userset {user_id} mediainfo")
         if config_dict['SHOW_MEDIAINFO']:
             mediainfo = "Force Enabled"
-        buttons.ibutton("Thumbnail", f"userset {user_id} thumb")
+        buttons.callback("Thumbnail", f"userset {user_id} thumb")
         thumbmsg = "Exists" if await aiopath.exists(thumbpath) else "Not Exists"
 
         if user_dict.get('media_group', False) or ('media_group' not in user_dict and config_dict['MEDIA_GROUP']):
-            buttons.ibutton("Disable Media Group", f"userset {user_id} mgroup")
+            buttons.callback("Disable Media Group", f"userset {user_id} mgroup")
         else:
-            buttons.ibutton("Enable Media Group", f"userset {user_id} mgroup")
+            buttons.callback("Enable Media Group", f"userset {user_id} mgroup")
         media_group = 'Enabled' if user_dict.get('media_group', config_dict.get('MEDIA_GROUP')) else 'Disabled'
 
-        buttons.ibutton("Leech Caption", f"userset {user_id} lcaption")
+        buttons.callback("Leech Caption", f"userset {user_id} lcaption")
         lcaption = user_dict.get('lcaption', 'Not Exists')
 
-        buttons.ibutton("Leech Dump", f"userset {user_id} ldump")
+        buttons.callback("Leech Dump", f"userset {user_id} ldump")
         ldump = 'Not Exists' if (val:=user_dict.get('ldump', '')) == '' else val
 
         SPLIT_SIZE = '4GB' if IS_PREMIUM_USER else '2GB'
@@ -132,9 +129,9 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         text += f'<b>• Leech Dump:</b> <code>{ldump}</code>\n'
         text += f'<b>• MediaInfo Mode:</b> <code>{mediainfo}</code>'
 
-        buttons.ibutton("Back", f"userset {user_id} back", "footer")
-        buttons.ibutton("Close", f"userset {user_id} close", "footer")
-        button = buttons.build_menu(2)
+        buttons.callback("Back", f"userset {user_id} back", "footer")
+        buttons.callback("Close", f"userset {user_id} close", "footer")
+        button = buttons.column(2)
     elif edit_type:
         text = f"<b><u>{fname_dict[key]} Settings :</u></b>\n\n"
         if key == 'rcc':
@@ -152,23 +149,23 @@ async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None)
         elif key == 'user_tds':
             set_exist = len(val) if (val:=user_dict.get(key, False)) else 'Not Exists'
             tds_mode = "Enabled" if user_dict.get('td_mode') else "Disabled"
-            buttons.ibutton('Disable UserTDs' if tds_mode == 'Enabled' else 'Enable UserTDs', f"userset {user_id} td_mode", "header")
+            buttons.callback('Disable UserTDs' if tds_mode == 'Enabled' else 'Enable UserTDs', f"userset {user_id} td_mode", "header")
             text += f"<b>User TD Mode:</b> {tds_mode}\n"
         else: 
             return
         text += f"<b>Description :</b> {uset_display_dict[key][0]}"
         if edit_mode:
             text += '\n\n' + uset_display_dict[key][1]
-            buttons.ibutton("Stop", f"userset {user_id} {key}")
+            buttons.callback("Stop", f"userset {user_id} {key}")
         elif key != 'user_tds' or set_exist == 'Not Exists':
-            buttons.ibutton("Change" if set_exist and set_exist != 'Not Exists' else "Set", f"userset {user_id} {key} edit")
+            buttons.callback("Change" if set_exist and set_exist != 'Not Exists' else "Set", f"userset {user_id} {key} edit")
         if set_exist and set_exist != 'Not Exists':
             if key == 'user_tds':
-                buttons.ibutton('Show', f"userset {user_id} show_tds", "header")
-            buttons.ibutton("Delete", f"userset {user_id} d{key}")
-        buttons.ibutton("Back", f"userset {user_id} back {edit_type}", "footer")
-        buttons.ibutton("Close", f"userset {user_id} close", "footer")
-        button = buttons.build_menu(2)
+                buttons.callback('Show', f"userset {user_id} show_tds", "header")
+            buttons.callback("Delete", f"userset {user_id} d{key}")
+        buttons.callback("Back", f"userset {user_id} back {edit_type}", "footer")
+        buttons.callback("Close", f"userset {user_id} close", "footer")
+        button = buttons.column(2)
     return text, button
 
 
@@ -315,7 +312,7 @@ async def edit_user_settings(client, query):
     elif data[2] == 'show_tds':
         handler_dict[user_id] = False
         user_tds = user_dict.get('user_tds', {})
-        msg = f'<b><u>User TD Details</u></b>\n\n'
+        msg = '<b><u>User TD Details</u></b>\n\n'
         for index_no, (drive_name, drive_dict) in enumerate(user_tds.items(), start=1):
             msg += f'{index_no}: <b>Name:</b> <code>{drive_name}</code>\n'
             msg += f"  <b>Drive ID:</b> <code>{drive_dict['drive_id']}</code>\n"
@@ -323,7 +320,7 @@ async def edit_user_settings(client, query):
         try:
             await sendCustomMsg(user_id, msg)
             await query.answer('User TDs Successfully Send in your PM', show_alert=True)
-        except:
+        except Exception:
             await query.answer('Start the Bot in PM (Private) and Try Again', show_alert=True)
         await update_user_settings(query, 'user_tds', 'mirror')
     elif data[2] == "dthumb":
@@ -342,7 +339,8 @@ async def edit_user_settings(client, query):
         await query.answer()
         edit_mode = len(data) == 4
         await update_user_settings(query, data[2], 'leech', edit_mode)
-        if not edit_mode: return
+        if not edit_mode:
+            return
         pfunc = partial(set_thumb, pre_event=query, key=data[2])
         rfunc = partial(update_user_settings, query, data[2], 'leech')
         await event_handler(client, query, pfunc, rfunc, True)
@@ -350,7 +348,8 @@ async def edit_user_settings(client, query):
         await query.answer()
         edit_mode = len(data) == 4
         await update_user_settings(query, data[2], 'universal', edit_mode)
-        if not edit_mode: return
+        if not edit_mode:
+            return
         pfunc = partial(set_yt_options, pre_event=query)
         rfunc = partial(update_user_settings, query, data[2], 'universal')
         await event_handler(client, query, pfunc, rfunc)
@@ -390,7 +389,8 @@ async def edit_user_settings(client, query):
         await query.answer()
         edit_mode = len(data) == 4
         await update_user_settings(query, data[2], 'mirror', edit_mode)
-        if not edit_mode: return
+        if not edit_mode:
+            return
         pfunc = partial(add_rclone, pre_event=query)
         rfunc = partial(update_user_settings, query, data[2], 'mirror')
         await event_handler(client, query, pfunc, rfunc, document=True)
@@ -411,7 +411,8 @@ async def edit_user_settings(client, query):
         await query.answer()
         edit_mode = len(data) == 4
         await update_user_settings(query, data[2], 'mirror', edit_mode)
-        if not edit_mode: return
+        if not edit_mode:
+            return
         pfunc = partial(set_custom, pre_event=query, key=data[2])
         rfunc = partial(update_user_settings, query, data[2], 'mirror')
         await event_handler(client, query, pfunc, rfunc)
@@ -420,7 +421,8 @@ async def edit_user_settings(client, query):
         await query.answer()
         edit_mode = len(data) == 4
         await update_user_settings(query, data[2], 'universal', edit_mode)
-        if not edit_mode: return
+        if not edit_mode:
+            return
         pfunc = partial(set_custom, pre_event=query, key=data[2])
         rfunc = partial(update_user_settings, query, data[2], 'universal')
         await event_handler(client, query, pfunc, rfunc)
@@ -429,7 +431,8 @@ async def edit_user_settings(client, query):
         await query.answer()
         edit_mode = len(data) == 4
         await update_user_settings(query, data[2], 'leech', edit_mode)
-        if not edit_mode: return
+        if not edit_mode:
+            return
         pfunc = partial(set_custom, pre_event=query, key=data[2])
         rfunc = partial(update_user_settings, query, data[2], 'leech')
         await event_handler(client, query, pfunc, rfunc)
@@ -465,10 +468,10 @@ async def edit_user_settings(client, query):
         handler_dict[user_id] = False
         await query.answer()
         buttons = ButtonMaker()
-        buttons.ibutton('Yes', f"userset {user_id} reset_now y")
-        buttons.ibutton('No', f"userset {user_id} reset_now n")
-        buttons.ibutton("Close", f"userset {user_id} close", "footer")
-        await editMessage(message, 'Do you want to Reset Settings ?', buttons.build_menu(2))
+        buttons.callback('Yes', f"userset {user_id} reset_now y")
+        buttons.callback('No', f"userset {user_id} reset_now n")
+        buttons.callback("Close", f"userset {user_id} close", "footer")
+        await editMessage(message, 'Do you want to Reset Settings ?', buttons.column(2))
     elif data[2] == 'reset_now':
         handler_dict[user_id] = False
         if data[3] == 'n':
@@ -521,8 +524,8 @@ async def send_users_settings(client, message):
     if not userid:
         msg = f'<u><b>Total Users / Chats Data Saved :</b> {len(user_data)}</u>'
         buttons = ButtonMaker()
-        buttons.ibutton("Close", f"userset {message.from_user.id} close")
-        button = buttons.build_menu(1)
+        buttons.callback("Close", f"userset {message.from_user.id} close")
+        button = buttons.column(1)
         for user, data in user_data.items():
             msg += f'\n\n<code>{user}</code>:'
             if data:
@@ -542,9 +545,9 @@ async def send_users_settings(client, message):
         msg = f'{await getUserInfo(client, userid)} ( <code>{userid}</code> ):'
         if data := user_data[int(userid)]:
             buttons = ButtonMaker()
-            buttons.ibutton("Delete", f"userset {message.from_user.id} user_del {userid}")
-            buttons.ibutton("Close", f"userset {message.from_user.id} close")
-            button = buttons.build_menu(1)
+            buttons.callback("Delete", f"userset {message.from_user.id} user_del {userid}")
+            buttons.callback("Close", f"userset {message.from_user.id} close")
+            button = buttons.column(1)
             for key, value in data.items():
                 if key in ['token', 'time']:
                     continue

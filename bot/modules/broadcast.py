@@ -4,7 +4,7 @@ from pyrogram.handlers import MessageHandler
 from pyrogram.filters import command
 from pyrogram.errors import FloodWait, UserIsBlocked, InputUserDeactivated
 
-from bot import bot, LOGGER, DATABASE_URL
+from bot import bot, DATABASE_URL
 from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.telegram_helper.message_utils import sendMessage, editMessage
 from bot.helper.telegram_helper.filters import CustomFilters
@@ -52,7 +52,7 @@ async def broadcast(_, message):
     await editMessage(broadcast_message, status)
 
 def generate_status(total, successful, blocked, unsuccessful, elapsed_time=""):
-    status = f'<b>Broadcast Stats :</b>\n\n'
+    status = '<b>Broadcast Stats :</b>\n\n'
     status += f'<b>• Total users:</b> {total}\n'
     status += f'<b>• Success:</b> {successful}\n'
     status += f'<b>• Blocked or deleted:</b> {blocked}\n'

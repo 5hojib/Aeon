@@ -62,7 +62,7 @@ class TelegramDownloadHelper:
         async with global_lock:
             try:
                 GLOBAL_GID.remove(self.__id)
-            except:
+            except Exception:
                 pass
         await self.__listener.onDownloadError(error)
 
@@ -114,7 +114,7 @@ class TelegramDownloadHelper:
                     await delete_links(self.__listener.message)
                     return
                 if limit_exceeded := await limit_checker(size, self.__listener):
-                    await listener.onDownloadError(limit_exceeded)
+                    await self.__listener.onDownloadError(limit_exceeded)
                     await delete_links(self.__listener.message)
                     return
                 added_to_queue, event = await is_queued(self.__listener.uid)

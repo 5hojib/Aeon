@@ -1,4 +1,3 @@
-from random import choice
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from pyrogram.filters import command, regex, create
 from pyrogram.enums import ChatType
@@ -13,7 +12,7 @@ from time import time
 from io import BytesIO
 from aioshutil import rmtree as aiormtree
 
-from bot import config_dict, user_data, DATABASE_URL, MAX_SPLIT_SIZE, list_drives_dict, aria2, GLOBAL_EXTENSION_FILTER, status_reply_dict_lock, Interval, aria2_options, aria2c_global, IS_PREMIUM_USER, download_dict, qbit_options, LOGGER, bot, extra_buttons, shorteners_list
+from bot import config_dict, DATABASE_URL, list_drives_dict, aria2, GLOBAL_EXTENSION_FILTER, status_reply_dict_lock, Interval, aria2_options, download_dict, LOGGER, bot, extra_buttons, shorteners_list
 from bot.helper.telegram_helper.message_utils import sendMessage, sendFile, editMessage, update_all_messages
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
@@ -368,21 +367,21 @@ async def load_config():
 async def get_buttons(key=None, edit_type=None, edit_mode=None, mess=None):
     buttons = ButtonMaker()
     if key is None:
-        buttons.ibutton('Config Variables', "botset var")
-        buttons.ibutton('Private Files', "botset private")
-        buttons.ibutton('Close', "botset close")
+        buttons.callback('Config Variables', "botset var")
+        buttons.callback('Private Files', "botset private")
+        buttons.callback('Close', "botset close")
         msg = 'Bot Settings:'
     elif key == 'var':
         for k in list(OrderedDict(sorted(config_dict.items())).keys())[START:10+START]:
-            buttons.ibutton(k, f"botset editvar {k}")
-        buttons.ibutton('Back', "botset back")
-        buttons.ibutton('Close', "botset close")
+            buttons.callback(k, f"botset editvar {k}")
+        buttons.callback('Back', "botset back")
+        buttons.callback('Close', "botset close")
         for x in range(0, len(config_dict)-1, 10):
-            buttons.ibutton(f'{int(x/10)+1}', f"botset start var {x}", position='footer')
+            buttons.callback(f'{int(x/10)+1}', f"botset start var {x}", position='footer')
         msg = f'<b>Config Variables<b> | Page: {int(START/10)+1}'
     elif key == 'private':
-        buttons.ibutton('Back', "botset back")
-        buttons.ibutton('Close', "botset close")
+        buttons.callback('Back', "botset back")
+        buttons.callback('Close', "botset close")
         msg = "Send private files: config.env, token.pickle, cookies.txt, accounts.zip, terabox.txt, .netrc, or any other files!\n\nTo delete a private file, send only the file name as a text message.\n\n<b>Please note:</b> Changes to .netrc will not take effect for aria2c until it's restarted.\n\n<b>Timeout:</b> 60 seconds"
     elif edit_type == 'editvar':
         msg = f'<b>Variable:</b> <code>{key}</code>\n\n'
@@ -390,16 +389,16 @@ async def get_buttons(key=None, edit_type=None, edit_mode=None, mess=None):
         if mess.chat.type == ChatType.PRIVATE:
             msg += f'<b>Value:</b> <code>{config_dict.get(key, "None")}</code>\n\n'
         elif key not in bool_vars:
-            buttons.ibutton('View value', f"botset showvar {key}", position="header")
-        buttons.ibutton('Back', "botset back var", position="footer")
+            buttons.callback('View value', f"botset showvar {key}", position="header")
+        buttons.callback('Back', "botset back var", position="footer")
         if key not in bool_vars:
             if not edit_mode:
-                buttons.ibutton('Edit Value', f"botset editvar {key} edit")
+                buttons.callback('Edit Value', f"botset editvar {key} edit")
             else:
-                buttons.ibutton('Stop Edit', f"botset editvar {key}")
+                buttons.callback('Stop Edit', f"botset editvar {key}")
         if key not in ['TELEGRAM_HASH', 'TELEGRAM_API', 'OWNER_ID', 'BOT_TOKEN'] and key not in bool_vars:
-            buttons.ibutton('Reset', f"botset resetvar {key}")
-        buttons.ibutton('Close', "botset close", position="footer")
+            buttons.callback('Reset', f"botset resetvar {key}")
+        buttons.callback('Close', "botset close", position="footer")
         if edit_mode and key in ['CMD_SUFFIX',
                                  'OWNER_ID',
                                  'USER_SESSION_STRING', 'TELEGRAM_HASH',
@@ -410,11 +409,11 @@ async def get_buttons(key=None, edit_type=None, edit_mode=None, mess=None):
         if edit_mode and key not in bool_vars:
             msg += 'Send a valid value for the above Var. <b>Timeout:</b> 60 sec'
         if key in bool_vars:
-            if not (value := config_dict.get(key)):
-            	  buttons.ibutton('Make it True', f"botset boolvar {key} on")
+            if not config_dict.get(key):
+            	  buttons.callback('Make it True', f"botset boolvar {key} on")
             else:
-            	  buttons.ibutton('Make it False', f"botset boolvar {key} off")
-    button = buttons.build_menu(1) if key is None else buttons.build_menu(2)
+            	  buttons.callback('Make it False', f"botset boolvar {key} off")
+    button = buttons.column(1) if key is None else buttons.column(2)
     return msg, button
 
 

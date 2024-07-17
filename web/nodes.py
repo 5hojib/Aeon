@@ -1,6 +1,5 @@
 from anytree import NodeMixin
 from re import findall as re_findall
-from os import environ
 
 class TorNode(NodeMixin):
     def __init__(self, name, is_folder=False, is_file=False, parent=None, size=None, priority=None, file_id=None, progress=None):

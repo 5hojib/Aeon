@@ -1,14 +1,11 @@
-from pyrogram.handlers import MessageHandler, CallbackQueryHandler
-from pyrogram.filters import command, regex
-from html import escape
+from pyrogram.handlers import MessageHandler
+from pyrogram.filters import command
 from base64 import b64encode
 from re import match as re_match
 from asyncio import sleep
-from aiofiles import open as aiopen
 from aiofiles.os import path as aiopath
-from cloudscraper import create_scraper
 
-from bot import bot, LOGGER, config_dict, bot_name, user_data
+from bot import bot, LOGGER, config_dict, user_data
 from bot.helper.ext_utils.bot_utils import is_url, is_magnet, is_mega_link, is_gdrive_link, get_content_type, new_task, sync_to_async, is_rclone_path, is_telegram_link, arg_parser, fetch_user_tds
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.task_manager import task_utils
@@ -23,7 +20,7 @@ from bot.helper.mirror_leech_utils.download_utils.direct_link_generator import d
 from bot.helper.mirror_leech_utils.download_utils.telegram_download import TelegramDownloadHelper
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, get_tg_link_content, delete_links, deleteMessage, one_minute_del, five_minute_del, isAdmin
+from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, get_tg_link_content, delete_links, deleteMessage, one_minute_del, five_minute_del
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
 from bot.helper.ext_utils.help_strings import MIRROR_HELP_MESSAGE
 from bot.helper.ext_utils.bulk_links import extract_bulk_links
@@ -34,7 +31,8 @@ from bot.helper.aeon_utils.nsfw_check import nsfw_precheck
 @new_task
 async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=None, bulk=[]):
     await send_react(message)
-    user_id      = message.from_user.id
+    user         = message.from_user or message.sender_chat
+    user_id      = user.id
     user_dict    = user_data.get(user_id, {})
     text         = message.text.split('\n')
     input_list   = text[0].split(' ')
@@ -133,7 +131,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
             bulk = await extract_bulk_links(message, bulk_start, bulk_end)
             if len(bulk) == 0:
                 raise ValueError('Bulk Empty!')
-        except:
+        except Exception:
             await sendMessage(message, 'Reply to text file or tg message that have links seperated by new line!')
             return
         b_msg = input_list[:1]
@@ -178,7 +176,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         message.from_user = await client.get_users(id_)
         try:
             await message.unpin()
-        except:
+        except Exception:
             pass
     elif sender_chat := message.sender_chat:
         tag = sender_chat.title
@@ -232,7 +230,7 @@ async def _mirror_leech(client, message, isQbit=False, isLeech=False, sameDir=No
         for __i, __msg in enumerate(error_msg, 1):
             final_msg += f'\n<blockquote><b>{__i}</b>: {__msg}</blockquote>'
         if error_button is not None:
-            error_button = error_button.build_menu(2)
+            error_button = error_button.column(2)
         await delete_links(message)
         force_m = await sendMessage(message, final_msg, error_button)
         await five_minute_del(force_m)

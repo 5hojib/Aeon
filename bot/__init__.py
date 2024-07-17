@@ -12,7 +12,7 @@ from aria2p import API as ariaAPI, Client as ariaClient
 from qbittorrentapi import Client as qbClient
 from faulthandler import enable as faulthandler_enable
 from socket import setdefaulttimeout
-from logging import getLogger, FileHandler, StreamHandler, INFO, basicConfig, error, info, warning, Formatter, ERROR
+from logging import getLogger, FileHandler, StreamHandler, INFO, basicConfig, error, warning, Formatter, ERROR
 from uvloop import install
 
 faulthandler_enable()

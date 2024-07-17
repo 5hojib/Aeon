@@ -1,7 +1,6 @@
-from asyncio import sleep
 from secrets import token_hex
 
-from bot import config_dict, LOGGER, aria2_options, aria2c_global, download_dict, download_dict_lock, non_queued_dl, queue_dict_lock
+from bot import LOGGER, aria2_options, aria2c_global, download_dict, download_dict_lock, non_queued_dl, queue_dict_lock
 from bot.helper.ext_utils.bot_utils import sync_to_async
 from bot.helper.ext_utils.task_manager import is_queued, stop_duplicate_check, limit_checker
 from bot.helper.listeners.direct_listener import DirectListener

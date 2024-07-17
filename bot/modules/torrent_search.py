@@ -97,8 +97,8 @@ async def __search(key, site, message, method):
         await sync_to_async(xnox_client.search_delete, search_id=search_id)
     link = await __getResult(search_results, key, message, method)
     buttons = ButtonMaker()
-    buttons.ubutton("View", link)
-    button = buttons.build_menu(1)
+    buttons.url("View", link)
+    button = buttons.column(1)
     await editMessage(message, msg, button)
 
 
@@ -131,7 +131,7 @@ async def __getResult(search_results, key, message, method):
                     msg += f"<b>Size: </b>{result['size']}<br>"
                     try:
                         msg += f"<b>Seeders: </b>{result['seeders']} | <b>Leechers: </b>{result['leechers']}<br>"
-                    except:
+                    except Exception:
                         pass
                     if 'torrent' in result.keys():
                         msg += f"<a href='{result['torrent']}'>Direct Link</a><br><br>"
@@ -140,7 +140,7 @@ async def __getResult(search_results, key, message, method):
                         msg += f"<a href='http://t.me/share/url?url={quote(result['magnet'])}'>Telegram</a><br><br>"
                     else:
                         msg += '<br>'
-            except:
+            except Exception:
                 continue
         else:
             msg += f"<a href='{result.descrLink}'>{escape(result.fileName)}</a><br>"
@@ -173,18 +173,18 @@ async def __getResult(search_results, key, message, method):
 def __api_buttons(user_id, method):
     buttons = ButtonMaker()
     for data, name in SITES.items():
-        buttons.ibutton(name, f"torser {user_id} {data} {method}")
-    buttons.ibutton("Cancel", f"torser {user_id} cancel")
-    return buttons.build_menu(2)
+        buttons.callback(name, f"torser {user_id} {data} {method}")
+    buttons.callback("Cancel", f"torser {user_id} cancel")
+    return buttons.column(2)
 
 
 async def __plugin_buttons(user_id):
     buttons = ButtonMaker()
     for siteName in PLUGINS:
-        buttons.ibutton(siteName.capitalize(), f"torser {user_id} {siteName} plugin")
-    buttons.ibutton('All', f"torser {user_id} all plugin")
-    buttons.ibutton("Cancel", f"torser {user_id} cancel")
-    return buttons.build_menu(2)
+        buttons.callback(siteName.capitalize(), f"torser {user_id} {siteName} plugin")
+    buttons.callback('All', f"torser {user_id} all plugin")
+    buttons.callback("Cancel", f"torser {user_id} cancel")
+    return buttons.column(2)
 
 @new_thread
 async def torrentSearch(_, message):
@@ -195,7 +195,7 @@ async def torrentSearch(_, message):
         if message.chat.type != message.chat.type.PRIVATE:
             msg, buttons = await checking_access(user_id, buttons)
             if msg is not None:
-                reply_message = await sendMessage(message, msg, buttons.build_menu(1))
+                reply_message = await sendMessage(message, msg, buttons.column(1))
                 await delete_links(message)
                 await five_minute_del(reply_message)
                 return
@@ -205,16 +205,16 @@ async def torrentSearch(_, message):
         await delete_links(message)
         return
     elif len(key) == 1:
-        buttons.ibutton('Trending', f"torser {user_id} apitrend")
-        buttons.ibutton('Recent', f"torser {user_id} apirecent")
-        buttons.ibutton("Cancel", f"torser {user_id} cancel")
-        button = buttons.build_menu(2)
+        buttons.callback('Trending', f"torser {user_id} apitrend")
+        buttons.callback('Recent', f"torser {user_id} apirecent")
+        buttons.callback("Cancel", f"torser {user_id} cancel")
+        button = buttons.column(2)
         reply_message = await sendMessage(message, "Send a search key along with command", button)
     elif SITES is not None:
-        buttons.ibutton('Api', f"torser {user_id} apisearch")
-        buttons.ibutton('Plugins', f"torser {user_id} plugin")
-        buttons.ibutton("Cancel", f"torser {user_id} cancel")
-        button = buttons.build_menu(2)
+        buttons.callback('Api', f"torser {user_id} apisearch")
+        buttons.callback('Plugins', f"torser {user_id} plugin")
+        buttons.callback("Cancel", f"torser {user_id} cancel")
+        button = buttons.column(2)
         reply_message = await sendMessage(message, 'Choose tool to search:', button)
     else:
         button = await __plugin_buttons(user_id)

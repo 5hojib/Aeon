@@ -1,5 +1,5 @@
 from asyncio import sleep as asleep
-from aiofiles.os import path as aiopath, remove as aioremove, mkdir
+from aiofiles.os import remove as aioremove
 from telegraph import upload_file
 
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
@@ -61,13 +61,13 @@ async def pictures(_, message):
         to_edit = await sendMessage(message, "Generating a grid of your images...")
         buttons = ButtonMaker()
         user_id = message.from_user.id
-        buttons.ibutton("<<", f"images {user_id} turn -1")
-        buttons.ibutton(">>", f"images {user_id} turn 1")
-        buttons.ibutton("Remove image", f"images {user_id} remove 0")
-        buttons.ibutton("Close", f"images {user_id} close")
-        buttons.ibutton("Remove all", f"images {user_id} removeall", 'footer')
+        buttons.callback("<<", f"images {user_id} turn -1")
+        buttons.callback(">>", f"images {user_id} turn 1")
+        buttons.callback("Remove image", f"images {user_id} remove 0")
+        buttons.callback("Close", f"images {user_id} close")
+        buttons.callback("Remove all", f"images {user_id} removeall", 'footer')
         await deleteMessage(to_edit)
-        await sendMessage(message, f'<b>Image No. : 1 / {len(IMAGES)}</b>', buttons.build_menu(2), IMAGES[0])
+        await sendMessage(message, f'<b>Image No. : 1 / {len(IMAGES)}</b>', buttons.column(2), IMAGES[0])
 
 @new_task
 async def pics_callback(_, query):
@@ -85,12 +85,12 @@ async def pics_callback(_, query):
         no = len(IMAGES) - abs(ind+1) if ind < 0 else ind + 1
         pic_info = f'<b>Image No. : {no} / {len(IMAGES)}</b>'
         buttons = ButtonMaker()
-        buttons.ibutton("<<", f"images {data[1]} turn {ind-1}")
-        buttons.ibutton(">>", f"images {data[1]} turn {ind+1}")
-        buttons.ibutton("Remove Image", f"images {data[1]} remove {ind}")
-        buttons.ibutton("Close", f"images {data[1]} close")
-        buttons.ibutton("Remove all", f"images {data[1]} removeall", 'footer')
-        await editMessage(message, pic_info, buttons.build_menu(2), IMAGES[ind])
+        buttons.callback("<<", f"images {data[1]} turn {ind-1}")
+        buttons.callback(">>", f"images {data[1]} turn {ind+1}")
+        buttons.callback("Remove Image", f"images {data[1]} remove {ind}")
+        buttons.callback("Close", f"images {data[1]} close")
+        buttons.callback("Remove all", f"images {data[1]} removeall", 'footer')
+        await editMessage(message, pic_info, buttons.column(2), IMAGES[ind])
 
     elif data[2] == "remove":
         IMAGES.pop(int(data[3]))
@@ -107,12 +107,12 @@ async def pics_callback(_, query):
         ind = len(IMAGES) - abs(ind) if ind < 0 else ind
         pic_info = f'<b>Image No. : {ind+1} / {len(IMAGES)}</b>'
         buttons = ButtonMaker()
-        buttons.ibutton("<<", f"images {data[1]} turn {ind-1}")
-        buttons.ibutton(">>", f"images {data[1]} turn {ind+1}")
-        buttons.ibutton("Remove image", f"images {data[1]} remove {ind}")
-        buttons.ibutton("Close", f"images {data[1]} close")
-        buttons.ibutton("Remove all", f"images {data[1]} removeall", 'footer')
-        await editMessage(message, pic_info, buttons.build_menu(2), IMAGES[ind])
+        buttons.callback("<<", f"images {data[1]} turn {ind-1}")
+        buttons.callback(">>", f"images {data[1]} turn {ind+1}")
+        buttons.callback("Remove image", f"images {data[1]} remove {ind}")
+        buttons.callback("Close", f"images {data[1]} close")
+        buttons.callback("Remove all", f"images {data[1]} removeall", 'footer')
+        await editMessage(message, pic_info, buttons.column(2), IMAGES[ind])
 
     elif data[2] == 'removeall':
         IMAGES.clear()
