@@ -1,3 +1,4 @@
+# ruff: noqa: F401
 import contextlib
 from asyncio import create_subprocess_exec, gather
 from html import escape
@@ -49,7 +50,7 @@ from .helper.telegram_helper.message_utils import (
     sendFile,
     sendMessage,
 )
-from .modules import (  # noqa: F401
+from .modules import (
     authorize,
     bot_settings,
     broadcast,
