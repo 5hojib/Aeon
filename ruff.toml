@@ -25,7 +25,7 @@ select = [
     "PL",   # pylint
     "ARG",  # flake8-unused-arguments
 ]
-ignore [
+ignore = [
     "PLR2004",
     "PLR0912",
     "E501",
