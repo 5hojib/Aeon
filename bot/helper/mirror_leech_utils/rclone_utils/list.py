@@ -176,7 +176,7 @@ class RcloneList:
         if self.path:
             buttons.callback('Back To Root', 'rcq root', position='footer')
         buttons.callback('Cancel', 'rcq cancel', position='footer')
-        button = buttons.column(f_cols=2)
+        button = buttons.column(2)
         msg = 'Choose Path:' + ('\nTransfer Type: Download' if self.list_status ==
                                 'rcd' else '\nTransfer Type: Upload')
         if self.list_status == 'rcu':
