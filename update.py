@@ -1,16 +1,16 @@
 import sys
+from os import path, environ
 from logging import (
-    ERROR,
     INFO,
-    FileHandler,
+    ERROR,
     Formatter,
+    FileHandler,
     StreamHandler,
-    basicConfig,
+    info,
     error,
     getLogger,
-    info,
+    basicConfig,
 )
-from os import environ, path
 from subprocess import run
 
 from dotenv import load_dotenv

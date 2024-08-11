@@ -5,26 +5,26 @@ from bot import (
     aria2_options,
     aria2c_global,
     download_dict,
-    download_dict_lock,
     non_queued_dl,
     queue_dict_lock,
+    download_dict_lock,
 )
-from bot.helper.aeon_utils.nsfw_check import isNSFWdata
 from bot.helper.ext_utils.bot_utils import sync_to_async
+from bot.helper.aeon_utils.nsfw_check import isNSFWdata
 from bot.helper.ext_utils.task_manager import (
     is_queued,
     limit_checker,
     stop_duplicate_check,
 )
 from bot.helper.listeners.direct_listener import DirectListener
-from bot.helper.mirror_leech_utils.status_utils.direct_status import DirectStatus
-from bot.helper.mirror_leech_utils.status_utils.queue_status import QueueStatus
 from bot.helper.telegram_helper.message_utils import (
+    sendMessage,
     delete_links,
     one_minute_del,
-    sendMessage,
     sendStatusMessage,
 )
+from bot.helper.mirror_leech_utils.status_utils.queue_status import QueueStatus
+from bot.helper.mirror_leech_utils.status_utils.direct_status import DirectStatus
 
 
 async def add_direct_download(details, path, listener, foldername):

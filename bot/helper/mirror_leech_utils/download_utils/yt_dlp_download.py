@@ -1,24 +1,24 @@
 import contextlib
-from logging import getLogger
-from os import listdir
 from os import path as ospath
+from os import listdir
 from re import search as re_search
+from logging import getLogger
 from secrets import token_hex
 
-from yt_dlp import DownloadError, YoutubeDL
+from yt_dlp import YoutubeDL, DownloadError
 
-from bot import download_dict, download_dict_lock, non_queued_dl, queue_dict_lock
+from bot import download_dict, non_queued_dl, queue_dict_lock, download_dict_lock
 from bot.helper.ext_utils.bot_utils import async_to_sync, sync_to_async
 from bot.helper.ext_utils.task_manager import (
     is_queued,
     limit_checker,
     stop_duplicate_check,
 )
+from bot.helper.telegram_helper.message_utils import sendStatusMessage
 from bot.helper.mirror_leech_utils.status_utils.queue_status import QueueStatus
 from bot.helper.mirror_leech_utils.status_utils.ytdlp_status import (
     YtDlpDownloadStatus,
 )
-from bot.helper.telegram_helper.message_utils import sendStatusMessage
 
 LOGGER = getLogger(__name__)
 
@@ -28,14 +28,14 @@ class MyLogger:
         self.obj = obj
 
     def debug(self, msg):
-        if not self.obj.is_playlist:
-            if match := re_search(
-                r".Merger..Merging formats into..(.*?).$", msg
-            ) or re_search(r".ExtractAudio..Destination..(.*?)$", msg):
-                LOGGER.info(msg)
-                newname = match.group(1)
-                newname = newname.rsplit("/", 1)[-1]
-                self.obj.name = newname
+        if not self.obj.is_playlist and (
+            match := re_search(r".Merger..Merging formats into..(.*?).$", msg)
+            or re_search(r".ExtractAudio..Destination..(.*?)$", msg)
+        ):
+            LOGGER.info(msg)
+            newname = match.group(1)
+            newname = newname.rsplit("/", 1)[-1]
+            self.obj.name = newname
 
     @staticmethod
     def warning(msg):

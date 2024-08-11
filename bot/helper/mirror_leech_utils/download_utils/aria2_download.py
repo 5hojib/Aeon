@@ -4,18 +4,18 @@ from aiofiles.os import remove as aioremove
 from bot import (
     LOGGER,
     aria2,
+    config_dict,
     aria2_options,
     aria2c_global,
-    config_dict,
     download_dict,
-    download_dict_lock,
     non_queued_dl,
     queue_dict_lock,
+    download_dict_lock,
 )
-from bot.helper.ext_utils.bot_utils import bt_selection_buttons, sync_to_async
+from bot.helper.ext_utils.bot_utils import sync_to_async, bt_selection_buttons
 from bot.helper.ext_utils.task_manager import is_queued
-from bot.helper.mirror_leech_utils.status_utils.aria2_status import Aria2Status
 from bot.helper.telegram_helper.message_utils import sendMessage, sendStatusMessage
+from bot.helper.mirror_leech_utils.status_utils.aria2_status import Aria2Status
 
 
 async def add_aria2c_download(

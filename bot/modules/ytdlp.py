@@ -1,48 +1,48 @@
 import contextlib
+from time import time
 from asyncio import Event, sleep, wait_for, wrap_future
 from functools import partial
-from time import time
 
-from aiofiles.os import path as aiopath
-from aiohttp import ClientSession
-from pyrogram.filters import command, regex, user
-from pyrogram.handlers import CallbackQueryHandler, MessageHandler
 from yt_dlp import YoutubeDL
+from aiohttp import ClientSession
+from aiofiles.os import path as aiopath
+from pyrogram.filters import user, regex, command
+from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 
-from bot import LOGGER, bot, config_dict, user_data
-from bot.helper.aeon_utils.nsfw_check import nsfw_precheck
-from bot.helper.aeon_utils.send_react import send_react
+from bot import LOGGER, bot, user_data, config_dict
 from bot.helper.ext_utils.bot_utils import (
-    arg_parser,
-    fetch_user_tds,
-    get_readable_file_size,
-    get_readable_time,
-    is_gdrive_link,
-    is_rclone_path,
     is_url,
     new_task,
+    arg_parser,
     new_thread,
     sync_to_async,
+    fetch_user_tds,
+    is_gdrive_link,
+    is_rclone_path,
+    get_readable_time,
+    get_readable_file_size,
 )
 from bot.helper.ext_utils.bulk_links import extract_bulk_links
+from bot.helper.aeon_utils.nsfw_check import nsfw_precheck
+from bot.helper.aeon_utils.send_react import send_react
 from bot.helper.ext_utils.help_strings import YT_HELP_MESSAGE
 from bot.helper.ext_utils.task_manager import task_utils
+from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
-from bot.helper.mirror_leech_utils.download_utils.yt_dlp_download import (
-    YoutubeDLHelper,
+from bot.helper.telegram_helper.bot_commands import BotCommands
+from bot.helper.telegram_helper.button_build import ButtonMaker
+from bot.helper.telegram_helper.message_utils import (
+    editMessage,
+    sendMessage,
+    delete_links,
+    deleteMessage,
+    one_minute_del,
+    five_minute_del,
 )
 from bot.helper.mirror_leech_utils.rclone_utils.list import RcloneList
 from bot.helper.mirror_leech_utils.upload_utils.gdriveTools import GoogleDriveHelper
-from bot.helper.telegram_helper.bot_commands import BotCommands
-from bot.helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import (
-    delete_links,
-    deleteMessage,
-    editMessage,
-    five_minute_del,
-    one_minute_del,
-    sendMessage,
+from bot.helper.mirror_leech_utils.download_utils.yt_dlp_download import (
+    YoutubeDLHelper,
 )
 
 
@@ -267,16 +267,18 @@ def extract_info(link, options):
 
 async def _mdisk(link, name):
     key = link.split("/")[-1]
-    async with ClientSession() as session:
-        async with session.get(
+    async with (
+        ClientSession() as session,
+        session.get(
             f"https://diskuploader.entertainvideo.com/v1/file/cdnurl?param={key}"
-        ) as resp:
-            if resp.status == 200:
-                resp_json = await resp.json()
-                link = resp_json["source"]
-                if not name:
-                    name = resp_json["filename"]
-            return name, link
+        ) as resp,
+    ):
+        if resp.status == 200:
+            resp_json = await resp.json()
+            link = resp_json["source"]
+            if not name:
+                name = resp_json["filename"]
+        return name, link
 
 
 @new_task

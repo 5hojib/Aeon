@@ -4,8 +4,8 @@ from bot import LOGGER
 from bot.helper.ext_utils.bot_utils import (
     MirrorStatus,
     async_to_sync,
-    get_readable_file_size,
     get_readable_time,
+    get_readable_file_size,
 )
 from bot.helper.ext_utils.files_utils import get_path_size
 

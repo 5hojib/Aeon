@@ -3,8 +3,8 @@ from time import time
 from bot import LOGGER, aria2
 from bot.helper.ext_utils.bot_utils import (
     MirrorStatus,
-    get_readable_time,
     sync_to_async,
+    get_readable_time,
 )
 
 

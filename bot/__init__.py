@@ -1,36 +1,36 @@
 import sys
-from asyncio import Lock
-from faulthandler import enable as faulthandler_enable
-from logging import (
-    ERROR,
-    INFO,
-    FileHandler,
-    Formatter,
-    StreamHandler,
-    basicConfig,
-    error,
-    getLogger,
-    warning,
-)
-from os import environ
 from os import path as ospath
 from os import remove as osremove
+from os import environ
+from time import time, sleep
 from socket import setdefaulttimeout
+from asyncio import Lock
+from logging import (
+    INFO,
+    ERROR,
+    Formatter,
+    FileHandler,
+    StreamHandler,
+    error,
+    warning,
+    getLogger,
+    basicConfig,
+)
+from threading import Thread
 from subprocess import Popen, check_output
 from subprocess import run as srun
-from threading import Thread
-from time import sleep, time
+from faulthandler import enable as faulthandler_enable
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aria2p import API as ariaAPI
 from aria2p import Client as ariaClient
-from dotenv import dotenv_values, load_dotenv
+from dotenv import load_dotenv, dotenv_values
+from uvloop import install
 from pymongo import MongoClient
+from tzlocal import get_localzone
 from pyrogram import Client as tgClient
 from pyrogram import enums
 from qbittorrentapi import Client as qbClient
-from tzlocal import get_localzone
-from uvloop import install
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 faulthandler_enable()
 install()

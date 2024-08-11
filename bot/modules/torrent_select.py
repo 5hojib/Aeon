@@ -5,8 +5,8 @@ from aiofiles.os import remove as aioremove
 from pyrogram.filters import regex
 from pyrogram.handlers import CallbackQueryHandler
 
-from bot import LOGGER, aria2, bot, xnox_client
-from bot.helper.ext_utils.bot_utils import getDownloadByGid, sync_to_async
+from bot import LOGGER, bot, aria2, xnox_client
+from bot.helper.ext_utils.bot_utils import sync_to_async, getDownloadByGid
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import sendStatusMessage
 

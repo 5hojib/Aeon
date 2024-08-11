@@ -1,9 +1,9 @@
-from logging import INFO, FileHandler, StreamHandler, basicConfig, getLogger
 from time import sleep
+from logging import INFO, FileHandler, StreamHandler, getLogger, basicConfig
 
+from flask import Flask, request
 from aria2p import API as ariaAPI
 from aria2p import Client as ariaClient
-from flask import Flask, request
 from qbittorrentapi import Client as qbClient
 from qbittorrentapi import NotFound404Error
 
