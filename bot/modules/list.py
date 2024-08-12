@@ -60,12 +60,12 @@ async def select_type(_, query):
     data = query.data.split()
     if user_id != int(data[1]):
         return await query.answer(text="Not Yours!", show_alert=True)
-    elif data[2] == "rec":
+    if data[2] == "rec":
         await query.answer()
         isRecursive = not bool(eval(data[3]))
         buttons = await list_buttons(user_id, isRecursive)
         return await editMessage(message, "Choose list options:", buttons)
-    elif data[2] == "cancel":
+    if data[2] == "cancel":
         await query.answer()
         return await editMessage(message, "List has been canceled!")
     await query.answer()

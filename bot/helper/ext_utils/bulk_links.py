@@ -47,6 +47,6 @@ async def extract_bulk_links(message, bulk_start, bulk_end):
         return await get_links_from_file(
             message.reply_to_message, bulk_start, bulk_end
         )
-    elif text := message.reply_to_message.text:
+    if text := message.reply_to_message.text:
         return await get_links_from_message(text, bulk_start, bulk_end)
     return []

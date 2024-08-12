@@ -45,8 +45,7 @@ async def __onDownloadStarted(api, gid):
                         break
                     download = download.live
         return
-    else:
-        LOGGER.info(f"onDownloadStarted: {download.name} - Gid: {gid}")
+    LOGGER.info(f"Download Started: {download.name} - Gid: {gid}")
     dl = None
     if config_dict["STOP_DUPLICATE"]:
         await sleep(1)

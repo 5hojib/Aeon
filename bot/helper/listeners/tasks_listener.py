@@ -260,7 +260,7 @@ class MirrorLeechListener:
                                 code = await self.suproc.wait()
                                 if code == -9:
                                     return
-                                elif code != 0:
+                                if code != 0:
                                     LOGGER.error("Unable to extract archive splits!")
                         if (
                             not self.seed
@@ -295,7 +295,7 @@ class MirrorLeechListener:
                     code = await self.suproc.wait()
                     if code == -9:
                         return
-                    elif code == 0:
+                    if code == 0:
                         LOGGER.info(f"Extracted Path: {up_path}")
                         if not self.seed:
                             try:
@@ -351,7 +351,7 @@ class MirrorLeechListener:
             code = await self.suproc.wait()
             if code == -9:
                 return
-            elif not self.seed:
+            if not self.seed:
                 await clean_target(dl_path)
 
         if not self.compress and not self.extract:

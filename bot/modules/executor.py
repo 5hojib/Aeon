@@ -46,7 +46,7 @@ async def send_response(msg, message):
 
 
 @new_task
-async def evaluate(client, message):
+async def evaluate(_, message):
     content = message.text.split(maxsplit=1)
     if len(content) == 1:
         await send_response("No command to execute.", message)
@@ -55,7 +55,7 @@ async def evaluate(client, message):
 
 
 @new_task
-async def execute(client, message):
+async def execute(_, message):
     content = message.text.split(maxsplit=1)
     if len(content) == 1:
         await send_response("No command to execute.", message)

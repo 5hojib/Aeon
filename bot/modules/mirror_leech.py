@@ -344,10 +344,10 @@ async def _mirror_leech(
         if up == "gd" and not config_dict["GDRIVE_ID"] and not drive_id:
             await sendMessage(message, "GDRIVE_ID not Provided!")
             return None
-        elif not up:
+        if not up:
             await sendMessage(message, "No Rclone Destination!")
             return None
-        elif up not in ["rcl", "gd"]:
+        if up not in ["rcl", "gd"]:
             if up.startswith("mrcc:"):
                 config_path = f"tanha/{message.from_user.id}.conf"
             else:

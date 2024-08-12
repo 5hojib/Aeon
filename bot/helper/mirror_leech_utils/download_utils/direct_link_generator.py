@@ -283,8 +283,7 @@ def pixeldrain(url):
             raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     if resp["success"]:
         return dl_link
-    else:
-        raise DirectDownloadLinkException(
+    raise DirectDownloadLinkException(
             f"ERROR: Cant't download due {resp['message']}."
         )
 
@@ -314,8 +313,7 @@ def racaty(url):
             raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     if direct_link := html.xpath("//a[@id='uniqueExpirylink']/@href"):
         return direct_link[0]
-    else:
-        raise DirectDownloadLinkException("ERROR: Direct link not found")
+    raise DirectDownloadLinkException("ERROR: Direct link not found")
 
 
 def fichier(link):
@@ -356,19 +354,17 @@ def fichier(link):
                 raise DirectDownloadLinkException(
                     f"ERROR: 1fichier is on a limit. Please wait {numbers[0]} minute."
                 )
-            else:
-                raise DirectDownloadLinkException(
+            raise DirectDownloadLinkException(
                     "ERROR: 1fichier is on a limit. Please wait a few minutes/hour."
                 )
-        elif "protect access" in str_2.lower():
+        if "protect access" in str_2.lower():
             raise DirectDownloadLinkException(
                 f"ERROR:\n{PASSWORD_ERROR_MESSAGE.format(link)}"
             )
-        else:
-            raise DirectDownloadLinkException(
+        raise DirectDownloadLinkException(
                 "ERROR: Failed to generate Direct Link from 1fichier!"
             )
-    elif len(ct_warn) == 4:
+    if len(ct_warn) == 4:
         str_1 = ct_warn[-2].text
         str_3 = ct_warn[-1].text
         if "you must wait" in str_1.lower():
@@ -376,11 +372,10 @@ def fichier(link):
                 raise DirectDownloadLinkException(
                     f"ERROR: 1fichier is on a limit. Please wait {numbers[0]} minute."
                 )
-            else:
-                raise DirectDownloadLinkException(
+            raise DirectDownloadLinkException(
                     "ERROR: 1fichier is on a limit. Please wait a few minutes/hour."
                 )
-        elif "bad password" in str_3.lower():
+        if "bad password" in str_3.lower():
             raise DirectDownloadLinkException(
                 "ERROR: The password you entered is wrong!"
             )
@@ -442,8 +437,7 @@ def uploadee(url):
             raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     if link := html.xpath("//a[@id='d_l']/@href"):
         return link[0]
-    else:
-        raise DirectDownloadLinkException("ERROR: Direct Link not found")
+    raise DirectDownloadLinkException("ERROR: Direct Link not found")
 
 
 def terabox(url):

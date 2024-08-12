@@ -30,7 +30,7 @@ def short_url(longurl, attempt=0):
                 headers=headers,
                 data=data,
             ).json()["shortenedUrl"]
-        elif "linkvertise" in _shortener:
+        if "linkvertise" in _shortener:
             url = quote(b64encode(longurl.encode("utf-8")))
             linkvertise = [
                 f"https://link-to.net/{_shortener_api}/{random() * 1000}/dynamic?r={url}",
@@ -39,7 +39,7 @@ def short_url(longurl, attempt=0):
                 f"https://file-link.net/{_shortener_api}/{random() * 1000}/dynamic?r={url}",
             ]
             return choice(linkvertise)
-        elif "bitly.com" in _shortener:
+        if "bitly.com" in _shortener:
             headers = {"Authorization": f"Bearer {_shortener_api}"}
             return cget(
                 "POST",
@@ -47,36 +47,35 @@ def short_url(longurl, attempt=0):
                 json={"long_url": longurl},
                 headers=headers,
             ).json()["link"]
-        elif "ouo.io" in _shortener:
+        if "ouo.io" in _shortener:
             return cget(
                 "GET",
                 f"http://ouo.io/api/{_shortener_api}?s={longurl}",
                 verify=False,
             ).text
-        elif "cutt.ly" in _shortener:
+        if "cutt.ly" in _shortener:
             return cget(
                 "GET",
                 f"http://cutt.ly/api/api.php?key={_shortener_api}&short={longurl}",
             ).json()["url"]["shortLink"]
-        else:
-            res = cget(
+        res = cget(
                 "GET",
                 f"https://{_shortener}/api?api={_shortener_api}&url={quote(longurl)}",
             ).json()
-            shorted = res["shortenedUrl"]
-            if not shorted:
-                shrtco_res = cget(
+        shorted = res["shortenedUrl"]
+        if not shorted:
+            shrtco_res = cget(
                     "GET", f"https://api.shrtco.de/v2/shorten?url={quote(longurl)}"
                 ).json()
-                shrtco_link = shrtco_res["result"]["full_short_link"]
-                res = cget(
+            shrtco_link = shrtco_res["result"]["full_short_link"]
+            res = cget(
                     "GET",
                     f"https://{_shortener}/api?api={_shortener_api}&url={shrtco_link}",
                 ).json()
-                shorted = res["shortenedUrl"]
-            if not shorted:
-                shorted = longurl
-            return shorted
+            shorted = res["shortenedUrl"]
+        if not shorted:
+            shorted = longurl
+        return shorted
     except Exception as e:
         LOGGER.error(e)
         sleep(1)

@@ -266,7 +266,7 @@ async def update_user_settings(
 
 
 @new_thread
-async def user_settings(client, message):
+async def user_settings(_, message):
     msg, button = await get_user_settings(message.from_user)
     user_id = message.from_user.id
     thumbnail = f"Thumbnails/{user_id}.jpg"
@@ -277,7 +277,7 @@ async def user_settings(client, message):
     await deleteMessage(x)
 
 
-async def set_yt_options(client, message, pre_event):
+async def set_yt_options(_, message, pre_event):
     user_id = message.from_user.id
     handler_dict[user_id] = False
     value = message.text
@@ -288,7 +288,7 @@ async def set_yt_options(client, message, pre_event):
         await DbManager().update_user_data(user_id)
 
 
-async def set_custom(client, message, pre_event, key):
+async def set_custom(_, message, pre_event, key):
     user_id = message.from_user.id
     handler_dict[user_id] = False
     value = message.text
@@ -335,7 +335,7 @@ async def set_custom(client, message, pre_event, key):
         await DbManager().update_user_data(user_id)
 
 
-async def set_thumb(client, message, pre_event, key):
+async def set_thumb(_, message, pre_event, key):
     user_id = message.from_user.id
     handler_dict[user_id] = False
     path = "Thumbnails/"
@@ -352,7 +352,7 @@ async def set_thumb(client, message, pre_event, key):
         await DbManager().update_user_doc(user_id, "thumb", des_dir)
 
 
-async def add_rclone(client, message, pre_event):
+async def add_rclone(_, message, pre_event):
     user_id = message.from_user.id
     handler_dict[user_id] = False
     path = f"{getcwd()}/tanha/"
@@ -407,19 +407,18 @@ async def edit_user_settings(client, query):
     if user_id != int(data[1]):
         await query.answer("Not Yours!", show_alert=True)
         return None
-    elif data[2] in ["universal", "mirror", "leech"]:
+    if data[2] in ["universal", "mirror", "leech"]:
         await query.answer()
         await update_user_settings(query, data[2])
         return None
-    elif data[2] == "doc":
+    if data[2] == "doc":
         update_user_ldata(user_id, "as_doc", not user_dict.get("as_doc", False))
         await query.answer()
         await update_user_settings(query, "leech")
         if DATABASE_URL:
             await DbManager().update_user_data(user_id)
-            return None
         return None
-    elif data[2] == "show_tds":
+    if data[2] == "show_tds":
         handler_dict[user_id] = False
         user_tds = user_dict.get("user_tds", {})
         msg = "<b><u>User TD Details</u></b>\n\n"
@@ -440,7 +439,7 @@ async def edit_user_settings(client, query):
             )
         await update_user_settings(query, "user_tds", "mirror")
         return None
-    elif data[2] == "dthumb":
+    if data[2] == "dthumb":
         handler_dict[user_id] = False
         if await aiopath.exists(thumb_path):
             await query.answer()
@@ -449,13 +448,11 @@ async def edit_user_settings(client, query):
             await update_user_settings(query, "thumb", "leech")
             if DATABASE_URL:
                 await DbManager().update_user_doc(user_id, "thumb")
-                return None
             return None
-        else:
-            await query.answer("Old Settings", show_alert=True)
-            await update_user_settings(query, "leech")
-            return None
-    elif data[2] == "thumb":
+        await query.answer("Old Settings", show_alert=True)
+        await update_user_settings(query, "leech")
+        return None
+    if data[2] == "thumb":
         await query.answer()
         edit_mode = len(data) == 4
         await update_user_settings(query, data[2], "leech", edit_mode)
@@ -465,7 +462,7 @@ async def edit_user_settings(client, query):
         rfunc = partial(update_user_settings, query, data[2], "leech")
         await event_handler(client, query, pfunc, rfunc, True)
         return None
-    elif data[2] == "yt_opt":
+    if data[2] == "yt_opt":
         await query.answer()
         edit_mode = len(data) == 4
         await update_user_settings(query, data[2], "universal", edit_mode)
@@ -475,16 +472,15 @@ async def edit_user_settings(client, query):
         rfunc = partial(update_user_settings, query, data[2], "universal")
         await event_handler(client, query, pfunc, rfunc)
         return None
-    elif data[2] == "dyt_opt":
+    if data[2] == "dyt_opt":
         handler_dict[user_id] = False
         await query.answer()
         update_user_ldata(user_id, "yt_opt", "")
         await update_user_settings(query, "yt_opt", "universal")
         if DATABASE_URL:
             await DbManager().update_user_data(user_id)
-            return None
         return None
-    elif data[2] == "td_mode":
+    if data[2] == "td_mode":
         handler_dict[user_id] = False
         if data[2] == "td_mode" and not user_dict.get("user_tds", False):
             return await query.answer(
@@ -495,9 +491,8 @@ async def edit_user_settings(client, query):
         await update_user_settings(query, "user_tds", "mirror")
         if DATABASE_URL:
             await DbManager().update_user_data(user_id)
-            return None
         return None
-    elif data[2] == "mediainfo":
+    if data[2] == "mediainfo":
         handler_dict[user_id] = False
         if config_dict["SHOW_MEDIAINFO"]:
             return await query.answer(
@@ -508,9 +503,8 @@ async def edit_user_settings(client, query):
         await update_user_settings(query, "leech")
         if DATABASE_URL:
             await DbManager().update_user_data(user_id)
-            return None
         return None
-    elif data[2] == "mgroup":
+    if data[2] == "mgroup":
         handler_dict[user_id] = False
         await query.answer()
         update_user_ldata(
@@ -519,9 +513,8 @@ async def edit_user_settings(client, query):
         await update_user_settings(query, "leech")
         if DATABASE_URL:
             await DbManager().update_user_data(user_id)
-            return None
         return None
-    elif data[2] == "rcc":
+    if data[2] == "rcc":
         await query.answer()
         edit_mode = len(data) == 4
         await update_user_settings(query, data[2], "mirror", edit_mode)
@@ -531,7 +524,7 @@ async def edit_user_settings(client, query):
         rfunc = partial(update_user_settings, query, data[2], "mirror")
         await event_handler(client, query, pfunc, rfunc, document=True)
         return None
-    elif data[2] == "drcc":
+    if data[2] == "drcc":
         handler_dict[user_id] = False
         if await aiopath.exists(rclone_path):
             await query.answer()
@@ -540,13 +533,11 @@ async def edit_user_settings(client, query):
             await update_user_settings(query, "rcc", "mirror")
             if DATABASE_URL:
                 await DbManager().update_user_doc(user_id, "rclone")
-                return None
             return None
-        else:
-            await query.answer("Old Settings", show_alert=True)
-            await update_user_settings(query)
-            return None
-    elif data[2] == "user_tds":
+        await query.answer("Old Settings", show_alert=True)
+        await update_user_settings(query)
+        return None
+    if data[2] == "user_tds":
         handler_dict[user_id] = False
         await query.answer()
         edit_mode = len(data) == 4
@@ -557,7 +548,7 @@ async def edit_user_settings(client, query):
         rfunc = partial(update_user_settings, query, data[2], "mirror")
         await event_handler(client, query, pfunc, rfunc)
         return None
-    elif data[2] in ["prefix", "suffix", "remname", "attachment", "metadata"]:
+    if data[2] in ["prefix", "suffix", "remname", "attachment", "metadata"]:
         handler_dict[user_id] = False
         await query.answer()
         edit_mode = len(data) == 4
@@ -568,7 +559,7 @@ async def edit_user_settings(client, query):
         rfunc = partial(update_user_settings, query, data[2], "universal")
         await event_handler(client, query, pfunc, rfunc)
         return None
-    elif data[2] in ["lcaption", "ldump"]:
+    if data[2] in ["lcaption", "ldump"]:
         handler_dict[user_id] = False
         await query.answer()
         edit_mode = len(data) == 4
@@ -579,25 +570,23 @@ async def edit_user_settings(client, query):
         rfunc = partial(update_user_settings, query, data[2], "leech")
         await event_handler(client, query, pfunc, rfunc)
         return None
-    elif data[2] in ["dlcaption", "dldump"]:
+    if data[2] in ["dlcaption", "dldump"]:
         handler_dict[user_id] = False
         await query.answer()
         update_user_ldata(user_id, data[2][1:], "")
         await update_user_settings(query, data[2][1:], "leech")
         if DATABASE_URL:
             await DbManager().update_user_data(user_id)
-            return None
         return None
-    elif data[2] in ["dprefix", "dsuffix", "dremname", "dmetadata", "dattachment"]:
+    if data[2] in ["dprefix", "dsuffix", "dremname", "dmetadata", "dattachment"]:
         handler_dict[user_id] = False
         await query.answer()
         update_user_ldata(user_id, data[2][1:], "")
         await update_user_settings(query, data[2][1:], "universal")
         if DATABASE_URL:
             await DbManager().update_user_data(user_id)
-            return None
         return None
-    elif data[2] == "duser_tds":
+    if data[2] == "duser_tds":
         handler_dict[user_id] = False
         await query.answer()
         update_user_ldata(user_id, data[2][1:], {})
@@ -606,15 +595,14 @@ async def edit_user_settings(client, query):
         await update_user_settings(query, data[2][1:], "mirror")
         if DATABASE_URL:
             await DbManager().update_user_data(user_id)
-            return None
         return None
-    elif data[2] == "back":
+    if data[2] == "back":
         handler_dict[user_id] = False
         await query.answer()
         setting = data[3] if len(data) == 4 else None
         await update_user_settings(query, setting)
         return None
-    elif data[2] == "reset_all":
+    if data[2] == "reset_all":
         handler_dict[user_id] = False
         await query.answer()
         buttons = ButtonMaker()
@@ -625,7 +613,7 @@ async def edit_user_settings(client, query):
             message, "Do you want to Reset Settings ?", buttons.column(2)
         )
         return None
-    elif data[2] == "reset_now":
+    if data[2] == "reset_now":
         handler_dict[user_id] = False
         if data[3] == "n":
             return await update_user_settings(query)
@@ -640,9 +628,8 @@ async def edit_user_settings(client, query):
             await DbManager().update_user_data(user_id)
             await DbManager().update_user_doc(user_id, "thumb")
             await DbManager().update_user_doc(user_id, "rclone")
-            return None
         return None
-    elif data[2] == "user_del":
+    if data[2] == "user_del":
         user_id = int(data[3])
         await query.answer()
         thumb_path = f"Thumbnails/{user_id}.jpg"
@@ -658,12 +645,11 @@ async def edit_user_settings(client, query):
             await DbManager().update_user_doc(user_id, "rclone")
         await editMessage(message, f"Data Reset for {user_id}")
         return None
-    else:
-        handler_dict[user_id] = False
-        await query.answer()
-        await message.reply_to_message.delete()
-        await message.delete()
-        return None
+    handler_dict[user_id] = False
+    await query.answer()
+    await message.reply_to_message.delete()
+    await message.delete()
+    return None
 
 
 async def getUserInfo(client, id):

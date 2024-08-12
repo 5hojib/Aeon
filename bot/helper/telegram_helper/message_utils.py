@@ -304,8 +304,7 @@ async def get_tg_link_content(link):
             ) from e
         if not user_message.empty:
             return user_message, "user"
-        else:
-            raise TgLinkException("Private: Please report!")
+        raise TgLinkException("Private: Please report!")
     elif not private:
         return message, "bot"
     else:

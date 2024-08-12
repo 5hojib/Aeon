@@ -68,19 +68,19 @@ async def change_sudo(message, is_sudo):
     await sendMessage(message, success_message)
 
 
-async def authorize(client, message):
+async def authorize(_, message):
     await change_authorization(message, True)
 
 
-async def unauthorize(client, message):
+async def unauthorize(_, message):
     await change_authorization(message, False)
 
 
-async def addSudo(client, message):
+async def addSudo(_, message):
     await change_sudo(message, True)
 
 
-async def removeSudo(client, message):
+async def removeSudo(_, message):
     await change_sudo(message, False)
 
 

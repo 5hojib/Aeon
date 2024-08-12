@@ -195,7 +195,7 @@ async def start(client, message):
     return None
 
 
-async def restart(client, message):
+async def restart(_, message):
     restart_message = await sendMessage(message, "Restarting...")
     if scheduler.running:
         scheduler.shutdown(wait=False)
@@ -277,7 +277,7 @@ async def log(_, message):
 
 
 @new_task
-async def bot_help(client, message):
+async def bot_help(_, message):
     reply_message = await sendMessage(message, help_string)
     await deleteMessage(message)
     await one_minute_del(reply_message)

@@ -451,11 +451,11 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
             await sendMessage(message, "GDRIVE_ID not Provided!")
             await delete_links(message)
             return None
-        elif not up:
+        if not up:
             await sendMessage(message, "No Rclone Destination!")
             await delete_links(message)
             return None
-        elif up not in ["rcl", "gd"]:
+        if up not in ["rcl", "gd"]:
             if up.startswith("mrcc:"):
                 config_path = f"tanha/{message.from_user.id}.conf"
             else:

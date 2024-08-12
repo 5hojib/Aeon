@@ -731,7 +731,7 @@ async def edit_bot_settings(client, query):
                 out_file.name = f"{data[2]}.txt"
                 await sendFile(message, out_file)
             return
-        elif value == "":
+        if value == "":
             value = None
         await query.answer(f"{value}", show_alert=True)
     elif data[1] == "edit":

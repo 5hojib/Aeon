@@ -204,7 +204,7 @@ async def limit_checker(
     if limit_exceeded:
         if size:
             return f"{limit_exceeded}.\nYour file or folder size is {get_readable_file_size(size)}."
-        elif isPlayList != 0:
+        if isPlayList != 0:
             return f"{limit_exceeded}.\nYour playlist has {isPlayList} files."
         return None
     return None

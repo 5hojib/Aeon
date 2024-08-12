@@ -304,7 +304,6 @@ async def split_file(
     listener,
     start_time=0,
     i=1,
-    inLoop=False,
     multi_streams=True,
 ):
     if (
@@ -364,7 +363,7 @@ async def split_file(
             code = await listener.suproc.wait()
             if code == -9:
                 return False
-            elif code != 0:
+            if code != 0:
                 err = (await listener.suproc.stderr.read()).decode().strip()
                 with contextlib.suppress(Exception):
                     await aioremove(out_path)
@@ -381,7 +380,6 @@ async def split_file(
                         listener,
                         start_time,
                         i,
-                        True,
                         False,
                     )
                 else:
@@ -403,7 +401,6 @@ async def split_file(
                     listener,
                     start_time,
                     i,
-                    True,
                 )
             lpd = (await get_media_info(out_path))[0]
             if lpd == 0:
@@ -672,8 +669,7 @@ def get_base_name(orig_path):
     )
     if extension != "":
         return re_split(f"{extension}$", orig_path, maxsplit=1, flags=IGNORECASE)[0]
-    else:
-        raise NotSupportedExtractionArchive(
+    raise NotSupportedExtractionArchive(
             "File format not supported for extraction"
         )
 

@@ -285,7 +285,7 @@ async def torrentSearch(_, message):
         await one_minute_del(reply_message)
         await delete_links(message)
         return
-    elif len(key) == 1:
+    if len(key) == 1:
         buttons.callback("Trending", f"torser {user_id} apitrend")
         buttons.callback("Recent", f"torser {user_id} apirecent")
         buttons.callback("Cancel", f"torser {user_id} cancel")
