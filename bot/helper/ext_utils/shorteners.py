@@ -59,19 +59,19 @@ def short_url(longurl, attempt=0):
                 f"http://cutt.ly/api/api.php?key={_shortener_api}&short={longurl}",
             ).json()["url"]["shortLink"]
         res = cget(
-                "GET",
-                f"https://{_shortener}/api?api={_shortener_api}&url={quote(longurl)}",
-            ).json()
+            "GET",
+            f"https://{_shortener}/api?api={_shortener_api}&url={quote(longurl)}",
+        ).json()
         shorted = res["shortenedUrl"]
         if not shorted:
             shrtco_res = cget(
-                    "GET", f"https://api.shrtco.de/v2/shorten?url={quote(longurl)}"
-                ).json()
+                "GET", f"https://api.shrtco.de/v2/shorten?url={quote(longurl)}"
+            ).json()
             shrtco_link = shrtco_res["result"]["full_short_link"]
             res = cget(
-                    "GET",
-                    f"https://{_shortener}/api?api={_shortener_api}&url={shrtco_link}",
-                ).json()
+                "GET",
+                f"https://{_shortener}/api?api={_shortener_api}&url={shrtco_link}",
+            ).json()
             shorted = res["shortenedUrl"]
         if not shorted:
             shorted = longurl

@@ -284,8 +284,8 @@ def pixeldrain(url):
     if resp["success"]:
         return dl_link
     raise DirectDownloadLinkException(
-            f"ERROR: Cant't download due {resp['message']}."
-        )
+        f"ERROR: Cant't download due {resp['message']}."
+    )
 
 
 def streamtape(url):
@@ -355,15 +355,15 @@ def fichier(link):
                     f"ERROR: 1fichier is on a limit. Please wait {numbers[0]} minute."
                 )
             raise DirectDownloadLinkException(
-                    "ERROR: 1fichier is on a limit. Please wait a few minutes/hour."
-                )
+                "ERROR: 1fichier is on a limit. Please wait a few minutes/hour."
+            )
         if "protect access" in str_2.lower():
             raise DirectDownloadLinkException(
                 f"ERROR:\n{PASSWORD_ERROR_MESSAGE.format(link)}"
             )
         raise DirectDownloadLinkException(
-                "ERROR: Failed to generate Direct Link from 1fichier!"
-            )
+            "ERROR: Failed to generate Direct Link from 1fichier!"
+        )
     if len(ct_warn) == 4:
         str_1 = ct_warn[-2].text
         str_3 = ct_warn[-1].text
@@ -373,8 +373,8 @@ def fichier(link):
                     f"ERROR: 1fichier is on a limit. Please wait {numbers[0]} minute."
                 )
             raise DirectDownloadLinkException(
-                    "ERROR: 1fichier is on a limit. Please wait a few minutes/hour."
-                )
+                "ERROR: 1fichier is on a limit. Please wait a few minutes/hour."
+            )
         if "bad password" in str_3.lower():
             raise DirectDownloadLinkException(
                 "ERROR: The password you entered is wrong!"

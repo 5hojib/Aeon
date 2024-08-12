@@ -669,9 +669,7 @@ def get_base_name(orig_path):
     )
     if extension != "":
         return re_split(f"{extension}$", orig_path, maxsplit=1, flags=IGNORECASE)[0]
-    raise NotSupportedExtractionArchive(
-            "File format not supported for extraction"
-        )
+    raise NotSupportedExtractionArchive("File format not supported for extraction")
 
 
 def get_mime_type(file_path):
