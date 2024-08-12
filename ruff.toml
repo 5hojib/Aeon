@@ -19,7 +19,6 @@ select = [
     "C4",   # flake8-comprehensions
     "PERF", # perflint
     "RUF",  # ruff
-    "G",    # flake8-logging-format
     "TID",  # flake8-tidy-imports
     "TCH",  # flake8-type-checking
     "FA",   # flake8-future-annotations
