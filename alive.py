@@ -1,16 +1,17 @@
 import os
 import time
 import logging
+
 import requests
 
-BASE_URL = os.environ.get('BASE_URL', None)
+BASE_URL = os.environ.get("BASE_URL", None)
 try:
     if len(BASE_URL) == 0:
         raise TypeError
     BASE_URL = BASE_URL.rstrip("/")
 except TypeError:
     BASE_URL = None
-PORT = os.environ.get('PORT', None)
+PORT = os.environ.get("PORT", None)
 if PORT is not None and BASE_URL is not None:
     while True:
         try:

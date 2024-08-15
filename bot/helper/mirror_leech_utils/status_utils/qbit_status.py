@@ -1,20 +1,23 @@
 from asyncio import sleep
 
-from bot import LOGGER, xnox_client, QbTorrents, qb_listener_lock
-from bot.helper.ext_utils.bot_utils import MirrorStatus, get_readable_file_size, get_readable_time, sync_to_async
+from bot import LOGGER, QbTorrents, xnox_client, qb_listener_lock
+from bot.helper.ext_utils.bot_utils import (
+    MirrorStatus,
+    sync_to_async,
+    get_readable_time,
+    get_readable_file_size,
+)
 
 
 def get_download(tag):
     try:
         return xnox_client.torrents_info(tag=tag)[0]
     except Exception as e:
-        LOGGER.error(
-            f'{e}: Qbittorrent, while getting torrent info. Tag: {tag}')
+        LOGGER.error(f"{e}: Qbittorrent, while getting torrent info. Tag: {tag}")
         return None
 
 
 class QbittorrentStatus:
-
     def __init__(self, listener, seeding=False, queued=False):
         self.__listener = listener
         self.__info = None
@@ -23,12 +26,12 @@ class QbittorrentStatus:
         self.message = listener.message
 
     def __update(self):
-        new_info = get_download(f'{self.__listener.uid}')
+        new_info = get_download(f"{self.__listener.uid}")
         if new_info is not None:
             self.__info = new_info
 
     def progress(self):
-        return f'{round(self.__info.progress*100, 2)}%'
+        return f"{round(self.__info.progress*100, 2)}%"
 
     def processed_bytes(self):
         return get_readable_file_size(self.__info.downloaded)
@@ -97,16 +100,22 @@ class QbittorrentStatus:
 
     async def cancel_download(self):
         self.__update()
-        await sync_to_async(xnox_client.torrents_pause, torrent_hashes=self.__info.hash)
+        await sync_to_async(
+            xnox_client.torrents_pause, torrent_hashes=self.__info.hash
+        )
         if not self.seeding:
             if self.queued:
-                LOGGER.info(f'Cancelling QueueDL: {self.name()}')
-                msg = 'task have been removed from queue/download'
+                LOGGER.info(f"Cancelling QueueDL: {self.name()}")
+                msg = "task have been removed from queue/download"
             else:
                 LOGGER.info(f"Cancelling Download: {self.__info.name}")
-                msg = 'Download stopped by user!'
+                msg = "Download stopped by user!"
             await sleep(0.3)
-            await sync_to_async(xnox_client.torrents_delete, torrent_hashes=self.__info.hash, delete_files=True)
+            await sync_to_async(
+                xnox_client.torrents_delete,
+                torrent_hashes=self.__info.hash,
+                delete_files=True,
+            )
             async with qb_listener_lock:
                 if self.__info.tags in QbTorrents:
                     del QbTorrents[self.__info.tags]

@@ -1,27 +1,49 @@
-from pyrogram.handlers import MessageHandler, CallbackQueryHandler
-from pyrogram.filters import command, regex, user
-from asyncio import sleep, wait_for, Event, wrap_future
+import contextlib
+from time import time
+from asyncio import Event, sleep, wait_for, wrap_future
+from functools import partial
+
+from yt_dlp import YoutubeDL
 from aiohttp import ClientSession
 from aiofiles.os import path as aiopath
-from yt_dlp import YoutubeDL
-from functools import partial
-from time import time
+from pyrogram.filters import user, regex, command
+from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 
-from bot import bot, config_dict, user_data, LOGGER
-from bot.helper.ext_utils.task_manager import task_utils
-from bot.helper.telegram_helper.message_utils import sendMessage, editMessage, delete_links, deleteMessage, one_minute_del, five_minute_del
-from bot.helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.ext_utils.bot_utils import get_readable_file_size, fetch_user_tds, is_url, is_gdrive_link, sync_to_async, new_task, is_rclone_path, new_thread, get_readable_time, arg_parser
-from bot.helper.mirror_leech_utils.download_utils.yt_dlp_download import YoutubeDLHelper
-from bot.helper.mirror_leech_utils.rclone_utils.list import RcloneList
-from bot.helper.telegram_helper.bot_commands import BotCommands
-from bot.helper.mirror_leech_utils.upload_utils.gdriveTools import GoogleDriveHelper
-from bot.helper.aeon_utils.send_react import send_react
-from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.listeners.tasks_listener import MirrorLeechListener
-from bot.helper.ext_utils.help_strings import YT_HELP_MESSAGE
+from bot import LOGGER, bot, user_data, config_dict
+from bot.helper.ext_utils.bot_utils import (
+    is_url,
+    new_task,
+    arg_parser,
+    new_thread,
+    sync_to_async,
+    fetch_user_tds,
+    is_gdrive_link,
+    is_rclone_path,
+    get_readable_time,
+    get_readable_file_size,
+)
 from bot.helper.ext_utils.bulk_links import extract_bulk_links
 from bot.helper.aeon_utils.nsfw_check import nsfw_precheck
+from bot.helper.aeon_utils.send_react import send_react
+from bot.helper.ext_utils.help_strings import YT_HELP_MESSAGE
+from bot.helper.ext_utils.task_manager import task_utils
+from bot.helper.telegram_helper.filters import CustomFilters
+from bot.helper.listeners.tasks_listener import MirrorLeechListener
+from bot.helper.telegram_helper.bot_commands import BotCommands
+from bot.helper.telegram_helper.button_build import ButtonMaker
+from bot.helper.telegram_helper.message_utils import (
+    editMessage,
+    sendMessage,
+    delete_links,
+    deleteMessage,
+    one_minute_del,
+    five_minute_del,
+)
+from bot.helper.mirror_leech_utils.rclone_utils.list import RcloneList
+from bot.helper.mirror_leech_utils.upload_utils.gdriveTools import GoogleDriveHelper
+from bot.helper.mirror_leech_utils.download_utils.yt_dlp_download import (
+    YoutubeDLHelper,
+)
 
 
 @new_task
@@ -30,29 +52,29 @@ async def select_format(_, query, obj):
     message = query.message
     await query.answer()
 
-    if data[1] == 'dict':
+    if data[1] == "dict":
         b_name = data[2]
         await obj.qual_subbuttons(b_name)
-    elif data[1] == 'mp3':
+    elif data[1] == "mp3":
         await obj.mp3_subbuttons()
-    elif data[1] == 'audio':
+    elif data[1] == "audio":
         await obj.audio_format()
-    elif data[1] == 'aq':
-        if data[2] == 'back':
+    elif data[1] == "aq":
+        if data[2] == "back":
             await obj.audio_format()
         else:
             await obj.audio_quality(data[2])
-    elif data[1] == 'back':
+    elif data[1] == "back":
         await obj.back_to_main()
-    elif data[1] == 'cancel':
-        await editMessage(message, 'Task has been cancelled.')
+    elif data[1] == "cancel":
+        await editMessage(message, "Task has been cancelled.")
         obj.qual = None
         obj.is_cancelled = True
         obj.event.set()
     else:
-        if data[1] == 'sub':
+        if data[1] == "sub":
             obj.qual = obj.formats[data[2]][data[3]][1]
-        elif '|' in data[1]:
+        elif "|" in data[1]:
             obj.qual = obj.formats[data[1]]
         else:
             obj.qual = data[1]
@@ -61,29 +83,33 @@ async def select_format(_, query, obj):
 
 class YtSelection:
     def __init__(self, client, message):
-        self.__message      = message
-        self.__user_id      = message.from_user.id
-        self.__client       = client
-        self.__is_m4a       = False
-        self.__reply_to     = None
-        self.__time         = time()
-        self.__timeout      = 120
-        self.__is_playlist  = False
-        self.is_cancelled   = False
+        self.__message = message
+        self.__user_id = message.from_user.id
+        self.__client = client
+        self.__is_m4a = False
+        self.__reply_to = None
+        self.__time = time()
+        self.__timeout = 120
+        self.__is_playlist = False
+        self.is_cancelled = False
         self.__main_buttons = None
-        self.event          = Event()
-        self.formats        = {}
-        self.qual           = None
+        self.event = Event()
+        self.formats = {}
+        self.qual = None
 
     @new_thread
     async def __event_handler(self):
         pfunc = partial(select_format, obj=self)
-        handler = self.__client.add_handler(CallbackQueryHandler(
-            pfunc, filters=regex('^ytq') & user(self.__user_id)), group=-1)
+        handler = self.__client.add_handler(
+            CallbackQueryHandler(
+                pfunc, filters=regex("^ytq") & user(self.__user_id)
+            ),
+            group=-1,
+        )
         try:
             await wait_for(self.event.wait(), timeout=self.__timeout)
         except Exception:
-            await editMessage(self.__reply_to, 'Timed Out. Task has been cancelled!')
+            await editMessage(self.__reply_to, "Timed Out. Task has been cancelled!")
             self.qual = None
             self.is_cancelled = True
             self.event.set()
@@ -93,70 +119,81 @@ class YtSelection:
     async def get_quality(self, result):
         future = self.__event_handler()
         buttons = ButtonMaker()
-        if 'entries' in result:
+        if "entries" in result:
             self.__is_playlist = True
-            for i in ['144', '240', '360', '480', '720', '1080', '1440', '2160']:
-                video_format = f'bv*[height<=?{i}][ext=mp4]+ba[ext=m4a]/b[height<=?{i}]'
-                b_data = f'{i}|mp4'
+            for i in ["144", "240", "360", "480", "720", "1080", "1440", "2160"]:
+                video_format = (
+                    f"bv*[height<=?{i}][ext=mp4]+ba[ext=m4a]/b[height<=?{i}]"
+                )
+                b_data = f"{i}|mp4"
                 self.formats[b_data] = video_format
-                buttons.callback(f'{i}-mp4', f'ytq {b_data}')
-                video_format = f'bv*[height<=?{i}][ext=webm]+ba/b[height<=?{i}]'
-                b_data = f'{i}|webm'
+                buttons.callback(f"{i}-mp4", f"ytq {b_data}")
+                video_format = f"bv*[height<=?{i}][ext=webm]+ba/b[height<=?{i}]"
+                b_data = f"{i}|webm"
                 self.formats[b_data] = video_format
-                buttons.callback(f'{i}-webm', f'ytq {b_data}')
-            buttons.callback('MP3', 'ytq mp3')
-            buttons.callback('Audio Formats', 'ytq audio')
-            buttons.callback('Best Videos', 'ytq bv*+ba/b')
-            buttons.callback('Best Audios', 'ytq ba/b')
-            buttons.callback('Cancel', 'ytq cancel', 'footer')
+                buttons.callback(f"{i}-webm", f"ytq {b_data}")
+            buttons.callback("MP3", "ytq mp3")
+            buttons.callback("Audio Formats", "ytq audio")
+            buttons.callback("Best Videos", "ytq bv*+ba/b")
+            buttons.callback("Best Audios", "ytq ba/b")
+            buttons.callback("Cancel", "ytq cancel", "footer")
             self.__main_buttons = buttons.column(3)
-            msg = f'Choose Playlist Videos Quality:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}'
+            msg = f"Choose Playlist Videos Quality:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}"
         else:
-            format_dict = result.get('formats')
+            format_dict = result.get("formats")
             if format_dict is not None:
                 for item in format_dict:
-                    if item.get('tbr'):
-                        format_id = item['format_id']
+                    if item.get("tbr"):
+                        format_id = item["format_id"]
 
-                        if item.get('filesize'):
-                            size = item['filesize']
-                        elif item.get('filesize_approx'):
-                            size = item['filesize_approx']
+                        if item.get("filesize"):
+                            size = item["filesize"]
+                        elif item.get("filesize_approx"):
+                            size = item["filesize_approx"]
                         else:
                             size = 0
 
-                        if item.get('video_ext') == 'none' and item.get('acodec') != 'none':
-                            if item.get('audio_ext') == 'm4a':
+                        if (
+                            item.get("video_ext") == "none"
+                            and item.get("acodec") != "none"
+                        ):
+                            if item.get("audio_ext") == "m4a":
                                 self.__is_m4a = True
                             b_name = f"{item['acodec']}-{item['ext']}"
                             v_format = format_id
-                        elif item.get('height'):
-                            height = item['height']
-                            ext = item['ext']
-                            fps = item['fps'] if item.get('fps') else ''
-                            b_name = f'{height}p{fps}-{ext}'
-                            ba_ext = '[ext=m4a]' if self.__is_m4a and ext == 'mp4' else ''
-                            v_format = f'{format_id}+ba{ba_ext}/b[height=?{height}]'
+                        elif item.get("height"):
+                            height = item["height"]
+                            ext = item["ext"]
+                            fps = item["fps"] if item.get("fps") else ""
+                            b_name = f"{height}p{fps}-{ext}"
+                            ba_ext = (
+                                "[ext=m4a]" if self.__is_m4a and ext == "mp4" else ""
+                            )
+                            v_format = f"{format_id}+ba{ba_ext}/b[height=?{height}]"
                         else:
                             continue
 
                         self.formats.setdefault(b_name, {})[f"{item['tbr']}"] = [
-                            size, v_format]
+                            size,
+                            v_format,
+                        ]
 
                 for b_name, tbr_dict in self.formats.items():
                     if len(tbr_dict) == 1:
                         tbr, v_list = next(iter(tbr_dict.items()))
-                        buttonName = f'{b_name} ({get_readable_file_size(v_list[0])})'
-                        buttons.callback(buttonName, f'ytq sub {b_name} {tbr}')
+                        buttonName = (
+                            f"{b_name} ({get_readable_file_size(v_list[0])})"
+                        )
+                        buttons.callback(buttonName, f"ytq sub {b_name} {tbr}")
                     else:
-                        buttons.callback(b_name, f'ytq dict {b_name}')
-            buttons.callback('MP3', 'ytq mp3')
-            buttons.callback('Audio Formats', 'ytq audio')
-            buttons.callback('Best Video', 'ytq bv*+ba/b')
-            buttons.callback('Best Audio', 'ytq ba/b')
-            buttons.callback('Cancel', 'ytq cancel', 'footer')
+                        buttons.callback(b_name, f"ytq dict {b_name}")
+            buttons.callback("MP3", "ytq mp3")
+            buttons.callback("Audio Formats", "ytq audio")
+            buttons.callback("Best Video", "ytq bv*+ba/b")
+            buttons.callback("Best Audio", "ytq ba/b")
+            buttons.callback("Cancel", "ytq cancel", "footer")
             self.__main_buttons = buttons.column(2)
-            msg = f'Choose Video Quality:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}'
+            msg = f"Choose Video Quality:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}"
         self.__reply_to = await sendMessage(self.__message, msg, self.__main_buttons)
         await wrap_future(future)
         if not self.is_cancelled:
@@ -165,58 +202,58 @@ class YtSelection:
 
     async def back_to_main(self):
         if self.__is_playlist:
-            msg = f'Choose Playlist Videos Quality:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}'
+            msg = f"Choose Playlist Videos Quality:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}"
         else:
-            msg = f'Choose Video Quality:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}'
+            msg = f"Choose Video Quality:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}"
         await editMessage(self.__reply_to, msg, self.__main_buttons)
 
     async def qual_subbuttons(self, b_name):
         buttons = ButtonMaker()
         tbr_dict = self.formats[b_name]
         for tbr, d_data in tbr_dict.items():
-            button_name = f'{tbr}K ({get_readable_file_size(d_data[0])})'
-            buttons.callback(button_name, f'ytq sub {b_name} {tbr}')
-        buttons.callback('Back', 'ytq back', 'footer')
-        buttons.callback('Cancel', 'ytq cancel', 'footer')
+            button_name = f"{tbr}K ({get_readable_file_size(d_data[0])})"
+            buttons.callback(button_name, f"ytq sub {b_name} {tbr}")
+        buttons.callback("Back", "ytq back", "footer")
+        buttons.callback("Cancel", "ytq cancel", "footer")
         subbuttons = buttons.column(2)
-        msg = f'Choose Bit rate for <b>{b_name}</b>:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}'
+        msg = f"Choose Bit rate for <b>{b_name}</b>:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}"
         await editMessage(self.__reply_to, msg, subbuttons)
 
     async def mp3_subbuttons(self):
-        i = 's' if self.__is_playlist else ''
+        i = "s" if self.__is_playlist else ""
         buttons = ButtonMaker()
         audio_qualities = [64, 128, 320]
         for q in audio_qualities:
-            audio_format = f'ba/b-mp3-{q}'
-            buttons.callback(f'{q}K-mp3', f'ytq {audio_format}')
-        buttons.callback('Back', 'ytq back')
-        buttons.callback('Cancel', 'ytq cancel')
+            audio_format = f"ba/b-mp3-{q}"
+            buttons.callback(f"{q}K-mp3", f"ytq {audio_format}")
+        buttons.callback("Back", "ytq back")
+        buttons.callback("Cancel", "ytq cancel")
         subbuttons = buttons.column(3)
-        msg = f'Choose mp3 Audio{i} Bitrate:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}'
+        msg = f"Choose mp3 Audio{i} Bitrate:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}"
         await editMessage(self.__reply_to, msg, subbuttons)
 
     async def audio_format(self):
-        i = 's' if self.__is_playlist else ''
+        i = "s" if self.__is_playlist else ""
         buttons = ButtonMaker()
-        for frmt in ['aac', 'alac', 'flac', 'm4a', 'opus', 'vorbis', 'wav']:
-            audio_format = f'ba/b-{frmt}-'
-            buttons.callback(frmt, f'ytq aq {audio_format}')
-        buttons.callback('Back', 'ytq back', 'footer')
-        buttons.callback('Cancel', 'ytq cancel', 'footer')
+        for frmt in ["aac", "alac", "flac", "m4a", "opus", "vorbis", "wav"]:
+            audio_format = f"ba/b-{frmt}-"
+            buttons.callback(frmt, f"ytq aq {audio_format}")
+        buttons.callback("Back", "ytq back", "footer")
+        buttons.callback("Cancel", "ytq cancel", "footer")
         subbuttons = buttons.column(3)
-        msg = f'Choose Audio{i} Format:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}'
+        msg = f"Choose Audio{i} Format:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}"
         await editMessage(self.__reply_to, msg, subbuttons)
 
     async def audio_quality(self, format):
-        i = 's' if self.__is_playlist else ''
+        i = "s" if self.__is_playlist else ""
         buttons = ButtonMaker()
         for qual in range(11):
-            audio_format = f'{format}{qual}'
-            buttons.callback(qual, f'ytq {audio_format}')
-        buttons.callback('Back', 'ytq aq back')
-        buttons.callback('Cancel', 'ytq aq cancel')
+            audio_format = f"{format}{qual}"
+            buttons.callback(qual, f"ytq {audio_format}")
+        buttons.callback("Back", "ytq aq back")
+        buttons.callback("Cancel", "ytq aq cancel")
         subbuttons = buttons.column(5)
-        msg = f'Choose Audio{i} Qaulity:\n0 is best and 10 is worst\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}'
+        msg = f"Choose Audio{i} Qaulity:\n0 is best and 10 is worst\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}"
         await editMessage(self.__reply_to, msg, subbuttons)
 
 
@@ -224,93 +261,104 @@ def extract_info(link, options):
     with YoutubeDL(options) as ydl:
         result = ydl.extract_info(link, download=False)
         if result is None:
-            raise ValueError('Info result is None')
+            raise ValueError("Info result is None")
         return result
 
 
 async def _mdisk(link, name):
-    key = link.split('/')[-1]
-    async with ClientSession() as session:
-        async with session.get(f'https://diskuploader.entertainvideo.com/v1/file/cdnurl?param={key}') as resp:
-            if resp.status == 200:
-                resp_json = await resp.json()
-                link = resp_json['source']
-                if not name:
-                    name = resp_json['filename']
-            return name, link
+    key = link.split("/")[-1]
+    async with (
+        ClientSession() as session,
+        session.get(
+            f"https://diskuploader.entertainvideo.com/v1/file/cdnurl?param={key}"
+        ) as resp,
+    ):
+        if resp.status == 200:
+            resp_json = await resp.json()
+            link = resp_json["source"]
+            if not name:
+                name = resp_json["filename"]
+        return name, link
 
 
 @new_task
 async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
     await send_react(message)
-    text        = message.text.split('\n')
-    input_list  = text[0].split(' ')
-    qual        = ''
-    arg_base    = {'link'   : '', 
-                   '-m'     : '',
-                   '-n'     : '',
-                   '-opt'   : '',
-                   '-up'    : '',
-                   '-rcf'   : '',
-                   '-id'    : '',
-                   '-index' : '',
-                   '-t'     : '',
-                   '-s'     : False,
-                   '-b'     : False,
-                   '-z'     : False,
-                   '-i'     : '0', 
-                   '-ss'    : '0'}
-    args        = arg_parser(input_list[1:], arg_base)
-    i           = args['-i']
-    select      = args['-s']
-    isBulk      = args['-b']
-    opt         = args['-opt']
-    folder_name = args['-m']
-    name        = args['-n']
-    up          = args['-up']
-    rcf         = args['-rcf']
-    link        = args['link']
-    compress    = args['-z']
-    thumb       = args['-t']
-    drive_id    = args['-id']
-    index_link  = args['-index']
-    ss          = args['-ss']
-    multi       = int(i) if i.isdigit() else 0
-    sshots      = min(int(ss) if ss.isdigit() else 0, 10)
-    bulk_start  = 0
-    bulk_end    = 0
+    text = message.text.split("\n")
+    input_list = text[0].split(" ")
+    qual = ""
+    arg_base = {
+        "link": "",
+        "-m": "",
+        "-n": "",
+        "-opt": "",
+        "-up": "",
+        "-rcf": "",
+        "-id": "",
+        "-index": "",
+        "-t": "",
+        "-s": False,
+        "-b": False,
+        "-z": False,
+        "-i": "0",
+        "-ss": "0",
+    }
+    args = arg_parser(input_list[1:], arg_base)
+    i = args["-i"]
+    select = args["-s"]
+    isBulk = args["-b"]
+    opt = args["-opt"]
+    folder_name = args["-m"]
+    name = args["-n"]
+    up = args["-up"]
+    rcf = args["-rcf"]
+    link = args["link"]
+    compress = args["-z"]
+    thumb = args["-t"]
+    drive_id = args["-id"]
+    index_link = args["-index"]
+    ss = args["-ss"]
+    multi = int(i) if i.isdigit() else 0
+    sshots = min(int(ss) if ss.isdigit() else 0, 10)
+    bulk_start = 0
+    bulk_end = 0
 
     if not isinstance(isBulk, bool):
-        dargs = isBulk.split(':')
+        dargs = isBulk.split(":")
         bulk_start = dargs[0] or None
         if len(dargs) == 2:
             bulk_end = dargs[1] or None
         isBulk = True
-        
+
     if drive_id and is_gdrive_link(drive_id):
         drive_id = GoogleDriveHelper.getIdFromUrl(drive_id)
 
     if folder_name and not isBulk:
-        folder_name = f'/{folder_name}'
+        folder_name = f"/{folder_name}"
         if sameDir is None:
-            sameDir = {'total': multi, 'tasks': set(), 'name': folder_name}
-        sameDir['tasks'].add(message.id)
+            sameDir = {"total": multi, "tasks": set(), "name": folder_name}
+        sameDir["tasks"].add(message.id)
 
     if isBulk:
         try:
             bulk = await extract_bulk_links(message, bulk_start, bulk_end)
             if len(bulk) == 0:
-                raise ValueError('Bulk Empty!')
+                raise ValueError("Bulk Empty!")
         except Exception:
-            await sendMessage(message, 'Reply to text file or tg message that have links seperated by new line!')
-            return
+            await sendMessage(
+                message,
+                "Reply to text file or tg message that have links seperated by new line!",
+            )
+            return None
         b_msg = input_list[:1]
-        b_msg.append(f'{bulk[0]} -i {len(bulk)}')
+        b_msg.append(f"{bulk[0]} -i {len(bulk)}")
         nextmsg = await sendMessage(message, " ".join(b_msg))
-        nextmsg = await client.get_messages(chat_id=message.chat.id, message_ids=nextmsg.id)
+        nextmsg = await client.get_messages(
+            chat_id=message.chat.id, message_ids=nextmsg.id
+        )
         nextmsg.from_user = message.from_user
         _ytdl(client, nextmsg, isLeech, sameDir, bulk)
-        return
+        return None
 
     if len(bulk) != 0:
         del bulk[0]
@@ -322,161 +370,184 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
         await sleep(5)
         if len(bulk) != 0:
             msg = input_list[:1]
-            msg.append(f'{bulk[0]} -i {multi - 1}')
+            msg.append(f"{bulk[0]} -i {multi - 1}")
             nextmsg = await sendMessage(message, " ".join(msg))
         else:
             msg = [s.strip() for s in input_list]
-            index = msg.index('-i')
-            msg[index+1] = f"{multi - 1}"
-            nextmsg = await client.get_messages(chat_id=message.chat.id, message_ids=message.reply_to_message_id + 1)
+            index = msg.index("-i")
+            msg[index + 1] = f"{multi - 1}"
+            nextmsg = await client.get_messages(
+                chat_id=message.chat.id, message_ids=message.reply_to_message_id + 1
+            )
             nextmsg = await sendMessage(nextmsg, " ".join(msg))
-        nextmsg = await client.get_messages(chat_id=message.chat.id, message_ids=nextmsg.id)
+        nextmsg = await client.get_messages(
+            chat_id=message.chat.id, message_ids=nextmsg.id
+        )
         if folder_name:
-            sameDir['tasks'].add(nextmsg.id)
+            sameDir["tasks"].add(nextmsg.id)
         nextmsg.from_user = message.from_user
         await sleep(5)
         _ytdl(client, nextmsg, isLeech, sameDir, bulk)
 
-    path = f'/usr/src/app/downloads/{message.id}{folder_name}'
+    path = f"/usr/src/app/downloads/{message.id}{folder_name}"
 
-    if len(text) > 1 and text[1].startswith('Tag: '):
-        tag, id_ = text[1].split('Tag: ')[1].split()
+    if len(text) > 1 and text[1].startswith("Tag: "):
+        tag, id_ = text[1].split("Tag: ")[1].split()
         message.from_user = await client.get_users(id_)
-        try:
+        with contextlib.suppress(Exception):
             await message.unpin()
-        except Exception:
-            pass
-    
+
     user_id = message.from_user.id
     user_dict = user_data.get(user_id, {})
-    opt = opt or user_dict.get('yt_opt') or config_dict['YT_DLP_OPTIONS']
-    
+    opt = opt or user_dict.get("yt_opt") or config_dict["YT_DLP_OPTIONS"]
+
     if username := message.from_user.username:
-        tag = f'@{username}'
+        tag = f"@{username}"
     else:
         tag = message.from_user.mention
 
     if not link and (reply_to := message.reply_to_message):
-        link = reply_to.text.split('\n', 1)[0].strip()
+        link = reply_to.text.split("\n", 1)[0].strip()
 
     if not is_url(link):
         reply_message = await sendMessage(message, YT_HELP_MESSAGE)
         await deleteMessage(message)
         await one_minute_del(reply_message)
-        return
+        return None
 
     error_msg = []
     error_button = None
     if await nsfw_precheck(message):
-     	  error_msg.extend(['NSFW detected'])
+        error_msg.extend(["NSFW detected"])
     task_utilis_msg, error_button = await task_utils(message)
     if task_utilis_msg:
         error_msg.extend(task_utilis_msg)
     if error_msg:
-        final_msg = f'Hey, <b>{tag}</b>!\n'
+        final_msg = f"Hey, <b>{tag}</b>!\n"
         for __i, __msg in enumerate(error_msg, 1):
-            final_msg += f'\n<blockquote><b>{__i}</b>: {__msg}</blockquote>'
+            final_msg += f"\n<blockquote><b>{__i}</b>: {__msg}</blockquote>"
         if error_button is not None:
             error_button = error_button.column(2)
         await delete_links(message)
         force_m = await sendMessage(message, final_msg, error_button)
         await five_minute_del(force_m)
-        return
+        return None
 
     if not isLeech:
-        if config_dict['DEFAULT_UPLOAD'] == 'rc' and not up or up == 'rc':
-            up = config_dict['RCLONE_PATH']
-        if not up and config_dict['DEFAULT_UPLOAD'] == 'gd':
-            up = 'gd'
+        if config_dict["DEFAULT_UPLOAD"] == "rc" and not up or up == "rc":
+            up = config_dict["RCLONE_PATH"]
+        if not up and config_dict["DEFAULT_UPLOAD"] == "gd":
+            up = "gd"
             user_tds = await fetch_user_tds(message.from_user.id)
             if not drive_id and len(user_tds) == 1:
                 drive_id, index_link = next(iter(user_tds.values())).values()
-            if drive_id and not await sync_to_async(GoogleDriveHelper().getFolderData, drive_id):
-                return await sendMessage(message, "Google Drive ID validation failed!!")
-        if up == 'gd' and not config_dict['GDRIVE_ID'] and not drive_id:
-            await sendMessage(message, 'GDRIVE_ID not Provided!')
+            if drive_id and not await sync_to_async(
+                GoogleDriveHelper().getFolderData, drive_id
+            ):
+                return await sendMessage(
+                    message, "Google Drive ID validation failed!!"
+                )
+        if up == "gd" and not config_dict["GDRIVE_ID"] and not drive_id:
+            await sendMessage(message, "GDRIVE_ID not Provided!")
             await delete_links(message)
-            return
-        elif not up:
-            await sendMessage(message, 'No Rclone Destination!')
+            return None
+        if not up:
+            await sendMessage(message, "No Rclone Destination!")
             await delete_links(message)
-            return
-        elif up not in ['rcl', 'gd']:
-            if up.startswith('mrcc:'):
-                config_path = f'tanha/{message.from_user.id}.conf'
+            return None
+        if up not in ["rcl", "gd"]:
+            if up.startswith("mrcc:"):
+                config_path = f"tanha/{message.from_user.id}.conf"
             else:
-                config_path = 'rcl.conf'
+                config_path = "rcl.conf"
             if not await aiopath.exists(config_path):
-                await sendMessage(message, f'Rclone Config: {config_path} not Exists!')
+                await sendMessage(
+                    message, f"Rclone Config: {config_path} not Exists!"
+                )
                 await delete_links(message)
-                return
-        if up != 'gd' and not is_rclone_path(up):
-            await sendMessage(message, 'Wrong Rclone Upload Destination!')
+                return None
+        if up != "gd" and not is_rclone_path(up):
+            await sendMessage(message, "Wrong Rclone Upload Destination!")
             await delete_links(message)
-            return
+            return None
 
-    if up == 'rcl' and not isLeech:
-        up = await RcloneList(client, message).get_rclone_path('rcu')
+    if up == "rcl" and not isLeech:
+        up = await RcloneList(client, message).get_rclone_path("rcu")
         if not is_rclone_path(up):
             await sendMessage(message, up)
             await delete_links(message)
-            return
+            return None
 
-    listener = MirrorLeechListener(message, compress, isLeech=isLeech, tag=tag, sameDir=sameDir, rcFlags=rcf, upPath=up, drive_id=drive_id, index_link=index_link, isYtdlp=True, files_utils={'screenshots': sshots, 'thumb': thumb})
+    listener = MirrorLeechListener(
+        message,
+        compress,
+        isLeech=isLeech,
+        tag=tag,
+        sameDir=sameDir,
+        rcFlags=rcf,
+        upPath=up,
+        drive_id=drive_id,
+        index_link=index_link,
+        isYtdlp=True,
+        files_utils={"screenshots": sshots, "thumb": thumb},
+    )
 
-    if 'mdisk.me' in link:
+    if "mdisk.me" in link:
         name, link = await _mdisk(link, name)
 
-    options = {'usenetrc': True, 'cookiefile': 'cookies.txt'}
+    options = {"usenetrc": True, "cookiefile": "cookies.txt"}
     if opt:
-        yt_opt = opt.split('|')
+        yt_opt = opt.split("|")
         for ytopt in yt_opt:
-            key, value = map(str.strip, ytopt.split(':', 1))
-            if key == 'format' and value.startswith('ba/b-'):
+            key, value = map(str.strip, ytopt.split(":", 1))
+            if key == "format" and value.startswith("ba/b-"):
                 if select:
-                    qual = ''
-                elif value.startswith('ba/b-'):
+                    qual = ""
+                elif value.startswith("ba/b-"):
                     qual = value
                     continue
-            if value.startswith('^'):
-                if '.' in value or value == '^inf':
-                    value = float(value.split('^')[1])
+            if value.startswith("^"):
+                if "." in value or value == "^inf":
+                    value = float(value.split("^")[1])
                 else:
-                    value = int(value.split('^')[1])
-            elif value.lower() == 'true':
+                    value = int(value.split("^")[1])
+            elif value.lower() == "true":
                 value = True
-            elif value.lower() == 'false':
+            elif value.lower() == "false":
                 value = False
-            elif value.startswith(('{', '[', '(')) and value.endswith(('}', ']', ')')):
+            elif value.startswith(("{", "[", "(")) and value.endswith(
+                ("}", "]", ")")
+            ):
                 value = eval(value)
             options[key] = value
 
-        options['playlist_items'] = '0'
+        options["playlist_items"] = "0"
 
     try:
         result = await sync_to_async(extract_info, link, options)
     except Exception as e:
-        msg = str(e).replace('<', ' ').replace('>', ' ')
-        x = await sendMessage(message, f'{tag} {msg}')
+        msg = str(e).replace("<", " ").replace(">", " ")
+        x = await sendMessage(message, f"{tag} {msg}")
         __run_multi()
         await delete_links(message)
         await five_minute_del(x)
-        return
+        return None
 
     __run_multi()
 
-    if not select and (not qual and 'format' in options):
-        qual = options['format']
+    if not select and (not qual and "format" in options):
+        qual = options["format"]
 
     if not qual:
         qual = await YtSelection(client, message).get_quality(result)
         if qual is None:
-            return
+            return None
     await delete_links(message)
-    LOGGER.info(f'Downloading with YT-DLP: {link}')
-    playlist = 'entries' in result
+    LOGGER.info(f"Downloading with YT-DLP: {link}")
+    playlist = "entries" in result
     ydl = YoutubeDLHelper(listener)
     await ydl.add_download(link, path, name, qual, playlist, opt)
+    return None
 
 
 async def ytdl(client, message):
@@ -487,5 +558,14 @@ async def ytdlleech(client, message):
     _ytdl(client, message, isLeech=True)
 
 
-bot.add_handler(MessageHandler(ytdl, filters=command(BotCommands.YtdlCommand) & CustomFilters.authorized))
-bot.add_handler(MessageHandler(ytdlleech, filters=command(BotCommands.YtdlLeechCommand) & CustomFilters.authorized))
+bot.add_handler(
+    MessageHandler(
+        ytdl, filters=command(BotCommands.YtdlCommand) & CustomFilters.authorized
+    )
+)
+bot.add_handler(
+    MessageHandler(
+        ytdlleech,
+        filters=command(BotCommands.YtdlLeechCommand) & CustomFilters.authorized,
+    )
+)

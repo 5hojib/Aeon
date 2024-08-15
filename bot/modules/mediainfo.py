@@ -1,31 +1,28 @@
-import aiohttp
+from os import path as ospath
+from os import getcwd
 from re import search as re_search
 from shlex import split as ssplit
-from aiofiles import open as aiopen
-from aiofiles.os import remove as aioremove, path as aiopath, mkdir
-from os import path as ospath, getcwd
 
-from pyrogram.handlers import MessageHandler
+import aiohttp
+from aiofiles import open as aiopen
+from aiofiles.os import path as aiopath
+from aiofiles.os import mkdir
+from aiofiles.os import remove as aioremove
 from pyrogram.filters import command
+from pyrogram.handlers import MessageHandler
 
 from bot import LOGGER, bot
+from bot.helper.ext_utils.bot_utils import cmd_exec
 from bot.helper.telegram_helper.filters import CustomFilters
+from bot.helper.ext_utils.telegraph_helper import telegraph
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.message_utils import editMessage, sendMessage
-from bot.helper.ext_utils.bot_utils import cmd_exec
-from bot.helper.ext_utils.telegraph_helper import telegraph
 
+section_dict = {"General", "Video", "Audio", "Text", "Menu"}
 
-section_dict = {
-    'General',
-    'Video',
-    'Audio',
-    'Text',
-    'Menu'
-}
 
 async def gen_mediainfo(message, link=None, media=None, msg=None):
-    temp_send = await sendMessage(message, 'Generating MediaInfo...')
+    temp_send = await sendMessage(message, "Generating MediaInfo...")
     try:
         path = "Mediainfo/"
         if not await aiopath.isdir(path):
@@ -59,32 +56,36 @@ async def gen_mediainfo(message, link=None, media=None, msg=None):
 
     except Exception as e:
         LOGGER.error(e)
-        await editMessage(temp_send, f"MediaInfo stopped due to {str(e)}")
+        await editMessage(temp_send, f"MediaInfo stopped due to {e!s}")
     finally:
         await aioremove(des_path)
 
-    link_id = (await telegraph.create_page(title='MediaInfo', content=tc))["path"]
-    await temp_send.edit(f"<blockquote>MediaInfo generated successfully<a href='https://graph.org/{link_id}'>.</a></blockquote>", disable_web_page_preview=False)
+    link_id = (await telegraph.create_page(title="MediaInfo", content=tc))["path"]
+    await temp_send.edit(
+        f"<blockquote>MediaInfo generated successfully<a href='https://graph.org/{link_id}'>.</a></blockquote>",
+        disable_web_page_preview=False,
+    )
 
 
 def parseinfo(out):
-    tc = ''
+    tc = ""
     trigger = False
-    for line in out.split('\n'):
+    for line in out.split("\n"):
         for section in section_dict:
             if line.startswith(section):
                 trigger = True
-                if not line.startswith('General'):
-                    tc += '</pre><br>'
+                if not line.startswith("General"):
+                    tc += "</pre><br>"
                 tc += f"<h4>{line.replace('Text', 'Subtitle')}</h4>"
                 break
         if trigger:
-            tc += '<br><pre>'
+            tc += "<br><pre>"
             trigger = False
         else:
-            tc += line + '\n'
-    tc += '</pre><br>'
+            tc += line + "\n"
+    tc += "</pre><br>"
     return tc
+
 
 async def mediainfo(_, message):
     reply = message.reply_to_message
@@ -98,11 +99,19 @@ async def mediainfo(_, message):
         link = reply.text if reply else message.command[1]
         await gen_mediainfo(message, link)
     elif reply:
-        if file := next((i for i in [reply.document, reply.video, reply.audio] if i), None):
+        if file := next(
+            (i for i in [reply.document, reply.video, reply.audio] if i), None
+        ):
             await gen_mediainfo(message, None, file, reply)
         else:
             await sendMessage(message, help_msg)
     else:
         await sendMessage(message, help_msg)
 
-bot.add_handler(MessageHandler(mediainfo, filters=command(BotCommands.MediaInfoCommand) & CustomFilters.authorized))
+
+bot.add_handler(
+    MessageHandler(
+        mediainfo,
+        filters=command(BotCommands.MediaInfoCommand) & CustomFilters.authorized,
+    )
+)

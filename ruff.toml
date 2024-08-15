@@ -1,0 +1,36 @@
+fix = true
+unsafe-fixes = true
+line-length = 85
+target-version = "py310"
+
+[lint.isort]
+length-sort = true
+
+[lint]
+select = [
+    "FURB", # refurb
+    "I",    # isort
+    "E",    # pycodestyle: error
+    "W",    # pycodestyle: warning
+    "UP",   # pyupgrade
+    "F",    # pyflakes
+    "SIM",  # flake8-simplify
+    "RET",  # flake8-return
+    "C4",   # flake8-comprehensions
+    "PERF", # perflint
+    "RUF",  # ruff
+    "TID",  # flake8-tidy-imports
+    "TCH",  # flake8-type-checking
+    "FA",   # flake8-future-annotations
+    "PL",   # pylint
+    "ARG",  # flake8-unused-arguments
+]
+
+ignore = [
+    "PLR2004",
+    "PLR0912",
+    "PLR0915",
+    "PLR0911",
+    "PLR0913",
+    "E501",
+]

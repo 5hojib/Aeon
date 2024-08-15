@@ -1,5 +1,6 @@
 from bot.helper.ext_utils.bot_utils import MirrorStatus
 
+
 class RcloneStatus:
     def __init__(self, obj, message, gid, status):
         self.__obj = obj
@@ -26,9 +27,9 @@ class RcloneStatus:
         return self.__obj.eta
 
     def status(self):
-        if self.__status == 'dl':
+        if self.__status == "dl":
             return MirrorStatus.STATUS_DOWNLOADING
-        elif self.__status == 'up':
+        elif self.__status == "up":
             return MirrorStatus.STATUS_UPLOADING
         else:
             return MirrorStatus.STATUS_CLONING

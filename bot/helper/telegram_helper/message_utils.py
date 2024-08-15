@@ -1,36 +1,74 @@
-from traceback import format_exc
-from asyncio import sleep
-from aiofiles.os import remove as aioremove
-from random import choice
-from time import time
 from re import match as re_match
+from time import time
+from random import choice
+from asyncio import sleep
+from traceback import format_exc
 
+from aiofiles.os import remove as aioremove
 from pyrogram.types import InputMediaPhoto
-from pyrogram.errors import ReplyMarkupInvalid, FloodWait, PeerIdInvalid, RPCError, UserNotParticipant, MessageNotModified, MessageEmpty, PhotoInvalidDimensions, WebpageCurlFailed, MediaEmpty
+from pyrogram.errors import (
+    RPCError,
+    FloodWait,
+    MediaEmpty,
+    MessageEmpty,
+    PeerIdInvalid,
+    WebpageCurlFailed,
+    MessageNotModified,
+    ReplyMarkupInvalid,
+    UserNotParticipant,
+    PhotoInvalidDimensions,
+)
 
-from bot import DELETE_LINKS, IMAGES, LOGGER, status_reply_dict, status_reply_dict_lock, Interval, bot, user, download_dict_lock
-from bot.helper.ext_utils.bot_utils import get_readable_message, setInterval, sync_to_async, download_image_url
-from bot.helper.telegram_helper.button_build import ButtonMaker
+from bot import (
+    IMAGES,
+    LOGGER,
+    DELETE_LINKS,
+    Interval,
+    bot,
+    user,
+    status_reply_dict,
+    download_dict_lock,
+    status_reply_dict_lock,
+)
+from bot.helper.ext_utils.bot_utils import (
+    setInterval,
+    sync_to_async,
+    download_image_url,
+    get_readable_message,
+)
 from bot.helper.ext_utils.exceptions import TgLinkException
+from bot.helper.telegram_helper.button_build import ButtonMaker
 
 
 async def sendMessage(message, text, buttons=None, photo=None):
     try:
         if photo:
             try:
-                if photo == 'Random':
+                if photo == "Random":
                     photo = choice(IMAGES)
-                return await message.reply_photo(photo=photo, reply_to_message_id=message.id, caption=text, reply_markup=buttons, disable_notification=True)
+                return await message.reply_photo(
+                    photo=photo,
+                    reply_to_message_id=message.id,
+                    caption=text,
+                    reply_markup=buttons,
+                    disable_notification=True,
+                )
             except IndexError:
                 pass
             except (PhotoInvalidDimensions, WebpageCurlFailed, MediaEmpty):
                 des_dir = await download_image_url(photo)
                 await sendMessage(message, text, buttons, des_dir)
                 await aioremove(des_dir)
-                return
+                return None
             except Exception:
                 LOGGER.error(format_exc())
-        return await message.reply(text=text, quote=True, disable_web_page_preview=True, disable_notification=True, reply_markup=buttons)
+        return await message.reply(
+            text=text,
+            quote=True,
+            disable_web_page_preview=True,
+            disable_notification=True,
+            reply_markup=buttons,
+        )
     except FloodWait as f:
         LOGGER.warning(str(f))
         await sleep(f.value * 1.2)
@@ -46,19 +84,31 @@ async def sendCustomMsg(chat_id, text, buttons=None, photo=None):
     try:
         if photo:
             try:
-                if photo == 'Random':
+                if photo == "Random":
                     photo = choice(IMAGES)
-                return await bot.send_photo(chat_id=chat_id, photo=photo, caption=text, reply_markup=buttons, disable_notification=True)
+                return await bot.send_photo(
+                    chat_id=chat_id,
+                    photo=photo,
+                    caption=text,
+                    reply_markup=buttons,
+                    disable_notification=True,
+                )
             except IndexError:
                 pass
             except (PhotoInvalidDimensions, WebpageCurlFailed, MediaEmpty):
                 des_dir = await download_image_url(photo)
                 await sendCustomMsg(chat_id, text, buttons, des_dir)
                 await aioremove(des_dir)
-                return
+                return None
             except Exception:
                 LOGGER.error(format_exc())
-        return await bot.send_message(chat_id=chat_id, text=text, disable_web_page_preview=True, disable_notification=True, reply_markup=buttons)
+        return await bot.send_message(
+            chat_id=chat_id,
+            text=text,
+            disable_web_page_preview=True,
+            disable_notification=True,
+            reply_markup=buttons,
+        )
     except FloodWait as f:
         LOGGER.warning(str(f))
         await sleep(f.value * 1.2)
@@ -71,10 +121,10 @@ async def sendCustomMsg(chat_id, text, buttons=None, photo=None):
 
 
 async def chat_info(channel_id):
-    if channel_id.startswith('-100'):
+    if channel_id.startswith("-100"):
         channel_id = int(channel_id)
-    elif channel_id.startswith('@'):
-        channel_id = channel_id.replace('@', '')
+    elif channel_id.startswith("@"):
+        channel_id = channel_id.replace("@", "")
     else:
         return None
     try:
@@ -83,14 +133,16 @@ async def chat_info(channel_id):
         LOGGER.error(f"{e.NAME}: {e.MESSAGE} for {channel_id}")
         return None
 
+
 async def isAdmin(message, user_id=None):
     if message.chat.type == message.chat.type.PRIVATE:
-        return
+        return None
     if user_id:
         member = await message.chat.get_member(user_id)
     else:
         member = await message.chat.get_member(message.from_user.id)
     return member.status in [member.status.ADMINISTRATOR, member.status.OWNER]
+
 
 async def sendMultiMessage(chat_ids, text, buttons=None, photo=None):
     msg_dict = {}
@@ -99,9 +151,15 @@ async def sendMultiMessage(chat_ids, text, buttons=None, photo=None):
         try:
             if photo:
                 try:
-                    if photo == 'Random':
+                    if photo == "Random":
                         photo = choice(IMAGES)
-                    sent = await bot.send_photo(chat_id=chat.id, photo=photo, caption=text, reply_markup=buttons, disable_notification=True)
+                    sent = await bot.send_photo(
+                        chat_id=chat.id,
+                        photo=photo,
+                        caption=text,
+                        reply_markup=buttons,
+                        disable_notification=True,
+                    )
                     msg_dict[chat.id] = sent
                     continue
                 except IndexError:
@@ -110,10 +168,16 @@ async def sendMultiMessage(chat_ids, text, buttons=None, photo=None):
                     des_dir = await download_image_url(photo)
                     await sendMultiMessage(chat_ids, text, buttons, des_dir)
                     await aioremove(des_dir)
-                    return
+                    return None
                 except Exception as e:
                     LOGGER.error(str(e))
-            sent = await bot.send_message(chat_id=chat.id, text=text, disable_web_page_preview=True, disable_notification=True, reply_markup=buttons)
+            sent = await bot.send_message(
+                chat_id=chat.id,
+                text=text,
+                disable_web_page_preview=True,
+                disable_notification=True,
+                reply_markup=buttons,
+            )
             msg_dict[chat.id] = sent
         except FloodWait as f:
             LOGGER.warning(str(f))
@@ -129,9 +193,13 @@ async def editMessage(message, text, buttons=None, photo=None):
     try:
         if message.media:
             if photo:
-                return await message.edit_media(InputMediaPhoto(photo, text), reply_markup=buttons)
+                return await message.edit_media(
+                    InputMediaPhoto(photo, text), reply_markup=buttons
+                )
             return await message.edit_caption(caption=text, reply_markup=buttons)
-        await message.edit(text=text, disable_web_page_preview=True, reply_markup=buttons)
+        await message.edit(
+            text=text, disable_web_page_preview=True, reply_markup=buttons
+        )
     except FloodWait as f:
         LOGGER.warning(str(f))
         await sleep(f.value * 1.2)
@@ -145,7 +213,13 @@ async def editMessage(message, text, buttons=None, photo=None):
 
 async def sendFile(message, file, caption=None, buttons=None):
     try:
-        return await message.reply_document(document=file, quote=True, caption=caption, disable_notification=True, reply_markup=buttons)
+        return await message.reply_document(
+            document=file,
+            quote=True,
+            caption=caption,
+            disable_notification=True,
+            reply_markup=buttons,
+        )
     except FloodWait as f:
         LOGGER.warning(str(f))
         await sleep(f.value * 1.2)
@@ -161,19 +235,23 @@ async def deleteMessage(message):
     except Exception as e:
         LOGGER.error(str(e))
 
+
 async def one_minute_del(message):
     await sleep(60)
     await deleteMessage(message)
 
+
 async def five_minute_del(message):
     await sleep(300)
     await deleteMessage(message)
+
 
 async def delete_links(message):
     if DELETE_LINKS:
         if reply_to := message.reply_to_message:
             await deleteMessage(reply_to)
         await deleteMessage(message)
+
 
 async def delete_all_messages():
     async with status_reply_dict_lock:
@@ -187,19 +265,25 @@ async def delete_all_messages():
 
 async def get_tg_link_content(link):
     message = None
-    if link.startswith('https://t.me/'):
+    if link.startswith("https://t.me/"):
         private = False
-        msg = re_match(r"https:\/\/t\.me\/(?:c\/)?([^\/]+)(?:\/[^\/]+)?\/([0-9]+)", link)
+        msg = re_match(
+            r"https:\/\/t\.me\/(?:c\/)?([^\/]+)(?:\/[^\/]+)?\/([0-9]+)", link
+        )
     else:
         private = True
-        msg = re_match(r"tg:\/\/openmessage\?user_id=([0-9]+)&message_id=([0-9]+)", link)
+        msg = re_match(
+            r"tg:\/\/openmessage\?user_id=([0-9]+)&message_id=([0-9]+)", link
+        )
         if not user:
-            raise TgLinkException('USER_SESSION_STRING required for this private link!')
+            raise TgLinkException(
+                "USER_SESSION_STRING required for this private link!"
+            )
 
     chat = msg.group(1)
     msg_id = int(msg.group(2))
     if chat.isdigit():
-        chat = int(chat) if private else int(f'-100{chat}')
+        chat = int(chat) if private else int(f"-100{chat}")
 
     if not private:
         try:
@@ -216,20 +300,24 @@ async def get_tg_link_content(link):
             user_message = await user.get_messages(chat_id=chat, message_ids=msg_id)
         except Exception as e:
             raise TgLinkException(
-                f"You don't have access to this chat!. ERROR: {e}") from e
+                f"You don't have access to this chat!. ERROR: {e}"
+            ) from e
         if not user_message.empty:
-            return user_message, 'user'
-        else:
-            raise TgLinkException("Private: Please report!")
+            return user_message, "user"
+        raise TgLinkException("Private: Please report!")
     elif not private:
-        return message, 'bot'
+        return message, "bot"
     else:
         raise TgLinkException("Bot can't download from GROUPS without joining!")
 
 
 async def update_all_messages(force=False):
     async with status_reply_dict_lock:
-        if not status_reply_dict or not Interval or (not force and time() - list(status_reply_dict.values())[0][1] < 3):
+        if (
+            not status_reply_dict
+            or not Interval
+            or (not force and time() - next(iter(status_reply_dict.values()))[1] < 3)
+        ):
             return
         for chat_id in list(status_reply_dict.keys()):
             status_reply_dict[chat_id][1] = time()
@@ -239,9 +327,12 @@ async def update_all_messages(force=False):
         return
     async with status_reply_dict_lock:
         for chat_id in list(status_reply_dict.keys()):
-            if status_reply_dict[chat_id] and msg != status_reply_dict[chat_id][0].text:
+            if (
+                status_reply_dict[chat_id]
+                and msg != status_reply_dict[chat_id][0].text
+            ):
                 rmsg = await editMessage(status_reply_dict[chat_id][0], msg, buttons)
-                if isinstance(rmsg, str) and rmsg.startswith('Telegram says: [400'):
+                if isinstance(rmsg, str) and rmsg.startswith("Telegram says: [400"):
                     del status_reply_dict[chat_id]
                     continue
                 status_reply_dict[chat_id][0].text = msg
@@ -268,7 +359,7 @@ async def sendStatusMessage(msg):
 
 async def forcesub(message, ids, button=None):
     join_button = {}
-    _msg = ''
+    _msg = ""
     for channel_id in ids.split():
         chat = await chat_info(channel_id)
         try:
@@ -282,13 +373,13 @@ async def forcesub(message, ids, button=None):
         except RPCError as e:
             LOGGER.error(f"{e.NAME}: {e.MESSAGE} for {channel_id}")
         except Exception as e:
-            LOGGER.error(f'{e} for {channel_id}')
+            LOGGER.error(f"{e} for {channel_id}")
     if join_button:
         if button is None:
             button = ButtonMaker()
         _msg = "You haven't joined our channel/group yet!"
         for key, value in join_button.items():
-            button.url(f'Join {key}', value, 'footer')
+            button.url(f"Join {key}", value, "footer")
     return _msg, button
 
 
@@ -299,12 +390,14 @@ async def user_info(client, userId):
 async def BotPm_check(message, button=None):
     user_id = message.from_user.id
     try:
-        temp_msg = await message._client.send_message(chat_id=message.from_user.id, text='<b>Checking Access...</b>')
+        temp_msg = await message._client.send_message(
+            chat_id=message.from_user.id, text="<b>Checking Access...</b>"
+        )
         await temp_msg.delete()
         return None, button
     except Exception:
         if button is None:
             button = ButtonMaker()
         _msg = "You haven't initiated the bot in a private message!"
-        button.callback("Start", f"aeon {user_id} private", 'header')
+        button.callback("Start", f"aeon {user_id} private", "header")
         return _msg, button

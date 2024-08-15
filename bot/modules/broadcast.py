@@ -1,30 +1,34 @@
 import asyncio
 from time import time
-from pyrogram.handlers import MessageHandler
-from pyrogram.filters import command
-from pyrogram.errors import FloodWait, UserIsBlocked, InputUserDeactivated
 
-from bot import bot, DATABASE_URL
+from pyrogram.errors import FloodWait, UserIsBlocked, InputUserDeactivated
+from pyrogram.filters import command
+from pyrogram.handlers import MessageHandler
+
+from bot import DATABASE_URL, bot
+from bot.helper.ext_utils.bot_utils import new_task, get_readable_time
 from bot.helper.ext_utils.db_handler import DbManager
-from bot.helper.telegram_helper.message_utils import sendMessage, editMessage
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
-from bot.helper.ext_utils.bot_utils import new_task, get_readable_time
+from bot.helper.telegram_helper.message_utils import editMessage, sendMessage
+
 
 @new_task
 async def broadcast(_, message):
     if not DATABASE_URL:
-        await sendMessage(message, 'DATABASE_URL not provided!')
+        await sendMessage(message, "DATABASE_URL not provided!")
         return
 
     if not message.reply_to_message:
-        await sendMessage(message, 'Reply to any message to broadcast messages to users in Bot PM.')
+        await sendMessage(
+            message, "Reply to any message to broadcast messages to users in Bot PM."
+        )
         return
 
     total, successful, blocked, unsuccessful = 0, 0, 0, 0
     start_time = time()
     updater = time()
-    broadcast_message = await sendMessage(message, 'Broadcast in progress...')
+    broadcast_message = await sendMessage(message, "Broadcast in progress...")
 
     for uid in await DbManager().get_pm_uids():
         try:
@@ -51,14 +55,21 @@ async def broadcast(_, message):
     status = generate_status(total, successful, blocked, unsuccessful, elapsed_time)
     await editMessage(broadcast_message, status)
 
+
 def generate_status(total, successful, blocked, unsuccessful, elapsed_time=""):
-    status = '<b>Broadcast Stats :</b>\n\n'
-    status += f'<b>• Total users:</b> {total}\n'
-    status += f'<b>• Success:</b> {successful}\n'
-    status += f'<b>• Blocked or deleted:</b> {blocked}\n'
-    status += f'<b>• Unsuccessful attempts:</b> {unsuccessful}'
+    status = "<b>Broadcast Stats :</b>\n\n"
+    status += f"<b>• Total users:</b> {total}\n"
+    status += f"<b>• Success:</b> {successful}\n"
+    status += f"<b>• Blocked or deleted:</b> {blocked}\n"
+    status += f"<b>• Unsuccessful attempts:</b> {unsuccessful}"
     if elapsed_time:
-        status += f'\n\n<b>Elapsed Time:</b> {elapsed_time}'
+        status += f"\n\n<b>Elapsed Time:</b> {elapsed_time}"
     return status
 
-bot.add_handler(MessageHandler(broadcast, filters=command(BotCommands.BroadcastCommand) & CustomFilters.owner))
+
+bot.add_handler(
+    MessageHandler(
+        broadcast,
+        filters=command(BotCommands.BroadcastCommand) & CustomFilters.owner,
+    )
+)
