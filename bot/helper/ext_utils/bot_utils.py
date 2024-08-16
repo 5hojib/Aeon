@@ -207,7 +207,7 @@ def get_readable_message():
         if download.status() not in [MirrorStatus.STATUS_SPLITTING, MirrorStatus.STATUS_SEEDING, MirrorStatus.STATUS_PROCESSING]:
             msg += f"<blockquote><code>{progress_bar(download.progress())}</code> {download.progress()}"
             msg += f"\n{download.processed_bytes()} of {download.size()}"
-            msg += f"\n⚡ Speed: {download.speed()}"
+            msg += f"\nSpeed: {download.speed()}"
             msg += f'\nEstimated: {download.eta()}'
             if hasattr(download, 'seeders_num'):
                 try:
@@ -242,9 +242,9 @@ def get_readable_message():
         buttons.callback(f"{PAGE_NO}/{PAGES}", "status ref")
         buttons.callback("Next", "status nex")
         button = buttons.column(3)
-    msg += f"<b>⌛ Tasks:</b> {tasks}{bmax_task}"
-    msg += f"\n<b>💿 F:</b> {get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}"
-    msg += f"<b> | 🚀 UP:</b>  {currentTime}"
+    msg += f"<b>Tasks:</b> {tasks}{bmax_task}"
+    msg += f"\n<b>Free:</b> {get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}"
+    msg += f"<b> | Uptime:</b> {currentTime}"
     msg += f"\n<b>🔻 DL:</b> {get_readable_file_size(dl_speed)}/s | <b>🔺 UL:</b> {get_readable_file_size(up_speed)}/s"
     return msg, button
 
