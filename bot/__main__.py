@@ -78,7 +78,7 @@ async def stats(_, message):
         'Clone'    : config_dict.get('CLONE_LIMIT',    '∞'),
         'Mega'     : config_dict.get('MEGA_LIMIT',     '∞'),
         'User task': config_dict.get('USER_MAX_TASKS', '∞')}
-    system_info = f'''<u><b>Sʏꜱᴛᴇᴍ Sᴛᴀᴛꜱ 🧮</b></u>\n
+    system_info = (f'''<u><b>Sʏꜱᴛᴇᴍ Sᴛᴀᴛꜱ 🧮</b></u>\n
                   <blockquote><b>🎖️ CPU Frequency:</b> {freq_current}\n
                   <b>CPU Cores [ Physical:</b> {cpu_count} | <b>Total:</b> {cpu_count_logical} ]\n\n
                   <b>💾 Total Disk Space:</b> {psutil._common.bytes2human(disk.total)}B\n
@@ -89,7 +89,7 @@ async def stats(_, message):
                   <b>Used:</b>{psutil._common.bytes2human(ram_stats.used)}B | <b>Free:</b> {psutil._common.bytes2human(ram_stats.available)}B\n\n
                   <b>🖥 CPU:</b> {cpuUsage}%\n
                   <b>🎮 RAM:</b> {int(ram_stats.percent)}%\n
-                  <b>💿 DISK:</b> {int(disk.percent)}%</blockquote>'''
+                  <b>💿 DISK:</b> {int(disk.percent)}%</blockquote>''') 
             
     limitations = '<b>LIMITATIONS</b>\n\n'
     
