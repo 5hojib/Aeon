@@ -79,17 +79,17 @@ async def stats(_, message):
         'Mega'     : config_dict.get('MEGA_LIMIT',     '∞'),
         'User task': config_dict.get('USER_MAX_TASKS', '∞')}
     system_info = f"<u><b>Sʏꜱᴛᴇᴍ Sᴛᴀᴛꜱ 🧮</b></u>\n"
-                                 f"<blockquote><b>🎖️ CPU Frequency:</b> {freq_current}\n"
-                                 f"<b>CPU Cores [ Physical:</b> {cpu_count} | <b>Total:</b> {cpu_count_logical} ]\n\n"
-                                 f"<b>💾 Total Disk Space:</b> {psutil._common.bytes2human(disk.total)}B\n"
-                                 f"<b>Used:</b> {psutil._common.bytes2human(disk.used)}B | <b>Free:</b> {psutil._common.bytes2human(disk.free)}B\n\n"
-                                 f"<b>🔺 Total Upload:</b> {psutil._common.bytes2human(ul_size)}B\n"
-                                 f"<b>🔻 Total Download:</b> {psutil._common.bytes2human(dl_size)}B\n\n"
-                                 f"<b>🎮 Total Ram Space:</b> {psutil._common.bytes2human(ram_stats.total)}B\n"
-                                 f"<b>Used:</b>{psutil._common.bytes2human(ram_stats.used)}B | <b>Free:</b> {psutil._common.bytes2human(ram_stats.available)}B\n\n"
-                                 f"<b>🖥 CPU:</b> {cpuUsage}%\n"
-                                 f"<b>🎮 RAM:</b> {int(ram_stats.percent)}%\n"
-                                 f"<b>💿 DISK:</b> {int(disk.percent)}%</blockquote>"
+                  f"<blockquote><b>🎖️ CPU Frequency:</b> {freq_current}\n"
+                  f"<b>CPU Cores [ Physical:</b> {cpu_count} | <b>Total:</b> {cpu_count_logical} ]\n\n"
+                  f"<b>💾 Total Disk Space:</b> {psutil._common.bytes2human(disk.total)}B\n"
+                  f"<b>Used:</b> {psutil._common.bytes2human(disk.used)}B | <b>Free:</b> {psutil._common.bytes2human(disk.free)}B\n\n"
+                  f"<b>🔺 Total Upload:</b> {psutil._common.bytes2human(ul_size)}B\n"
+                  f"<b>🔻 Total Download:</b> {psutil._common.bytes2human(dl_size)}B\n\n"
+                  f"<b>🎮 Total Ram Space:</b> {psutil._common.bytes2human(ram_stats.total)}B\n"
+                  f"<b>Used:</b>{psutil._common.bytes2human(ram_stats.used)}B | <b>Free:</b> {psutil._common.bytes2human(ram_stats.available)}B\n\n"
+                  f"<b>🖥 CPU:</b> {cpuUsage}%\n"
+                  f"<b>🎮 RAM:</b> {int(ram_stats.percent)}%\n"
+                  f"<b>💿 DISK:</b> {int(disk.percent)}%</blockquote>"
             
     limitations = '<b>LIMITATIONS</b>\n\n'
     
