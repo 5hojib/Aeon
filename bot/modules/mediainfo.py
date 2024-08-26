@@ -34,7 +34,11 @@ async def gen_mediainfo(message, link=None, media=None, msg=None):
             headers = {
                 "user-agent": "Mozilla/5.0 (Linux; Android 12; 2201116PI) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36"
             }
-            async with aiohttp.ClientSession() as session, session.get(link, headers=headers) as response, aiopen(des_path, "wb") as f:
+            async with (
+                aiohttp.ClientSession() as session,
+                session.get(link, headers=headers) as response,
+                aiopen(des_path, "wb") as f,
+            ):
                 async with aiopen(des_path, "wb") as f:
                     async for chunk in response.content.iter_chunked(10000000):
                         await f.write(chunk)

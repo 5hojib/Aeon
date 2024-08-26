@@ -86,7 +86,10 @@ async def drive_list(_, message):
         await one_minute_del(reply_message)
         return
     user_id = message.from_user.id
-    if not await isAdmin(message, user_id) and message.chat.type != message.chat.type.PRIVATE:
+    if (
+        not await isAdmin(message, user_id)
+        and message.chat.type != message.chat.type.PRIVATE
+    ):
         msg, btn = await checking_access(user_id)
         if msg is not None:
             reply_message = await send_message(message, msg, btn.column(1))

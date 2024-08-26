@@ -71,8 +71,11 @@ async def initiate_search_tools():
     if SEARCH_API_LINK := config_dict["SEARCH_API_LINK"]:
         global SITES  # noqa: PLW0603
         try:
-            async with ClientSession(trust_env=True) as c, c.get(f"{SEARCH_API_LINK}/api/v1/sites") as res:
-                    data = await res.json()
+            async with (
+                ClientSession(trust_env=True) as c,
+                c.get(f"{SEARCH_API_LINK}/api/v1/sites") as res,
+            ):
+                data = await res.json()
             SITES = {
                 str(site): str(site).capitalize() for site in data["supported_sites"]
             }
@@ -268,13 +271,16 @@ async def torrentSearch(_, message):
     user_id = message.from_user.id
     buttons = ButtonMaker()
     key = message.text.split()
-    if not await isAdmin(message, user_id) and message.chat.type != message.chat.type.PRIVATE:
+    if (
+        not await isAdmin(message, user_id)
+        and message.chat.type != message.chat.type.PRIVATE
+    ):
         msg, buttons = await checking_access(user_id, buttons)
         if msg is not None:
-                reply_message = await send_message(message, msg, buttons.column(1))
-                await delete_links(message)
-                await five_minute_del(reply_message)
-                return
+            reply_message = await send_message(message, msg, buttons.column(1))
+            await delete_links(message)
+            await five_minute_del(reply_message)
+            return
     if len(key) == 1 and SITES is None:
         reply_message = await send_message(
             message, "Send a search key along with command"
