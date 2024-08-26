@@ -183,8 +183,8 @@ EXTENSION_FILTER = environ.get("EXTENSION_FILTER", "")
 if len(EXTENSION_FILTER) > 0:
     fx = EXTENSION_FILTER.split()
     for x in fx:
-        x = x.lstrip(".")
-        GLOBAL_EXTENSION_FILTER.append(x.strip().lower())
+        cleaned_x = x.lstrip(".")
+        GLOBAL_EXTENSION_FILTER.append(cleaned_x.strip().lower())
 
 IS_PREMIUM_USER = False
 user = ""

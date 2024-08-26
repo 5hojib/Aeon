@@ -609,7 +609,7 @@ def clean_all():
         rmtree("/usr/src/app/downloads/")
 
 
-def exit_clean_up(signal, frame):
+def exit_clean_up(_, _):
     try:
         LOGGER.info("Please wait, while we clean up and stop the running downloads")
         clean_all()

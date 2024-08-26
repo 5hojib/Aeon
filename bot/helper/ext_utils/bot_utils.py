@@ -318,7 +318,7 @@ def text_to_bytes(size_text):
 
 
 async def turn_page(data):
-    global STATUS_START, PAGE_NO
+    global STATUS_START, PAGE_NO # noqa: PLW0603
     async with download_dict_lock:
         if data[1] == "nex":
             if PAGE_NO == PAGES:
@@ -438,9 +438,8 @@ def arg_parser(items, arg_base):
 
 async def get_content_type(url):
     try:
-        async with aioClientSession(trust_env=True) as session:
-            async with session.get(url, verify_ssl=False) as response:
-                return response.headers.get("Content-Type")
+        async with aioClientSession(trust_env=True) as session, session.get(url, verify_ssl=False) as response:
+            return response.headers.get("Content-Type")
     except Exception:
         return None
 

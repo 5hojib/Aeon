@@ -134,12 +134,12 @@ async def stats(_, message):
 
     for k, v in limit_mapping.items():
         if v == "":
-            v = "∞"
+            value = "∞"
         elif k != "User task":
-            v = f"{v}GB/Link"
+            value = f"{v}GB/Link"
         else:
-            v = f"{v} Tasks/user"
-        limitations += f"<code>• {k:<11}:</code> {v}\n"
+            value = f"{v} Tasks/user"
+        limitations += f"<code>• {k:<11}:</code> {value}\n"
 
     stats = system_info + limitations
     reply_message = await send_message(message, stats, photo="Random")
