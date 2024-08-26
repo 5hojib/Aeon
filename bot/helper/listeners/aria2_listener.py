@@ -142,8 +142,7 @@ async def __onDownloadComplete(api, gid):
                 msg = "Your download paused. Choose files then press Done Selecting button to start downloading."
                 await send_message(listener.message, msg, SBUTTONS)
     elif download.is_torrent:
-        if dl := await getDownloadByGid(gid):
-            if hasattr(dl, "listener") and dl.seeding:
+        if (dl := await getDownloadByGid(gid)) and hasattr(dl, "listener") and dl.seeding:
                 LOGGER.info(f"Cancelling Seed: {download.name} onDownloadComplete")
                 listener = dl.listener()
                 await listener.onUploadError(
@@ -218,7 +217,7 @@ async def __onBtDownloadComplete(api, gid):
 
 
 @new_thread
-async def __onDownloadStopped(api, gid):
+async def __onDownloadStopped(_, gid):
     await sleep(6)
     if dl := await getDownloadByGid(gid):
         listener = dl.listener()

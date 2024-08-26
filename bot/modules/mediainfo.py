@@ -39,10 +39,9 @@ async def gen_mediainfo(message, link=None, media=None, msg=None):
                 session.get(link, headers=headers) as response,
                 aiopen(des_path, "wb") as f,
             ):
-                async with aiopen(des_path, "wb") as f:
-                    async for chunk in response.content.iter_chunked(10000000):
-                        await f.write(chunk)
-                        break
+                async for chunk in response.content.iter_chunked(10000000):
+                    await f.write(chunk)
+                    break
         elif media:
             des_path = ospath.join(path, media.file_name)
             if media.file_size <= 50000000:

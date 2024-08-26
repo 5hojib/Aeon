@@ -115,8 +115,8 @@ async def load_config():
         GLOBAL_EXTENSION_FILTER.append("aria2")
         for x in fx:
             if x.strip().startswith("."):
-                x = x.lstrip(".")
-            GLOBAL_EXTENSION_FILTER.append(x.strip().lower())
+                clean_x = x.lstrip(".")
+            GLOBAL_EXTENSION_FILTER.append(clean_x.strip().lower())
 
     METADATA_KEY = environ.get("METADATA_KEY", "")
     if len(METADATA_KEY) == 0:

@@ -1,3 +1,4 @@
+# ruff: noqa: ARG002
 from asyncio import Event
 from secrets import token_hex
 

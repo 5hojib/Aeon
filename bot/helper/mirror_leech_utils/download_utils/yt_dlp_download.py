@@ -77,10 +77,10 @@ class YoutubeDLHelper:
             "trim_file_name": 220,
             "ffmpeg_location": "/bin/xtra",
             "retry_sleep_functions": {
-                "http": lambda n: 3,
-                "fragment": lambda n: 3,
-                "file_access": lambda n: 3,
-                "extractor": lambda n: 3,
+                "http": lambda _: 3,
+                "fragment": lambda _: 3,
+                "file_access": lambda _: 3,
+                "extractor": lambda _: 3,
             },
         }
 

@@ -68,7 +68,7 @@ class TelegramDownloadHelper:
         else:
             LOGGER.info(f"Start Queued Download from Telegram: {name}")
 
-    async def __onDownloadProgress(self, current, total):
+    async def __onDownloadProgress(self, current, _):
         if self.__is_cancelled:
             if IS_PREMIUM_USER:
                 user.stop_transmission()
