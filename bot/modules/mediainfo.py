@@ -16,13 +16,13 @@ from bot.helper.ext_utils.bot_utils import cmd_exec
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.ext_utils.telegraph_helper import telegraph
 from bot.helper.telegram_helper.bot_commands import BotCommands
-from bot.helper.telegram_helper.message_utils import editMessage, sendMessage
+from bot.helper.telegram_helper.message_utils import edit_message, send_message
 
 section_dict = {"General", "Video", "Audio", "Text", "Menu"}
 
 
 async def gen_mediainfo(message, link=None, media=None, msg=None):
-    temp_send = await sendMessage(message, "Generating MediaInfo...")
+    temp_send = await send_message(message, "Generating MediaInfo...")
     try:
         path = "Mediainfo/"
         if not await aiopath.isdir(path):
@@ -56,7 +56,7 @@ async def gen_mediainfo(message, link=None, media=None, msg=None):
 
     except Exception as e:
         LOGGER.error(e)
-        await editMessage(temp_send, f"MediaInfo stopped due to {e!s}")
+        await edit_message(temp_send, f"MediaInfo stopped due to {e!s}")
     finally:
         await aioremove(des_path)
 
@@ -104,9 +104,9 @@ async def mediainfo(_, message):
         ):
             await gen_mediainfo(message, None, file, reply)
         else:
-            await sendMessage(message, help_msg)
+            await send_message(message, help_msg)
     else:
-        await sendMessage(message, help_msg)
+        await send_message(message, help_msg)
 
 
 bot.add_handler(

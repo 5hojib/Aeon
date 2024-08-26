@@ -22,8 +22,8 @@ from bot.helper.ext_utils.bot_utils import (
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.message_utils import (
-    sendMessage,
-    deleteMessage,
+    send_message,
+    delete_message,
     one_minute_del,
     sendStatusMessage,
     update_all_messages,
@@ -42,12 +42,12 @@ async def mirror_status(_, message):
         msg += f"\n<b>• Bot uptime</b>: {currentTime}"
         msg += f"\n<b>• Free disk space</b>: {free}"
 
-        reply_message = await sendMessage(message, msg)
-        await deleteMessage(message)
+        reply_message = await send_message(message, msg)
+        await delete_message(message)
         await one_minute_del(reply_message)
     else:
         await sendStatusMessage(message)
-        await deleteMessage(message)
+        await delete_message(message)
         async with status_reply_dict_lock:
             if Interval:
                 Interval[0].cancel()

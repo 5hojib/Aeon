@@ -32,10 +32,10 @@ from bot.helper.listeners.tasks_listener import MirrorLeechListener
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import (
-    editMessage,
-    sendMessage,
+    edit_message,
+    send_message,
     delete_links,
-    deleteMessage,
+    delete_message,
     one_minute_del,
     five_minute_del,
 )
@@ -67,7 +67,7 @@ async def select_format(_, query, obj):
     elif data[1] == "back":
         await obj.back_to_main()
     elif data[1] == "cancel":
-        await editMessage(message, "Task has been cancelled.")
+        await edit_message(message, "Task has been cancelled.")
         obj.qual = None
         obj.is_cancelled = True
         obj.event.set()
@@ -109,7 +109,7 @@ class YtSelection:
         try:
             await wait_for(self.event.wait(), timeout=self.__timeout)
         except Exception:
-            await editMessage(self.__reply_to, "Timed Out. Task has been cancelled!")
+            await edit_message(self.__reply_to, "Timed Out. Task has been cancelled!")
             self.qual = None
             self.is_cancelled = True
             self.event.set()
@@ -194,10 +194,10 @@ class YtSelection:
             buttons.callback("Cancel", "ytq cancel", "footer")
             self.__main_buttons = buttons.column(2)
             msg = f"Choose Video Quality:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}"
-        self.__reply_to = await sendMessage(self.__message, msg, self.__main_buttons)
+        self.__reply_to = await send_message(self.__message, msg, self.__main_buttons)
         await wrap_future(future)
         if not self.is_cancelled:
-            await deleteMessage(self.__reply_to)
+            await delete_message(self.__reply_to)
         return self.qual
 
     async def back_to_main(self):
@@ -205,7 +205,7 @@ class YtSelection:
             msg = f"Choose Playlist Videos Quality:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}"
         else:
             msg = f"Choose Video Quality:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}"
-        await editMessage(self.__reply_to, msg, self.__main_buttons)
+        await edit_message(self.__reply_to, msg, self.__main_buttons)
 
     async def qual_subbuttons(self, b_name):
         buttons = ButtonMaker()
@@ -217,7 +217,7 @@ class YtSelection:
         buttons.callback("Cancel", "ytq cancel", "footer")
         subbuttons = buttons.column(2)
         msg = f"Choose Bit rate for <b>{b_name}</b>:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}"
-        await editMessage(self.__reply_to, msg, subbuttons)
+        await edit_message(self.__reply_to, msg, subbuttons)
 
     async def mp3_subbuttons(self):
         i = "s" if self.__is_playlist else ""
@@ -230,7 +230,7 @@ class YtSelection:
         buttons.callback("Cancel", "ytq cancel")
         subbuttons = buttons.column(3)
         msg = f"Choose mp3 Audio{i} Bitrate:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}"
-        await editMessage(self.__reply_to, msg, subbuttons)
+        await edit_message(self.__reply_to, msg, subbuttons)
 
     async def audio_format(self):
         i = "s" if self.__is_playlist else ""
@@ -242,7 +242,7 @@ class YtSelection:
         buttons.callback("Cancel", "ytq cancel", "footer")
         subbuttons = buttons.column(3)
         msg = f"Choose Audio{i} Format:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}"
-        await editMessage(self.__reply_to, msg, subbuttons)
+        await edit_message(self.__reply_to, msg, subbuttons)
 
     async def audio_quality(self, format):
         i = "s" if self.__is_playlist else ""
@@ -254,7 +254,7 @@ class YtSelection:
         buttons.callback("Cancel", "ytq aq cancel")
         subbuttons = buttons.column(5)
         msg = f"Choose Audio{i} Qaulity:\n0 is best and 10 is worst\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}"
-        await editMessage(self.__reply_to, msg, subbuttons)
+        await edit_message(self.__reply_to, msg, subbuttons)
 
 
 def extract_info(link, options):
@@ -345,14 +345,14 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
             if len(bulk) == 0:
                 raise ValueError("Bulk Empty!")
         except Exception:
-            await sendMessage(
+            await send_message(
                 message,
                 "Reply to text file or tg message that have links seperated by new line!",
             )
             return None
         b_msg = input_list[:1]
         b_msg.append(f"{bulk[0]} -i {len(bulk)}")
-        nextmsg = await sendMessage(message, " ".join(b_msg))
+        nextmsg = await send_message(message, " ".join(b_msg))
         nextmsg = await client.get_messages(
             chat_id=message.chat.id, message_ids=nextmsg.id
         )
@@ -371,7 +371,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
         if len(bulk) != 0:
             msg = input_list[:1]
             msg.append(f"{bulk[0]} -i {multi - 1}")
-            nextmsg = await sendMessage(message, " ".join(msg))
+            nextmsg = await send_message(message, " ".join(msg))
         else:
             msg = [s.strip() for s in input_list]
             index = msg.index("-i")
@@ -379,7 +379,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
             nextmsg = await client.get_messages(
                 chat_id=message.chat.id, message_ids=message.reply_to_message_id + 1
             )
-            nextmsg = await sendMessage(nextmsg, " ".join(msg))
+            nextmsg = await send_message(nextmsg, " ".join(msg))
         nextmsg = await client.get_messages(
             chat_id=message.chat.id, message_ids=nextmsg.id
         )
@@ -410,8 +410,8 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
         link = reply_to.text.split("\n", 1)[0].strip()
 
     if not is_url(link):
-        reply_message = await sendMessage(message, YT_HELP_MESSAGE)
-        await deleteMessage(message)
+        reply_message = await send_message(message, YT_HELP_MESSAGE)
+        await delete_message(message)
         await one_minute_del(reply_message)
         return None
 
@@ -429,7 +429,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
         if error_button is not None:
             error_button = error_button.column(2)
         await delete_links(message)
-        force_m = await sendMessage(message, final_msg, error_button)
+        force_m = await send_message(message, final_msg, error_button)
         await five_minute_del(force_m)
         return None
 
@@ -444,15 +444,15 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
             if drive_id and not await sync_to_async(
                 GoogleDriveHelper().getFolderData, drive_id
             ):
-                return await sendMessage(
+                return await send_message(
                     message, "Google Drive ID validation failed!!"
                 )
         if up == "gd" and not config_dict["GDRIVE_ID"] and not drive_id:
-            await sendMessage(message, "GDRIVE_ID not Provided!")
+            await send_message(message, "GDRIVE_ID not Provided!")
             await delete_links(message)
             return None
         if not up:
-            await sendMessage(message, "No Rclone Destination!")
+            await send_message(message, "No Rclone Destination!")
             await delete_links(message)
             return None
         if up not in ["rcl", "gd"]:
@@ -461,20 +461,20 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
             else:
                 config_path = "rcl.conf"
             if not await aiopath.exists(config_path):
-                await sendMessage(
+                await send_message(
                     message, f"Rclone Config: {config_path} not Exists!"
                 )
                 await delete_links(message)
                 return None
         if up != "gd" and not is_rclone_path(up):
-            await sendMessage(message, "Wrong Rclone Upload Destination!")
+            await send_message(message, "Wrong Rclone Upload Destination!")
             await delete_links(message)
             return None
 
     if up == "rcl" and not isLeech:
         up = await RcloneList(client, message).get_rclone_path("rcu")
         if not is_rclone_path(up):
-            await sendMessage(message, up)
+            await send_message(message, up)
             await delete_links(message)
             return None
 
@@ -527,7 +527,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
         result = await sync_to_async(extract_info, link, options)
     except Exception as e:
         msg = str(e).replace("<", " ").replace(">", " ")
-        x = await sendMessage(message, f"{tag} {msg}")
+        x = await send_message(message, f"{tag} {msg}")
         __run_multi()
         await delete_links(message)
         await five_minute_del(x)

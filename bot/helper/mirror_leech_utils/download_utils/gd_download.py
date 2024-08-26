@@ -14,7 +14,7 @@ from bot.helper.ext_utils.task_manager import (
     limit_checker,
     stop_duplicate_check,
 )
-from bot.helper.telegram_helper.message_utils import sendMessage, sendStatusMessage
+from bot.helper.telegram_helper.message_utils import send_message, sendStatusMessage
 from bot.helper.mirror_leech_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.mirror_leech_utils.status_utils.queue_status import QueueStatus
 from bot.helper.mirror_leech_utils.status_utils.gdrive_status import GdriveStatus
@@ -37,7 +37,7 @@ async def add_gd_download(link, path, listener, newname):
 
     msg, button = await stop_duplicate_check(name, listener)
     if msg:
-        await sendMessage(listener.message, msg, button)
+        await send_message(listener.message, msg, button)
         return
     if limit_exceeded := await limit_checker(size, listener, isDriveLink=True):
         await listener.onDownloadError(limit_exceeded)

@@ -16,9 +16,9 @@ from bot.helper.ext_utils.bot_utils import (
 from bot.helper.ext_utils.files_utils import get_base_name, clean_unwanted
 from bot.helper.ext_utils.task_manager import limit_checker
 from bot.helper.telegram_helper.message_utils import (
-    sendMessage,
+    send_message,
     delete_links,
-    deleteMessage,
+    delete_message,
     update_all_messages,
 )
 from bot.helper.mirror_leech_utils.upload_utils.gdriveTools import GoogleDriveHelper
@@ -37,11 +37,11 @@ async def __onDownloadStarted(api, gid):
             listener = dl.listener()
             if listener.select:
                 metamsg = "Downloading Metadata, wait then you can select files. Use torrent file to avoid this wait."
-                meta = await sendMessage(listener.message, metamsg)
+                meta = await send_message(listener.message, metamsg)
                 while True:
                     await sleep(0.5)
                     if download.is_removed or download.followed_by_ids:
-                        await deleteMessage(meta)
+                        await delete_message(meta)
                         break
                     download = download.live
         return
@@ -140,7 +140,7 @@ async def __onDownloadComplete(api, gid):
                     await sync_to_async(api.client.force_pause, new_gid)
                 SBUTTONS = bt_selection_buttons(new_gid)
                 msg = "Your download paused. Choose files then press Done Selecting button to start downloading."
-                await sendMessage(listener.message, msg, SBUTTONS)
+                await send_message(listener.message, msg, SBUTTONS)
     elif download.is_torrent:
         if dl := await getDownloadByGid(gid):
             if hasattr(dl, "listener") and dl.seeding:

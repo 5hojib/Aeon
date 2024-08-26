@@ -31,10 +31,10 @@ from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.message_utils import (
-    editMessage,
-    sendMessage,
+    edit_message,
+    send_message,
     delete_links,
-    deleteMessage,
+    delete_message,
     one_minute_del,
     five_minute_del,
     get_tg_link_content,
@@ -175,14 +175,14 @@ async def _mirror_leech(
             if len(bulk) == 0:
                 raise ValueError("Bulk Empty!")
         except Exception:
-            await sendMessage(
+            await send_message(
                 message,
                 "Reply to text file or tg message that have links seperated by new line!",
             )
             return None
         b_msg = input_list[:1]
         b_msg.append(f"{bulk[0]} -i {len(bulk)}")
-        nextmsg = await sendMessage(message, " ".join(b_msg))
+        nextmsg = await send_message(message, " ".join(b_msg))
         nextmsg = await client.get_messages(
             chat_id=message.chat.id, message_ids=nextmsg.id
         )
@@ -201,7 +201,7 @@ async def _mirror_leech(
         if len(bulk) != 0:
             msg = input_list[:1]
             msg.append(f"{bulk[0]} -i {multi - 1}")
-            nextmsg = await sendMessage(message, " ".join(msg))
+            nextmsg = await send_message(message, " ".join(msg))
         else:
             msg = [s.strip() for s in input_list]
             index = msg.index("-i")
@@ -209,7 +209,7 @@ async def _mirror_leech(
             nextmsg = await client.get_messages(
                 chat_id=message.chat.id, message_ids=message.reply_to_message_id + 1
             )
-            nextmsg = await sendMessage(nextmsg, " ".join(msg))
+            nextmsg = await send_message(nextmsg, " ".join(msg))
         nextmsg = await client.get_messages(
             chat_id=message.chat.id, message_ids=nextmsg.id
         )
@@ -238,7 +238,7 @@ async def _mirror_leech(
         try:
             reply_to, session = await get_tg_link_content(link)
         except Exception as e:
-            await sendMessage(message, f"ERROR: {e}")
+            await send_message(message, f"ERROR: {e}")
             await delete_links(message)
             return None
     elif not link and (reply_to := message.reply_to_message) and reply_to.text:
@@ -247,7 +247,7 @@ async def _mirror_leech(
             try:
                 reply_to, session = await get_tg_link_content(reply_text)
             except Exception as e:
-                await sendMessage(message, f"ERROR: {e}")
+                await send_message(message, f"ERROR: {e}")
                 await delete_links(message)
                 return None
 
@@ -275,8 +275,8 @@ async def _mirror_leech(
         and not is_rclone_path(link)
         and file_ is None
     ):
-        reply_message = await sendMessage(message, MIRROR_HELP_MESSAGE)
-        await deleteMessage(message)
+        reply_message = await send_message(message, MIRROR_HELP_MESSAGE)
+        await delete_message(message)
         await one_minute_del(reply_message)
         return None
 
@@ -294,7 +294,7 @@ async def _mirror_leech(
         if error_button is not None:
             error_button = error_button.column(2)
         await delete_links(message)
-        force_m = await sendMessage(message, final_msg, error_button)
+        force_m = await send_message(message, final_msg, error_button)
         await five_minute_del(force_m)
         return None
 
@@ -309,7 +309,7 @@ async def _mirror_leech(
     ):
         content_type = await get_content_type(link)
         if content_type is None or re_match(r"text/html|text/plain", content_type):
-            process_msg = await sendMessage(
+            process_msg = await send_message(
                 message, f"<b>Processing:</b> <code>{link}</code>"
             )
             try:
@@ -321,11 +321,11 @@ async def _mirror_leech(
             except DirectDownloadLinkException as e:
                 LOGGER.info(str(e))
                 if str(e).startswith("ERROR:"):
-                    await editMessage(process_msg, str(e))
+                    await edit_message(process_msg, str(e))
                     await delete_links(message)
                     await one_minute_del(process_msg)
                     return None
-            await deleteMessage(process_msg)
+            await delete_message(process_msg)
 
     if not isLeech:
         if config_dict["DEFAULT_UPLOAD"] == "rc" and not up or up == "rc":
@@ -338,14 +338,14 @@ async def _mirror_leech(
             if drive_id and not await sync_to_async(
                 GoogleDriveHelper().getFolderData, drive_id
             ):
-                return await sendMessage(
+                return await send_message(
                     message, "Google Drive ID validation failed!!"
                 )
         if up == "gd" and not config_dict["GDRIVE_ID"] and not drive_id:
-            await sendMessage(message, "GDRIVE_ID not Provided!")
+            await send_message(message, "GDRIVE_ID not Provided!")
             return None
         if not up:
-            await sendMessage(message, "No Rclone Destination!")
+            await send_message(message, "No Rclone Destination!")
             return None
         if up not in ["rcl", "gd"]:
             if up.startswith("mrcc:"):
@@ -353,26 +353,26 @@ async def _mirror_leech(
             else:
                 config_path = "rcl.conf"
             if not await aiopath.exists(config_path):
-                await sendMessage(
+                await send_message(
                     message, f"Rclone Config: {config_path} not Exists!"
                 )
                 return None
         if up != "gd" and not is_rclone_path(up):
-            await sendMessage(message, "Wrong Rclone Upload Destination!")
+            await send_message(message, "Wrong Rclone Upload Destination!")
             await delete_links(message)
             return None
 
     if link == "rcl":
         link = await RcloneList(client, message).get_rclone_path("rcd")
         if not is_rclone_path(link):
-            await sendMessage(message, link)
+            await send_message(message, link)
             await delete_links(message)
             return None
 
     if up == "rcl" and not isLeech:
         up = await RcloneList(client, message).get_rclone_path("rcu")
         if not is_rclone_path(up):
-            await sendMessage(message, up)
+            await send_message(message, up)
             await delete_links(message)
             return None
 
@@ -409,7 +409,7 @@ async def _mirror_leech(
         else:
             config_path = "rcl.conf"
         if not await aiopath.exists(config_path):
-            await sendMessage(message, f"Rclone Config: {config_path} not Exists!")
+            await send_message(message, f"Rclone Config: {config_path} not Exists!")
             return None
         await add_rclone_download(link, config_path, f"{path}/", name, listener)
     elif is_gdrive_link(link):

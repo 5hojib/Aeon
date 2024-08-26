@@ -22,7 +22,7 @@ from bot.helper.ext_utils.task_manager import (
     limit_checker,
     stop_duplicate_check,
 )
-from bot.helper.telegram_helper.message_utils import sendMessage, sendStatusMessage
+from bot.helper.telegram_helper.message_utils import send_message, sendStatusMessage
 from bot.helper.mirror_leech_utils.status_utils.mega_status import MegaDownloadStatus
 from bot.helper.mirror_leech_utils.status_utils.queue_status import QueueStatus
 
@@ -161,7 +161,7 @@ async def add_mega_download(mega_link, path, listener, name):
         await executor.do(folder_api.loginToFolder, (mega_link,))
         node = await sync_to_async(folder_api.authorizeNode, mega_listener.node)
     if mega_listener.error is not None:
-        await sendMessage(listener.message, str(mega_listener.error))
+        await send_message(listener.message, str(mega_listener.error))
         await executor.do(api.logout, ())
         if folder_api is not None:
             await executor.do(folder_api.logout, ())
@@ -170,7 +170,7 @@ async def add_mega_download(mega_link, path, listener, name):
     name = name or node.getName()
     msg, button = await stop_duplicate_check(name, listener)
     if msg:
-        await sendMessage(listener.message, msg, button)
+        await send_message(listener.message, msg, button)
         await executor.do(api.logout, ())
         if folder_api is not None:
             await executor.do(folder_api.logout, ())

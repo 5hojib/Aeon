@@ -20,7 +20,7 @@ from bot.helper.ext_utils.task_manager import (
     stop_duplicate_check,
 )
 from bot.helper.telegram_helper.message_utils import (
-    sendMessage,
+    send_message,
     delete_links,
     sendStatusMessage,
 )
@@ -107,7 +107,7 @@ class TelegramDownloadHelper:
     async def add_download(self, message, path, filename, session):
         if session == "user":
             if not self.__listener.isSuperGroup:
-                await sendMessage(
+                await send_message(
                     message, "Use SuperGroup to download this Link with User!"
                 )
                 return
@@ -132,7 +132,7 @@ class TelegramDownloadHelper:
 
                 msg, button = await stop_duplicate_check(name, self.__listener)
                 if msg:
-                    await sendMessage(self.__listener.message, msg, button)
+                    await send_message(self.__listener.message, msg, button)
                     await delete_links(self.__listener.message)
                     return
                 if limit_exceeded := await limit_checker(size, self.__listener):

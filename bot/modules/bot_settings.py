@@ -39,8 +39,8 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import (
     sendFile,
-    editMessage,
-    sendMessage,
+    edit_message,
+    send_message,
     update_all_messages,
 )
 
@@ -469,7 +469,7 @@ async def get_buttons(key=None, edit_type=None, edit_mode=None, mess=None):
 
 async def update_buttons(message, key=None, edit_type=None, edit_mode=None):
     msg, button = await get_buttons(key, edit_type, edit_mode, message)
-    await editMessage(message, msg, button)
+    await edit_message(message, msg, button)
 
 
 async def edit_variable(_, message, pre_message, key):
@@ -752,7 +752,7 @@ async def edit_bot_settings(client, query):
 async def bot_settings(_, message):
     msg, button = await get_buttons()
     globals()["START"] = 0
-    await sendMessage(message, msg, button)
+    await send_message(message, msg, button)
 
 
 bot.add_handler(

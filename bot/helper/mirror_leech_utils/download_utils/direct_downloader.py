@@ -18,7 +18,7 @@ from bot.helper.ext_utils.task_manager import (
 )
 from bot.helper.listeners.direct_listener import DirectListener
 from bot.helper.telegram_helper.message_utils import (
-    sendMessage,
+    send_message,
     delete_links,
     one_minute_del,
     sendStatusMessage,
@@ -29,7 +29,7 @@ from bot.helper.mirror_leech_utils.status_utils.direct_status import DirectStatu
 
 async def add_direct_download(details, path, listener, foldername):
     if not (contents := details.get("contents")):
-        await sendMessage(listener.message, "There is nothing to download!")
+        await send_message(listener.message, "There is nothing to download!")
         return
     size = details["total_size"]
     if not foldername:
@@ -40,13 +40,13 @@ async def add_direct_download(details, path, listener, foldername):
     path = f"{path}/{foldername}"
     msg, button = await stop_duplicate_check(foldername, listener)
     if msg:
-        msg = await sendMessage(listener.message, msg, button)
+        msg = await send_message(listener.message, msg, button)
         await delete_links(listener.message)
         await one_minute_del(msg)
         return
     if limit_exceeded := await limit_checker(size, listener):
         LOGGER.info(f"Limit Exceeded: {foldername} | {size}")
-        msg = await sendMessage(listener.message, limit_exceeded)
+        msg = await send_message(listener.message, limit_exceeded)
         await delete_links(listener.message)
         await one_minute_del(msg)
         return

@@ -6,7 +6,7 @@ from bot.helper.ext_utils.bot_utils import update_user_ldata
 from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
-from bot.helper.telegram_helper.message_utils import sendMessage
+from bot.helper.telegram_helper.message_utils import send_message
 
 
 async def change_authorization(message, is_authorize):
@@ -33,7 +33,7 @@ async def change_authorization(message, is_authorize):
                 await DbManager().update_user_data(id_)
         else:
             success_message = "Already unauthorized!"
-    await sendMessage(message, success_message)
+    await send_message(message, success_message)
 
 
 async def change_sudo(message, is_sudo):
@@ -65,7 +65,7 @@ async def change_sudo(message, is_sudo):
         success_message = (
             "Give ID or Reply To message of whom you want to remove from Sudo"
         )
-    await sendMessage(message, success_message)
+    await send_message(message, success_message)
 
 
 async def authorize(_, message):

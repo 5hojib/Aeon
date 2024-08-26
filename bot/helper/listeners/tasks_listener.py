@@ -49,10 +49,10 @@ from bot.helper.ext_utils.files_utils import (
 from bot.helper.ext_utils.task_manager import start_from_queued
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import (
-    editMessage,
-    sendMessage,
+    edit_message,
+    send_message,
     delete_links,
-    deleteMessage,
+    delete_message,
     sendCustomMsg,
     five_minute_del,
     sendMultiMessage,
@@ -486,7 +486,7 @@ class MirrorLeechListener:
                     msg += (
                         "<b>Files have not been sent for an unspecified reason</b>"
                     )
-                await sendMessage(self.message, msg)
+                await send_message(self.message, msg)
             else:
                 attachmsg = True
                 fmsg, totalmsg = "\n\n", ""
@@ -496,27 +496,27 @@ class MirrorLeechListener:
                     totalmsg = (msg + lmsg + fmsg) if attachmsg else fmsg
                     if len(totalmsg.encode()) > 3900:
                         if self.linkslogmsg:
-                            await editMessage(self.linkslogmsg, totalmsg)
-                            await sendMessage(self.botpmmsg, totalmsg)
-                            self.linkslogmsg = await sendMessage(
+                            await edit_message(self.linkslogmsg, totalmsg)
+                            await send_message(self.botpmmsg, totalmsg)
+                            self.linkslogmsg = await send_message(
                                 self.linkslogmsg, "Fetching Details..."
                             )
                         attachmsg = False
                         await sleep(1)
                         fmsg = "\n\n"
                 if fmsg != "\n\n" and self.linkslogmsg:
-                    await sendMessage(self.linkslogmsg, msg + lmsg + fmsg)
-                    await deleteMessage(self.linkslogmsg)
-                await sendMessage(self.botpmmsg, msg + lmsg + fmsg)
-                await deleteMessage(self.botpmmsg)
+                    await send_message(self.linkslogmsg, msg + lmsg + fmsg)
+                    await delete_message(self.linkslogmsg)
+                await send_message(self.botpmmsg, msg + lmsg + fmsg)
+                await delete_message(self.botpmmsg)
                 if self.isSuperGroup:
-                    await sendMessage(
+                    await send_message(
                         self.message,
                         f"{msg}<b>Files has been sent to your inbox</b>",
                         inboxButton.column(1),
                     )
                 else:
-                    await deleteMessage(self.botpmmsg)
+                    await delete_message(self.botpmmsg)
             if self.seed:
                 if self.newDir:
                     await clean_target(self.newDir)
@@ -552,17 +552,17 @@ class MirrorLeechListener:
             if config_dict["MIRROR_LOG_ID"]:
                 await sendMultiMessage(config_dict["MIRROR_LOG_ID"], msg, button)
                 if self.linkslogmsg:
-                    await deleteMessage(self.linkslogmsg)
-            await sendMessage(self.botpmmsg, msg, button, "Random")
-            await deleteMessage(self.botpmmsg)
+                    await delete_message(self.linkslogmsg)
+            await send_message(self.botpmmsg, msg, button, "Random")
+            await delete_message(self.botpmmsg)
             if self.isSuperGroup:
-                await sendMessage(
+                await send_message(
                     self.message,
                     f"{msg} <b>Links has been sent to your inbox</b>",
                     inboxButton.column(1),
                 )
             else:
-                await deleteMessage(self.botpmmsg)
+                await delete_message(self.botpmmsg)
             if self.seed:
                 if self.newDir:
                     await clean_target(self.newDir)
@@ -603,18 +603,18 @@ class MirrorLeechListener:
         msg += "Your download has been stopped!\n\n"
         msg += f"<blockquote><b>Reason:</b> {escape(error)}\n"
         msg += f"<b>Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}</blockquote>"
-        x = await sendMessage(self.message, msg, button)
+        x = await send_message(self.message, msg, button)
         await delete_links(self.message)
         if self.botpmmsg:
-            await deleteMessage(self.botpmmsg)
+            await delete_message(self.botpmmsg)
         if self.linkslogmsg:
-            await deleteMessage(self.linkslogmsg)
+            await delete_message(self.linkslogmsg)
         if count == 0:
             await self.clean()
         else:
             await update_all_messages()
         if self.isSuperGroup and self.botpmmsg:
-            await sendMessage(self.botpmmsg, msg, button)
+            await send_message(self.botpmmsg, msg, button)
         await five_minute_del(x)
 
         async with queue_dict_lock:
@@ -644,18 +644,18 @@ class MirrorLeechListener:
         msg += "Your upload has been stopped!\n\n"
         msg += f"<blockquote><b>Reason:</b> {escape(error)}\n"
         msg += f"<b>Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}</blockquote>"
-        x = await sendMessage(self.message, msg)
+        x = await send_message(self.message, msg)
         if self.linkslogmsg:
-            await deleteMessage(self.linkslogmsg)
+            await delete_message(self.linkslogmsg)
         await delete_links(self.message)
         if self.botpmmsg:
-            await deleteMessage(self.botpmmsg)
+            await delete_message(self.botpmmsg)
         if count == 0:
             await self.clean()
         else:
             await update_all_messages()
         if self.isSuperGroup and self.botpmmsg:
-            await sendMessage(self.botpmmsg, msg)
+            await send_message(self.botpmmsg, msg)
         await five_minute_del(x)
 
         async with queue_dict_lock:
