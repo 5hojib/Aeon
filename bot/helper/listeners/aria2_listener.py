@@ -142,13 +142,17 @@ async def __onDownloadComplete(api, gid):
                 msg = "Your download paused. Choose files then press Done Selecting button to start downloading."
                 await send_message(listener.message, msg, SBUTTONS)
     elif download.is_torrent:
-        if (dl := await getDownloadByGid(gid)) and hasattr(dl, "listener") and dl.seeding:
-                LOGGER.info(f"Cancelling Seed: {download.name} onDownloadComplete")
-                listener = dl.listener()
-                await listener.onUploadError(
-                    f"Seeding stopped with Ratio: {dl.ratio()} and Time: {dl.seeding_time()}"
-                )
-                await sync_to_async(api.remove, [download], force=True, files=True)
+        if (
+            (dl := await getDownloadByGid(gid))
+            and hasattr(dl, "listener")
+            and dl.seeding
+        ):
+            LOGGER.info(f"Cancelling Seed: {download.name} onDownloadComplete")
+            listener = dl.listener()
+            await listener.onUploadError(
+                f"Seeding stopped with Ratio: {dl.ratio()} and Time: {dl.seeding_time()}"
+            )
+            await sync_to_async(api.remove, [download], force=True, files=True)
     else:
         LOGGER.info(f"onDownloadComplete: {download.name} - Gid: {gid}")
         if dl := await getDownloadByGid(gid):
