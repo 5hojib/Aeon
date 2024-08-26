@@ -5,7 +5,6 @@ from time import sleep
 from uuid import uuid4
 from hashlib import sha256
 from urllib.parse import parse_qs, urlparse
-from http.cookiejar import MozillaCookieJar
 
 import requests
 from bs4 import BeautifulSoup
@@ -77,17 +76,16 @@ domain_dict = {
     "wetransfer": ["wetransfer.com", "we.tl"],
     "terabox": [
         "terabox.com",
-                    "nephobox.com",
-                    "4funbox.com",
-                    "mirrobox.com",
-                    "momerybox.com",
-                    "teraboxapp.com",
-                    "1024tera.com",
-                    "terabox.app",
-                    "gibibox.com",
-                    "goaibox.com",
-                    "terasharelink.com",
-        
+        "nephobox.com",
+        "4funbox.com",
+        "mirrobox.com",
+        "momerybox.com",
+        "teraboxapp.com",
+        "1024tera.com",
+        "terabox.app",
+        "gibibox.com",
+        "goaibox.com",
+        "terasharelink.com",
     ],
     "filewish": [
         "filelions.co",
@@ -453,15 +451,12 @@ def terabox(url, video_quality="HD Video", save_dir="HD_Video"):
         raise DirectDownloadLinkException("ERROR: Invalid terabox URL")
 
     netloc = urlparse(url).netloc
-    terabox_url = url.replace(
-        netloc,
-        "1024tera.com"
-    )
+    terabox_url = url.replace(netloc, "1024tera.com")
 
     urls = [
         "https://ytshorts.savetube.me/api/v1/terabox-downloader",
         f"https://teraboxvideodownloader.nepcoderdevs.workers.dev/?url={terabox_url}",
-        f"https://terabox.udayscriptsx.workers.dev/?url={terabox_url}"
+        f"https://terabox.udayscriptsx.workers.dev/?url={terabox_url}",
     ]
 
     headers = {
@@ -473,50 +468,40 @@ def terabox(url, video_quality="HD Video", save_dir="HD_Video"):
         "Alt-Used": "ytshorts.savetube.me",
         "Sec-Fetch-Dest": "empty",
         "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "same-origin"
+        "Sec-Fetch-Site": "same-origin",
     }
 
     for base_url in urls:
         try:
             if "api/v1" in base_url:
-                response = post(
-                    base_url,
-                    headers=headers,
-                    json={"url": terabox_url}
-                )
+                response = post(base_url, headers=headers, json={"url": terabox_url})
             else:
                 response = get(base_url)
 
             if response.status_code == 200:
                 break
         except RequestException as e:
-            raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}") from e
+            raise DirectDownloadLinkException(
+                f"ERROR: {e.__class__.__name__}"
+            ) from e
     else:
         raise DirectDownloadLinkException("ERROR: Unable to fetch the JSON data")
 
     data = response.json()
-    details = {
-        "contents": [],
-        "title": "",
-        "total_size": 0
-    }
+    details = {"contents": [], "title": "", "total_size": 0}
 
     for item in data["response"]:
         title = item["title"]
-        resolutions = item.get(
-            "resolutions",
-            {}
-        )
+        resolutions = item.get("resolutions", {})
         zlink = resolutions.get(video_quality)
         if zlink:
-            details["contents"].append({
-                "url": zlink,
-                "filename": title,
-                "path": ospath.join(
-                    title,
-                    save_dir
-                )
-            })
+            details["contents"].append(
+                {
+                    "url": zlink,
+                    "filename": title,
+                    "path": ospath.join(title, save_dir),
+                }
+            )
         details["title"] = title
 
     if not details["contents"]:
