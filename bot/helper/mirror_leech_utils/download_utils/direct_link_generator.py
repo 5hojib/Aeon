@@ -6,9 +6,8 @@ from uuid import uuid4
 from hashlib import sha256
 from urllib.parse import parse_qs, urlparse
 
-import requests
 from bs4 import BeautifulSoup
-from requests import Session, post, get
+from requests import Session, get, post
 from requests import session as req_session
 from lxml.etree import HTML
 from cloudscraper import create_scraper
