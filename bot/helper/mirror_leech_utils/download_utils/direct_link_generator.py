@@ -8,7 +8,7 @@ from urllib.parse import parse_qs, urlparse
 
 import requests
 from bs4 import BeautifulSoup
-from requests import Session, post
+from requests import Session, post, get
 from requests import session as req_session
 from lxml.etree import HTML
 from cloudscraper import create_scraper
@@ -480,7 +480,7 @@ def terabox(url, video_quality="HD Video", save_dir="HD_Video"):
 
             if response.status_code == 200:
                 break
-        except RequestException as e:
+        except Exception as e:
             raise DirectDownloadLinkException(
                 f"ERROR: {e.__class__.__name__}"
             ) from e
@@ -493,13 +493,13 @@ def terabox(url, video_quality="HD Video", save_dir="HD_Video"):
     for item in data["response"]:
         title = item["title"]
         resolutions = item.get("resolutions", {})
-        zlink = resolutions.get(video_quality)
-        if zlink:
+        links = resolutions.get(video_quality)
+        if links:
             details["contents"].append(
                 {
-                    "url": zlink,
+                    "url": links,
                     "filename": title,
-                    "path": ospath.join(title, save_dir),
+                    "path": path.join(title, save_dir),
                 }
             )
         details["title"] = title
@@ -1116,7 +1116,7 @@ def doods(url):
     if "/e/" in url:
         url = url.replace("/e/", "/d/")
     api_url = f"https://api.pake.tk/dood?url={url}"
-    response = requests.get(api_url)
+    response = get(api_url)
     if response.status_code != 200:
         raise DirectDownloadLinkException(
             "ERROR: Failed to fetch direct link from API"

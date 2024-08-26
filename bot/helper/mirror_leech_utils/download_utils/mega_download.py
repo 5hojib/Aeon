@@ -75,7 +75,7 @@ class MegaAppListener(MegaListener):
         ):
             self.continue_event.set()
 
-    def onRequestTemporaryError(self, api, request, error: MegaError):
+    def onRequestTemporaryError(self, _, request, error: MegaError):
         LOGGER.error(f"Mega Request error in {error}")
         if not self.is_cancelled:
             self.is_cancelled = True
