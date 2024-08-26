@@ -20,9 +20,9 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import (
     isAdmin,
+    delete_links,
     edit_message,
     send_message,
-    delete_links,
     one_minute_del,
     five_minute_del,
 )

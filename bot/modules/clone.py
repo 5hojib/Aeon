@@ -27,9 +27,9 @@ from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.message_utils import (
+    delete_links,
     edit_message,
     send_message,
-    delete_links,
     delete_message,
     one_minute_del,
     five_minute_del,

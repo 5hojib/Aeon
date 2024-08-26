@@ -32,9 +32,9 @@ from bot.helper.listeners.tasks_listener import MirrorLeechListener
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import (
+    delete_links,
     edit_message,
     send_message,
-    delete_links,
     delete_message,
     one_minute_del,
     five_minute_del,
@@ -109,7 +109,9 @@ class YtSelection:
         try:
             await wait_for(self.event.wait(), timeout=self.__timeout)
         except Exception:
-            await edit_message(self.__reply_to, "Timed Out. Task has been cancelled!")
+            await edit_message(
+                self.__reply_to, "Timed Out. Task has been cancelled!"
+            )
             self.qual = None
             self.is_cancelled = True
             self.event.set()
@@ -194,7 +196,9 @@ class YtSelection:
             buttons.callback("Cancel", "ytq cancel", "footer")
             self.__main_buttons = buttons.column(2)
             msg = f"Choose Video Quality:\nTimeout: {get_readable_time(self.__timeout-(time()-self.__time), True)}"
-        self.__reply_to = await send_message(self.__message, msg, self.__main_buttons)
+        self.__reply_to = await send_message(
+            self.__message, msg, self.__main_buttons
+        )
         await wrap_future(future)
         if not self.is_cancelled:
             await delete_message(self.__reply_to)
