@@ -178,7 +178,11 @@ async def limit_checker(
             limit = YTDLP_LIMIT * 1024**3
             if size > limit:
                 limit_exceeded = f"Ytdlp limit is {get_readable_file_size(limit)}"
-        if isPlayList != 0 and (PLAYLIST_LIMIT := config_dict["PLAYLIST_LIMIT"]) and isPlayList > PLAYLIST_LIMIT:
+        if (
+            isPlayList != 0
+            and (PLAYLIST_LIMIT := config_dict["PLAYLIST_LIMIT"])
+            and isPlayList > PLAYLIST_LIMIT
+        ):
             limit_exceeded = f"Playlist limit is {PLAYLIST_LIMIT}"
     elif isTorrent:
         if TORRENT_LIMIT := config_dict["TORRENT_LIMIT"]:

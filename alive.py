@@ -1,6 +1,7 @@
 import os
 import time
 import logging
+
 import requests
 
 BASE_URL = os.environ.get("BASE_URL", None)
@@ -14,6 +15,7 @@ except TypeError:
 
 PORT = os.environ.get("PORT", None)
 
+
 def check_status():
     try:
         requests.get(BASE_URL).status_code
@@ -21,6 +23,7 @@ def check_status():
         logging.error(f"alive.py: {e}")
         return False
     return True
+
 
 if PORT and BASE_URL:
     while True:
