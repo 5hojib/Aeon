@@ -114,8 +114,7 @@ class GoogleDriveHelper:
                 return build(
                     "drive", "v3", credentials=credentials, cache_discovery=False
                 )
-            else:
-                LOGGER.error("token.pickle not found!")
+            LOGGER.error("token.pickle not found!")
         return None
 
     def __switchServiceAccount(self):
@@ -287,7 +286,7 @@ class GoogleDriveHelper:
                     link = self.__G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(dir_id)
                     self.deletefile(link)
                 return
-            elif self.__is_errored:
+            if self.__is_errored:
                 return
             async_to_sync(
                 self.__listener.onUploadComplete,
@@ -421,17 +420,15 @@ class GoogleDriveHelper:
                                 f"Reached maximum number of service accounts switching, which is {self.__sa_count}"
                             )
                             raise err
-                        else:
-                            if self.__is_cancelled:
-                                return None
-                            self.__switchServiceAccount()
-                            LOGGER.info(f"Got: {reason}, Trying Again.")
-                            return self.__upload_file(
-                                file_path, file_name, mime_type, dest_id
-                            )
-                    else:
-                        LOGGER.error(f"Got: {reason}")
-                        raise err
+                        if self.__is_cancelled:
+                            return None
+                        self.__switchServiceAccount()
+                        LOGGER.info(f"Got: {reason}, Trying Again.")
+                        return self.__upload_file(
+                            file_path, file_name, mime_type, dest_id
+                        )
+                    LOGGER.error(f"Got: {reason}")
+                    raise err
         if self.__is_cancelled:
             return None
         if not self.__listener.seed or self.__listener.newDir:
@@ -562,11 +559,10 @@ class GoogleDriveHelper:
                             f"Reached maximum number of service accounts switching, which is {self.__sa_count}"
                         )
                         raise err
-                    else:
-                        if self.__is_cancelled:
-                            return None
-                        self.__switchServiceAccount()
-                        return self.__copyFile(file_id, dest_id, file_name)
+                    if self.__is_cancelled:
+                        return None
+                    self.__switchServiceAccount()
+                    return self.__copyFile(file_id, dest_id, file_name)
                 else:
                     LOGGER.error(f"Got: {reason}")
                     raise err
@@ -637,53 +633,47 @@ class GoogleDriveHelper:
                         )
                         .execute()
                     )
-                else:
-                    return (
-                        self.__service.files()
-                        .list(
-                            supportsAllDrives=True,
-                            includeItemsFromAllDrives=True,
-                            driveId=dir_id,
-                            q=query,
-                            spaces="drive",
-                            pageSize=150,
-                            fields="files(id, name, mimeType, size, teamDriveId, parents)",
-                            corpora="drive",
-                            orderBy="folder, name asc",
-                        )
-                        .execute()
-                    )
-            else:
-                if stopDup:
-                    query = f"'{dir_id}' in parents and name = '{fileName}' and "
-                else:
-                    query = f"'{dir_id}' in parents and "
-                    fileName = fileName.split()
-                    for name in fileName:
-                        if name != "":
-                            query += f"name contains '{name}' and "
-                    if itemType == "files":
-                        query += (
-                            "mimeType != 'application/vnd.google-apps.folder' and "
-                        )
-                    elif itemType == "folders":
-                        query += (
-                            "mimeType = 'application/vnd.google-apps.folder' and "
-                        )
-                query += "trashed = false"
                 return (
                     self.__service.files()
                     .list(
                         supportsAllDrives=True,
                         includeItemsFromAllDrives=True,
+                        driveId=dir_id,
                         q=query,
                         spaces="drive",
                         pageSize=150,
-                        fields="files(id, name, mimeType, size)",
+                        fields="files(id, name, mimeType, size, teamDriveId, parents)",
+                        corpora="drive",
                         orderBy="folder, name asc",
                     )
                     .execute()
                 )
+            if stopDup:
+                query = f"'{dir_id}' in parents and name = '{fileName}' and "
+            else:
+                query = f"'{dir_id}' in parents and "
+                fileName = fileName.split()
+                for name in fileName:
+                    if name != "":
+                        query += f"name contains '{name}' and "
+                if itemType == "files":
+                    query += "mimeType != 'application/vnd.google-apps.folder' and "
+                elif itemType == "folders":
+                    query += "mimeType = 'application/vnd.google-apps.folder' and "
+            query += "trashed = false"
+            return (
+                self.__service.files()
+                .list(
+                    supportsAllDrives=True,
+                    includeItemsFromAllDrives=True,
+                    q=query,
+                    spaces="drive",
+                    pageSize=150,
+                    fields="files(id, name, mimeType, size)",
+                    orderBy="folder, name asc",
+                )
+                .execute()
+            )
         except Exception as err:
             err = str(err).replace(">", "").replace("<", "")
             LOGGER.error(err)
@@ -711,8 +701,7 @@ class GoogleDriveHelper:
             if not response["files"]:
                 if noMulti:
                     break
-                else:
-                    continue
+                continue
             if not Title:
                 msg += f"<h4>Search Result For {fileName}</h4>"
                 Title = True
@@ -955,17 +944,15 @@ class GoogleDriveHelper:
                                 f"Reached maximum number of service accounts switching, which is {self.__sa_count}"
                             )
                             raise err
-                        else:
-                            if self.__is_cancelled:
-                                return None
-                            self.__switchServiceAccount()
-                            LOGGER.info(f"Got: {reason}, Trying Again...")
-                            return self.__download_file(
-                                file_id, path, filename, mime_type
-                            )
-                    else:
-                        LOGGER.error(f"Got: {reason}")
-                        raise err
+                        if self.__is_cancelled:
+                            return None
+                        self.__switchServiceAccount()
+                        LOGGER.info(f"Got: {reason}, Trying Again...")
+                        return self.__download_file(
+                            file_id, path, filename, mime_type
+                        )
+                    LOGGER.error(f"Got: {reason}")
+                    raise err
         self.__file_processed_bytes = 0
         return None
 

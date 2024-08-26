@@ -305,10 +305,9 @@ async def get_tg_link_content(link):
         if not user_message.empty:
             return user_message, "user"
         raise TgLinkException("Private: Please report!")
-    elif not private:
+    if not private:
         return message, "bot"
-    else:
-        raise TgLinkException("Bot can't download from GROUPS without joining!")
+    raise TgLinkException("Bot can't download from GROUPS without joining!")
 
 
 async def update_all_messages(force=False):

@@ -382,10 +382,9 @@ async def split_file(
                         i,
                         False,
                     )
-                else:
-                    LOGGER.warning(
-                        f"{err}. Unable to split this video, if it's size less than {MAX_SPLIT_SIZE} will be uploaded as it is. Path: {path}"
-                    )
+                LOGGER.warning(
+                    f"{err}. Unable to split this video, if it's size less than {MAX_SPLIT_SIZE} will be uploaded as it is. Path: {path}"
+                )
                 return "errored"
             out_size = await aiopath.getsize(out_path)
             if out_size > MAX_SPLIT_SIZE:
@@ -408,12 +407,12 @@ async def split_file(
                     f"Something went wrong while splitting, mostly file is corrupted. Path: {path}"
                 )
                 break
-            elif duration == lpd:
+            if duration == lpd:
                 LOGGER.warning(
                     f"This file has been splitted with default stream and audio, so you will only see one part with less size from orginal one because it doesn't have all streams and audios. This happens mostly with MKV videos. Path: {path}"
                 )
                 break
-            elif lpd <= 3:
+            if lpd <= 3:
                 await aioremove(out_path)
                 break
             start_time += lpd - 3
@@ -432,7 +431,7 @@ async def split_file(
         code = await listener.suproc.wait()
         if code == -9:
             return False
-        elif code != 0:
+        if code != 0:
             err = (await listener.suproc.stderr.read()).decode().strip()
             LOGGER.error(err)
     return True

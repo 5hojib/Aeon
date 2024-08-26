@@ -24,7 +24,7 @@ class GdriveStatus:
             if self.__obj.processed_bytes == 0:
                 return MirrorStatus.STATUS_PROCESSING
             return MirrorStatus.STATUS_UPLOADING
-        elif self.__status == "dl":
+        if self.__status == "dl":
             return MirrorStatus.STATUS_DOWNLOADING
         return MirrorStatus.STATUS_CLONING
 

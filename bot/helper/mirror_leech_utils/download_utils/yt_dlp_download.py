@@ -158,7 +158,7 @@ class YoutubeDLHelper:
                 for entry in result["entries"]:
                     if not entry:
                         continue
-                    elif "filesize_approx" in entry:
+                    if "filesize_approx" in entry:
                         self.__size += entry["filesize_approx"]
                     elif "filesize" in entry:
                         self.__size += entry["filesize"]
@@ -170,20 +170,19 @@ class YoutubeDLHelper:
                         if not self.__ext:
                             self.__ext = ext
                 return None
-            else:
-                outtmpl_ = "%(title,fulltitle,alt_title)s%(season_number& |)s%(season_number&S|)s%(season_number|)02d%(episode_number&E|)s%(episode_number|)02d%(height& |)s%(height|)s%(height&p|)s%(fps|)s%(fps&fps|)s%(tbr& |)s%(tbr|)d.%(ext)s"
-                realName = ydl.prepare_filename(result, outtmpl=outtmpl_)
-                ext = ospath.splitext(realName)[-1]
-                self.name = f"{name}{ext}" if name else realName
-                if not self.__ext:
-                    self.__ext = ext
-                if result.get("filesize"):
-                    self.__size = result["filesize"]
-                    return None
-                elif result.get("filesize_approx"):
-                    self.__size = result["filesize_approx"]
-                    return None
+            outtmpl_ = "%(title,fulltitle,alt_title)s%(season_number& |)s%(season_number&S|)s%(season_number|)02d%(episode_number&E|)s%(episode_number|)02d%(height& |)s%(height|)s%(height&p|)s%(fps|)s%(fps&fps|)s%(tbr& |)s%(tbr|)d.%(ext)s"
+            realName = ydl.prepare_filename(result, outtmpl=outtmpl_)
+            ext = ospath.splitext(realName)[-1]
+            self.name = f"{name}{ext}" if name else realName
+            if not self.__ext:
+                self.__ext = ext
+            if result.get("filesize"):
+                self.__size = result["filesize"]
                 return None
+            if result.get("filesize_approx"):
+                self.__size = result["filesize_approx"]
+                return None
+            return None
 
     def __download(self, link, path):
         try:

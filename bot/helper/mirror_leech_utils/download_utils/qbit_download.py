@@ -54,7 +54,7 @@ async def add_qb_torrent(link, path, listener, ratio, seed_time):
                     )
                     if len(tor_info) > 0:
                         break
-                    elif time() - ADD_TIME >= 120:
+                    if time() - ADD_TIME >= 120:
                         await listener.onDownloadError(
                             "Not added! Check if the link is valid or not. If it's torrent file then report, this happens if torrent file size above 10mb."
                         )

@@ -228,7 +228,7 @@ async def AeonCallback(_, query):
     data = query.data.split()
     if user_id != int(data[1]):
         return await query.answer(text="This message not your's!", show_alert=True)
-    elif data[2] == "logdisplay":
+    if data[2] == "logdisplay":
         await query.answer()
         async with aiopen("log.txt", "r") as f:
             logFileLines = (await f.read()).splitlines()

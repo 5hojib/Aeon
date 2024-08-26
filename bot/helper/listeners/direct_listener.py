@@ -59,7 +59,7 @@ class DirectListener:
                     )
                     self.task.remove(True, True)
                     break
-                elif self.task.is_complete:
+                if self.task.is_complete:
                     self.proc_bytes += self.task.total_length
                     self.task.remove(True)
                     break

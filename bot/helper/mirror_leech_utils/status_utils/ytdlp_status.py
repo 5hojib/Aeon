@@ -23,8 +23,7 @@ class YtDlpDownloadStatus:
     def processed_raw(self):
         if self.__obj.downloaded_bytes != 0:
             return self.__obj.downloaded_bytes
-        else:
-            return async_to_sync(get_path_size, self.__listener.dir)
+        return async_to_sync(get_path_size, self.__listener.dir)
 
     def size(self):
         return get_readable_file_size(self.__obj.size)

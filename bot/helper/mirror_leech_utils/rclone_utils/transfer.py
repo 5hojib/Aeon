@@ -120,7 +120,7 @@ class RcloneTransferHelper:
         if return_code == 0:
             await self.__listener.onDownloadComplete()
             return None
-        elif return_code != -9:
+        if return_code != -9:
             error = (await self.__proc.stderr.read()).decode().strip()
             if (
                 not error
@@ -144,10 +144,9 @@ class RcloneTransferHelper:
                     if self.__is_cancelled:
                         return None
                     return await self.__start_download(cmd, remote_type)
-                else:
-                    LOGGER.info(
-                        f"Reached maximum number of service accounts switching, which is {self.__sa_count}"
-                    )
+                LOGGER.info(
+                    f"Reached maximum number of service accounts switching, which is {self.__sa_count}"
+                )
 
             await self.__listener.onDownloadError(error[:4000])
             return None
@@ -241,7 +240,7 @@ class RcloneTransferHelper:
 
         if return_code == -9:
             return False
-        elif return_code != 0:
+        if return_code != 0:
             error = (await self.__proc.stderr.read()).decode().strip()
             if (
                 not error
@@ -266,14 +265,12 @@ class RcloneTransferHelper:
                         if self.__is_cancelled
                         else await self.__start_upload(cmd, remote_type)
                     )
-                else:
-                    LOGGER.info(
-                        f"Reached maximum number of service accounts switching, which is {self.__sa_count}"
-                    )
+                LOGGER.info(
+                    f"Reached maximum number of service accounts switching, which is {self.__sa_count}"
+                )
             await self.__listener.onUploadError(error[:4000])
             return False
-        else:
-            return True
+        return True
 
     async def upload(self, path, size):
         self.__is_upload = True
@@ -413,35 +410,32 @@ class RcloneTransferHelper:
 
         if return_code == -9:
             return None, None
-        elif return_code != 0:
+        if return_code != 0:
             error = (await self.__proc.stderr.read()).decode().strip()
             LOGGER.error(error)
             await self.__listener.onUploadError(error[:4000])
             return None, None
-        elif dst_remote_type == "drive":
+        if dst_remote_type == "drive":
             link, destination = await self.__get_gdrive_link(
                 config_path, dst_remote, dst_path, mime_type
             )
             return (None, None) if self.__is_cancelled else (link, destination)
-        else:
-            if mime_type != "Folder":
-                destination += f"/{self.name}" if dst_path else self.name
+        if mime_type != "Folder":
+            destination += f"/{self.name}" if dst_path else self.name
 
-            cmd = ["xone", "link", "--config", config_path, destination]
-            res, err, code = await cmd_exec(cmd)
+        cmd = ["xone", "link", "--config", config_path, destination]
+        res, err, code = await cmd_exec(cmd)
 
-            if self.__is_cancelled:
-                return None, None
+        if self.__is_cancelled:
+            return None, None
 
-            if code == 0:
-                return res, destination
-            elif code != -9:
-                LOGGER.error(
-                    f"while getting link. Path: {destination} | Stderr: {err}"
-                )
-                await self.__listener.onUploadError(err[:4000])
-                return None, None
-            return None
+        if code == 0:
+            return res, destination
+        if code != -9:
+            LOGGER.error(f"while getting link. Path: {destination} | Stderr: {err}")
+            await self.__listener.onUploadError(err[:4000])
+            return None, None
+        return None
 
     @staticmethod
     def __getUpdatedCommand(config_path, source, destination, rcflags, method):

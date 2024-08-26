@@ -469,8 +469,7 @@ def terabox(url):
         if _json["errno"] not in [0, "0"]:
             if "errmsg" in _json:
                 raise DirectDownloadLinkException(f"ERROR: {_json['errmsg']}")
-            else:
-                raise DirectDownloadLinkException("ERROR: Something went wrong!")
+            raise DirectDownloadLinkException("ERROR: Something went wrong!")
 
         if "list" not in _json:
             return
@@ -578,10 +577,9 @@ def appflix(url):
         drive_link := HTML(res.text).xpath("//a[contains(@class,'btn')]/@href")
     ) and "drive.google.com" in drive_link[0]:
         return drive_link[0]
-    else:
-        raise DirectDownloadLinkException(
-            "ERROR: Drive Link not found, Try in your broswer"
-        )
+    raise DirectDownloadLinkException(
+        "ERROR: Drive Link not found, Try in your broswer"
+    )
 
 
 def wetransfer(url):
@@ -601,12 +599,11 @@ def wetransfer(url):
             raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     if "direct_link" in res:
         return res["direct_link"]
-    elif "message" in res:
+    if "message" in res:
         raise DirectDownloadLinkException(f"ERROR: {res['message']}")
-    elif "error" in res:
+    if "error" in res:
         raise DirectDownloadLinkException(f"ERROR: {res['error']}")
-    else:
-        raise DirectDownloadLinkException("ERROR: cannot find direct link")
+    raise DirectDownloadLinkException("ERROR: cannot find direct link")
 
 
 def akmfiles(url):
@@ -621,8 +618,7 @@ def akmfiles(url):
             raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     if direct_link := html.xpath("//a[contains(@class,'btn btn-dow')]/@href"):
         return direct_link[0]
-    else:
-        raise DirectDownloadLinkException("ERROR: Direct link not found")
+    raise DirectDownloadLinkException("ERROR: Direct link not found")
 
 
 def shrdsk(url):
@@ -1030,7 +1026,7 @@ def send_cm_file(url, file_id=None):
 def send_cm(url):
     if "/d/" in url:
         return send_cm_file(url)
-    elif "/s/" not in url:
+    if "/s/" not in url:
         file_id = url.split("/")[-1]
         return send_cm_file(url, file_id)
     splitted_url = url.split("/")
@@ -1140,10 +1136,7 @@ def doods(url):
     json_data = response.json()
     if direct_link := json_data.get("data", {}).get("direct_link"):
         return f"https://dd-cdn.pakai.eu.org/download?url={direct_link}"
-    else:
-        raise DirectDownloadLinkException(
-            "ERROR: Direct link not found in API response"
-        )
+    raise DirectDownloadLinkException("ERROR: Direct link not found in API response")
 
 
 def hubdrive(url):
@@ -1221,7 +1214,7 @@ def easyupload(url):
             raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}")
     if "download_link" in json_resp:
         return json_resp["download_link"]
-    elif "data" in json_resp:
+    if "data" in json_resp:
         raise DirectDownloadLinkException(
             f"ERROR: Failed to generate direct link due to {json_resp['data']}"
         )
@@ -1287,7 +1280,7 @@ def filewish(url):
     for version in result["versions"]:
         if quality == version["name"]:
             return version["url"]
-        elif version["name"] == "l":
+        if version["name"] == "l":
             error += "\nLow"
         elif version["name"] == "n":
             error += "\nNormal"
@@ -1337,14 +1330,14 @@ def streamvid(url):
             raise DirectDownloadLinkException(
                 "ERROR: direct link not found! in the script"
             )
-        elif (qualities_urls := html.xpath('//div[@id="dl_versions"]/a/@href')) and (
+        if (qualities_urls := html.xpath('//div[@id="dl_versions"]/a/@href')) and (
             qualities := html.xpath('//div[@id="dl_versions"]/a/text()[2]')
         ):
             error = "\nProvide a quality to download the video\nAvailable Quality:"
             for quality_url, quality in zip(qualities_urls, qualities):
                 error += f"\n{quality.strip()} <code>{quality_url}</code>"
             raise DirectDownloadLinkException(f"ERROR: {error}")
-        elif error := html.xpath('//div[@class="not-found-text"]/text()'):
+        if error := html.xpath('//div[@class="not-found-text"]/text()'):
             raise DirectDownloadLinkException(f"ERROR: {error[0]}")
         raise DirectDownloadLinkException("ERROR: Something went wrong")
 

@@ -42,8 +42,7 @@ class QbittorrentStatus:
     def name(self):
         if self.__info.state in ["metaDL", "checkingResumeData"]:
             return f"[METADATA]{self.__info.name}"
-        else:
-            return self.__info.name
+        return self.__info.name
 
     def size(self):
         return get_readable_file_size(self.__info.size)
@@ -56,16 +55,15 @@ class QbittorrentStatus:
         state = self.__info.state
         if state == "queuedDL" or self.queued:
             return MirrorStatus.STATUS_QUEUEDL
-        elif state == "queuedUP":
+        if state == "queuedUP":
             return MirrorStatus.STATUS_QUEUEUP
-        elif state in ["pausedDL", "pausedUP"]:
+        if state in ["pausedDL", "pausedUP"]:
             return MirrorStatus.STATUS_PAUSED
-        elif state in ["checkingUP", "checkingDL"]:
+        if state in ["checkingUP", "checkingDL"]:
             return MirrorStatus.STATUS_CHECKING
-        elif state in ["stalledUP", "uploading"] and self.seeding:
+        if state in ["stalledUP", "uploading"] and self.seeding:
             return MirrorStatus.STATUS_SEEDING
-        else:
-            return MirrorStatus.STATUS_DOWNLOADING
+        return MirrorStatus.STATUS_DOWNLOADING
 
     def seeders_num(self):
         return self.__info.num_seeds
