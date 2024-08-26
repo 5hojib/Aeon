@@ -69,10 +69,9 @@ async def initiate_search_tools():
     await sync_to_async(xnox_client.search_install_plugin, src_plugins)
 
     if SEARCH_API_LINK := config_dict["SEARCH_API_LINK"]:
-        global SITES
+        global SITES  # noqa: PLW0603
         try:
-            async with ClientSession(trust_env=True) as c:
-                async with c.get(f"{SEARCH_API_LINK}/api/v1/sites") as res:
+            async with ClientSession(trust_env=True) as c, c.get(f"{SEARCH_API_LINK}/api/v1/sites") as res:
                     data = await res.json()
             SITES = {
                 str(site): str(site).capitalize() for site in data["supported_sites"]
@@ -108,9 +107,8 @@ async def __search(key, site, message, method):
             else:
                 api = f"{SEARCH_API_LINK}/api/v1/recent?site={site}&limit={SEARCH_LIMIT}"
         try:
-            async with ClientSession(trust_env=True) as c:
-                async with c.get(api) as res:
-                    search_results = await res.json()
+            async with ClientSession(trust_env=True) as c, c.get(api) as res:
+                search_results = await res.json()
             if "error" in search_results or search_results["total"] == 0:
                 await edit_message(
                     message,
@@ -270,10 +268,9 @@ async def torrentSearch(_, message):
     user_id = message.from_user.id
     buttons = ButtonMaker()
     key = message.text.split()
-    if not await isAdmin(message, user_id):
-        if message.chat.type != message.chat.type.PRIVATE:
-            msg, buttons = await checking_access(user_id, buttons)
-            if msg is not None:
+    if not await isAdmin(message, user_id) and message.chat.type != message.chat.type.PRIVATE:
+        msg, buttons = await checking_access(user_id, buttons)
+        if msg is not None:
                 reply_message = await send_message(message, msg, buttons.column(1))
                 await delete_links(message)
                 await five_minute_del(reply_message)

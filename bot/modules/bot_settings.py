@@ -497,8 +497,8 @@ async def edit_variable(_, message, pre_message, key):
         GLOBAL_EXTENSION_FILTER.append(".aria2")
         for x in fx:
             if x.strip().startswith("."):
-                x = x.lstrip(".")
-            GLOBAL_EXTENSION_FILTER.append(x.strip().lower())
+                clean_x = x.lstrip(".")
+            GLOBAL_EXTENSION_FILTER.append(clean_x.strip().lower())
     elif key == "GDRIVE_ID":
         list_drives_dict["Main"] = {
             "drive_id": value,

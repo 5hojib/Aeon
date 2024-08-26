@@ -255,11 +255,11 @@ async def delete_links(message):
 
 async def delete_all_messages():
     async with status_reply_dict_lock:
-        for key, data in list(status_reply_dict.items()):
-            try:
+        try:
+            for key, data in list(status_reply_dict.items()):
                 del status_reply_dict[key]
                 await delete_message(data[0])
-            except Exception as e:
+        except Exception as e:
                 LOGGER.error(str(e))
 
 

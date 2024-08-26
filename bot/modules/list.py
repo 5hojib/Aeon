@@ -86,14 +86,13 @@ async def drive_list(_, message):
         await one_minute_del(reply_message)
         return
     user_id = message.from_user.id
-    if not await isAdmin(message, user_id):
-        if message.chat.type != message.chat.type.PRIVATE:
-            msg, btn = await checking_access(user_id)
-            if msg is not None:
-                reply_message = await send_message(message, msg, btn.column(1))
-                await delete_links(message)
-                await five_minute_del(reply_message)
-                return
+    if not await isAdmin(message, user_id) and message.chat.type != message.chat.type.PRIVATE:
+        msg, btn = await checking_access(user_id)
+        if msg is not None:
+            reply_message = await send_message(message, msg, btn.column(1))
+            await delete_links(message)
+            await five_minute_del(reply_message)
+            return
     buttons = await list_buttons(user_id)
     reply_message = await send_message(message, "Choose list options:", buttons)
     await five_minute_del(reply_message)
