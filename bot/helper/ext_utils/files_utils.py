@@ -459,7 +459,9 @@ async def process_file(file_, user_id, dirpath=None, is_mirror=False):
         for rep in range(1, len(slit)):
             args = slit[rep].split(":")
             if len(args) == 3:
-                __new_file_name = re_sub(args[0], args[1], __new_file_name, int(args[2]))
+                __new_file_name = re_sub(
+                    args[0], args[1], __new_file_name, int(args[2])
+                )
             elif len(args) == 2:
                 __new_file_name = re_sub(args[0], args[1], __new_file_name)
             elif len(args) == 1:
@@ -483,7 +485,8 @@ async def process_file(file_, user_id, dirpath=None, is_mirror=False):
         _new_ext_file_name = f"{_ext_out_name}{suffix}.{file_dict[-1]}"
         if len(_ext_out_name) > (64 - (suf_len + _ext_in)):
             _new_ext_file_name = (
-                _ext_out_name[: 64 - (suf_len + _ext_in)] + f"{suffix}.{file_dict[-1]}"
+                _ext_out_name[: 64 - (suf_len + _ext_in)]
+                + f"{suffix}.{file_dict[-1]}"
             )
         file_ = _new_ext_file_name
     elif suffix:
