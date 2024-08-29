@@ -7,15 +7,15 @@ from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from bot import (
     Interval,
     bot,
-    bot_start_time,
     download_dict,
+    bot_start_time,
     download_dict_lock,
     status_reply_dict_lock,
 )
 from bot.helper.ext_utils.bot_utils import (
+    SetInterval,
     new_task,
     turn_page,
-    SetInterval,
     get_readable_time,
     get_readable_file_size,
 )

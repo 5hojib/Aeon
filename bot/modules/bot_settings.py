@@ -30,7 +30,7 @@ from bot import (
     status_reply_dict_lock,
 )
 from bot.modules.torrent_search import initiate_search_tools
-from bot.helper.ext_utils.bot_utils import new_thread, SetInterval, sync_to_async
+from bot.helper.ext_utils.bot_utils import SetInterval, new_thread, sync_to_async
 from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.ext_utils.help_strings import bset_display_dict
 from bot.helper.ext_utils.task_manager import start_from_queued
