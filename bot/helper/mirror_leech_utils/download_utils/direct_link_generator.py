@@ -156,9 +156,7 @@ def mediafire(url, session=None):
         raise DirectDownloadLinkError(f"ERROR: {error[0]}")
     if not (final_link := html.xpath("//a[@id='downloadButton']/@href")):
         session.close()
-        raise DirectDownloadLinkError(
-            "ERROR: No links found in this page Try Again"
-        )
+        raise DirectDownloadLinkError("ERROR: No links found in this page Try Again")
     if final_link[0].startswith("//"):
         return mediafire(f"https://{final_link[0][2:]}", session)
     session.close()
@@ -284,9 +282,7 @@ def pixeldrain(url):
             raise DirectDownloadLinkError(f"ERROR: {e.__class__.__name__}")
     if resp["success"]:
         return dl_link
-    raise DirectDownloadLinkError(
-        f"ERROR: Cant't download due {resp['message']}."
-    )
+    raise DirectDownloadLinkError(f"ERROR: Cant't download due {resp['message']}.")
 
 
 def streamtape(url):
@@ -414,9 +410,7 @@ def krakenfiles(url):
         if token := html.xpath('//input[@id="dl-token"]/@value'):
             data = {"token": token[0]}
         else:
-            raise DirectDownloadLinkError(
-                "ERROR: Unable to find token for post."
-            )
+            raise DirectDownloadLinkError("ERROR: Unable to find token for post.")
         try:
             _json = session.post(post_url, data=data).json()
         except Exception as e:
@@ -480,9 +474,7 @@ def terabox(url, video_quality="HD Video", save_dir="HD_Video"):
             if response.status_code == 200:
                 break
         except Exception as e:
-            raise DirectDownloadLinkError(
-                f"ERROR: {e.__class__.__name__}"
-            ) from e
+            raise DirectDownloadLinkError(f"ERROR: {e.__class__.__name__}") from e
     else:
         raise DirectDownloadLinkError("ERROR: Unable to fetch the JSON data")
 
@@ -564,9 +556,7 @@ def appflix(url):
         drive_link := HTML(res.text).xpath("//a[contains(@class,'btn')]/@href")
     ) and "drive.google.com" in drive_link[0]:
         return drive_link[0]
-    raise DirectDownloadLinkError(
-        "ERROR: Drive Link not found, Try in your broswer"
-    )
+    raise DirectDownloadLinkError("ERROR: Drive Link not found, Try in your broswer")
 
 
 def wetransfer(url):
@@ -784,9 +774,7 @@ def gofile(url):
         if _json["status"] in "error-passwordWrong":
             raise DirectDownloadLinkError("ERROR: This password is wrong !")
         if _json["status"] in "error-notFound":
-            raise DirectDownloadLinkError(
-                "ERROR: File not found on gofile's server"
-            )
+            raise DirectDownloadLinkError("ERROR: File not found on gofile's server")
         if _json["status"] in "error-notPublic":
             raise DirectDownloadLinkError("ERROR: This folder is not public")
 
@@ -1117,9 +1105,7 @@ def doods(url):
     api_url = f"https://api.pake.tk/dood?url={url}"
     response = get(api_url)
     if response.status_code != 200:
-        raise DirectDownloadLinkError(
-            "ERROR: Failed to fetch direct link from API"
-        )
+        raise DirectDownloadLinkError("ERROR: Failed to fetch direct link from API")
     json_data = response.json()
     if direct_link := json_data.get("data", {}).get("direct_link"):
         return f"https://dd-cdn.pakai.eu.org/download?url={direct_link}"
@@ -1309,9 +1295,7 @@ def streamvid(url):
                     '//div[@class="alert alert-danger"][1]/text()[2]'
                 ):
                     raise DirectDownloadLinkError(f"ERROR: {error[0]}")
-                raise DirectDownloadLinkError(
-                    "ERROR: direct link script not found!"
-                )
+                raise DirectDownloadLinkError("ERROR: direct link script not found!")
             if directLink := findall(r'document\.location\.href="(.*)"', script[0]):
                 return directLink[0]
             raise DirectDownloadLinkError(
