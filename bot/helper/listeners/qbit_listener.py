@@ -35,7 +35,7 @@ async def __remove_torrent(hash_, tag):
 
 
 @new_task
-async def __onDownloadError(err, tor, button=None):
+async def __on_download_error(err, tor, button=None):
     LOGGER.info(f"Cancelling Download: {tor.name}")
     ext_hash = tor.hash
     download = await get_task_by_gid(ext_hash[:8])
@@ -47,7 +47,7 @@ async def __onDownloadError(err, tor, button=None):
 
 
 @new_task
-async def __onSeedFinish(tor):
+async def __on_seed_finish(tor):
     ext_hash = tor.hash
     LOGGER.info(f"Cancelling Seed: {tor.name}")
     download = await get_task_by_gid(ext_hash[:8])
@@ -68,7 +68,7 @@ async def __stop_duplicate(tor):
     name = tor.content_path.rsplit("/", 1)[-1].rsplit(".!qB", 1)[0]
     msg, button = await stop_duplicate_check(name, listener)
     if msg:
-        __onDownloadError(msg, tor, button)
+        __on_download_error(msg, tor, button)
 
 
 @new_task
@@ -78,7 +78,7 @@ async def __size_checked(tor):
         listener = download.listener()
         size = tor.size
         if limit_exceeded := await limit_checker(size, listener, True):
-            await __onDownloadError(limit_exceeded, tor)
+            await __on_download_error(limit_exceeded, tor)
 
 
 @new_task
@@ -92,7 +92,7 @@ async def __on_download_complete(tor):
         await sync_to_async(xnox_client.torrents_pause, torrent_hashes=ext_hash)
     if listener.select:
         await clean_unwanted(listener.dir)
-    await listener.onDownloadComplete()
+    await listener.on_download_complete()
     if listener.seed:
         async with download_dict_lock:
             if listener.uid in download_dict:
@@ -133,7 +133,7 @@ async def __qb_listener():
                             TORRENT_TIMEOUT
                             and time() - tor_info.added_on >= TORRENT_TIMEOUT
                         ):
-                            __onDownloadError("Dead Torrent!", tor_info)
+                            __on_download_error("Dead Torrent!", tor_info)
                         else:
                             await sync_to_async(
                                 xnox_client.torrents_reannounce,
@@ -170,7 +170,7 @@ async def __qb_listener():
                             and time() - QbTorrents[tag]["stalled_time"]
                             >= TORRENT_TIMEOUT
                         ):
-                            __onDownloadError("Dead Torrent!", tor_info)
+                            __on_download_error("Dead Torrent!", tor_info)
                         else:
                             await sync_to_async(
                                 xnox_client.torrents_reannounce,
@@ -182,7 +182,7 @@ async def __qb_listener():
                             torrent_hashes=tor_info.hash,
                         )
                     elif state == "error":
-                        __onDownloadError(
+                        __on_download_error(
                             "No enough space for this torrent on device", tor_info
                         )
                     elif (
@@ -198,13 +198,13 @@ async def __qb_listener():
                         and QbTorrents[tag]["seeding"]
                     ):
                         QbTorrents[tag]["seeding"] = False
-                        __onSeedFinish(tor_info)
+                        __on_seed_finish(tor_info)
             except Exception as e:
                 LOGGER.error(str(e))
         await sleep(3)
 
 
-async def onDownloadStart(tag):
+async def on_download_start(tag):
     async with qb_listener_lock:
         QbTorrents[tag] = {
             "stalled_time": time(),

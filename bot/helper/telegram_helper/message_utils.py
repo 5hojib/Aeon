@@ -36,7 +36,7 @@ from bot.helper.ext_utils.bot_utils import (
     download_image_url,
     get_readable_message,
 )
-from bot.helper.ext_utils.exceptions import TgLinkException
+from bot.helper.ext_utils.exceptions import TgLinkError
 from bot.helper.telegram_helper.button_build import ButtonMaker
 
 
@@ -276,7 +276,7 @@ async def get_tg_link_content(link):
             r"tg:\/\/openmessage\?user_id=([0-9]+)&message_id=([0-9]+)", link
         )
         if not user:
-            raise TgLinkException(
+            raise TgLinkError(
                 "USER_SESSION_STRING required for this private link!"
             )
 
@@ -299,15 +299,15 @@ async def get_tg_link_content(link):
         try:
             user_message = await user.get_messages(chat_id=chat, message_ids=msg_id)
         except Exception as e:
-            raise TgLinkException(
+            raise TgLinkError(
                 f"You don't have access to this chat!. ERROR: {e}"
             ) from e
         if not user_message.empty:
             return user_message, "user"
-        raise TgLinkException("Private: Please report!")
+        raise TgLinkError("Private: Please report!")
     if not private:
         return message, "bot"
-    raise TgLinkException("Bot can't download from GROUPS without joining!")
+    raise TgLinkError("Bot can't download from GROUPS without joining!")
 
 
 async def update_all_messages(force=False):

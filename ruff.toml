@@ -10,6 +10,7 @@ length-sort = true
 max-branches = 50
 max-statements = 100
 max-returns = 15
+max-args = 10
 
 [lint]
 select = [

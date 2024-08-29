@@ -75,7 +75,7 @@ async def add_rclone_download(rc_path, config_path, path, name, listener):
             download_dict[listener.uid] = QueueStatus(
                 name, size, gid, listener, "dl"
             )
-        await listener.onDownloadStart()
+        await listener.on_download_start()
         await sendStatusMessage(listener.message)
         await event.wait()
         async with download_dict_lock:
@@ -96,7 +96,7 @@ async def add_rclone_download(rc_path, config_path, path, name, listener):
     if from_queue:
         LOGGER.info(f"Start Queued Download with rclone: {rc_path}")
     else:
-        await listener.onDownloadStart()
+        await listener.on_download_start()
         await sendStatusMessage(listener.message)
         LOGGER.info(f"Download with rclone: {rc_path}")
 

@@ -43,7 +43,7 @@ from bot.helper.ext_utils.bot_utils import (
 )
 from bot.helper.ext_utils.telegraph_helper import telegraph
 
-from .exceptions import NotSupportedExtractionArchive
+from .exceptions import ExtractionArchiveError
 
 FIRST_SPLIT_REGEX = r"(\.|_)part0*1\.rar$|(\.|_)7z\.0*1$|(\.|_)zip\.0*1$|^(?!.*(\.|_)part\d+\.rar$).*\.rar$"
 SPLIT_REGEX = r"\.r\d+$|\.7z\.\d+$|\.z\d+$|\.zip\.\d+$"
@@ -671,7 +671,7 @@ def get_base_name(orig_path):
     )
     if extension != "":
         return re_split(f"{extension}$", orig_path, maxsplit=1, flags=IGNORECASE)[0]
-    raise NotSupportedExtractionArchive("File format not supported for extraction")
+    raise ExtractionArchiveError("File format not supported for extraction")
 
 
 def get_mime_type(file_path):

@@ -49,7 +49,7 @@ async def add_gd_download(link, path, listener, newname):
             download_dict[listener.uid] = QueueStatus(
                 name, size, gid, listener, "dl"
             )
-        await listener.onDownloadStart()
+        await listener.on_download_start()
         await sendStatusMessage(listener.message)
         await event.wait()
         async with download_dict_lock:
@@ -72,7 +72,7 @@ async def add_gd_download(link, path, listener, newname):
         LOGGER.info(f"Start Queued Download from GDrive: {name}")
     else:
         LOGGER.info(f"Download from GDrive: {name}")
-        await listener.onDownloadStart()
+        await listener.on_download_start()
         await sendStatusMessage(listener.message)
 
     await sync_to_async(drive.download, link)

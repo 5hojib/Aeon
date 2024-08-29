@@ -102,7 +102,7 @@ class MegaAppListener(MegaListener):
             elif transfer.isFinished() and (
                 transfer.isFolderTransfer() or transfer.getFileName() == self.__name
             ):
-                async_to_sync(self.listener.onDownloadComplete)
+                async_to_sync(self.listener.on_download_complete)
                 self.continue_event.set()
         except Exception as e:
             LOGGER.error(e)
@@ -190,7 +190,7 @@ async def add_mega_download(mega_link, path, listener, name):
             download_dict[listener.uid] = QueueStatus(
                 name, size, gid, listener, "Dl"
             )
-        await listener.onDownloadStart()
+        await listener.on_download_start()
         await sendStatusMessage(listener.message)
         await event.wait()
         async with download_dict_lock:
@@ -214,7 +214,7 @@ async def add_mega_download(mega_link, path, listener, name):
     if from_queue:
         LOGGER.info(f"Start Queued Download from Mega: {name}")
     else:
-        await listener.onDownloadStart()
+        await listener.on_download_start()
         await sendStatusMessage(listener.message)
         LOGGER.info(f"Download from Mega: {name}")
 

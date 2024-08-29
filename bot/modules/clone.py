@@ -18,7 +18,7 @@ from bot.helper.ext_utils.bot_utils import (
     is_rclone_path,
     get_telegraph_list,
 )
-from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
+from bot.helper.ext_utils.exceptions import DirectDownloadLinkError
 from bot.helper.aeon_utils.nsfw_check import nsfw_precheck
 from bot.helper.aeon_utils.send_react import send_react
 from bot.helper.ext_utils.help_strings import CLONE_HELP_MESSAGE
@@ -116,7 +116,7 @@ async def rcloneNode(client, message, link, dst_path, rcf, tag):
         mime_type = rstat["MimeType"]
 
     listener = MirrorLeechListener(message, tag=tag)
-    await listener.onDownloadStart()
+    await listener.on_download_start()
 
     RCTransfer = RcloneTransferHelper(listener, name)
     LOGGER.info(
@@ -192,7 +192,7 @@ async def gdcloneNode(message, link, listen_up):
             await edit_message(
                 process_msg, f"<b>Generated Link:</b> <code>{link}</code>"
             )
-        except DirectDownloadLinkException as e:
+        except DirectDownloadLinkError as e:
             LOGGER.error(str(e))
             if str(e).startswith("ERROR:"):
                 await edit_message(process_msg, str(e))
@@ -219,14 +219,14 @@ async def gdcloneNode(message, link, listen_up):
         listener = MirrorLeechListener(
             message,
             tag=listen_up[0],
-            isClone=True,
+            is_clone=True,
             drive_id=listen_up[1],
             index_link=listen_up[2],
         )
         if limit_exceeded := await limit_checker(size, listener):
             await listener.onUploadError(limit_exceeded)
             return
-        await listener.onDownloadStart()
+        await listener.on_download_start()
         LOGGER.info(f"Clone Started: Name: {name} - Source: {link}")
         drive = GoogleDriveHelper(name, listener=listener)
         if files <= 20:

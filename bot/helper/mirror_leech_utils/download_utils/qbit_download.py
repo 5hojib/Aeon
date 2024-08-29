@@ -14,7 +14,7 @@ from bot import (
 )
 from bot.helper.ext_utils.bot_utils import sync_to_async, bt_selection_buttons
 from bot.helper.ext_utils.task_manager import is_queued
-from bot.helper.listeners.qbit_listener import onDownloadStart
+from bot.helper.listeners.qbit_listener import on_download_start
 from bot.helper.telegram_helper.message_utils import (
     send_message,
     delete_message,
@@ -71,7 +71,7 @@ async def add_qb_torrent(link, path, listener, ratio, seed_time):
             download_dict[listener.uid] = QbittorrentStatus(
                 listener, queued=added_to_queue
             )
-        await onDownloadStart(f"{listener.uid}")
+        await on_download_start(f"{listener.uid}")
 
         if added_to_queue:
             LOGGER.info(
@@ -82,7 +82,7 @@ async def add_qb_torrent(link, path, listener, ratio, seed_time):
                 non_queued_dl.add(listener.uid)
             LOGGER.info(f"QbitDownload started: {tor_info.name} - Hash: {ext_hash}")
 
-        await listener.onDownloadStart()
+        await listener.on_download_start()
 
         if config_dict["BASE_URL"] and listener.select:
             if link.startswith("magnet:"):

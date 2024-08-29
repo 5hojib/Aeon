@@ -22,7 +22,7 @@ from bot.helper.ext_utils.bot_utils import (
     is_telegram_link,
 )
 from bot.helper.ext_utils.bulk_links import extract_bulk_links
-from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
+from bot.helper.ext_utils.exceptions import DirectDownloadLinkError
 from bot.helper.aeon_utils.nsfw_check import nsfw_precheck
 from bot.helper.aeon_utils.send_react import send_react
 from bot.helper.ext_utils.help_strings import MIRROR_HELP_MESSAGE
@@ -65,7 +65,7 @@ from bot.helper.mirror_leech_utils.download_utils.direct_link_generator import (
 
 @new_task
 async def _mirror_leech(
-    client, message, isQbit=False, isLeech=False, sameDir=None, bulk=[]
+    client, message, is_qbit=False, is_leech=False, same_dir=None, bulk=[]
 ):
     await send_react(message)
     user = message.from_user or message.sender_chat
@@ -131,18 +131,18 @@ async def _mirror_leech(
 
     if link:
         if is_magnet(link) or link.endswith(".torrent"):
-            isQbit = True
+            is_qbit = True
     elif not link and (reply_to := message.reply_to_message) and reply_to.text:
         reply_text = reply_to.text.split("\n", 1)[0].strip()
         if reply_text and is_magnet(reply_text):
-            isQbit = True
+            is_qbit = True
     if reply_to := message.reply_to_message:
         file_ = getattr(reply_to, reply_to.media.value) if reply_to.media else None
         if reply_to.document and (
             file_.mime_type == "application/x-bittorrent"
             or file_.file_name.endswith(".torrent")
         ):
-            isQbit = True
+            is_qbit = True
     if not isinstance(seed, bool):
         dargs = seed.split(":")
         ratio = dargs[0] or None
@@ -165,9 +165,9 @@ async def _mirror_leech(
         ratio = None
         seed_time = None
         folder_name = f"/{folder_name}"
-        if sameDir is None:
-            sameDir = {"total": multi, "tasks": set(), "name": folder_name}
-        sameDir["tasks"].add(message.id)
+        if same_dir is None:
+            same_dir = {"total": multi, "tasks": set(), "name": folder_name}
+        same_dir["tasks"].add(message.id)
 
     if isBulk:
         try:
@@ -187,7 +187,7 @@ async def _mirror_leech(
             chat_id=message.chat.id, message_ids=nextmsg.id
         )
         nextmsg.from_user = message.from_user
-        _mirror_leech(client, nextmsg, isQbit, isLeech, sameDir, bulk)
+        _mirror_leech(client, nextmsg, is_qbit, is_leech, same_dir, bulk)
         return None
 
     if len(bulk) != 0:
@@ -214,10 +214,10 @@ async def _mirror_leech(
             chat_id=message.chat.id, message_ids=nextmsg.id
         )
         if folder_name:
-            sameDir["tasks"].add(nextmsg.id)
+            same_dir["tasks"].add(nextmsg.id)
         nextmsg.from_user = message.from_user
         await sleep(5)
-        _mirror_leech(client, nextmsg, isQbit, isLeech, sameDir, bulk)
+        _mirror_leech(client, nextmsg, is_qbit, is_leech, same_dir, bulk)
 
     __run_multi()
 
@@ -300,7 +300,7 @@ async def _mirror_leech(
 
     if (
         not is_mega_link(link)
-        and not isQbit
+        and not is_qbit
         and not is_magnet(link)
         and not is_rclone_path(link)
         and not is_gdrive_link(link)
@@ -318,7 +318,7 @@ async def _mirror_leech(
                     link, headers = link
                 elif isinstance(link, str):
                     LOGGER.info(f"Generated link: {link}")
-            except DirectDownloadLinkException as e:
+            except DirectDownloadLinkError as e:
                 LOGGER.info(str(e))
                 if str(e).startswith("ERROR:"):
                     await edit_message(process_msg, str(e))
@@ -327,7 +327,7 @@ async def _mirror_leech(
                     return None
             await delete_message(process_msg)
 
-    if not isLeech:
+    if not is_leech:
         if config_dict["DEFAULT_UPLOAD"] == "rc" and not up or up == "rc":
             up = config_dict["RCLONE_PATH"]
         if not up and config_dict["DEFAULT_UPLOAD"] == "gd":
@@ -369,7 +369,7 @@ async def _mirror_leech(
             await delete_links(message)
             return None
 
-    if up == "rcl" and not isLeech:
+    if up == "rcl" and not is_leech:
         up = await RcloneList(client, message).get_rclone_path("rcu")
         if not is_rclone_path(up):
             await send_message(message, up)
@@ -380,12 +380,12 @@ async def _mirror_leech(
         message,
         compress,
         extract,
-        isQbit,
-        isLeech,
+        is_qbit,
+        is_leech,
         tag,
         select,
         seed,
-        sameDir,
+        same_dir,
         rcf,
         up,
         join,
@@ -418,7 +418,7 @@ async def _mirror_leech(
     elif is_mega_link(link):
         await delete_links(message)
         await add_mega_download(link, f"{path}/", listener, name)
-    elif isQbit:
+    elif is_qbit:
         await add_qb_torrent(link, path, listener, ratio, seed_time)
         LOGGER.info("Downloading with qbitEngine")
     else:
@@ -441,7 +441,7 @@ async def mirror(client, message):
 
 
 async def leech(client, message):
-    _mirror_leech(client, message, isLeech=True)
+    _mirror_leech(client, message, is_leech=True)
 
 
 bot.add_handler(

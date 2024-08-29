@@ -118,7 +118,7 @@ class RcloneTransferHelper:
             return None
 
         if return_code == 0:
-            await self.__listener.onDownloadComplete()
+            await self.__listener.on_download_complete()
             return None
         if return_code != -9:
             error = (await self.__proc.stderr.read()).decode().strip()
@@ -176,15 +176,15 @@ class RcloneTransferHelper:
                 remote = f"sa{self.__sa_index:03}"
                 LOGGER.info(f"Download with service account {remote}")
 
-        rcflags = self.__listener.rcFlags or config_dict["RCLONE_FLAGS"]
+        rc_flags = self.__listener.rc_flags or config_dict["RCLONE_FLAGS"]
         cmd = self.__getUpdatedCommand(
-            config_path, f"{remote}:{rc_path}", path, rcflags, "copy"
+            config_path, f"{remote}:{rc_path}", path, rc_flags, "copy"
         )
 
         if (
             remote_type == "drive"
             and not config_dict["RCLONE_FLAGS"]
-            and not self.__listener.rcFlags
+            and not self.__listener.rc_flags
         ):
             cmd.append("--drive-acknowledge-abuse")
         elif remote_type != "drive":
@@ -321,17 +321,17 @@ class RcloneTransferHelper:
                 fremote = f"sa{self.__sa_index:03}"
                 LOGGER.info(f"Upload with service account {fremote}")
 
-        rcflags = self.__listener.rcFlags or config_dict["RCLONE_FLAGS"]
+        rc_flags = self.__listener.rc_flags or config_dict["RCLONE_FLAGS"]
         method = (
             "move" if not self.__listener.seed or self.__listener.newDir else "copy"
         )
         cmd = self.__getUpdatedCommand(
-            fconfig_path, path, f"{fremote}:{rc_path}", rcflags, method
+            fconfig_path, path, f"{fremote}:{rc_path}", rc_flags, method
         )
         if (
             remote_type == "drive"
             and not config_dict["RCLONE_FLAGS"]
-            and not self.__listener.rcFlags
+            and not self.__listener.rc_flags
         ):
             cmd.extend(("--drive-chunk-size", "64M", "--drive-upload-cutoff", "32M"))
         elif remote_type != "drive":
@@ -371,7 +371,7 @@ class RcloneTransferHelper:
         )
 
     async def clone(
-        self, config_path, src_remote, src_path, destination, rcflags, mime_type
+        self, config_path, src_remote, src_path, destination, rc_flags, mime_type
     ):
         dst_remote, dst_path = destination.split(":", 1)
 
@@ -390,9 +390,9 @@ class RcloneTransferHelper:
         )
 
         cmd = self.__getUpdatedCommand(
-            config_path, f"{src_remote}:{src_path}", destination, rcflags, "copy"
+            config_path, f"{src_remote}:{src_path}", destination, rc_flags, "copy"
         )
-        if not rcflags:
+        if not rc_flags:
             if src_remote_type == "drive" and dst_remote_type != "drive":
                 cmd.append("--drive-acknowledge-abuse")
             elif dst_remote_type == "drive" and src_remote_type != "drive":
@@ -438,7 +438,7 @@ class RcloneTransferHelper:
         return None
 
     @staticmethod
-    def __getUpdatedCommand(config_path, source, destination, rcflags, method):
+    def __getUpdatedCommand(config_path, source, destination, rc_flags, method):
         ext = "*.{" + ",".join(GLOBAL_EXTENSION_FILTER) + "}"
         cmd = [
             "xone",
@@ -460,9 +460,9 @@ class RcloneTransferHelper:
             "--log-level",
             "DEBUG",
         ]
-        if rcflags:
-            rcflags = rcflags.split("|")
-            for flag in rcflags:
+        if rc_flags:
+            rc_flags = rc_flags.split("|")
+            for flag in rc_flags:
                 if ":" in flag:
                     key, value = map(str.strip, flag.split(":", 1))
                     cmd.extend((key, value))

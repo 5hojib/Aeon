@@ -59,7 +59,7 @@ async def add_direct_download(details, path, listener, foldername):
             download_dict[listener.uid] = QueueStatus(
                 foldername, size, gid, listener, "dl"
             )
-        await listener.onDownloadStart()
+        await listener.on_download_start()
         await sendStatusMessage(listener.message)
         await event.wait()
         async with download_dict_lock:
@@ -86,7 +86,7 @@ async def add_direct_download(details, path, listener, foldername):
         LOGGER.info(f"Start Queued Download from Direct Download: {foldername}")
     else:
         LOGGER.info(f"Download from Direct Download: {foldername}")
-        await listener.onDownloadStart()
+        await listener.on_download_start()
         await sendStatusMessage(listener.message)
 
     await delete_links(listener.message)

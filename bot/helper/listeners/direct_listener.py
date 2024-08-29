@@ -72,7 +72,7 @@ class DirectListener:
                 self.__listener.onDownloadError, "All files are failed to download!"
             )
             return
-        async_to_sync(self.__listener.onDownloadComplete)
+        async_to_sync(self.__listener.on_download_complete)
 
     async def cancel_download(self):
         self.__is_cancelled = True

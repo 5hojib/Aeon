@@ -286,7 +286,7 @@ async def _mdisk(link, name):
 
 
 @new_task
-async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
+async def _ytdl(client, message, is_leech=False, same_dir=None, bulk=[]):
     await send_react(message)
     text = message.text.split("\n")
     input_list = text[0].split(" ")
@@ -339,9 +339,9 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
 
     if folder_name and not isBulk:
         folder_name = f"/{folder_name}"
-        if sameDir is None:
-            sameDir = {"total": multi, "tasks": set(), "name": folder_name}
-        sameDir["tasks"].add(message.id)
+        if same_dir is None:
+            same_dir = {"total": multi, "tasks": set(), "name": folder_name}
+        same_dir["tasks"].add(message.id)
 
     if isBulk:
         try:
@@ -361,7 +361,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
             chat_id=message.chat.id, message_ids=nextmsg.id
         )
         nextmsg.from_user = message.from_user
-        _ytdl(client, nextmsg, isLeech, sameDir, bulk)
+        _ytdl(client, nextmsg, is_leech, same_dir, bulk)
         return None
 
     if len(bulk) != 0:
@@ -388,10 +388,10 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
             chat_id=message.chat.id, message_ids=nextmsg.id
         )
         if folder_name:
-            sameDir["tasks"].add(nextmsg.id)
+            same_dir["tasks"].add(nextmsg.id)
         nextmsg.from_user = message.from_user
         await sleep(5)
-        _ytdl(client, nextmsg, isLeech, sameDir, bulk)
+        _ytdl(client, nextmsg, is_leech, same_dir, bulk)
 
     path = f"/usr/src/app/downloads/{message.id}{folder_name}"
 
@@ -437,7 +437,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
         await five_minute_del(force_m)
         return None
 
-    if not isLeech:
+    if not is_leech:
         if config_dict["DEFAULT_UPLOAD"] == "rc" and not up or up == "rc":
             up = config_dict["RCLONE_PATH"]
         if not up and config_dict["DEFAULT_UPLOAD"] == "gd":
@@ -475,7 +475,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
             await delete_links(message)
             return None
 
-    if up == "rcl" and not isLeech:
+    if up == "rcl" and not is_leech:
         up = await RcloneList(client, message).get_rclone_path("rcu")
         if not is_rclone_path(up):
             await send_message(message, up)
@@ -485,10 +485,10 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
     listener = MirrorLeechListener(
         message,
         compress,
-        isLeech=isLeech,
+        is_leech=is_leech,
         tag=tag,
-        sameDir=sameDir,
-        rcFlags=rcf,
+        same_dir=same_dir,
+        rc_flags=rcf,
         upPath=up,
         drive_id=drive_id,
         index_link=index_link,
@@ -559,7 +559,7 @@ async def ytdl(client, message):
 
 
 async def ytdlleech(client, message):
-    _ytdl(client, message, isLeech=True)
+    _ytdl(client, message, is_leech=True)
 
 
 bot.add_handler(

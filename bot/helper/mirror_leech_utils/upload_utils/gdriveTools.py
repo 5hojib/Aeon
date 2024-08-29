@@ -869,7 +869,7 @@ class GoogleDriveHelper:
             self.__updater.cancel()
             if self.__is_cancelled:
                 return None
-            async_to_sync(self.__listener.onDownloadComplete)
+            async_to_sync(self.__listener.on_download_complete)
 
     def __download_folder(self, folder_id, path, folder_name):
         folder_name = folder_name.replace("/", "")

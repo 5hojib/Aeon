@@ -69,7 +69,7 @@ async def add_aria2c_download(
             non_queued_dl.add(listener.uid)
         LOGGER.info(f"Aria2Download started: {name}. Gid: {gid}")
 
-    await listener.onDownloadStart()
+    await listener.on_download_start()
 
     if not added_to_queue and (not listener.select or not config_dict["BASE_URL"]):
         await sendStatusMessage(listener.message)

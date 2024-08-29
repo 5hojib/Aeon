@@ -652,7 +652,7 @@ async def edit_user_settings(client, query):
     return None
 
 
-async def getUserInfo(client, id):
+async def get_user_info(client, id):
     try:
         return (await client.get_users(id)).mention(style="html")
     except Exception:
@@ -691,7 +691,7 @@ async def send_users_settings(client, message):
         else:
             await send_message(message, msg, button)
     elif int(userid) in user_data:
-        msg = f"{await getUserInfo(client, userid)} ( <code>{userid}</code> ):"
+        msg = f"{await get_user_info(client, userid)} ( <code>{userid}</code> ):"
         if data := user_data[int(userid)]:
             buttons = ButtonMaker()
             buttons.callback(
