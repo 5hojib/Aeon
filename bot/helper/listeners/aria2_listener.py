@@ -26,7 +26,7 @@ from bot.helper.mirror_leech_utils.status_utils.aria2_status import Aria2Status
 
 
 @new_thread
-async def __onDownloadStarted(api, gid):
+async def __on_download_started(api, gid):
     download = await sync_to_async(api.get_download, gid)
     if download.options.follow_torrent == "false":
         return
@@ -123,7 +123,7 @@ async def __onDownloadStarted(api, gid):
 
 
 @new_thread
-async def __onDownloadComplete(api, gid):
+async def __on_download_complete(api, gid):
     try:
         download = await sync_to_async(api.get_download, gid)
     except Exception:
@@ -138,9 +138,9 @@ async def __onDownloadComplete(api, gid):
             if config_dict["BASE_URL"] and listener.select:
                 if not dl.queued:
                     await sync_to_async(api.client.force_pause, new_gid)
-                SBUTTONS = bt_selection_buttons(new_gid)
+                s_buttons = bt_selection_buttons(new_gid)
                 msg = "Your download paused. Choose files then press Done Selecting button to start downloading."
-                await send_message(listener.message, msg, SBUTTONS)
+                await send_message(listener.message, msg, s_buttons)
     elif download.is_torrent:
         if (
             (dl := await get_task_by_gid(gid))
@@ -248,10 +248,10 @@ async def __onDownloadError(api, gid):
 def start_aria2_listener():
     aria2.listen_to_notifications(
         threaded=False,
-        on_download_start=__onDownloadStarted,
+        on_download_start=__on_download_started,
         on_download_error=__onDownloadError,
         on_download_stop=__onDownloadStopped,
-        on_download_complete=__onDownloadComplete,
+        on_download_complete=__on_download_complete,
         on_bt_download_complete=__onBtDownloadComplete,
         timeout=60,
     )

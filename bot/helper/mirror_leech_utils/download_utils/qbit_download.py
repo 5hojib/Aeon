@@ -113,9 +113,9 @@ async def add_qb_torrent(link, path, listener, ratio, seed_time):
                 await sync_to_async(
                     xnox_client.torrents_pause, torrent_hashes=ext_hash
                 )
-            SBUTTONS = bt_selection_buttons(ext_hash)
+            s_buttons = bt_selection_buttons(ext_hash)
             msg = "Your download paused. Choose files then press Done Selecting button to start downloading."
-            await send_message(listener.message, msg, SBUTTONS)
+            await send_message(listener.message, msg, s_buttons)
         else:
             await sendStatusMessage(listener.message)
 

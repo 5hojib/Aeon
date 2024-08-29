@@ -39,7 +39,7 @@ async def add_gd_download(link, path, listener, newname):
     if msg:
         await send_message(listener.message, msg, button)
         return
-    if limit_exceeded := await limit_checker(size, listener, isDriveLink=True):
+    if limit_exceeded := await limit_checker(size, listener, is_drive_link=True):
         await listener.onDownloadError(limit_exceeded)
         return
     added_to_queue, event = await is_queued(listener.uid)

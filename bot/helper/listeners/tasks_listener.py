@@ -87,7 +87,7 @@ class MirrorLeechListener:
         upPath=None,
         isClone=False,
         join=False,
-        isYtdlp=False,
+        is_ytdlp=False,
         drive_id=None,
         index_link=None,
         attachment=None,
@@ -102,7 +102,7 @@ class MirrorLeechListener:
         self.isQbit = isQbit
         self.isLeech = isLeech
         self.isClone = isClone
-        self.isYtdlp = isYtdlp
+        self.is_ytdlp = is_ytdlp
         self.tag = tag
         self.seed = seed
         self.newDir = ""
@@ -465,7 +465,7 @@ class MirrorLeechListener:
         self, link, size, files, folders, mime_type, name, rclonePath=""
     ):
         user_id = self.message.from_user.id
-        name, _ = await process_file(name, user_id, isMirror=not self.isLeech)
+        name, _ = await process_file(name, user_id, is_mirror=not self.isLeech)
         msg = f"{escape(name)}\n\n"
         msg += f"<blockquote><b>• Size: </b>{get_readable_file_size(size)}\n"
         msg += f"<b>• Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n"

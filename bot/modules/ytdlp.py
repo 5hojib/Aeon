@@ -492,7 +492,7 @@ async def _ytdl(client, message, isLeech=False, sameDir=None, bulk=[]):
         upPath=up,
         drive_id=drive_id,
         index_link=index_link,
-        isYtdlp=True,
+        is_ytdlp=True,
         files_utils={"screenshots": sshots, "thumb": thumb},
     )
 

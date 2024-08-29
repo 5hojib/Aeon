@@ -327,8 +327,8 @@ class YoutubeDLHelper:
         if limit_exceeded := await limit_checker(
             self.__size,
             self.__listener,
-            isYtdlp=True,
-            isPlayList=self.playlist_count,
+            is_ytdlp=True,
+            is_playlist=self.playlist_count,
         ):
             await self.__listener.onDownloadError(limit_exceeded)
             return

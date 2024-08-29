@@ -179,7 +179,7 @@ async def add_mega_download(mega_link, path, listener, name):
 
     gid = token_hex(4)
     size = api.getSize(node)
-    if limit_exceeded := await limit_checker(size, listener, isMega=True):
+    if limit_exceeded := await limit_checker(size, listener, is_mega=True):
         await listener.onDownloadError(limit_exceeded)
         return
 

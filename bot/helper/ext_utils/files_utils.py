@@ -437,7 +437,7 @@ async def split_file(
     return True
 
 
-async def process_file(file_, user_id, dirpath=None, isMirror=False):
+async def process_file(file_, user_id, dirpath=None, is_mirror=False):
     user_dict = user_data.get(user_id, {})
     prefix = user_dict.get("prefix", "")
     remname = user_dict.get("remname", "")
@@ -455,16 +455,16 @@ async def process_file(file_, user_id, dirpath=None, isMirror=False):
             remname = f"|{remname}"
         remname = remname.replace(r"\s", " ")
         slit = remname.split("|")
-        __newFileName = ospath.splitext(file_)[0]
+        __new_file_name = ospath.splitext(file_)[0]
         for rep in range(1, len(slit)):
             args = slit[rep].split(":")
             if len(args) == 3:
-                __newFileName = re_sub(args[0], args[1], __newFileName, int(args[2]))
+                __new_file_name = re_sub(args[0], args[1], __new_file_name, int(args[2]))
             elif len(args) == 2:
-                __newFileName = re_sub(args[0], args[1], __newFileName)
+                __new_file_name = re_sub(args[0], args[1], __new_file_name)
             elif len(args) == 1:
-                __newFileName = re_sub(args[0], "", __newFileName)
-        file_ = __newFileName + ospath.splitext(file_)[1]
+                __new_file_name = re_sub(args[0], "", __new_file_name)
+        file_ = __new_file_name + ospath.splitext(file_)[1]
         LOGGER.info(f"New Filename : {file_}")
 
     nfile_ = file_
@@ -474,18 +474,18 @@ async def process_file(file_, user_id, dirpath=None, isMirror=False):
         if not file_.startswith(prefix):
             file_ = f"{prefix}{file_}"
 
-    if suffix and not isMirror:
+    if suffix and not is_mirror:
         suffix = suffix.replace(r"\s", " ")
-        sufLen = len(suffix)
-        fileDict = file_.split(".")
-        _extIn = 1 + len(fileDict[-1])
-        _extOutName = ".".join(fileDict[:-1]).replace(".", " ").replace("-", " ")
-        _newExtFileName = f"{_extOutName}{suffix}.{fileDict[-1]}"
-        if len(_extOutName) > (64 - (sufLen + _extIn)):
-            _newExtFileName = (
-                _extOutName[: 64 - (sufLen + _extIn)] + f"{suffix}.{fileDict[-1]}"
+        suf_len = len(suffix)
+        file_dict = file_.split(".")
+        _ext_in = 1 + len(file_dict[-1])
+        _ext_out_name = ".".join(file_dict[:-1]).replace(".", " ").replace("-", " ")
+        _new_ext_file_name = f"{_ext_out_name}{suffix}.{file_dict[-1]}"
+        if len(_ext_out_name) > (64 - (suf_len + _ext_in)):
+            _new_ext_file_name = (
+                _ext_out_name[: 64 - (suf_len + _ext_in)] + f"{suffix}.{file_dict[-1]}"
             )
-        file_ = _newExtFileName
+        file_ = _new_ext_file_name
     elif suffix:
         suffix = suffix.replace(r"\s", " ")
         file_ = (
@@ -495,9 +495,9 @@ async def process_file(file_, user_id, dirpath=None, isMirror=False):
         )
 
     cap_mono = nfile_
-    if lcaption and dirpath and not isMirror:
+    if lcaption and dirpath and not is_mirror:
 
-        def lowerVars(match):
+        def lower_vars(match):
             return f"{{{match.group(1).lower()}}}"
 
         lcaption = (
@@ -507,7 +507,7 @@ async def process_file(file_, user_id, dirpath=None, isMirror=False):
             .replace(r"\s", " ")
         )
         slit = lcaption.split("|")
-        slit[0] = re_sub(r"\{([^}]+)\}", lowerVars, slit[0])
+        slit[0] = re_sub(r"\{([^}]+)\}", lower_vars, slit[0])
         up_path = ospath.join(dirpath, prefile_)
         dur, qual, lang, subs = await get_media_info(up_path, True)
         cap_mono = slit[0].format(

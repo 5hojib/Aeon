@@ -82,7 +82,7 @@ async def __size_checked(tor):
 
 
 @new_task
-async def __onDownloadComplete(tor):
+async def __on_download_complete(tor):
     ext_hash = tor.hash
     tag = tor.tags
     await sleep(2)
@@ -192,7 +192,7 @@ async def __qb_listener():
                         not in ["checkingUP", "checkingDL", "checkingResumeData"]
                     ):
                         QbTorrents[tag]["uploaded"] = True
-                        __onDownloadComplete(tor_info)
+                        __on_download_complete(tor_info)
                     elif (
                         state in ["pausedUP", "pausedDL"]
                         and QbTorrents[tag]["seeding"]

@@ -82,7 +82,7 @@ class TelegramDownloadHelper:
                 GLOBAL_GID.remove(self.__id)
         await self.__listener.onDownloadError(error)
 
-    async def __onDownloadComplete(self):
+    async def __on_download_complete(self):
         await self.__listener.onDownloadComplete()
         async with global_lock:
             GLOBAL_GID.remove(self.__id)
@@ -100,7 +100,7 @@ class TelegramDownloadHelper:
             await self.__onDownloadError(str(e))
             return
         if download is not None:
-            await self.__onDownloadComplete()
+            await self.__on_download_complete()
         elif not self.__is_cancelled:
             await self.__onDownloadError("Internal error occurred")
 

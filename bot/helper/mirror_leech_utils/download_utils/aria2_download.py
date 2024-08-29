@@ -76,9 +76,9 @@ async def add_aria2c_download(
     elif listener.select and download.is_torrent and not download.is_metadata:
         if not added_to_queue:
             await sync_to_async(aria2.client.force_pause, gid)
-        SBUTTONS = bt_selection_buttons(gid)
+        s_buttons = bt_selection_buttons(gid)
         msg = "Your download paused. Choose files then press Done Selecting button to start downloading."
-        await send_message(listener.message, msg, SBUTTONS)
+        await send_message(listener.message, msg, s_buttons)
 
     if added_to_queue:
         await event.wait()

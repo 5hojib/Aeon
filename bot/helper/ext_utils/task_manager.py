@@ -139,11 +139,11 @@ async def start_from_queued():
 async def limit_checker(
     size,
     listener,
-    isTorrent=False,
-    isMega=False,
-    isDriveLink=False,
-    isYtdlp=False,
-    isPlayList=None,
+    is_torrent=False,
+    is_mega=False,
+    is_drive_link=False,
+    is_ytdlp=False,
+    is_playlist=None,
 ):
     LOGGER.info("Checking limit")
     user_id = listener.message.from_user.id
@@ -161,30 +161,30 @@ async def limit_checker(
             limit = CLONE_LIMIT * 1024**3
             if size > limit:
                 limit_exceeded = f"Clone limit is {get_readable_file_size(limit)}."
-    elif isMega:
+    elif is_mega:
         if MEGA_LIMIT := config_dict["MEGA_LIMIT"]:
             limit = MEGA_LIMIT * 1024**3
             if size > limit:
                 limit_exceeded = f"Mega limit is {get_readable_file_size(limit)}"
-    elif isDriveLink:
+    elif is_drive_link:
         if GDRIVE_LIMIT := config_dict["GDRIVE_LIMIT"]:
             limit = GDRIVE_LIMIT * 1024**3
             if size > limit:
                 limit_exceeded = (
                     f"Google drive limit is {get_readable_file_size(limit)}"
                 )
-    elif isYtdlp:
+    elif is_ytdlp:
         if YTDLP_LIMIT := config_dict["YTDLP_LIMIT"]:
             limit = YTDLP_LIMIT * 1024**3
             if size > limit:
                 limit_exceeded = f"Ytdlp limit is {get_readable_file_size(limit)}"
         if (
-            isPlayList != 0
+            is_playlist != 0
             and (PLAYLIST_LIMIT := config_dict["PLAYLIST_LIMIT"])
-            and isPlayList > PLAYLIST_LIMIT
+            and is_playlist > PLAYLIST_LIMIT
         ):
             limit_exceeded = f"Playlist limit is {PLAYLIST_LIMIT}"
-    elif isTorrent:
+    elif is_torrent:
         if TORRENT_LIMIT := config_dict["TORRENT_LIMIT"]:
             limit = TORRENT_LIMIT * 1024**3
             if size > limit:
@@ -207,8 +207,8 @@ async def limit_checker(
     if limit_exceeded:
         if size:
             return f"{limit_exceeded}.\nYour file or folder size is {get_readable_file_size(size)}."
-        if isPlayList != 0:
-            return f"{limit_exceeded}.\nYour playlist has {isPlayList} files."
+        if is_playlist != 0:
+            return f"{limit_exceeded}.\nYour playlist has {is_playlist} files."
         return None
     return None
 

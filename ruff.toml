@@ -7,8 +7,9 @@ target-version = "py310"
 length-sort = true
 
 [lint.pylint]
-max-branches = 30
-max-statements = 75
+max-branches = 50
+max-statements = 100
+max-returns = 15
 
 [lint]
 select = [

@@ -329,7 +329,7 @@ class GoogleDriveHelper:
     )
     def __create_directory(self, directory_name, dest_id):
         directory_name, _ = async_to_sync(
-            process_file, directory_name, self.__user_id, isMirror=True
+            process_file, directory_name, self.__user_id, is_mirror=True
         )
         file_metadata = {
             "name": directory_name,
@@ -531,7 +531,7 @@ class GoogleDriveHelper:
     )
     def __copyFile(self, file_id, dest_id, file_name):
         file_name, _ = async_to_sync(
-            process_file, file_name, self.__user_id, isMirror=True
+            process_file, file_name, self.__user_id, is_mirror=True
         )
         body = {"name": file_name, "parents": [dest_id]}
         try:
