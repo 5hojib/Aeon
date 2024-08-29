@@ -26,8 +26,8 @@ from googleapiclient.discovery import build
 from bot import GLOBAL_EXTENSION_FILTER, config_dict, list_drives_dict
 from bot.helper.aeon_utils.metadata import add_attachment
 from bot.helper.ext_utils.bot_utils import (
-    isMkv,
-    setInterval,
+    is_mkv,
+    SetInterval,
     async_to_sync,
     get_readable_file_size,
 )
@@ -243,7 +243,7 @@ class GoogleDriveHelper:
         self.__is_uploading = True
         item_path = f"{self.__path}/{file_name}"
         LOGGER.info(f"Uploading: {item_path}")
-        self.__updater = setInterval(self.__update_interval, self.__progress)
+        self.__updater = SetInterval(self.__update_interval, self.__progress)
         try:
             if ospath.isfile(item_path):
                 if item_path.lower().endswith(tuple(GLOBAL_EXTENSION_FILTER)):
@@ -359,7 +359,7 @@ class GoogleDriveHelper:
         file_name, _ = async_to_sync(
             process_file, file_name, self.__user_id, location, True
         )
-        if (atc := self.__listener.attachment) and isMkv(file_name):
+        if (atc := self.__listener.attachment) and is_mkv(file_name):
             file_name = async_to_sync(add_attachment, file_name, location, atc)
         file_metadata = {
             "name": file_name,
@@ -837,7 +837,7 @@ class GoogleDriveHelper:
     def download(self, link):
         self.__is_downloading = True
         file_id = self.getIdFromUrl(link)
-        self.__updater = setInterval(self.__update_interval, self.__progress)
+        self.__updater = SetInterval(self.__update_interval, self.__progress)
         try:
             meta = self.__getFileMetadata(file_id)
             if meta.get("mimeType") == self.__G_DRIVE_DIR_MIME_TYPE:

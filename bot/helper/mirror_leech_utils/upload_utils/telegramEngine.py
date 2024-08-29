@@ -39,7 +39,7 @@ from bot import (
 )
 from bot.helper.aeon_utils.metadata import add_attachment
 from bot.helper.ext_utils.bot_utils import (
-    isMkv,
+    is_mkv,
     is_url,
     sync_to_async,
     is_telegram_link,
@@ -254,7 +254,7 @@ class TgUploader:
 
     async def __prepare_file(self, prefile_, dirpath):
         file_, cap_mono = await process_file(prefile_, self.__user_id, dirpath)
-        if (atc := self.__listener.attachment) and isMkv(prefile_):
+        if (atc := self.__listener.attachment) and is_mkv(prefile_):
             file_ = await add_attachment(prefile_, dirpath, atc)
         if prefile_ != file_:
             if (

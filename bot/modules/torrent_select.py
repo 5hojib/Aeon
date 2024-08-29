@@ -6,7 +6,7 @@ from pyrogram.filters import regex
 from pyrogram.handlers import CallbackQueryHandler
 
 from bot import LOGGER, bot, aria2, xnox_client
-from bot.helper.ext_utils.bot_utils import sync_to_async, getDownloadByGid
+from bot.helper.ext_utils.bot_utils import sync_to_async, get_task_by_gid
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import sendStatusMessage
 
@@ -15,7 +15,7 @@ async def handle_query(client, query):
     user_id = query.from_user.id
     data = query.data.split()
     message = query.message
-    download = await getDownloadByGid(data[2])
+    download = await get_task_by_gid(data[2])
 
     if not download:
         await query.answer("This task has been cancelled!", show_alert=True)

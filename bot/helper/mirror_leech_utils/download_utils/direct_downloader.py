@@ -10,7 +10,7 @@ from bot import (
     download_dict_lock,
 )
 from bot.helper.ext_utils.bot_utils import sync_to_async
-from bot.helper.aeon_utils.nsfw_check import isNSFWdata
+from bot.helper.aeon_utils.nsfw_check import is_nsfw_data
 from bot.helper.ext_utils.task_manager import (
     is_queued,
     limit_checker,
@@ -34,7 +34,7 @@ async def add_direct_download(details, path, listener, foldername):
     size = details["total_size"]
     if not foldername:
         foldername = details["title"]
-    if isNSFWdata(details):
+    if is_nsfw_data(details):
         await listener.onDownloadError("NSFW detected")
         return
     path = f"{path}/{foldername}"

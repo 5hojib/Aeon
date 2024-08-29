@@ -6,7 +6,7 @@ from pyrogram.filters import regex, command
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 
 from bot import IMAGES, LOGGER, DATABASE_URL, bot
-from bot.helper.ext_utils.bot_utils import new_task, handleIndex
+from bot.helper.ext_utils.bot_utils import new_task, handle_index
 from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
@@ -105,7 +105,7 @@ async def pics_callback(_, query):
 
     if data[2] == "turn":
         await query.answer()
-        ind = handleIndex(int(data[3]), IMAGES)
+        ind = handle_index(int(data[3]), IMAGES)
         no = len(IMAGES) - abs(ind + 1) if ind < 0 else ind + 1
         pic_info = f"<b>Image No. : {no} / {len(IMAGES)}</b>"
         buttons = ButtonMaker()

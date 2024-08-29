@@ -6,6 +6,10 @@ target-version = "py310"
 [lint.isort]
 length-sort = true
 
+[lint.pylint]
+max-branches = 30
+max-statements = 75
+
 [lint]
 select = [
     "FURB", # refurb
@@ -29,4 +33,5 @@ select = [
 
 ignore = [
     "E501",
+    "PLR2004",
 ]

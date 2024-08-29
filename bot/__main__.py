@@ -25,7 +25,7 @@ from bot import (
     scheduler,
     user_data,
     config_dict,
-    botStartTime,
+    bot_start_time,
 )
 
 from .modules import (
@@ -107,9 +107,9 @@ else:
 async def stats(_, message):
     total, used, free, disk = disk_usage("/")
     memory = virtual_memory()
-    currentTime = get_readable_time(time() - botStartTime)
-    osUptime = get_readable_time(time() - boot_time())
-    cpuUsage = cpu_percent(interval=0.5)
+    current_time = get_readable_time(time() - bot_start_time)
+    os_uptime = get_readable_time(time() - boot_time())
+    cpu_usage = cpu_percent(interval=0.5)
     limit_mapping = {
         "Torrent": config_dict.get("TORRENT_LIMIT", "∞"),
         "Gdrive": config_dict.get("GDRIVE_LIMIT", "∞"),
@@ -121,9 +121,9 @@ async def stats(_, message):
         "User task": config_dict.get("USER_MAX_TASKS", "∞"),
     }
     system_info = (
-        f"<code>• Bot uptime :</code> {currentTime}\n"
-        f"<code>• Sys uptime :</code> {osUptime}\n"
-        f"<code>• CPU usage  :</code> {cpuUsage}%\n"
+        f"<code>• Bot uptime :</code> {current_time}\n"
+        f"<code>• Sys uptime :</code> {os_uptime}\n"
+        f"<code>• CPU usage  :</code> {cpu_usage}%\n"
         f"<code>• RAM usage  :</code> {memory.percent}%\n"
         f"<code>• Disk usage :</code> {disk}%\n"
         f"<code>• Free space :</code> {get_readable_file_size(free)}\n"
@@ -222,7 +222,7 @@ async def ping(_, message):
 
 
 @new_task
-async def AeonCallback(_, query):
+async def aeon_callback(_, query):
     message = query.message
     user_id = query.from_user.id
     data = query.data.split()
@@ -231,7 +231,7 @@ async def AeonCallback(_, query):
     if data[2] == "logdisplay":
         await query.answer()
         async with aiopen("log.txt", "r") as f:
-            logFileLines = (await f.read()).splitlines()
+            log_file_lines = (await f.read()).splitlines()
 
         def parseline(line):
             try:
@@ -239,19 +239,19 @@ async def AeonCallback(_, query):
             except IndexError:
                 return line
 
-        ind, Loglines = 1, ""
+        ind, log_lines = 1, ""
         try:
-            while len(Loglines) <= 3500:
-                Loglines = parseline(logFileLines[-ind]) + "\n" + Loglines
-                if ind == len(logFileLines):
+            while len(log_lines) <= 3500:
+                log_lines = parseline(log_file_lines[-ind]) + "\n" + log_lines
+                if ind == len(log_file_lines):
                     break
                 ind += 1
-            startLine = "<pre language='python'>"
-            endLine = "</pre>"
+            start_line = "<pre language='python'>"
+            end_line = "</pre>"
             btn = ButtonMaker()
             btn.callback("Close", f"aeon {user_id} close")
             reply_message = await send_message(
-                message, startLine + escape(Loglines) + endLine, btn.column(1)
+                message, start_line + escape(log_lines) + end_line, btn.column(1)
             )
             await query.edit_message_reply_markup(None)
             await delete_message(message)
@@ -330,7 +330,7 @@ async def main():
             filters=command(BotCommands.StatsCommand) & CustomFilters.authorized,
         )
     )
-    bot.add_handler(CallbackQueryHandler(AeonCallback, filters=regex(r"^aeon")))
+    bot.add_handler(CallbackQueryHandler(aeon_callback, filters=regex(r"^aeon")))
     LOGGER.info("Bot Started!")
     signal(SIGINT, exit_clean_up)
 

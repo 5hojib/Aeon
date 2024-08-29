@@ -9,7 +9,7 @@ from bot import LOGGER, aria2, config_dict, download_dict, download_dict_lock
 from bot.helper.ext_utils.bot_utils import (
     new_thread,
     sync_to_async,
-    getDownloadByGid,
+    get_task_by_gid,
     get_telegraph_list,
     bt_selection_buttons,
 )
@@ -33,7 +33,7 @@ async def __onDownloadStarted(api, gid):
     if download.is_metadata:
         LOGGER.info(f"onDownloadStarted: {gid} METADATA")
         await sleep(1)
-        if dl := await getDownloadByGid(gid):
+        if dl := await get_task_by_gid(gid):
             listener = dl.listener()
             if listener.select:
                 metamsg = "Downloading Metadata, wait then you can select files. Use torrent file to avoid this wait."
@@ -50,7 +50,7 @@ async def __onDownloadStarted(api, gid):
     if config_dict["STOP_DUPLICATE"]:
         await sleep(1)
         if dl is None:
-            dl = await getDownloadByGid(gid)
+            dl = await get_task_by_gid(gid)
         if dl:
             if not hasattr(dl, "listener"):
                 LOGGER.warning(
@@ -91,7 +91,7 @@ async def __onDownloadStarted(api, gid):
                         return
     await sleep(1)
     if dl is None:
-        dl = await getDownloadByGid(gid)
+        dl = await get_task_by_gid(gid)
     if dl is not None:
         if not hasattr(dl, "listener"):
             LOGGER.warning(
@@ -133,7 +133,7 @@ async def __onDownloadComplete(api, gid):
     if download.followed_by_ids:
         new_gid = download.followed_by_ids[0]
         LOGGER.info(f"Gid changed from {gid} to {new_gid}")
-        if dl := await getDownloadByGid(new_gid):
+        if dl := await get_task_by_gid(new_gid):
             listener = dl.listener()
             if config_dict["BASE_URL"] and listener.select:
                 if not dl.queued:
@@ -143,7 +143,7 @@ async def __onDownloadComplete(api, gid):
                 await send_message(listener.message, msg, SBUTTONS)
     elif download.is_torrent:
         if (
-            (dl := await getDownloadByGid(gid))
+            (dl := await get_task_by_gid(gid))
             and hasattr(dl, "listener")
             and dl.seeding
         ):
@@ -155,7 +155,7 @@ async def __onDownloadComplete(api, gid):
             await sync_to_async(api.remove, [download], force=True, files=True)
     else:
         LOGGER.info(f"onDownloadComplete: {download.name} - Gid: {gid}")
-        if dl := await getDownloadByGid(gid):
+        if dl := await get_task_by_gid(gid):
             listener = dl.listener()
             await listener.onDownloadComplete()
             await sync_to_async(api.remove, [download], force=True, files=True)
@@ -169,7 +169,7 @@ async def __onBtDownloadComplete(api, gid):
     if download.options.follow_torrent == "false":
         return
     LOGGER.info(f"onBtDownloadComplete: {download.name} - Gid: {gid}")
-    if dl := await getDownloadByGid(gid):
+    if dl := await get_task_by_gid(gid):
         listener = dl.listener()
         if listener.select:
             res = download.files
@@ -197,7 +197,7 @@ async def __onBtDownloadComplete(api, gid):
         download = download.live
         if listener.seed:
             if download.is_complete:
-                if dl := await getDownloadByGid(gid):
+                if dl := await get_task_by_gid(gid):
                     LOGGER.info(f"Cancelling Seed: {download.name}")
                     await listener.onUploadError(
                         f"Seeding stopped with Ratio: {dl.ratio()} and Time: {dl.seeding_time()}"
@@ -223,7 +223,7 @@ async def __onBtDownloadComplete(api, gid):
 @new_thread
 async def __onDownloadStopped(_, gid):
     await sleep(6)
-    if dl := await getDownloadByGid(gid):
+    if dl := await get_task_by_gid(gid):
         listener = dl.listener()
         await listener.onDownloadError("Dead torrent!")
 
@@ -240,7 +240,7 @@ async def __onDownloadError(api, gid):
         LOGGER.info(f"Download Error: {error}")
     except Exception:
         pass
-    if dl := await getDownloadByGid(gid):
+    if dl := await get_task_by_gid(gid):
         listener = dl.listener()
         await listener.onDownloadError(error)
 

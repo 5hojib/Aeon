@@ -35,7 +35,7 @@ from bot import (
 from bot.modules.mediainfo import parseinfo
 from bot.helper.aeon_utils.metadata import change_metadata
 from bot.helper.ext_utils.bot_utils import (
-    isMkv,
+    is_mkv,
     cmd_exec,
     sync_to_async,
     get_readable_time,
@@ -446,7 +446,7 @@ async def process_file(file_, user_id, dirpath=None, isMirror=False):
     metadata_key = user_dict.get("metadata", "") or config_dict["METADATA_KEY"]
     prefile_ = file_
 
-    if metadata_key and dirpath and isMkv(file_):
+    if metadata_key and dirpath and is_mkv(file_):
         file_ = await change_metadata(file_, dirpath, metadata_key)
 
     file_ = re_sub(r"^www\S+\s*[-_]*\s*", "", file_)

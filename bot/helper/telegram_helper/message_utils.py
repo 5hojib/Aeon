@@ -31,7 +31,7 @@ from bot import (
     status_reply_dict_lock,
 )
 from bot.helper.ext_utils.bot_utils import (
-    setInterval,
+    SetInterval,
     sync_to_async,
     download_image_url,
     get_readable_message,
@@ -355,7 +355,7 @@ async def sendStatusMessage(msg):
         message.text = progress
         status_reply_dict[chat_id] = [message, time()]
         if not Interval:
-            Interval.append(setInterval(1, update_all_messages))
+            Interval.append(SetInterval(1, update_all_messages))
 
 
 async def forcesub(message, ids, button=None):

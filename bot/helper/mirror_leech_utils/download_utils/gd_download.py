@@ -8,7 +8,7 @@ from bot import (
     download_dict_lock,
 )
 from bot.helper.ext_utils.bot_utils import sync_to_async
-from bot.helper.aeon_utils.nsfw_check import isNSFW, isNSFWdata
+from bot.helper.aeon_utils.nsfw_check import is_nsfw, is_nsfw_data
 from bot.helper.ext_utils.task_manager import (
     is_queued,
     limit_checker,
@@ -31,7 +31,7 @@ async def add_gd_download(link, path, listener, newname):
     name = newname or name
     gid = token_hex(4)
 
-    if isNSFW(name) or isNSFWdata(data):
+    if is_nsfw(name) or is_nsfw_data(data):
         await listener.onDownloadError("NSFW detected")
         return
 

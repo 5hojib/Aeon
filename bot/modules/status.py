@@ -7,7 +7,7 @@ from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from bot import (
     Interval,
     bot,
-    botStartTime,
+    bot_start_time,
     download_dict,
     download_dict_lock,
     status_reply_dict_lock,
@@ -15,7 +15,7 @@ from bot import (
 from bot.helper.ext_utils.bot_utils import (
     new_task,
     turn_page,
-    setInterval,
+    SetInterval,
     get_readable_time,
     get_readable_file_size,
 )
@@ -36,10 +36,10 @@ async def mirror_status(_, message):
         count = len(download_dict)
 
     if count == 0:
-        currentTime = get_readable_time(time() - botStartTime)
+        current_time = get_readable_time(time() - bot_start_time)
         free = get_readable_file_size(disk_usage("/usr/src/app/downloads/").free)
         msg = "No downloads are currently in progress.\n"
-        msg += f"\n<b>• Bot uptime</b>: {currentTime}"
+        msg += f"\n<b>• Bot uptime</b>: {current_time}"
         msg += f"\n<b>• Free disk space</b>: {free}"
 
         reply_message = await send_message(message, msg)
@@ -52,7 +52,7 @@ async def mirror_status(_, message):
             if Interval:
                 Interval[0].cancel()
                 Interval.clear()
-                Interval.append(setInterval(1, update_all_messages))
+                Interval.append(SetInterval(1, update_all_messages))
 
 
 @new_task

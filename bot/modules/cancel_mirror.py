@@ -7,8 +7,8 @@ from bot import OWNER_ID, bot, bot_name, user_data, download_dict, download_dict
 from bot.helper.ext_utils.bot_utils import (
     MirrorStatus,
     new_task,
-    getAllDownload,
-    getDownloadByGid,
+    get_all_task,
+    get_task_by_gid,
 )
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
@@ -31,7 +31,7 @@ async def cancel_mirror(_, message):
         if len(cmd_data) > 1 and cmd_data[1].strip() != bot_name:
             return
         gid = cmd_data[0]
-        dl = await getDownloadByGid(gid)
+        dl = await get_task_by_gid(gid)
         if dl is None:
             await delete_message(message)
             return
@@ -56,7 +56,7 @@ async def cancel_mirror(_, message):
 
 
 async def cancel_all(status):
-    matches = await getAllDownload(status)
+    matches = await get_all_task(status)
     if not matches:
         return False
     for dl in matches:
