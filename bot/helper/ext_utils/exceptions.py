@@ -1,10 +1,10 @@
-class DirectDownloadLinkException(Exception):
+class DirectDownloadLinkError(Exception):
     pass
 
 
-class NotSupportedExtractionArchive(Exception):
+class ExtractionArchiveError(Exception):
     pass
 
 
-class TgLinkException(Exception):
+class TgLinkError(Exception):
     pass

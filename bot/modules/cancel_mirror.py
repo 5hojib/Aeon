@@ -7,15 +7,15 @@ from bot import OWNER_ID, bot, bot_name, user_data, download_dict, download_dict
 from bot.helper.ext_utils.bot_utils import (
     MirrorStatus,
     new_task,
-    getAllDownload,
-    getDownloadByGid,
+    get_all_task,
+    get_task_by_gid,
 )
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import (
-    sendMessage,
-    deleteMessage,
+    send_message,
+    delete_message,
     one_minute_del,
 )
 
@@ -24,31 +24,31 @@ from bot.helper.telegram_helper.message_utils import (
 async def cancel_mirror(_, message):
     user_id = message.from_user.id
     msg = message.text.split("_", maxsplit=1)
-    await deleteMessage(message)
+    await delete_message(message)
 
     if len(msg) > 1:
         cmd_data = msg[1].split("@", maxsplit=1)
         if len(cmd_data) > 1 and cmd_data[1].strip() != bot_name:
             return
         gid = cmd_data[0]
-        dl = await getDownloadByGid(gid)
+        dl = await get_task_by_gid(gid)
         if dl is None:
-            await deleteMessage(message)
+            await delete_message(message)
             return
     elif reply_to_id := message.reply_to_message_id:
         async with download_dict_lock:
             dl = download_dict.get(reply_to_id, None)
         if dl is None:
-            await deleteMessage(message)
+            await delete_message(message)
             return
     elif len(msg) == 1:
-        await deleteMessage(message)
+        await delete_message(message)
         return
 
     if user_id not in (OWNER_ID, dl.message.from_user.id) and (
         user_id not in user_data or not user_data[user_id].get("is_sudo")
     ):
-        await deleteMessage(message)
+        await delete_message(message)
         return
 
     obj = dl.download()
@@ -56,7 +56,7 @@ async def cancel_mirror(_, message):
 
 
 async def cancel_all(status):
-    matches = await getAllDownload(status)
+    matches = await get_all_task(status)
     if not matches:
         return False
     for dl in matches:
@@ -70,7 +70,7 @@ async def cancell_all_buttons(_, message):
     async with download_dict_lock:
         count = len(download_dict)
     if count == 0:
-        await sendMessage(message, "No active tasks!")
+        await send_message(message, "No active tasks!")
         return
 
     buttons = ButtonMaker()
@@ -86,8 +86,8 @@ async def cancell_all_buttons(_, message):
     buttons.callback("All", "stopall all")
     buttons.callback("Close", "stopall close")
     button = buttons.column(2)
-    can_msg = await sendMessage(message, "Choose tasks to cancel.", button)
-    await deleteMessage(message)
+    can_msg = await send_message(message, "Choose tasks to cancel.", button)
+    await delete_message(message)
     await one_minute_del(can_msg)
 
 
@@ -98,12 +98,12 @@ async def cancel_all_update(_, query):
     reply_to = message.reply_to_message
     await query.answer()
     if data[1] == "close":
-        await deleteMessage(reply_to)
-        await deleteMessage(message)
+        await delete_message(reply_to)
+        await delete_message(message)
     else:
         res = await cancel_all(data[1])
         if not res:
-            await sendMessage(reply_to, f"No matching tasks for {data[1]}!")
+            await send_message(reply_to, f"No matching tasks for {data[1]}!")
 
 
 bot.add_handler(

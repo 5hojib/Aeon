@@ -11,7 +11,7 @@ from bot import (
 )
 from bot.helper.ext_utils.bot_utils import cmd_exec
 from bot.helper.ext_utils.task_manager import is_queued, stop_duplicate_check
-from bot.helper.telegram_helper.message_utils import sendMessage, sendStatusMessage
+from bot.helper.telegram_helper.message_utils import send_message, sendStatusMessage
 from bot.helper.mirror_leech_utils.rclone_utils.transfer import RcloneTransferHelper
 from bot.helper.mirror_leech_utils.status_utils.queue_status import QueueStatus
 from bot.helper.mirror_leech_utils.status_utils.rclone_status import RcloneStatus
@@ -46,13 +46,13 @@ async def add_rclone_download(rc_path, config_path, path, name, listener):
         if res1[2] != -9:
             err = res1[1] or res2[1]
             msg = f"Error: While getting rclone stat/size. Path: {remote}:{rc_path}. Stderr: {err[:4000]}"
-            await sendMessage(listener.message, msg)
+            await send_message(listener.message, msg)
         return
     try:
         rstat = loads(res1[0])
         rsize = loads(res2[0])
     except Exception as err:
-        await sendMessage(listener.message, f"RcloneDownload JsonLoad: {err}")
+        await send_message(listener.message, f"RcloneDownload JsonLoad: {err}")
         return
     if rstat["IsDir"]:
         if not name:
@@ -65,7 +65,7 @@ async def add_rclone_download(rc_path, config_path, path, name, listener):
 
     msg, button = await stop_duplicate_check(name, listener)
     if msg:
-        await sendMessage(listener.message, msg, button)
+        await send_message(listener.message, msg, button)
         return
 
     added_to_queue, event = await is_queued(listener.uid)
@@ -75,7 +75,7 @@ async def add_rclone_download(rc_path, config_path, path, name, listener):
             download_dict[listener.uid] = QueueStatus(
                 name, size, gid, listener, "dl"
             )
-        await listener.onDownloadStart()
+        await listener.on_download_start()
         await sendStatusMessage(listener.message)
         await event.wait()
         async with download_dict_lock:
@@ -96,7 +96,7 @@ async def add_rclone_download(rc_path, config_path, path, name, listener):
     if from_queue:
         LOGGER.info(f"Start Queued Download with rclone: {rc_path}")
     else:
-        await listener.onDownloadStart()
+        await listener.on_download_start()
         await sendStatusMessage(listener.message)
         LOGGER.info(f"Download with rclone: {rc_path}")
 

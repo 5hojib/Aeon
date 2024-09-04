@@ -14,7 +14,7 @@ from bot import (
 )
 from bot.helper.ext_utils.bot_utils import sync_to_async, bt_selection_buttons
 from bot.helper.ext_utils.task_manager import is_queued
-from bot.helper.telegram_helper.message_utils import sendMessage, sendStatusMessage
+from bot.helper.telegram_helper.message_utils import send_message, sendStatusMessage
 from bot.helper.mirror_leech_utils.status_utils.aria2_status import Aria2Status
 
 
@@ -44,14 +44,14 @@ async def add_aria2c_download(
         download = (await sync_to_async(aria2.add, link, a2c_opt))[0]
     except Exception as e:
         LOGGER.info(f"Aria2c Download Error: {e}")
-        await sendMessage(listener.message, f"{e}")
+        await send_message(listener.message, f"{e}")
         return
     if await aiopath.exists(link):
         await aioremove(link)
     if download.error_message:
         error = str(download.error_message).replace("<", " ").replace(">", " ")
         LOGGER.info(f"Aria2c Download Error: {error}")
-        await sendMessage(listener.message, error)
+        await send_message(listener.message, error)
         return
 
     gid = download.gid
@@ -69,16 +69,16 @@ async def add_aria2c_download(
             non_queued_dl.add(listener.uid)
         LOGGER.info(f"Aria2Download started: {name}. Gid: {gid}")
 
-    await listener.onDownloadStart()
+    await listener.on_download_start()
 
     if not added_to_queue and (not listener.select or not config_dict["BASE_URL"]):
         await sendStatusMessage(listener.message)
     elif listener.select and download.is_torrent and not download.is_metadata:
         if not added_to_queue:
             await sync_to_async(aria2.client.force_pause, gid)
-        SBUTTONS = bt_selection_buttons(gid)
+        s_buttons = bt_selection_buttons(gid)
         msg = "Your download paused. Choose files then press Done Selecting button to start downloading."
-        await sendMessage(listener.message, msg, SBUTTONS)
+        await send_message(listener.message, msg, s_buttons)
 
     if added_to_queue:
         await event.wait()

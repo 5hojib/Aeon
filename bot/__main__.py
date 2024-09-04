@@ -25,7 +25,7 @@ from bot import (
     scheduler,
     user_data,
     config_dict,
-    botStartTime,
+    bot_start_time,
 )
 
 from .modules import (
@@ -65,9 +65,9 @@ from .helper.telegram_helper.bot_commands import BotCommands
 from .helper.telegram_helper.button_build import ButtonMaker
 from .helper.telegram_helper.message_utils import (
     sendFile,
-    editMessage,
-    sendMessage,
-    deleteMessage,
+    edit_message,
+    send_message,
+    delete_message,
     one_minute_del,
     five_minute_del,
 )
@@ -107,9 +107,9 @@ else:
 async def stats(_, message):
     total, used, free, disk = disk_usage("/")
     memory = virtual_memory()
-    currentTime = get_readable_time(time() - botStartTime)
-    osUptime = get_readable_time(time() - boot_time())
-    cpuUsage = cpu_percent(interval=0.5)
+    current_time = get_readable_time(time() - bot_start_time)
+    os_uptime = get_readable_time(time() - boot_time())
+    cpu_usage = cpu_percent(interval=0.5)
     limit_mapping = {
         "Torrent": config_dict.get("TORRENT_LIMIT", "∞"),
         "Gdrive": config_dict.get("GDRIVE_LIMIT", "∞"),
@@ -121,9 +121,9 @@ async def stats(_, message):
         "User task": config_dict.get("USER_MAX_TASKS", "∞"),
     }
     system_info = (
-        f"<code>• Bot uptime :</code> {currentTime}\n"
-        f"<code>• Sys uptime :</code> {osUptime}\n"
-        f"<code>• CPU usage  :</code> {cpuUsage}%\n"
+        f"<code>• Bot uptime :</code> {current_time}\n"
+        f"<code>• Sys uptime :</code> {os_uptime}\n"
+        f"<code>• CPU usage  :</code> {cpu_usage}%\n"
         f"<code>• RAM usage  :</code> {memory.percent}%\n"
         f"<code>• Disk usage :</code> {disk}%\n"
         f"<code>• Free space :</code> {get_readable_file_size(free)}\n"
@@ -134,44 +134,44 @@ async def stats(_, message):
 
     for k, v in limit_mapping.items():
         if v == "":
-            v = "∞"
+            value = "∞"
         elif k != "User task":
-            v = f"{v}GB/Link"
+            value = f"{v}GB/Link"
         else:
-            v = f"{v} Tasks/user"
-        limitations += f"<code>• {k:<11}:</code> {v}\n"
+            value = f"{v} Tasks/user"
+        limitations += f"<code>• {k:<11}:</code> {value}\n"
 
     stats = system_info + limitations
-    reply_message = await sendMessage(message, stats, photo="Random")
-    await deleteMessage(message)
+    reply_message = await send_message(message, stats, photo="Random")
+    await delete_message(message)
     await one_minute_del(reply_message)
 
 
 @new_thread
 async def start(client, message):
     if len(message.command) > 1 and message.command[1] == "private":
-        await deleteMessage(message)
+        await delete_message(message)
     elif len(message.command) > 1 and len(message.command[1]) == 36:
         userid = message.from_user.id
         input_token = message.command[1]
         if DATABASE_URL:
             stored_token = await DbManager().get_user_token(userid)
             if stored_token is None:
-                return await sendMessage(
+                return await send_message(
                     message,
                     "<b>This token is not for you!</b>\n\nPlease generate your own.",
                 )
             if input_token != stored_token:
-                return await sendMessage(
+                return await send_message(
                     message, "Invalid token.\n\nPlease generate a new one."
                 )
         if userid not in user_data:
-            return await sendMessage(
+            return await send_message(
                 message, "This token is not yours!\n\nKindly generate your own."
             )
         data = user_data[userid]
         if "token" not in data or data["token"] != input_token:
-            return await sendMessage(
+            return await send_message(
                 message,
                 "<b>This token has already been used!</b>\n\nPlease get a new one.",
             )
@@ -184,19 +184,19 @@ async def start(client, message):
             await DbManager().update_user_tdata(userid, token, token_time)
         msg = "Your token has been successfully generated!\n\n"
         msg += f'It will be valid for {get_readable_time(int(config_dict["TOKEN_TIMEOUT"]), True)}'
-        return await sendMessage(message, msg)
+        return await send_message(message, msg)
     elif await CustomFilters.authorized(client, message):
         help_command = f"/{BotCommands.HelpCommand}"
         start_string = f"This bot can mirror all your links|files|torrents to Google Drive or any rclone cloud or to telegram.\n<b>Type {help_command} to get a list of available commands</b>"
-        await sendMessage(message, start_string, photo="Random")
+        await send_message(message, start_string, photo="Random")
     else:
-        await sendMessage(message, "You are not a authorized user!", photo="Random")
+        await send_message(message, "You are not a authorized user!", photo="Random")
     await DbManager().update_pm_users(message.from_user.id)
     return None
 
 
 async def restart(_, message):
-    restart_message = await sendMessage(message, "Restarting...")
+    restart_message = await send_message(message, "Restarting...")
     if scheduler.running:
         scheduler.shutdown(wait=False)
     for interval in [QbInterval, Interval]:
@@ -215,23 +215,23 @@ async def restart(_, message):
 
 async def ping(_, message):
     start_time = int(round(time() * 1000))
-    reply = await sendMessage(message, "Starting ping...")
+    reply = await send_message(message, "Starting ping...")
     end_time = int(round(time() * 1000))
     value = end_time - start_time
-    await editMessage(reply, f"{value} ms.")
+    await edit_message(reply, f"{value} ms.")
 
 
 @new_task
-async def AeonCallback(_, query):
+async def aeon_callback(_, query):
     message = query.message
     user_id = query.from_user.id
     data = query.data.split()
     if user_id != int(data[1]):
         return await query.answer(text="This message not your's!", show_alert=True)
-    elif data[2] == "logdisplay":
+    if data[2] == "logdisplay":
         await query.answer()
         async with aiopen("log.txt", "r") as f:
-            logFileLines = (await f.read()).splitlines()
+            log_file_lines = (await f.read()).splitlines()
 
         def parseline(line):
             try:
@@ -239,22 +239,22 @@ async def AeonCallback(_, query):
             except IndexError:
                 return line
 
-        ind, Loglines = 1, ""
+        ind, log_lines = 1, ""
         try:
-            while len(Loglines) <= 3500:
-                Loglines = parseline(logFileLines[-ind]) + "\n" + Loglines
-                if ind == len(logFileLines):
+            while len(log_lines) <= 3500:
+                log_lines = parseline(log_file_lines[-ind]) + "\n" + log_lines
+                if ind == len(log_file_lines):
                     break
                 ind += 1
-            startLine = "<pre language='python'>"
-            endLine = "</pre>"
+            start_line = "<pre language='python'>"
+            end_line = "</pre>"
             btn = ButtonMaker()
             btn.callback("Close", f"aeon {user_id} close")
-            reply_message = await sendMessage(
-                message, startLine + escape(Loglines) + endLine, btn.column(1)
+            reply_message = await send_message(
+                message, start_line + escape(log_lines) + end_line, btn.column(1)
             )
             await query.edit_message_reply_markup(None)
-            await deleteMessage(message)
+            await delete_message(message)
             await five_minute_del(reply_message)
         except Exception as err:
             LOGGER.error(f"TG Log Display : {err!s}")
@@ -263,7 +263,7 @@ async def AeonCallback(_, query):
         return None
     else:
         await query.answer()
-        await deleteMessage(message)
+        await delete_message(message)
         return None
 
 
@@ -272,14 +272,14 @@ async def log(_, message):
     buttons = ButtonMaker()
     buttons.callback("Log display", f"aeon {message.from_user.id} logdisplay")
     reply_message = await sendFile(message, "log.txt", buttons=buttons.column(1))
-    await deleteMessage(message)
+    await delete_message(message)
     await five_minute_del(reply_message)
 
 
 @new_task
 async def bot_help(_, message):
-    reply_message = await sendMessage(message, help_string)
-    await deleteMessage(message)
+    reply_message = await send_message(message, help_string)
+    await delete_message(message)
     await one_minute_del(reply_message)
 
 
@@ -330,7 +330,7 @@ async def main():
             filters=command(BotCommands.StatsCommand) & CustomFilters.authorized,
         )
     )
-    bot.add_handler(CallbackQueryHandler(AeonCallback, filters=regex(r"^aeon")))
+    bot.add_handler(CallbackQueryHandler(aeon_callback, filters=regex(r"^aeon")))
     LOGGER.info("Bot Started!")
     signal(SIGINT, exit_clean_up)
 

@@ -30,7 +30,7 @@ from bot import (
     status_reply_dict_lock,
 )
 from bot.modules.torrent_search import initiate_search_tools
-from bot.helper.ext_utils.bot_utils import new_thread, setInterval, sync_to_async
+from bot.helper.ext_utils.bot_utils import SetInterval, new_thread, sync_to_async
 from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.ext_utils.help_strings import bset_display_dict
 from bot.helper.ext_utils.task_manager import start_from_queued
@@ -39,8 +39,8 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import (
     sendFile,
-    editMessage,
-    sendMessage,
+    edit_message,
+    send_message,
     update_all_messages,
 )
 
@@ -115,8 +115,8 @@ async def load_config():
         GLOBAL_EXTENSION_FILTER.append("aria2")
         for x in fx:
             if x.strip().startswith("."):
-                x = x.lstrip(".")
-            GLOBAL_EXTENSION_FILTER.append(x.strip().lower())
+                clean_x = x.lstrip(".")
+            GLOBAL_EXTENSION_FILTER.append(clean_x.strip().lower())
 
     METADATA_KEY = environ.get("METADATA_KEY", "")
     if len(METADATA_KEY) == 0:
@@ -148,7 +148,7 @@ async def load_config():
             if Interval:
                 Interval[0].cancel()
                 Interval.clear()
-                Interval.append(setInterval(1, update_all_messages))
+                Interval.append(SetInterval(1, update_all_messages))
 
     YT_DLP_OPTIONS = environ.get("YT_DLP_OPTIONS", "")
     if len(YT_DLP_OPTIONS) == 0:
@@ -469,7 +469,7 @@ async def get_buttons(key=None, edit_type=None, edit_mode=None, mess=None):
 
 async def update_buttons(message, key=None, edit_type=None, edit_mode=None):
     msg, button = await get_buttons(key, edit_type, edit_mode, message)
-    await editMessage(message, msg, button)
+    await edit_message(message, msg, button)
 
 
 async def edit_variable(_, message, pre_message, key):
@@ -497,8 +497,8 @@ async def edit_variable(_, message, pre_message, key):
         GLOBAL_EXTENSION_FILTER.append(".aria2")
         for x in fx:
             if x.strip().startswith("."):
-                x = x.lstrip(".")
-            GLOBAL_EXTENSION_FILTER.append(x.strip().lower())
+                clean_x = x.lstrip(".")
+            GLOBAL_EXTENSION_FILTER.append(clean_x.strip().lower())
     elif key == "GDRIVE_ID":
         list_drives_dict["Main"] = {
             "drive_id": value,
@@ -752,7 +752,7 @@ async def edit_bot_settings(client, query):
 async def bot_settings(_, message):
     msg, button = await get_buttons()
     globals()["START"] = 0
-    await sendMessage(message, msg, button)
+    await send_message(message, msg, button)
 
 
 bot.add_handler(

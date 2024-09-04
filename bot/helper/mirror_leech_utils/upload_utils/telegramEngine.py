@@ -39,7 +39,7 @@ from bot import (
 )
 from bot.helper.aeon_utils.metadata import add_attachment
 from bot.helper.ext_utils.bot_utils import (
-    isMkv,
+    is_mkv,
     is_url,
     sync_to_async,
     is_telegram_link,
@@ -60,7 +60,7 @@ from bot.helper.ext_utils.files_utils import (
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import (
     chat_info,
-    deleteMessage,
+    delete_message,
     sendMultiMessage,
     get_tg_link_content,
 )
@@ -173,7 +173,7 @@ class TgUploader:
                         reply_to_message_id=msg.id,
                     )
                     if msg.text:
-                        await deleteMessage(msg)
+                        await delete_message(msg)
                     if self.__has_buttons:
                         with contextlib.suppress(MessageNotModified):
                             await self.__leechmsg[chat_id].edit_reply_markup(
@@ -254,7 +254,7 @@ class TgUploader:
 
     async def __prepare_file(self, prefile_, dirpath):
         file_, cap_mono = await process_file(prefile_, self.__user_id, dirpath)
-        if (atc := self.__listener.attachment) and isMkv(prefile_):
+        if (atc := self.__listener.attachment) and is_mkv(prefile_):
             file_ = await add_attachment(prefile_, dirpath, atc)
         if prefile_ != file_:
             if (
@@ -330,7 +330,7 @@ class TgUploader:
         for msg in msgs:
             if msg.link in self.__msgs_dict:
                 del self.__msgs_dict[msg.link]
-            await deleteMessage(msg)
+            await delete_message(msg)
         del self.__media_dict[key][subkey]
         if self.__listener.isSuperGroup or config_dict["LEECH_DUMP_ID"]:
             for m in msgs_list:
@@ -416,7 +416,7 @@ class TgUploader:
                     if not isDeleted:
                         values_list = list(self.__leechmsg.values())
                         if values_list:
-                            await deleteMessage(values_list[0])
+                            await delete_message(values_list[0])
                         isDeleted = True
                     if self.__is_cancelled:
                         return
@@ -531,7 +531,7 @@ class TgUploader:
                             reply_markup=buttons,
                         )
                         if self.__sent_msg:
-                            await deleteMessage(nrml_media)
+                            await delete_message(nrml_media)
                     except Exception:
                         self.__sent_msg = nrml_media
                 else:
@@ -591,7 +591,7 @@ class TgUploader:
                             reply_markup=buttons,
                         )
                         if self.__sent_msg:
-                            await deleteMessage(nrml_media)
+                            await delete_message(nrml_media)
                     except Exception:
                         self.__sent_msg = nrml_media
                 else:

@@ -58,14 +58,12 @@ class Aria2Status:
         if self.__download.is_waiting or self.queued:
             if self.seeding:
                 return MirrorStatus.STATUS_QUEUEUP
-            else:
-                return MirrorStatus.STATUS_QUEUEDL
-        elif self.__download.is_paused:
+            return MirrorStatus.STATUS_QUEUEDL
+        if self.__download.is_paused:
             return MirrorStatus.STATUS_PAUSED
-        elif self.__download.seeder and self.seeding:
+        if self.__download.seeder and self.seeding:
             return MirrorStatus.STATUS_SEEDING
-        else:
-            return MirrorStatus.STATUS_DOWNLOADING
+        return MirrorStatus.STATUS_DOWNLOADING
 
     def seeders_num(self):
         return self.__download.num_seeders

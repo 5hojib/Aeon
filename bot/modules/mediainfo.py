@@ -16,13 +16,13 @@ from bot.helper.ext_utils.bot_utils import cmd_exec
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.ext_utils.telegraph_helper import telegraph
 from bot.helper.telegram_helper.bot_commands import BotCommands
-from bot.helper.telegram_helper.message_utils import editMessage, sendMessage
+from bot.helper.telegram_helper.message_utils import edit_message, send_message
 
 section_dict = {"General", "Video", "Audio", "Text", "Menu"}
 
 
 async def gen_mediainfo(message, link=None, media=None, msg=None):
-    temp_send = await sendMessage(message, "Generating MediaInfo...")
+    temp_send = await send_message(message, "Generating MediaInfo...")
     try:
         path = "Mediainfo/"
         if not await aiopath.isdir(path):
@@ -34,12 +34,14 @@ async def gen_mediainfo(message, link=None, media=None, msg=None):
             headers = {
                 "user-agent": "Mozilla/5.0 (Linux; Android 12; 2201116PI) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36"
             }
-            async with aiohttp.ClientSession() as session:
-                async with session.get(link, headers=headers) as response:
-                    async with aiopen(des_path, "wb") as f:
-                        async for chunk in response.content.iter_chunked(10000000):
-                            await f.write(chunk)
-                            break
+            async with (
+                aiohttp.ClientSession() as session,
+                session.get(link, headers=headers) as response,
+                aiopen(des_path, "wb") as f,
+            ):
+                async for chunk in response.content.iter_chunked(10000000):
+                    await f.write(chunk)
+                    break
         elif media:
             des_path = ospath.join(path, media.file_name)
             if media.file_size <= 50000000:
@@ -56,7 +58,7 @@ async def gen_mediainfo(message, link=None, media=None, msg=None):
 
     except Exception as e:
         LOGGER.error(e)
-        await editMessage(temp_send, f"MediaInfo stopped due to {e!s}")
+        await edit_message(temp_send, f"MediaInfo stopped due to {e!s}")
     finally:
         await aioremove(des_path)
 
@@ -104,9 +106,9 @@ async def mediainfo(_, message):
         ):
             await gen_mediainfo(message, None, file, reply)
         else:
-            await sendMessage(message, help_msg)
+            await send_message(message, help_msg)
     else:
-        await sendMessage(message, help_msg)
+        await send_message(message, help_msg)
 
 
 bot.add_handler(

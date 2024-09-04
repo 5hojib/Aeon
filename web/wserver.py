@@ -2,7 +2,7 @@ from time import sleep
 from logging import INFO, FileHandler, StreamHandler, getLogger, basicConfig
 
 from flask import Flask, request
-from aria2p import API as ariaAPI
+from aria2p import API
 from aria2p import Client as ariaClient
 from qbittorrentapi import Client as qbClient
 from qbittorrentapi import NotFound404Error
@@ -11,7 +11,7 @@ from web.nodes import make_tree
 
 app = Flask(__name__)
 
-aria2 = ariaAPI(ariaClient(host="http://localhost", port=6800, secret=""))
+aria2 = API(ariaClient(host="http://localhost", port=6800, secret=""))
 
 xnox_client = qbClient(
     host="localhost",

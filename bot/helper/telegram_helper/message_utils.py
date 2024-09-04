@@ -31,16 +31,16 @@ from bot import (
     status_reply_dict_lock,
 )
 from bot.helper.ext_utils.bot_utils import (
-    setInterval,
+    SetInterval,
     sync_to_async,
     download_image_url,
     get_readable_message,
 )
-from bot.helper.ext_utils.exceptions import TgLinkException
+from bot.helper.ext_utils.exceptions import TgLinkError
 from bot.helper.telegram_helper.button_build import ButtonMaker
 
 
-async def sendMessage(message, text, buttons=None, photo=None):
+async def send_message(message, text, buttons=None, photo=None):
     try:
         if photo:
             try:
@@ -57,7 +57,7 @@ async def sendMessage(message, text, buttons=None, photo=None):
                 pass
             except (PhotoInvalidDimensions, WebpageCurlFailed, MediaEmpty):
                 des_dir = await download_image_url(photo)
-                await sendMessage(message, text, buttons, des_dir)
+                await send_message(message, text, buttons, des_dir)
                 await aioremove(des_dir)
                 return None
             except Exception:
@@ -72,9 +72,9 @@ async def sendMessage(message, text, buttons=None, photo=None):
     except FloodWait as f:
         LOGGER.warning(str(f))
         await sleep(f.value * 1.2)
-        return await sendMessage(message, text, buttons, photo)
+        return await send_message(message, text, buttons, photo)
     except ReplyMarkupInvalid:
-        return await sendMessage(message, text, None, photo)
+        return await send_message(message, text, None, photo)
     except Exception as e:
         LOGGER.error(format_exc())
         return str(e)
@@ -189,7 +189,7 @@ async def sendMultiMessage(chat_ids, text, buttons=None, photo=None):
     return msg_dict
 
 
-async def editMessage(message, text, buttons=None, photo=None):
+async def edit_message(message, text, buttons=None, photo=None):
     try:
         if message.media:
             if photo:
@@ -203,7 +203,7 @@ async def editMessage(message, text, buttons=None, photo=None):
     except FloodWait as f:
         LOGGER.warning(str(f))
         await sleep(f.value * 1.2)
-        return await editMessage(message, text, buttons, photo)
+        return await edit_message(message, text, buttons, photo)
     except (MessageNotModified, MessageEmpty):
         pass
     except Exception as e:
@@ -229,7 +229,7 @@ async def sendFile(message, file, caption=None, buttons=None):
         return str(e)
 
 
-async def deleteMessage(message):
+async def delete_message(message):
     try:
         await message.delete()
     except Exception as e:
@@ -238,29 +238,29 @@ async def deleteMessage(message):
 
 async def one_minute_del(message):
     await sleep(60)
-    await deleteMessage(message)
+    await delete_message(message)
 
 
 async def five_minute_del(message):
     await sleep(300)
-    await deleteMessage(message)
+    await delete_message(message)
 
 
 async def delete_links(message):
     if DELETE_LINKS:
         if reply_to := message.reply_to_message:
-            await deleteMessage(reply_to)
-        await deleteMessage(message)
+            await delete_message(reply_to)
+        await delete_message(message)
 
 
 async def delete_all_messages():
     async with status_reply_dict_lock:
-        for key, data in list(status_reply_dict.items()):
-            try:
+        try:
+            for key, data in list(status_reply_dict.items()):
                 del status_reply_dict[key]
-                await deleteMessage(data[0])
-            except Exception as e:
-                LOGGER.error(str(e))
+                await delete_message(data[0])
+        except Exception as e:
+            LOGGER.error(str(e))
 
 
 async def get_tg_link_content(link):
@@ -276,9 +276,7 @@ async def get_tg_link_content(link):
             r"tg:\/\/openmessage\?user_id=([0-9]+)&message_id=([0-9]+)", link
         )
         if not user:
-            raise TgLinkException(
-                "USER_SESSION_STRING required for this private link!"
-            )
+            raise TgLinkError("USER_SESSION_STRING required for this private link!")
 
     chat = msg.group(1)
     msg_id = int(msg.group(2))
@@ -299,16 +297,15 @@ async def get_tg_link_content(link):
         try:
             user_message = await user.get_messages(chat_id=chat, message_ids=msg_id)
         except Exception as e:
-            raise TgLinkException(
+            raise TgLinkError(
                 f"You don't have access to this chat!. ERROR: {e}"
             ) from e
         if not user_message.empty:
             return user_message, "user"
-        raise TgLinkException("Private: Please report!")
-    elif not private:
+        raise TgLinkError("Private: Please report!")
+    if not private:
         return message, "bot"
-    else:
-        raise TgLinkException("Bot can't download from GROUPS without joining!")
+    raise TgLinkError("Bot can't download from GROUPS without joining!")
 
 
 async def update_all_messages(force=False):
@@ -331,7 +328,9 @@ async def update_all_messages(force=False):
                 status_reply_dict[chat_id]
                 and msg != status_reply_dict[chat_id][0].text
             ):
-                rmsg = await editMessage(status_reply_dict[chat_id][0], msg, buttons)
+                rmsg = await edit_message(
+                    status_reply_dict[chat_id][0], msg, buttons
+                )
                 if isinstance(rmsg, str) and rmsg.startswith("Telegram says: [400"):
                     del status_reply_dict[chat_id]
                     continue
@@ -348,13 +347,13 @@ async def sendStatusMessage(msg):
         chat_id = msg.chat.id
         if chat_id in list(status_reply_dict.keys()):
             message = status_reply_dict[chat_id][0]
-            await deleteMessage(message)
+            await delete_message(message)
             del status_reply_dict[chat_id]
-        message = await sendMessage(msg, progress, buttons)
+        message = await send_message(msg, progress, buttons)
         message.text = progress
         status_reply_dict[chat_id] = [message, time()]
         if not Interval:
-            Interval.append(setInterval(1, update_all_messages))
+            Interval.append(SetInterval(1, update_all_messages))
 
 
 async def forcesub(message, ids, button=None):

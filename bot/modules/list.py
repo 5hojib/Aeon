@@ -13,9 +13,9 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import (
     isAdmin,
-    editMessage,
-    sendMessage,
     delete_links,
+    edit_message,
+    send_message,
     one_minute_del,
     five_minute_del,
 )
@@ -44,12 +44,12 @@ async def _list_drive(key, message, item_type, isRecursive):
         try:
             button = await get_telegraph_list(telegraph_content)
         except Exception as e:
-            await editMessage(message, e)
+            await edit_message(message, e)
             return
         msg = f"<b>Found {contents_no} result for </b>{key}"
-        await editMessage(message, msg, button)
+        await edit_message(message, msg, button)
     else:
-        await editMessage(message, f"<b>No result found for </b>{key}")
+        await edit_message(message, f"<b>No result found for </b>{key}")
 
 
 @new_task
@@ -64,14 +64,14 @@ async def select_type(_, query):
         await query.answer()
         isRecursive = not bool(eval(data[3]))
         buttons = await list_buttons(user_id, isRecursive)
-        return await editMessage(message, "Choose list options:", buttons)
+        return await edit_message(message, "Choose list options:", buttons)
     if data[2] == "cancel":
         await query.answer()
-        return await editMessage(message, "List has been canceled!")
+        return await edit_message(message, "List has been canceled!")
     await query.answer()
     item_type = data[2]
     isRecursive = eval(data[3])
-    await editMessage(message, f"<b>Searching for </b>{key}...")
+    await edit_message(message, f"<b>Searching for </b>{key}...")
     await _list_drive(key, message, item_type, isRecursive)
     return None
 
@@ -79,23 +79,25 @@ async def select_type(_, query):
 @new_task
 async def drive_list(_, message):
     if len(message.text.split()) == 1:
-        reply_message = await sendMessage(
+        reply_message = await send_message(
             message, "Send a search key along with command"
         )
         await delete_links(message)
         await one_minute_del(reply_message)
         return
     user_id = message.from_user.id
-    if not await isAdmin(message, user_id):
-        if message.chat.type != message.chat.type.PRIVATE:
-            msg, btn = await checking_access(user_id)
-            if msg is not None:
-                reply_message = await sendMessage(message, msg, btn.column(1))
-                await delete_links(message)
-                await five_minute_del(reply_message)
-                return
+    if (
+        not await isAdmin(message, user_id)
+        and message.chat.type != message.chat.type.PRIVATE
+    ):
+        msg, btn = await checking_access(user_id)
+        if msg is not None:
+            reply_message = await send_message(message, msg, btn.column(1))
+            await delete_links(message)
+            await five_minute_del(reply_message)
+            return
     buttons = await list_buttons(user_id)
-    reply_message = await sendMessage(message, "Choose list options:", buttons)
+    reply_message = await send_message(message, "Choose list options:", buttons)
     await five_minute_del(reply_message)
     await delete_links(message)
 

@@ -6,8 +6,8 @@ from bot.helper.ext_utils.bot_utils import new_task, sync_to_async, is_gdrive_li
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.message_utils import (
-    sendMessage,
-    deleteMessage,
+    send_message,
+    delete_message,
     one_minute_del,
 )
 from bot.helper.mirror_leech_utils.upload_utils.gdriveTools import GoogleDriveHelper
@@ -38,8 +38,8 @@ async def deletefile(_, message):
     else:
         msg = "Send a Google Drive link along with the command or reply to the link with the command."
 
-    reply_message = await sendMessage(message, msg)
-    await deleteMessage(message)
+    reply_message = await send_message(message, msg)
+    await delete_message(message)
     await one_minute_del(reply_message)
 
 

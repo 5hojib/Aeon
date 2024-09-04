@@ -35,7 +35,7 @@ from bot import (
 from bot.modules.mediainfo import parseinfo
 from bot.helper.aeon_utils.metadata import change_metadata
 from bot.helper.ext_utils.bot_utils import (
-    isMkv,
+    is_mkv,
     cmd_exec,
     sync_to_async,
     get_readable_time,
@@ -43,7 +43,7 @@ from bot.helper.ext_utils.bot_utils import (
 )
 from bot.helper.ext_utils.telegraph_helper import telegraph
 
-from .exceptions import NotSupportedExtractionArchive
+from .exceptions import ExtractionArchiveError
 
 FIRST_SPLIT_REGEX = r"(\.|_)part0*1\.rar$|(\.|_)7z\.0*1$|(\.|_)zip\.0*1$|^(?!.*(\.|_)part\d+\.rar$).*\.rar$"
 SPLIT_REGEX = r"\.r\d+$|\.7z\.\d+$|\.z\d+$|\.zip\.\d+$"
@@ -382,10 +382,9 @@ async def split_file(
                         i,
                         False,
                     )
-                else:
-                    LOGGER.warning(
-                        f"{err}. Unable to split this video, if it's size less than {MAX_SPLIT_SIZE} will be uploaded as it is. Path: {path}"
-                    )
+                LOGGER.warning(
+                    f"{err}. Unable to split this video, if it's size less than {MAX_SPLIT_SIZE} will be uploaded as it is. Path: {path}"
+                )
                 return "errored"
             out_size = await aiopath.getsize(out_path)
             if out_size > MAX_SPLIT_SIZE:
@@ -408,12 +407,12 @@ async def split_file(
                     f"Something went wrong while splitting, mostly file is corrupted. Path: {path}"
                 )
                 break
-            elif duration == lpd:
+            if duration == lpd:
                 LOGGER.warning(
                     f"This file has been splitted with default stream and audio, so you will only see one part with less size from orginal one because it doesn't have all streams and audios. This happens mostly with MKV videos. Path: {path}"
                 )
                 break
-            elif lpd <= 3:
+            if lpd <= 3:
                 await aioremove(out_path)
                 break
             start_time += lpd - 3
@@ -432,13 +431,13 @@ async def split_file(
         code = await listener.suproc.wait()
         if code == -9:
             return False
-        elif code != 0:
+        if code != 0:
             err = (await listener.suproc.stderr.read()).decode().strip()
             LOGGER.error(err)
     return True
 
 
-async def process_file(file_, user_id, dirpath=None, isMirror=False):
+async def process_file(file_, user_id, dirpath=None, is_mirror=False):
     user_dict = user_data.get(user_id, {})
     prefix = user_dict.get("prefix", "")
     remname = user_dict.get("remname", "")
@@ -447,7 +446,7 @@ async def process_file(file_, user_id, dirpath=None, isMirror=False):
     metadata_key = user_dict.get("metadata", "") or config_dict["METADATA_KEY"]
     prefile_ = file_
 
-    if metadata_key and dirpath and isMkv(file_):
+    if metadata_key and dirpath and is_mkv(file_):
         file_ = await change_metadata(file_, dirpath, metadata_key)
 
     file_ = re_sub(r"^www\S+\s*[-_]*\s*", "", file_)
@@ -456,16 +455,18 @@ async def process_file(file_, user_id, dirpath=None, isMirror=False):
             remname = f"|{remname}"
         remname = remname.replace(r"\s", " ")
         slit = remname.split("|")
-        __newFileName = ospath.splitext(file_)[0]
+        __new_file_name = ospath.splitext(file_)[0]
         for rep in range(1, len(slit)):
             args = slit[rep].split(":")
             if len(args) == 3:
-                __newFileName = re_sub(args[0], args[1], __newFileName, int(args[2]))
+                __new_file_name = re_sub(
+                    args[0], args[1], __new_file_name, int(args[2])
+                )
             elif len(args) == 2:
-                __newFileName = re_sub(args[0], args[1], __newFileName)
+                __new_file_name = re_sub(args[0], args[1], __new_file_name)
             elif len(args) == 1:
-                __newFileName = re_sub(args[0], "", __newFileName)
-        file_ = __newFileName + ospath.splitext(file_)[1]
+                __new_file_name = re_sub(args[0], "", __new_file_name)
+        file_ = __new_file_name + ospath.splitext(file_)[1]
         LOGGER.info(f"New Filename : {file_}")
 
     nfile_ = file_
@@ -475,18 +476,19 @@ async def process_file(file_, user_id, dirpath=None, isMirror=False):
         if not file_.startswith(prefix):
             file_ = f"{prefix}{file_}"
 
-    if suffix and not isMirror:
+    if suffix and not is_mirror:
         suffix = suffix.replace(r"\s", " ")
-        sufLen = len(suffix)
-        fileDict = file_.split(".")
-        _extIn = 1 + len(fileDict[-1])
-        _extOutName = ".".join(fileDict[:-1]).replace(".", " ").replace("-", " ")
-        _newExtFileName = f"{_extOutName}{suffix}.{fileDict[-1]}"
-        if len(_extOutName) > (64 - (sufLen + _extIn)):
-            _newExtFileName = (
-                _extOutName[: 64 - (sufLen + _extIn)] + f"{suffix}.{fileDict[-1]}"
+        suf_len = len(suffix)
+        file_dict = file_.split(".")
+        _ext_in = 1 + len(file_dict[-1])
+        _ext_out_name = ".".join(file_dict[:-1]).replace(".", " ").replace("-", " ")
+        _new_ext_file_name = f"{_ext_out_name}{suffix}.{file_dict[-1]}"
+        if len(_ext_out_name) > (64 - (suf_len + _ext_in)):
+            _new_ext_file_name = (
+                _ext_out_name[: 64 - (suf_len + _ext_in)]
+                + f"{suffix}.{file_dict[-1]}"
             )
-        file_ = _newExtFileName
+        file_ = _new_ext_file_name
     elif suffix:
         suffix = suffix.replace(r"\s", " ")
         file_ = (
@@ -496,9 +498,9 @@ async def process_file(file_, user_id, dirpath=None, isMirror=False):
         )
 
     cap_mono = nfile_
-    if lcaption and dirpath and not isMirror:
+    if lcaption and dirpath and not is_mirror:
 
-        def lowerVars(match):
+        def lower_vars(match):
             return f"{{{match.group(1).lower()}}}"
 
         lcaption = (
@@ -508,7 +510,7 @@ async def process_file(file_, user_id, dirpath=None, isMirror=False):
             .replace(r"\s", " ")
         )
         slit = lcaption.split("|")
-        slit[0] = re_sub(r"\{([^}]+)\}", lowerVars, slit[0])
+        slit[0] = re_sub(r"\{([^}]+)\}", lower_vars, slit[0])
         up_path = ospath.join(dirpath, prefile_)
         dur, qual, lang, subs = await get_media_info(up_path, True)
         cap_mono = slit[0].format(
@@ -610,7 +612,7 @@ def clean_all():
         rmtree("/usr/src/app/downloads/")
 
 
-def exit_clean_up(signal, frame):
+def exit_clean_up(_, __):
     try:
         LOGGER.info("Please wait, while we clean up and stop the running downloads")
         clean_all()
@@ -669,7 +671,7 @@ def get_base_name(orig_path):
     )
     if extension != "":
         return re_split(f"{extension}$", orig_path, maxsplit=1, flags=IGNORECASE)[0]
-    raise NotSupportedExtractionArchive("File format not supported for extraction")
+    raise ExtractionArchiveError("File format not supported for extraction")
 
 
 def get_mime_type(file_path):

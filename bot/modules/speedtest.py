@@ -7,15 +7,15 @@ from bot.helper.ext_utils.bot_utils import new_task, get_readable_file_size
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.message_utils import (
-    editMessage,
-    sendMessage,
-    deleteMessage,
+    edit_message,
+    send_message,
+    delete_message,
 )
 
 
 @new_task
 async def speedtest(_, message):
-    speed = await sendMessage(message, "Initializing Speedtest...")
+    speed = await send_message(message, "Initializing Speedtest...")
 
     def get_speedtest_results():
         test = Speedtest()
@@ -27,7 +27,7 @@ async def speedtest(_, message):
     result = await bot.loop.run_in_executor(None, get_speedtest_results)
 
     if not result:
-        await editMessage(speed, "Speedtest failed to complete.")
+        await edit_message(speed, "Speedtest failed to complete.")
         return
 
     string_speed = "<b>SPEEDTEST INFO</b>\n\n"
@@ -37,11 +37,11 @@ async def speedtest(_, message):
     string_speed += f"<b>• IP Address:</b> <code>{result.client['ip']}</code>"
 
     try:
-        await sendMessage(message, string_speed, photo=result.share())
-        await deleteMessage(speed)
+        await send_message(message, string_speed, photo=result.share())
+        await delete_message(speed)
     except Exception as e:
         LOGGER.error(str(e))
-        await editMessage(speed, string_speed)
+        await edit_message(speed, string_speed)
 
 
 bot.add_handler(

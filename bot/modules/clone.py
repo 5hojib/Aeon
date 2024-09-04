@@ -18,7 +18,7 @@ from bot.helper.ext_utils.bot_utils import (
     is_rclone_path,
     get_telegraph_list,
 )
-from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
+from bot.helper.ext_utils.exceptions import DirectDownloadLinkError
 from bot.helper.aeon_utils.nsfw_check import nsfw_precheck
 from bot.helper.aeon_utils.send_react import send_react
 from bot.helper.ext_utils.help_strings import CLONE_HELP_MESSAGE
@@ -27,10 +27,10 @@ from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.listeners.tasks_listener import MirrorLeechListener
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.message_utils import (
-    editMessage,
-    sendMessage,
     delete_links,
-    deleteMessage,
+    edit_message,
+    send_message,
+    delete_message,
     one_minute_del,
     five_minute_del,
     sendStatusMessage,
@@ -49,7 +49,7 @@ async def rcloneNode(client, message, link, dst_path, rcf, tag):
     if link == "rcl":
         link = await RcloneList(client, message).get_rclone_path("rcd")
         if not is_rclone_path(link):
-            await sendMessage(message, link)
+            await send_message(message, link)
             return
 
     if link.startswith("mrcc:"):
@@ -59,7 +59,7 @@ async def rcloneNode(client, message, link, dst_path, rcf, tag):
         config_path = "rcl.conf"
 
     if not await aiopath.exists(config_path):
-        await sendMessage(message, f"Rclone Config: {config_path} not Exists!")
+        await send_message(message, f"Rclone Config: {config_path} not Exists!")
         return
 
     if dst_path == "rcl" or config_dict["RCLONE_PATH"] == "rcl":
@@ -67,22 +67,22 @@ async def rcloneNode(client, message, link, dst_path, rcf, tag):
             "rcu", config_path
         )
         if not is_rclone_path(dst_path):
-            await sendMessage(message, dst_path)
+            await send_message(message, dst_path)
             return
 
     dst_path = (dst_path or config_dict["RCLONE_PATH"]).strip("/")
     if not is_rclone_path(dst_path):
-        await sendMessage(message, "Given Wrong RClone Destination!")
+        await send_message(message, "Given Wrong RClone Destination!")
         return
     if dst_path.startswith("mrcc:"):
         if config_path != f"tanha/{message.from_user.id}.conf":
-            await sendMessage(
+            await send_message(
                 message, "You should use same rcl.conf to clone between pathies!"
             )
             return
         dst_path = dst_path.lstrip("mrcc:")
     elif config_path != "rcl.conf":
-        await sendMessage(
+        await send_message(
             message, "You should use same rcl.conf to clone between pathies!"
         )
         return
@@ -104,7 +104,7 @@ async def rcloneNode(client, message, link, dst_path, rcf, tag):
     if res[2] != 0:
         if res[2] != -9:
             msg = f"Error: While getting RClone Stats. Path: {remote}:{src_path}. Stderr: {res[1][:4000]}"
-            await sendMessage(message, msg)
+            await send_message(message, msg)
         return
     rstat = loads(res[0])
     if rstat["IsDir"]:
@@ -116,7 +116,7 @@ async def rcloneNode(client, message, link, dst_path, rcf, tag):
         mime_type = rstat["MimeType"]
 
     listener = MirrorLeechListener(message, tag=tag)
-    await listener.onDownloadStart()
+    await listener.on_download_start()
 
     RCTransfer = RcloneTransferHelper(listener, name)
     LOGGER.info(
@@ -183,28 +183,28 @@ async def rcloneNode(client, message, link, dst_path, rcf, tag):
 
 async def gdcloneNode(message, link, listen_up):
     if not is_gdrive_link(link) and is_share_link(link):
-        process_msg = await sendMessage(
+        process_msg = await send_message(
             message, f"<b>Processing Link:</b> <code>{link}</code>"
         )
         try:
             link = await sync_to_async(direct_link_generator, link)
             LOGGER.info(f"Generated link: {link}")
-            await editMessage(
+            await edit_message(
                 process_msg, f"<b>Generated Link:</b> <code>{link}</code>"
             )
-        except DirectDownloadLinkException as e:
+        except DirectDownloadLinkError as e:
             LOGGER.error(str(e))
             if str(e).startswith("ERROR:"):
-                await editMessage(process_msg, str(e))
+                await edit_message(process_msg, str(e))
                 await delete_links(message)
                 await one_minute_del(process_msg)
                 return
-        await deleteMessage(process_msg)
+        await delete_message(process_msg)
     if is_gdrive_link(link):
         gd = GoogleDriveHelper()
         name, mime_type, size, files, _ = await sync_to_async(gd.count, link)
         if mime_type is None:
-            await sendMessage(message, name)
+            await send_message(message, name)
             return
         if config_dict["STOP_DUPLICATE"]:
             LOGGER.info("Checking File/Folder if already in Drive...")
@@ -214,27 +214,27 @@ async def gdcloneNode(message, link, listen_up):
             if telegraph_content:
                 msg = f"File/Folder is already available in Drive.\nHere are {contents_no} list results:"
                 button = await get_telegraph_list(telegraph_content)
-                await sendMessage(message, msg, button)
+                await send_message(message, msg, button)
                 return
         listener = MirrorLeechListener(
             message,
             tag=listen_up[0],
-            isClone=True,
+            is_clone=True,
             drive_id=listen_up[1],
             index_link=listen_up[2],
         )
         if limit_exceeded := await limit_checker(size, listener):
             await listener.onUploadError(limit_exceeded)
             return
-        await listener.onDownloadStart()
+        await listener.on_download_start()
         LOGGER.info(f"Clone Started: Name: {name} - Source: {link}")
         drive = GoogleDriveHelper(name, listener=listener)
         if files <= 20:
-            msg = await sendMessage(message, f"<b>Cloning:</b> <code>{link}</code>")
+            msg = await send_message(message, f"<b>Cloning:</b> <code>{link}</code>")
             link, size, mime_type, files, folders = await sync_to_async(
                 drive.clone, link, listener.drive_id
             )
-            await deleteMessage(msg)
+            await delete_message(msg)
         else:
             gid = token_hex(4)
             async with download_dict_lock:
@@ -250,8 +250,8 @@ async def gdcloneNode(message, link, listen_up):
         LOGGER.info(f"Cloning Done: {name}")
         await listener.onUploadComplete(link, size, files, folders, mime_type, name)
     else:
-        reply_message = await sendMessage(message, CLONE_HELP_MESSAGE)
-        await deleteMessage(message)
+        reply_message = await send_message(message, CLONE_HELP_MESSAGE)
+        await delete_message(message)
         await one_minute_del(reply_message)
 
 
@@ -293,7 +293,7 @@ async def clone(client, message):
             nextmsg = await client.get_messages(
                 chat_id=message.chat.id, message_ids=message.reply_to_message_id + 1
             )
-            nextmsg = await sendMessage(nextmsg, " ".join(msg))
+            nextmsg = await send_message(nextmsg, " ".join(msg))
             nextmsg = await client.get_messages(
                 chat_id=message.chat.id, message_ids=nextmsg.id
             )
@@ -307,8 +307,8 @@ async def clone(client, message):
         drive_id = GoogleDriveHelper.getIdFromUrl(drive_id)
 
     if len(link) == 0:
-        reply_message = await sendMessage(message, CLONE_HELP_MESSAGE)
-        await deleteMessage(message)
+        reply_message = await send_message(message, CLONE_HELP_MESSAGE)
+        await delete_message(message)
         await one_minute_del(reply_message)
         return None
 
@@ -326,7 +326,7 @@ async def clone(client, message):
         if error_button is not None:
             error_button = error_button.column(2)
         await delete_links(message)
-        force_m = await sendMessage(message, final_msg, error_button)
+        force_m = await send_message(message, final_msg, error_button)
         await five_minute_del(force_m)
         return None
 
@@ -334,10 +334,10 @@ async def clone(client, message):
         if not await aiopath.exists("rcl.conf") and not await aiopath.exists(
             f"tanha/{message.from_user.id}.conf"
         ):
-            await sendMessage(message, "Rclone Config Not exists!")
+            await send_message(message, "Rclone Config Not exists!")
             return None
         if not config_dict["RCLONE_PATH"] and not dst_path:
-            await sendMessage(message, "Destination not specified!")
+            await send_message(message, "Destination not specified!")
             await delete_links(message)
             return None
         await rcloneNode(client, message, link, dst_path, rcf, tag)
@@ -348,9 +348,9 @@ async def clone(client, message):
         if drive_id and not await sync_to_async(
             GoogleDriveHelper().getFolderData, drive_id
         ):
-            return await sendMessage(message, "Google Drive ID validation failed!!")
+            return await send_message(message, "Google Drive ID validation failed!!")
         if not config_dict["GDRIVE_ID"] and not drive_id:
-            await sendMessage(message, "GDRIVE_ID not Provided!")
+            await send_message(message, "GDRIVE_ID not Provided!")
             await delete_links(message)
             return None
         await gdcloneNode(message, link, [tag, drive_id, index_link])

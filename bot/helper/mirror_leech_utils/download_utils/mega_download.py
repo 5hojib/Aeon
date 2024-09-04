@@ -1,3 +1,4 @@
+# ruff: noqa: ARG002
 from asyncio import Event
 from secrets import token_hex
 
@@ -22,7 +23,7 @@ from bot.helper.ext_utils.task_manager import (
     limit_checker,
     stop_duplicate_check,
 )
-from bot.helper.telegram_helper.message_utils import sendMessage, sendStatusMessage
+from bot.helper.telegram_helper.message_utils import send_message, sendStatusMessage
 from bot.helper.mirror_leech_utils.status_utils.mega_status import MegaDownloadStatus
 from bot.helper.mirror_leech_utils.status_utils.queue_status import QueueStatus
 
@@ -75,7 +76,7 @@ class MegaAppListener(MegaListener):
         ):
             self.continue_event.set()
 
-    def onRequestTemporaryError(self, api, request, error: MegaError):
+    def onRequestTemporaryError(self, _, request, error: MegaError):
         LOGGER.error(f"Mega Request error in {error}")
         if not self.is_cancelled:
             self.is_cancelled = True
@@ -101,7 +102,7 @@ class MegaAppListener(MegaListener):
             elif transfer.isFinished() and (
                 transfer.isFolderTransfer() or transfer.getFileName() == self.__name
             ):
-                async_to_sync(self.listener.onDownloadComplete)
+                async_to_sync(self.listener.on_download_complete)
                 self.continue_event.set()
         except Exception as e:
             LOGGER.error(e)
@@ -161,7 +162,7 @@ async def add_mega_download(mega_link, path, listener, name):
         await executor.do(folder_api.loginToFolder, (mega_link,))
         node = await sync_to_async(folder_api.authorizeNode, mega_listener.node)
     if mega_listener.error is not None:
-        await sendMessage(listener.message, str(mega_listener.error))
+        await send_message(listener.message, str(mega_listener.error))
         await executor.do(api.logout, ())
         if folder_api is not None:
             await executor.do(folder_api.logout, ())
@@ -170,7 +171,7 @@ async def add_mega_download(mega_link, path, listener, name):
     name = name or node.getName()
     msg, button = await stop_duplicate_check(name, listener)
     if msg:
-        await sendMessage(listener.message, msg, button)
+        await send_message(listener.message, msg, button)
         await executor.do(api.logout, ())
         if folder_api is not None:
             await executor.do(folder_api.logout, ())
@@ -178,7 +179,7 @@ async def add_mega_download(mega_link, path, listener, name):
 
     gid = token_hex(4)
     size = api.getSize(node)
-    if limit_exceeded := await limit_checker(size, listener, isMega=True):
+    if limit_exceeded := await limit_checker(size, listener, is_mega=True):
         await listener.onDownloadError(limit_exceeded)
         return
 
@@ -189,7 +190,7 @@ async def add_mega_download(mega_link, path, listener, name):
             download_dict[listener.uid] = QueueStatus(
                 name, size, gid, listener, "Dl"
             )
-        await listener.onDownloadStart()
+        await listener.on_download_start()
         await sendStatusMessage(listener.message)
         await event.wait()
         async with download_dict_lock:
@@ -213,7 +214,7 @@ async def add_mega_download(mega_link, path, listener, name):
     if from_queue:
         LOGGER.info(f"Start Queued Download from Mega: {name}")
     else:
-        await listener.onDownloadStart()
+        await listener.on_download_start()
         await sendStatusMessage(listener.message)
         LOGGER.info(f"Download from Mega: {name}")
 

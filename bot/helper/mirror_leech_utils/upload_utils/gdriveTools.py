@@ -26,8 +26,8 @@ from googleapiclient.discovery import build
 from bot import GLOBAL_EXTENSION_FILTER, config_dict, list_drives_dict
 from bot.helper.aeon_utils.metadata import add_attachment
 from bot.helper.ext_utils.bot_utils import (
-    isMkv,
-    setInterval,
+    SetInterval,
+    is_mkv,
     async_to_sync,
     get_readable_file_size,
 )
@@ -114,8 +114,7 @@ class GoogleDriveHelper:
                 return build(
                     "drive", "v3", credentials=credentials, cache_discovery=False
                 )
-            else:
-                LOGGER.error("token.pickle not found!")
+            LOGGER.error("token.pickle not found!")
         return None
 
     def __switchServiceAccount(self):
@@ -244,7 +243,7 @@ class GoogleDriveHelper:
         self.__is_uploading = True
         item_path = f"{self.__path}/{file_name}"
         LOGGER.info(f"Uploading: {item_path}")
-        self.__updater = setInterval(self.__update_interval, self.__progress)
+        self.__updater = SetInterval(self.__update_interval, self.__progress)
         try:
             if ospath.isfile(item_path):
                 if item_path.lower().endswith(tuple(GLOBAL_EXTENSION_FILTER)):
@@ -287,7 +286,7 @@ class GoogleDriveHelper:
                     link = self.__G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(dir_id)
                     self.deletefile(link)
                 return
-            elif self.__is_errored:
+            if self.__is_errored:
                 return
             async_to_sync(
                 self.__listener.onUploadComplete,
@@ -330,7 +329,7 @@ class GoogleDriveHelper:
     )
     def __create_directory(self, directory_name, dest_id):
         directory_name, _ = async_to_sync(
-            process_file, directory_name, self.__user_id, isMirror=True
+            process_file, directory_name, self.__user_id, is_mirror=True
         )
         file_metadata = {
             "name": directory_name,
@@ -360,7 +359,7 @@ class GoogleDriveHelper:
         file_name, _ = async_to_sync(
             process_file, file_name, self.__user_id, location, True
         )
-        if (atc := self.__listener.attachment) and isMkv(file_name):
+        if (atc := self.__listener.attachment) and is_mkv(file_name):
             file_name = async_to_sync(add_attachment, file_name, location, atc)
         file_metadata = {
             "name": file_name,
@@ -421,17 +420,15 @@ class GoogleDriveHelper:
                                 f"Reached maximum number of service accounts switching, which is {self.__sa_count}"
                             )
                             raise err
-                        else:
-                            if self.__is_cancelled:
-                                return None
-                            self.__switchServiceAccount()
-                            LOGGER.info(f"Got: {reason}, Trying Again.")
-                            return self.__upload_file(
-                                file_path, file_name, mime_type, dest_id
-                            )
-                    else:
-                        LOGGER.error(f"Got: {reason}")
-                        raise err
+                        if self.__is_cancelled:
+                            return None
+                        self.__switchServiceAccount()
+                        LOGGER.info(f"Got: {reason}, Trying Again.")
+                        return self.__upload_file(
+                            file_path, file_name, mime_type, dest_id
+                        )
+                    LOGGER.error(f"Got: {reason}")
+                    raise err
         if self.__is_cancelled:
             return None
         if not self.__listener.seed or self.__listener.newDir:
@@ -534,7 +531,7 @@ class GoogleDriveHelper:
     )
     def __copyFile(self, file_id, dest_id, file_name):
         file_name, _ = async_to_sync(
-            process_file, file_name, self.__user_id, isMirror=True
+            process_file, file_name, self.__user_id, is_mirror=True
         )
         body = {"name": file_name, "parents": [dest_id]}
         try:
@@ -562,11 +559,10 @@ class GoogleDriveHelper:
                             f"Reached maximum number of service accounts switching, which is {self.__sa_count}"
                         )
                         raise err
-                    else:
-                        if self.__is_cancelled:
-                            return None
-                        self.__switchServiceAccount()
-                        return self.__copyFile(file_id, dest_id, file_name)
+                    if self.__is_cancelled:
+                        return None
+                    self.__switchServiceAccount()
+                    return self.__copyFile(file_id, dest_id, file_name)
                 else:
                     LOGGER.error(f"Got: {reason}")
                     raise err
@@ -637,53 +633,47 @@ class GoogleDriveHelper:
                         )
                         .execute()
                     )
-                else:
-                    return (
-                        self.__service.files()
-                        .list(
-                            supportsAllDrives=True,
-                            includeItemsFromAllDrives=True,
-                            driveId=dir_id,
-                            q=query,
-                            spaces="drive",
-                            pageSize=150,
-                            fields="files(id, name, mimeType, size, teamDriveId, parents)",
-                            corpora="drive",
-                            orderBy="folder, name asc",
-                        )
-                        .execute()
-                    )
-            else:
-                if stopDup:
-                    query = f"'{dir_id}' in parents and name = '{fileName}' and "
-                else:
-                    query = f"'{dir_id}' in parents and "
-                    fileName = fileName.split()
-                    for name in fileName:
-                        if name != "":
-                            query += f"name contains '{name}' and "
-                    if itemType == "files":
-                        query += (
-                            "mimeType != 'application/vnd.google-apps.folder' and "
-                        )
-                    elif itemType == "folders":
-                        query += (
-                            "mimeType = 'application/vnd.google-apps.folder' and "
-                        )
-                query += "trashed = false"
                 return (
                     self.__service.files()
                     .list(
                         supportsAllDrives=True,
                         includeItemsFromAllDrives=True,
+                        driveId=dir_id,
                         q=query,
                         spaces="drive",
                         pageSize=150,
-                        fields="files(id, name, mimeType, size)",
+                        fields="files(id, name, mimeType, size, teamDriveId, parents)",
+                        corpora="drive",
                         orderBy="folder, name asc",
                     )
                     .execute()
                 )
+            if stopDup:
+                query = f"'{dir_id}' in parents and name = '{fileName}' and "
+            else:
+                query = f"'{dir_id}' in parents and "
+                fileName = fileName.split()
+                for name in fileName:
+                    if name != "":
+                        query += f"name contains '{name}' and "
+                if itemType == "files":
+                    query += "mimeType != 'application/vnd.google-apps.folder' and "
+                elif itemType == "folders":
+                    query += "mimeType = 'application/vnd.google-apps.folder' and "
+            query += "trashed = false"
+            return (
+                self.__service.files()
+                .list(
+                    supportsAllDrives=True,
+                    includeItemsFromAllDrives=True,
+                    q=query,
+                    spaces="drive",
+                    pageSize=150,
+                    fields="files(id, name, mimeType, size)",
+                    orderBy="folder, name asc",
+                )
+                .execute()
+            )
         except Exception as err:
             err = str(err).replace(">", "").replace("<", "")
             LOGGER.error(err)
@@ -711,8 +701,7 @@ class GoogleDriveHelper:
             if not response["files"]:
                 if noMulti:
                     break
-                else:
-                    continue
+                continue
             if not Title:
                 msg += f"<h4>Search Result For {fileName}</h4>"
                 Title = True
@@ -848,7 +837,7 @@ class GoogleDriveHelper:
     def download(self, link):
         self.__is_downloading = True
         file_id = self.getIdFromUrl(link)
-        self.__updater = setInterval(self.__update_interval, self.__progress)
+        self.__updater = SetInterval(self.__update_interval, self.__progress)
         try:
             meta = self.__getFileMetadata(file_id)
             if meta.get("mimeType") == self.__G_DRIVE_DIR_MIME_TYPE:
@@ -880,7 +869,7 @@ class GoogleDriveHelper:
             self.__updater.cancel()
             if self.__is_cancelled:
                 return None
-            async_to_sync(self.__listener.onDownloadComplete)
+            async_to_sync(self.__listener.on_download_complete)
 
     def __download_folder(self, folder_id, path, folder_name):
         folder_name = folder_name.replace("/", "")
@@ -955,17 +944,15 @@ class GoogleDriveHelper:
                                 f"Reached maximum number of service accounts switching, which is {self.__sa_count}"
                             )
                             raise err
-                        else:
-                            if self.__is_cancelled:
-                                return None
-                            self.__switchServiceAccount()
-                            LOGGER.info(f"Got: {reason}, Trying Again...")
-                            return self.__download_file(
-                                file_id, path, filename, mime_type
-                            )
-                    else:
-                        LOGGER.error(f"Got: {reason}")
-                        raise err
+                        if self.__is_cancelled:
+                            return None
+                        self.__switchServiceAccount()
+                        LOGGER.info(f"Got: {reason}, Trying Again...")
+                        return self.__download_file(
+                            file_id, path, filename, mime_type
+                        )
+                    LOGGER.error(f"Got: {reason}")
+                    raise err
         self.__file_processed_bytes = 0
         return None
 

@@ -19,13 +19,13 @@ from bot.helper.ext_utils.bot_utils import (
 )
 from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.telegram_helper.message_utils import editMessage, sendMessage
+from bot.helper.telegram_helper.message_utils import edit_message, send_message
 
 LIST_LIMIT = 6
 
 
 @new_task
-async def path_updates(client, query, obj):
+async def path_updates(_, query, obj):
     await query.answer()
     message = query.message
     data = query.data.split()
@@ -150,9 +150,9 @@ class RcloneList:
     async def __send_list_message(self, msg, button):
         if not self.is_cancelled:
             if self.__reply_to is None:
-                self.__reply_to = await sendMessage(self.__message, msg, button)
+                self.__reply_to = await send_message(self.__message, msg, button)
             else:
-                await editMessage(self.__reply_to, msg, button)
+                await edit_message(self.__reply_to, msg, button)
 
     async def get_path_buttons(self):
         items_no = len(self.path_list)

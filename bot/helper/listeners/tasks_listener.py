@@ -33,7 +33,7 @@ from bot.helper.ext_utils.bot_utils import (
     get_readable_time,
     get_readable_file_size,
 )
-from bot.helper.ext_utils.exceptions import NotSupportedExtractionArchive
+from bot.helper.ext_utils.exceptions import ExtractionArchiveError
 from bot.helper.ext_utils.files_utils import (
     is_archive,
     join_files,
@@ -49,11 +49,11 @@ from bot.helper.ext_utils.files_utils import (
 from bot.helper.ext_utils.task_manager import start_from_queued
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import (
-    editMessage,
-    sendMessage,
     delete_links,
-    deleteMessage,
+    edit_message,
+    send_message,
     sendCustomMsg,
+    delete_message,
     five_minute_del,
     sendMultiMessage,
     delete_all_messages,
@@ -77,32 +77,32 @@ class MirrorLeechListener:
         message,
         compress=False,
         extract=False,
-        isQbit=False,
-        isLeech=False,
+        is_qbit=False,
+        is_leech=False,
         tag=None,
         select=False,
         seed=False,
-        sameDir=None,
-        rcFlags=None,
+        same_dir=None,
+        rc_flags=None,
         upPath=None,
-        isClone=False,
+        is_clone=False,
         join=False,
-        isYtdlp=False,
+        is_ytdlp=False,
         drive_id=None,
         index_link=None,
         attachment=None,
         files_utils={},
     ):
-        if sameDir is None:
-            sameDir = {}
+        if same_dir is None:
+            same_dir = {}
         self.message = message
         self.uid = message.id
         self.extract = extract
         self.compress = compress
-        self.isQbit = isQbit
-        self.isLeech = isLeech
-        self.isClone = isClone
-        self.isYtdlp = isYtdlp
+        self.is_qbit = is_qbit
+        self.is_leech = is_leech
+        self.is_clone = is_clone
+        self.is_ytdlp = is_ytdlp
         self.tag = tag
         self.seed = seed
         self.newDir = ""
@@ -114,8 +114,8 @@ class MirrorLeechListener:
         ]
         self.isPrivate = message.chat.type == ChatType.BOT
         self.suproc = None
-        self.sameDir = sameDir
-        self.rcFlags = rcFlags
+        self.same_dir = same_dir
+        self.rc_flags = rc_flags
         self.upPath = upPath
         self.join = join
         self.linkslogmsg = None
@@ -136,7 +136,7 @@ class MirrorLeechListener:
         except Exception:
             pass
 
-    async def onDownloadStart(self):
+    async def on_download_start(self):
         if config_dict["LEECH_LOG_ID"]:
             msg = "<b>Task Started</b>\n\n"
             msg += f"<b>• Task by:</b> {self.tag}\n"
@@ -146,26 +146,26 @@ class MirrorLeechListener:
             self.message.from_user.id, "<b>Task started</b>"
         )
 
-    async def onDownloadComplete(self):
+    async def on_download_complete(self):
         multi_links = False
         while True:
-            if self.sameDir:
+            if self.same_dir:
                 if (
-                    self.sameDir["total"] in [1, 0]
-                    or self.sameDir["total"] > 1
-                    and len(self.sameDir["tasks"]) > 1
+                    self.same_dir["total"] in [1, 0]
+                    or self.same_dir["total"] > 1
+                    and len(self.same_dir["tasks"]) > 1
                 ):
                     break
             else:
                 break
             await sleep(0.2)
         async with download_dict_lock:
-            if self.sameDir and self.sameDir["total"] > 1:
-                self.sameDir["tasks"].remove(self.uid)
-                self.sameDir["total"] -= 1
-                folder_name = self.sameDir["name"]
+            if self.same_dir and self.same_dir["total"] > 1:
+                self.same_dir["tasks"].remove(self.uid)
+                self.same_dir["total"] -= 1
+                folder_name = self.same_dir["name"]
                 spath = f"{self.dir}/{folder_name}"
-                des_path = f"/usr/src/app/downloads/{next(iter(self.sameDir['tasks']))}/{folder_name}"
+                des_path = f"/usr/src/app/downloads/{next(iter(self.same_dir['tasks']))}/{folder_name}"
                 await makedirs(des_path, exist_ok=True)
                 for item in await listdir(spath):
                     if item.endswith((".aria2", ".!qB")):
@@ -187,7 +187,7 @@ class MirrorLeechListener:
             return
         if (
             name == "None"
-            or self.isQbit
+            or self.is_qbit
             or not await aiopath.exists(f"{self.dir}/{name}")
         ):
             try:
@@ -306,7 +306,7 @@ class MirrorLeechListener:
                         LOGGER.error("Unable to extract archive! Uploading anyway")
                         self.newDir = ""
                         up_path = dl_path
-            except NotSupportedExtractionArchive:
+            except ExtractionArchiveError:
                 LOGGER.info("Not any valid archive, uploading file as it is.")
                 self.newDir = ""
                 up_path = dl_path
@@ -316,7 +316,7 @@ class MirrorLeechListener:
             if up_path:
                 dl_path = up_path
                 up_path = f"{up_path}.zip"
-            elif self.seed and self.isLeech:
+            elif self.seed and self.is_leech:
                 self.newDir = f"{self.dir}10000"
                 up_path = f"{self.newDir}/{name}.zip"
             else:
@@ -336,7 +336,7 @@ class MirrorLeechListener:
             for ext in GLOBAL_EXTENSION_FILTER:
                 ex_ext = f"-xr!*.{ext}"
                 cmd.append(ex_ext)
-            if self.isLeech and int(size) > LEECH_SPLIT_SIZE:
+            if self.is_leech and int(size) > LEECH_SPLIT_SIZE:
                 if not pswd:
                     del cmd[4]
                 LOGGER.info(f"Zip: orig_path: {dl_path}, zip_path: {up_path}.0*")
@@ -359,7 +359,7 @@ class MirrorLeechListener:
 
         up_dir, up_name = up_path.rsplit("/", 1)
         size = await get_path_size(up_dir)
-        if self.isLeech:
+        if self.is_leech:
             m_size = []
             o_files = []
             if not self.compress:
@@ -430,7 +430,7 @@ class MirrorLeechListener:
             LOGGER.info(f"Start from Queued/Upload: {name}")
         async with queue_dict_lock:
             non_queued_up.add(self.uid)
-        if self.isLeech:
+        if self.is_leech:
             size = await get_path_size(up_dir)
             for s in m_size:
                 size = size - s
@@ -465,7 +465,7 @@ class MirrorLeechListener:
         self, link, size, files, folders, mime_type, name, rclonePath=""
     ):
         user_id = self.message.from_user.id
-        name, _ = await process_file(name, user_id, isMirror=not self.isLeech)
+        name, _ = await process_file(name, user_id, is_mirror=not self.is_leech)
         msg = f"{escape(name)}\n\n"
         msg += f"<blockquote><b>• Size: </b>{get_readable_file_size(size)}\n"
         msg += f"<b>• Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n"
@@ -474,7 +474,7 @@ class MirrorLeechListener:
         inboxButton = ButtonMaker()
         inboxButton.callback("View in inbox", f"aeon {user_id} private", "header")
         inboxButton = extra_btns(inboxButton)
-        if self.isLeech:
+        if self.is_leech:
             if folders > 1:
                 msg += f"<b>• Total files: </b>{folders}\n"
             if mime_type != 0:
@@ -486,37 +486,37 @@ class MirrorLeechListener:
                     msg += (
                         "<b>Files have not been sent for an unspecified reason</b>"
                     )
-                await sendMessage(self.message, msg)
+                await send_message(self.message, msg)
             else:
                 attachmsg = True
                 fmsg, totalmsg = "\n\n", ""
                 lmsg = "<b>Files have been sent. Access them via the provided links.</b>"
-                for index, (link, name) in enumerate(files.items(), start=1):
-                    fmsg += f"{index}. <a href='{link}'>{name}</a>\n"
+                for index, (dlink, name) in enumerate(files.items(), start=1):
+                    fmsg += f"{index}. <a href='{dlink}'>{name}</a>\n"
                     totalmsg = (msg + lmsg + fmsg) if attachmsg else fmsg
                     if len(totalmsg.encode()) > 3900:
                         if self.linkslogmsg:
-                            await editMessage(self.linkslogmsg, totalmsg)
-                            await sendMessage(self.botpmmsg, totalmsg)
-                            self.linkslogmsg = await sendMessage(
+                            await edit_message(self.linkslogmsg, totalmsg)
+                            await send_message(self.botpmmsg, totalmsg)
+                            self.linkslogmsg = await send_message(
                                 self.linkslogmsg, "Fetching Details..."
                             )
                         attachmsg = False
                         await sleep(1)
                         fmsg = "\n\n"
                 if fmsg != "\n\n" and self.linkslogmsg:
-                    await sendMessage(self.linkslogmsg, msg + lmsg + fmsg)
-                    await deleteMessage(self.linkslogmsg)
-                await sendMessage(self.botpmmsg, msg + lmsg + fmsg)
-                await deleteMessage(self.botpmmsg)
+                    await send_message(self.linkslogmsg, msg + lmsg + fmsg)
+                    await delete_message(self.linkslogmsg)
+                await send_message(self.botpmmsg, msg + lmsg + fmsg)
+                await delete_message(self.botpmmsg)
                 if self.isSuperGroup:
-                    await sendMessage(
+                    await send_message(
                         self.message,
                         f"{msg}<b>Files has been sent to your inbox</b>",
                         inboxButton.column(1),
                     )
                 else:
-                    await deleteMessage(self.botpmmsg)
+                    await delete_message(self.botpmmsg)
             if self.seed:
                 if self.newDir:
                     await clean_target(self.newDir)
@@ -552,17 +552,17 @@ class MirrorLeechListener:
             if config_dict["MIRROR_LOG_ID"]:
                 await sendMultiMessage(config_dict["MIRROR_LOG_ID"], msg, button)
                 if self.linkslogmsg:
-                    await deleteMessage(self.linkslogmsg)
-            await sendMessage(self.botpmmsg, msg, button, "Random")
-            await deleteMessage(self.botpmmsg)
+                    await delete_message(self.linkslogmsg)
+            await send_message(self.botpmmsg, msg, button, "Random")
+            await delete_message(self.botpmmsg)
             if self.isSuperGroup:
-                await sendMessage(
+                await send_message(
                     self.message,
                     f"{msg} <b>Links has been sent to your inbox</b>",
                     inboxButton.column(1),
                 )
             else:
-                await deleteMessage(self.botpmmsg)
+                await delete_message(self.botpmmsg)
             if self.seed:
                 if self.newDir:
                     await clean_target(self.newDir)
@@ -596,25 +596,25 @@ class MirrorLeechListener:
             if self.uid in download_dict:
                 del download_dict[self.uid]
             count = len(download_dict)
-            if self.sameDir and self.uid in self.sameDir["tasks"]:
-                self.sameDir["tasks"].remove(self.uid)
-                self.sameDir["total"] -= 1
+            if self.same_dir and self.uid in self.same_dir["tasks"]:
+                self.same_dir["tasks"].remove(self.uid)
+                self.same_dir["total"] -= 1
         msg = f"Hey, {self.tag}!\n"
         msg += "Your download has been stopped!\n\n"
         msg += f"<blockquote><b>Reason:</b> {escape(error)}\n"
         msg += f"<b>Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}</blockquote>"
-        x = await sendMessage(self.message, msg, button)
+        x = await send_message(self.message, msg, button)
         await delete_links(self.message)
         if self.botpmmsg:
-            await deleteMessage(self.botpmmsg)
+            await delete_message(self.botpmmsg)
         if self.linkslogmsg:
-            await deleteMessage(self.linkslogmsg)
+            await delete_message(self.linkslogmsg)
         if count == 0:
             await self.clean()
         else:
             await update_all_messages()
         if self.isSuperGroup and self.botpmmsg:
-            await sendMessage(self.botpmmsg, msg, button)
+            await send_message(self.botpmmsg, msg, button)
         await five_minute_del(x)
 
         async with queue_dict_lock:
@@ -644,18 +644,18 @@ class MirrorLeechListener:
         msg += "Your upload has been stopped!\n\n"
         msg += f"<blockquote><b>Reason:</b> {escape(error)}\n"
         msg += f"<b>Elapsed:</b> {get_readable_time(time() - self.message.date.timestamp())}</blockquote>"
-        x = await sendMessage(self.message, msg)
+        x = await send_message(self.message, msg)
         if self.linkslogmsg:
-            await deleteMessage(self.linkslogmsg)
+            await delete_message(self.linkslogmsg)
         await delete_links(self.message)
         if self.botpmmsg:
-            await deleteMessage(self.botpmmsg)
+            await delete_message(self.botpmmsg)
         if count == 0:
             await self.clean()
         else:
             await update_all_messages()
         if self.isSuperGroup and self.botpmmsg:
-            await sendMessage(self.botpmmsg, msg)
+            await send_message(self.botpmmsg, msg)
         await five_minute_del(x)
 
         async with queue_dict_lock:

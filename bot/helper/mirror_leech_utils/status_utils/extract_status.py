@@ -60,8 +60,7 @@ class ExtractStatus:
     def processed_raw(self):
         if self.__listener.newDir:
             return async_to_sync(get_path_size, self.__listener.newDir)
-        else:
-            return async_to_sync(get_path_size, self.__listener.dir) - self.__size
+        return async_to_sync(get_path_size, self.__listener.dir) - self.__size
 
     def download(self):
         return self

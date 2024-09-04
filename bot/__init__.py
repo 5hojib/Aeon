@@ -21,7 +21,7 @@ from subprocess import Popen, check_output
 from subprocess import run as srun
 from faulthandler import enable as faulthandler_enable
 
-from aria2p import API as ariaAPI
+from aria2p import API
 from aria2p import Client as ariaClient
 from dotenv import load_dotenv, dotenv_values
 from uvloop import install
@@ -37,7 +37,7 @@ install()
 setdefaulttimeout(600)
 getLogger("pymongo").setLevel(ERROR)
 getLogger("httpx").setLevel(ERROR)
-botStartTime = time()
+bot_start_time = time()
 
 
 class CustomFormatter(Formatter):
@@ -183,8 +183,8 @@ EXTENSION_FILTER = environ.get("EXTENSION_FILTER", "")
 if len(EXTENSION_FILTER) > 0:
     fx = EXTENSION_FILTER.split()
     for x in fx:
-        x = x.lstrip(".")
-        GLOBAL_EXTENSION_FILTER.append(x.strip().lower())
+        cleaned_x = x.lstrip(".")
+        GLOBAL_EXTENSION_FILTER.append(cleaned_x.strip().lower())
 
 IS_PREMIUM_USER = False
 user = ""
@@ -472,7 +472,7 @@ if not ospath.exists("accounts"):
 alive = Popen(["python3", "alive.py"])
 sleep(0.5)
 
-aria2 = ariaAPI(ariaClient(host="http://localhost", port=6800, secret=""))
+aria2 = API(ariaClient(host="http://localhost", port=6800, secret=""))
 
 
 xnox_client = qbClient(

@@ -11,9 +11,9 @@ from bot.helper.ext_utils.bot_utils import (
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.message_utils import (
-    sendMessage,
     delete_links,
-    deleteMessage,
+    send_message,
+    delete_message,
 )
 from bot.helper.mirror_leech_utils.upload_utils.gdriveTools import GoogleDriveHelper
 
@@ -41,17 +41,17 @@ async def countNode(_, message):
         link = reply_to.text.split(maxsplit=1)[0].strip()
 
     if is_gdrive_link(link):
-        msg = await sendMessage(message, f"<b>Counting:</b> <code>{link}</code>")
+        msg = await send_message(message, f"<b>Counting:</b> <code>{link}</code>")
         gd = GoogleDriveHelper()
         name, mime_type, size, files, folders = await sync_to_async(gd.count, link)
         if mime_type is None:
-            await sendMessage(message, name)
-            await deleteMessage(msg)
+            await send_message(message, name)
+            await delete_message(msg)
             return
         msg = await format_node_count(name, mime_type, size, files, folders, tag)
     else:
         msg = "Send a Google Drive link along with the command or reply to a link with the command."
-    await sendMessage(message, msg)
+    await send_message(message, msg)
     await delete_links(message)
 
 

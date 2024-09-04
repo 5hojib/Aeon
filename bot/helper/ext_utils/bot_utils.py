@@ -29,9 +29,9 @@ from bot import (
     bot_name,
     user_data,
     config_dict,
-    botStartTime,
     download_dict,
     extra_buttons,
+    bot_start_time,
     download_dict_lock,
 )
 from bot.helper.aeon_utils.tinyfy import tinyfy
@@ -123,7 +123,7 @@ class MirrorStatus:
     STATUS_PROCESSING = "Processing"
 
 
-class setInterval:
+class SetInterval:
     def __init__(self, interval, action):
         self.interval = interval
         self.action = action
@@ -138,7 +138,7 @@ class setInterval:
         self.task.cancel()
 
 
-def isMkv(file):
+def is_mkv(file):
     return file.lower().endswith("mkv")
 
 
@@ -156,7 +156,7 @@ def get_readable_file_size(size_in_bytes: int):
     )
 
 
-async def getDownloadByGid(gid):
+async def get_task_by_gid(gid):
     async with download_dict_lock:
         return next(
             (
@@ -168,7 +168,7 @@ async def getDownloadByGid(gid):
         )
 
 
-async def getAllDownload(req_status, user_id=None):
+async def get_all_task(req_status, user_id=None):
     dls = []
     async with download_dict_lock:
         for dl in list(download_dict.values()):
@@ -181,7 +181,7 @@ async def getAllDownload(req_status, user_id=None):
 
 
 async def get_user_tasks(user_id, maxtask):
-    if tasks := await getAllDownload("all", user_id):
+    if tasks := await get_all_task("all", user_id):
         return len(tasks) >= maxtask
     return None
 
@@ -190,8 +190,8 @@ def bt_selection_buttons(id_):
     gid = id_[:8]
     pincode = "".join([n for n in id_ if n.isdigit()][:4])
     buttons = ButtonMaker()
-    BASE_URL = config_dict["BASE_URL"]
-    buttons.url("Select", f"{BASE_URL}/app/files/{id_}")
+    base_url = config_dict["BASE_URL"]
+    buttons.url("Select", f"{base_url}/app/files/{id_}")
     buttons.callback("Pincode", f"btsel pin {gid} {pincode}")
     buttons.callback("Cancel", f"btsel rm {gid} {id_}")
     buttons.callback("Done Selecting", f"btsel done {gid} {id_}")
@@ -211,7 +211,7 @@ async def get_telegraph_list(telegraph_content):
     return buttons.column(1)
 
 
-def handleIndex(index, dic):
+def handle_index(index, dic):
     while True:
         if abs(index) < len(dic):
             break
@@ -233,9 +233,9 @@ def progress_bar(pct):
     if isinstance(pct, str):
         pct = float(pct.strip("%"))
     p = min(max(pct, 0), 100)
-    cFull = int((p + 5) // 10)
-    p_str = "●" * cFull
-    p_str += "○" * (10 - cFull)
+    c_full = int((p + 5) // 10)
+    p_str = "●" * c_full
+    p_str += "○" * (10 - c_full)
     return p_str
 
 
@@ -251,7 +251,7 @@ def get_readable_message():
     msg = "<b>Powered by Aeon</b>\n\n"
     button = None
     tasks = len(download_dict)
-    currentTime = get_readable_time(time() - botStartTime)
+    current_time = get_readable_time(time() - bot_start_time)
     if config_dict["BOT_MAX_TASKS"]:
         bmax_task = f"/{config_dict['BOT_MAX_TASKS']}"
     else:
@@ -296,7 +296,7 @@ def get_readable_message():
         buttons.callback("Next", "status nex")
         button = buttons.column(3)
     msg += f"<b>• Tasks</b>: {tasks}{bmax_task}"
-    msg += f"\n<b>• Bot uptime</b>: {currentTime}"
+    msg += f"\n<b>• Bot uptime</b>: {current_time}"
     msg += f"\n<b>• Free disk space</b>: {get_readable_file_size(disk_usage('/usr/src/app/downloads/').free)}"
     return msg, button
 
@@ -318,7 +318,7 @@ def text_to_bytes(size_text):
 
 
 async def turn_page(data):
-    global STATUS_START, PAGE_NO
+    global STATUS_START, PAGE_NO  # noqa: PLW0603
     async with download_dict_lock:
         if data[1] == "nex":
             if PAGE_NO == PAGES:
@@ -438,9 +438,11 @@ def arg_parser(items, arg_base):
 
 async def get_content_type(url):
     try:
-        async with aioClientSession(trust_env=True) as session:
-            async with session.get(url, verify_ssl=False) as response:
-                return response.headers.get("Content-Type")
+        async with (
+            aioClientSession(trust_env=True) as session,
+            session.get(url, verify_ssl=False) as response,
+        ):
+            return response.headers.get("Content-Type")
     except Exception:
         return None
 
@@ -523,10 +525,10 @@ async def checking_access(user_id, button=None):
     if DATABASE_URL:
         data["time"] = await DbManager().get_token_expiry(user_id)
     expire = data.get("time")
-    isExpired = (
+    is_expired = (
         expire is None or expire is not None and (time() - expire) > token_timeout
     )
-    if isExpired:
+    if is_expired:
         token = data["token"] if expire is None and "token" in data else str(uuid4())
         if expire is not None:
             del data["time"]

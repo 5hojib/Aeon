@@ -27,7 +27,7 @@ from bot.helper.mirror_leech_utils.upload_utils.gdriveTools import GoogleDriveHe
 async def stop_duplicate_check(name, listener):
     if (
         not config_dict["STOP_DUPLICATE"]
-        or listener.isLeech
+        or listener.is_leech
         or listener.upPath != "gd"
         or listener.select
     ):
@@ -139,11 +139,11 @@ async def start_from_queued():
 async def limit_checker(
     size,
     listener,
-    isTorrent=False,
-    isMega=False,
-    isDriveLink=False,
-    isYtdlp=False,
-    isPlayList=None,
+    is_torrent=False,
+    is_mega=False,
+    is_drive_link=False,
+    is_ytdlp=False,
+    is_playlist=None,
 ):
     LOGGER.info("Checking limit")
     user_id = listener.message.from_user.id
@@ -156,46 +156,49 @@ async def limit_checker(
     if await isAdmin(listener.message):
         return None
     limit_exceeded = ""
-    if listener.isClone:
-        if CLONE_LIMIT := config_dict["CLONE_LIMIT"]:
-            limit = CLONE_LIMIT * 1024**3
+    if listener.is_clone:
+        if clone_limit := config_dict["CLONE_LIMIT"]:
+            limit = clone_limit * 1024**3
             if size > limit:
                 limit_exceeded = f"Clone limit is {get_readable_file_size(limit)}."
-    elif isMega:
-        if MEGA_LIMIT := config_dict["MEGA_LIMIT"]:
-            limit = MEGA_LIMIT * 1024**3
+    elif is_mega:
+        if mega_limit := config_dict["MEGA_LIMIT"]:
+            limit = mega_limit * 1024**3
             if size > limit:
                 limit_exceeded = f"Mega limit is {get_readable_file_size(limit)}"
-    elif isDriveLink:
-        if GDRIVE_LIMIT := config_dict["GDRIVE_LIMIT"]:
-            limit = GDRIVE_LIMIT * 1024**3
+    elif is_drive_link:
+        if gd_limit := config_dict["GDRIVE_LIMIT"]:
+            limit = gd_limit * 1024**3
             if size > limit:
                 limit_exceeded = (
                     f"Google drive limit is {get_readable_file_size(limit)}"
                 )
-    elif isYtdlp:
-        if YTDLP_LIMIT := config_dict["YTDLP_LIMIT"]:
-            limit = YTDLP_LIMIT * 1024**3
+    elif is_ytdlp:
+        if ytdlp_limit := config_dict["YTDLP_LIMIT"]:
+            limit = ytdlp_limit * 1024**3
             if size > limit:
                 limit_exceeded = f"Ytdlp limit is {get_readable_file_size(limit)}"
-        if isPlayList != 0 and (PLAYLIST_LIMIT := config_dict["PLAYLIST_LIMIT"]):
-            if isPlayList > PLAYLIST_LIMIT:
-                limit_exceeded = f"Playlist limit is {PLAYLIST_LIMIT}"
-    elif isTorrent:
-        if TORRENT_LIMIT := config_dict["TORRENT_LIMIT"]:
-            limit = TORRENT_LIMIT * 1024**3
+        if (
+            is_playlist != 0
+            and (playlist_limit := config_dict["PLAYLIST_LIMIT"])
+            and is_playlist > playlist_limit
+        ):
+            limit_exceeded = f"Playlist limit is {PLAYLIST_LIMIT}"
+    elif is_torrent:
+        if torrent_limit := config_dict["TORRENT_LIMIT"]:
+            limit = torrent_limit * 1024**3
             if size > limit:
                 limit_exceeded = f"Torrent limit is {get_readable_file_size(limit)}"
-    elif DIRECT_LIMIT := config_dict["DIRECT_LIMIT"]:
-        limit = DIRECT_LIMIT * 1024**3
+    elif direct_limit := config_dict["DIRECT_LIMIT"]:
+        limit = direct_limit * 1024**3
         if size > limit:
             limit_exceeded = f"Direct limit is {get_readable_file_size(limit)}"
     if not limit_exceeded:
-        if (LEECH_LIMIT := config_dict["LEECH_LIMIT"]) and listener.isLeech:
-            limit = LEECH_LIMIT * 1024**3
+        if (leech_limit := config_dict["LEECH_LIMIT"]) and listener.is_leech:
+            limit = leech_limit * 1024**3
             if size > limit:
                 limit_exceeded = f"Leech limit is {get_readable_file_size(limit)}"
-        if not listener.isClone:
+        if not listener.is_clone:
             arch = any([listener.compress, listener.extract])
             limit = 3 * 1024**3
             acpt = await sync_to_async(check_storage_threshold, size, limit, arch)
@@ -204,8 +207,8 @@ async def limit_checker(
     if limit_exceeded:
         if size:
             return f"{limit_exceeded}.\nYour file or folder size is {get_readable_file_size(size)}."
-        if isPlayList != 0:
-            return f"{limit_exceeded}.\nYour playlist has {isPlayList} files."
+        if is_playlist != 0:
+            return f"{limit_exceeded}.\nYour playlist has {is_playlist} files."
         return None
     return None
 

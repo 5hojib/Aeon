@@ -20,8 +20,8 @@ from bot.helper.ext_utils.task_manager import (
     stop_duplicate_check,
 )
 from bot.helper.telegram_helper.message_utils import (
-    sendMessage,
     delete_links,
+    send_message,
     sendStatusMessage,
 )
 from bot.helper.mirror_leech_utils.status_utils.queue_status import QueueStatus
@@ -49,7 +49,7 @@ class TelegramDownloadHelper:
     def processed_bytes(self):
         return self.__processed_bytes
 
-    async def __onDownloadStart(self, name, size, file_id, from_queue):
+    async def __on_download_start(self, name, size, file_id, from_queue):
         async with global_lock:
             GLOBAL_GID.add(file_id)
         self.name = name
@@ -62,13 +62,13 @@ class TelegramDownloadHelper:
         async with queue_dict_lock:
             non_queued_dl.add(self.__listener.uid)
         if not from_queue:
-            await self.__listener.onDownloadStart()
+            await self.__listener.on_download_start()
             await sendStatusMessage(self.__listener.message)
             LOGGER.info(f"Download from Telegram: {name}")
         else:
             LOGGER.info(f"Start Queued Download from Telegram: {name}")
 
-    async def __onDownloadProgress(self, current, total):
+    async def __onDownloadProgress(self, current, _):
         if self.__is_cancelled:
             if IS_PREMIUM_USER:
                 user.stop_transmission()
@@ -76,14 +76,14 @@ class TelegramDownloadHelper:
                 bot.stop_transmission()
         self.__processed_bytes = current
 
-    async def __onDownloadError(self, error):
+    async def __on_download_error(self, error):
         async with global_lock:
             with contextlib.suppress(Exception):
                 GLOBAL_GID.remove(self.__id)
         await self.__listener.onDownloadError(error)
 
-    async def __onDownloadComplete(self):
-        await self.__listener.onDownloadComplete()
+    async def __on_download_complete(self):
+        await self.__listener.on_download_complete()
         async with global_lock:
             GLOBAL_GID.remove(self.__id)
 
@@ -93,21 +93,21 @@ class TelegramDownloadHelper:
                 file_name=path, progress=self.__onDownloadProgress
             )
             if self.__is_cancelled:
-                await self.__onDownloadError("Cancelled by user!")
+                await self.__on_download_error("Cancelled by user!")
                 return
         except Exception as e:
             LOGGER.error(str(e))
-            await self.__onDownloadError(str(e))
+            await self.__on_download_error(str(e))
             return
         if download is not None:
-            await self.__onDownloadComplete()
+            await self.__on_download_complete()
         elif not self.__is_cancelled:
-            await self.__onDownloadError("Internal error occurred")
+            await self.__on_download_error("Internal error occurred")
 
     async def add_download(self, message, path, filename, session):
         if session == "user":
             if not self.__listener.isSuperGroup:
-                await sendMessage(
+                await send_message(
                     message, "Use SuperGroup to download this Link with User!"
                 )
                 return
@@ -132,7 +132,7 @@ class TelegramDownloadHelper:
 
                 msg, button = await stop_duplicate_check(name, self.__listener)
                 if msg:
-                    await sendMessage(self.__listener.message, msg, button)
+                    await send_message(self.__listener.message, msg, button)
                     await delete_links(self.__listener.message)
                     return
                 if limit_exceeded := await limit_checker(size, self.__listener):
@@ -146,7 +146,7 @@ class TelegramDownloadHelper:
                         download_dict[self.__listener.uid] = QueueStatus(
                             name, size, gid, self.__listener, "dl"
                         )
-                    await self.__listener.onDownloadStart()
+                    await self.__listener.on_download_start()
                     await sendStatusMessage(self.__listener.message)
                     await event.wait()
                     async with download_dict_lock:
@@ -155,12 +155,12 @@ class TelegramDownloadHelper:
                     from_queue = True
                 else:
                     from_queue = False
-                await self.__onDownloadStart(name, size, gid, from_queue)
+                await self.__on_download_start(name, size, gid, from_queue)
                 await self.__download(message, path)
             else:
-                await self.__onDownloadError("File already being downloaded!")
+                await self.__on_download_error("File already being downloaded!")
         else:
-            await self.__onDownloadError(
+            await self.__on_download_error(
                 "No valid media type in the replied message"
             )
 

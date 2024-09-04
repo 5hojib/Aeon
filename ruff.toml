@@ -6,6 +6,12 @@ target-version = "py310"
 [lint.isort]
 length-sort = true
 
+[lint.pylint]
+max-branches = 50
+max-statements = 100
+max-returns = 15
+max-args = 10
+
 [lint]
 select = [
     "FURB", # refurb
@@ -14,6 +20,7 @@ select = [
     "W",    # pycodestyle: warning
     "UP",   # pyupgrade
     "F",    # pyflakes
+    "N",
     "SIM",  # flake8-simplify
     "RET",  # flake8-return
     "C4",   # flake8-comprehensions
@@ -27,10 +34,6 @@ select = [
 ]
 
 ignore = [
-    "PLR2004",
-    "PLR0912",
-    "PLR0915",
-    "PLR0911",
-    "PLR0913",
     "E501",
+    "PLR2004",
 ]

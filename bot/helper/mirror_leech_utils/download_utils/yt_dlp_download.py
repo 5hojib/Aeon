@@ -77,10 +77,10 @@ class YoutubeDLHelper:
             "trim_file_name": 220,
             "ffmpeg_location": "/bin/xtra",
             "retry_sleep_functions": {
-                "http": lambda n: 3,
-                "fragment": lambda n: 3,
-                "file_access": lambda n: 3,
-                "extractor": lambda n: 3,
+                "http": lambda _: 3,
+                "fragment": lambda _: 3,
+                "file_access": lambda _: 3,
+                "extractor": lambda _: 3,
             },
         }
 
@@ -128,16 +128,16 @@ class YoutubeDLHelper:
             with contextlib.suppress(Exception):
                 self.__progress = (self.__downloaded_bytes / self.__size) * 100
 
-    async def __onDownloadStart(self, from_queue=False):
+    async def __on_download_start(self, from_queue=False):
         async with download_dict_lock:
             download_dict[self.__listener.uid] = YtDlpDownloadStatus(
                 self, self.__listener, self.__gid
             )
         if not from_queue:
-            await self.__listener.onDownloadStart()
+            await self.__listener.on_download_start()
             await sendStatusMessage(self.__listener.message)
 
-    def __onDownloadError(self, error):
+    def __on_download_error(self, error):
         self.__is_cancelled = True
         async_to_sync(self.__listener.onDownloadError, error)
 
@@ -150,7 +150,7 @@ class YoutubeDLHelper:
                 if result is None:
                     raise ValueError("Info result is None")
             except Exception as e:
-                return self.__onDownloadError(str(e))
+                return self.__on_download_error(str(e))
             if self.is_playlist:
                 self.playlist_count = result.get("playlist_count", 0)
             if "entries" in result:
@@ -158,7 +158,7 @@ class YoutubeDLHelper:
                 for entry in result["entries"]:
                     if not entry:
                         continue
-                    elif "filesize_approx" in entry:
+                    if "filesize_approx" in entry:
                         self.__size += entry["filesize_approx"]
                     elif "filesize" in entry:
                         self.__size += entry["filesize"]
@@ -170,20 +170,19 @@ class YoutubeDLHelper:
                         if not self.__ext:
                             self.__ext = ext
                 return None
-            else:
-                outtmpl_ = "%(title,fulltitle,alt_title)s%(season_number& |)s%(season_number&S|)s%(season_number|)02d%(episode_number&E|)s%(episode_number|)02d%(height& |)s%(height|)s%(height&p|)s%(fps|)s%(fps&fps|)s%(tbr& |)s%(tbr|)d.%(ext)s"
-                realName = ydl.prepare_filename(result, outtmpl=outtmpl_)
-                ext = ospath.splitext(realName)[-1]
-                self.name = f"{name}{ext}" if name else realName
-                if not self.__ext:
-                    self.__ext = ext
-                if result.get("filesize"):
-                    self.__size = result["filesize"]
-                    return None
-                elif result.get("filesize_approx"):
-                    self.__size = result["filesize_approx"]
-                    return None
+            outtmpl_ = "%(title,fulltitle,alt_title)s%(season_number& |)s%(season_number&S|)s%(season_number|)02d%(episode_number&E|)s%(episode_number|)02d%(height& |)s%(height|)s%(height&p|)s%(fps|)s%(fps&fps|)s%(tbr& |)s%(tbr|)d.%(ext)s"
+            realName = ydl.prepare_filename(result, outtmpl=outtmpl_)
+            ext = ospath.splitext(realName)[-1]
+            self.name = f"{name}{ext}" if name else realName
+            if not self.__ext:
+                self.__ext = ext
+            if result.get("filesize"):
+                self.__size = result["filesize"]
                 return None
+            if result.get("filesize_approx"):
+                self.__size = result["filesize_approx"]
+                return None
+            return None
 
     def __download(self, link, path):
         try:
@@ -192,20 +191,20 @@ class YoutubeDLHelper:
                     ydl.download([link])
                 except DownloadError as e:
                     if not self.__is_cancelled:
-                        self.__onDownloadError(str(e))
+                        self.__on_download_error(str(e))
                     return
             if self.is_playlist and (
                 not ospath.exists(path) or len(listdir(path)) == 0
             ):
-                self.__onDownloadError(
+                self.__on_download_error(
                     "No video available to download from this playlist. Check logs for more details"
                 )
                 return
             if self.__is_cancelled:
                 raise ValueError
-            async_to_sync(self.__listener.onDownloadComplete)
+            async_to_sync(self.__listener.on_download_complete)
         except ValueError:
-            self.__onDownloadError("Download Stopped by User!")
+            self.__on_download_error("Download Stopped by User!")
 
     async def add_download(self, link, path, name, qual, playlist, options):
         if playlist:
@@ -214,7 +213,7 @@ class YoutubeDLHelper:
 
         self.__gid = token_hex(4)
 
-        await self.__onDownloadStart()
+        await self.__on_download_start()
 
         self.opts["postprocessors"] = [
             {
@@ -292,7 +291,7 @@ class YoutubeDLHelper:
         if qual.startswith("ba/b"):
             self.name = f"{base_name}{self.__ext}"
 
-        if self.__listener.isLeech:
+        if self.__listener.is_leech:
             self.opts["postprocessors"].append(
                 {
                     "format": "jpg",
@@ -314,11 +313,11 @@ class YoutubeDLHelper:
         ]:
             self.opts["postprocessors"].append(
                 {
-                    "already_have_thumbnail": self.__listener.isLeech,
+                    "already_have_thumbnail": self.__listener.is_leech,
                     "key": "EmbedThumbnail",
                 }
             )
-        elif not self.__listener.isLeech:
+        elif not self.__listener.is_leech:
             self.opts["writethumbnail"] = False
 
         msg, button = await stop_duplicate_check(self.name, self.__listener)
@@ -328,8 +327,8 @@ class YoutubeDLHelper:
         if limit_exceeded := await limit_checker(
             self.__size,
             self.__listener,
-            isYtdlp=True,
-            isPlayList=self.playlist_count,
+            is_ytdlp=True,
+            is_playlist=self.playlist_count,
         ):
             await self.__listener.onDownloadError(limit_exceeded)
             return
@@ -345,7 +344,7 @@ class YoutubeDLHelper:
                 if self.__listener.uid not in download_dict:
                     return
             LOGGER.info(f"Start Queued Download from YT_DLP: {self.name}")
-            await self.__onDownloadStart(True)
+            await self.__on_download_start(True)
         else:
             LOGGER.info(f"Download with YT_DLP: {self.name}")
 

@@ -37,65 +37,26 @@ async def change_metadata(file, dirpath, key):
         )
         return file
 
+    languages = {}
+    for stream in streams:
+        stream_index = stream["index"]
+        stream_type = stream["codec_type"]
+        if "tags" in stream and "language" in stream["tags"]:
+            languages[stream_index] = stream["tags"]["language"]
+
     cmd = [
         "xtra",
         "-y",
         "-i",
         full_file_path,
+        "-map_metadata",
+        "-1",
         "-c",
         "copy",
         "-metadata:s:v:0",
         f"title={key}",
         "-metadata",
         f"title={key}",
-        "-metadata",
-        "copyright=",
-        "-metadata",
-        "description=",
-        "-metadata",
-        "license=",
-        "-metadata",
-        "LICENSE=",
-        "-metadata",
-        "author=",
-        "-metadata",
-        "summary=",
-        "-metadata",
-        "comment=",
-        "-metadata",
-        "artist=",
-        "-metadata",
-        "album=",
-        "-metadata",
-        "genre=",
-        "-metadata",
-        "date=",
-        "-metadata",
-        "creation_time=",
-        "-metadata",
-        "language=",
-        "-metadata",
-        "publisher=",
-        "-metadata",
-        "encoder=",
-        "-metadata",
-        "SUMMARY=",
-        "-metadata",
-        "AUTHOR=",
-        "-metadata",
-        "WEBSITE=",
-        "-metadata",
-        "COMMENT=",
-        "-metadata",
-        "ENCODER=",
-        "-metadata",
-        "FILENAME=",
-        "-metadata",
-        "MIMETYPE=",
-        "-metadata",
-        "PURL=",
-        "-metadata",
-        "ALBUM=",
     ]
 
     audio_index = 0
@@ -111,6 +72,13 @@ async def change_metadata(file, dirpath, key):
                 cmd.extend(["-map", f"0:{stream_index}"])
                 first_video = True
             cmd.extend([f"-metadata:s:v:{stream_index}", f"title={key}"])
+            if stream_index in languages:
+                cmd.extend(
+                    [
+                        f"-metadata:s:v:{stream_index}",
+                        f"language={languages[stream_index]}",
+                    ]
+                )
         elif stream_type == "audio":
             cmd.extend(
                 [
@@ -120,6 +88,13 @@ async def change_metadata(file, dirpath, key):
                     f"title={key}",
                 ]
             )
+            if stream_index in languages:
+                cmd.extend(
+                    [
+                        f"-metadata:s:a:{audio_index}",
+                        f"language={languages[stream_index]}",
+                    ]
+                )
             audio_index += 1
         elif stream_type == "subtitle":
             codec_name = stream.get("codec_name", "unknown")
@@ -136,6 +111,13 @@ async def change_metadata(file, dirpath, key):
                         f"title={key}",
                     ]
                 )
+                if stream_index in languages:
+                    cmd.extend(
+                        [
+                            f"-metadata:s:s:{subtitle_index}",
+                            f"language={languages[stream_index]}",
+                        ]
+                    )
                 subtitle_index += 1
         else:
             cmd.extend(["-map", f"0:{stream_index}"])

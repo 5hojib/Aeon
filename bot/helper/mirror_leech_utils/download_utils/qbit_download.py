@@ -14,10 +14,10 @@ from bot import (
 )
 from bot.helper.ext_utils.bot_utils import sync_to_async, bt_selection_buttons
 from bot.helper.ext_utils.task_manager import is_queued
-from bot.helper.listeners.qbit_listener import onDownloadStart
+from bot.helper.listeners.qbit_listener import on_download_start
 from bot.helper.telegram_helper.message_utils import (
-    sendMessage,
-    deleteMessage,
+    send_message,
+    delete_message,
     sendStatusMessage,
 )
 from bot.helper.mirror_leech_utils.status_utils.qbit_status import QbittorrentStatus
@@ -54,7 +54,7 @@ async def add_qb_torrent(link, path, listener, ratio, seed_time):
                     )
                     if len(tor_info) > 0:
                         break
-                    elif time() - ADD_TIME >= 120:
+                    if time() - ADD_TIME >= 120:
                         await listener.onDownloadError(
                             "Not added! Check if the link is valid or not. If it's torrent file then report, this happens if torrent file size above 10mb."
                         )
@@ -71,7 +71,7 @@ async def add_qb_torrent(link, path, listener, ratio, seed_time):
             download_dict[listener.uid] = QbittorrentStatus(
                 listener, queued=added_to_queue
             )
-        await onDownloadStart(f"{listener.uid}")
+        await on_download_start(f"{listener.uid}")
 
         if added_to_queue:
             LOGGER.info(
@@ -82,18 +82,18 @@ async def add_qb_torrent(link, path, listener, ratio, seed_time):
                 non_queued_dl.add(listener.uid)
             LOGGER.info(f"QbitDownload started: {tor_info.name} - Hash: {ext_hash}")
 
-        await listener.onDownloadStart()
+        await listener.on_download_start()
 
         if config_dict["BASE_URL"] and listener.select:
             if link.startswith("magnet:"):
                 metamsg = "Downloading Metadata, wait then you can select files. Use torrent file to avoid this wait."
-                meta = await sendMessage(listener.message, metamsg)
+                meta = await send_message(listener.message, metamsg)
                 while True:
                     tor_info = await sync_to_async(
                         xnox_client.torrents_info, tag=f"{listener.uid}"
                     )
                     if len(tor_info) == 0:
-                        await deleteMessage(meta)
+                        await delete_message(meta)
                         return
                     try:
                         tor_info = tor_info[0]
@@ -102,10 +102,10 @@ async def add_qb_torrent(link, path, listener, ratio, seed_time):
                             "checkingResumeData",
                             "pausedDL",
                         ]:
-                            await deleteMessage(meta)
+                            await delete_message(meta)
                             break
                     except Exception:
-                        await deleteMessage(meta)
+                        await delete_message(meta)
                         return
 
             ext_hash = tor_info.hash
@@ -113,9 +113,9 @@ async def add_qb_torrent(link, path, listener, ratio, seed_time):
                 await sync_to_async(
                     xnox_client.torrents_pause, torrent_hashes=ext_hash
                 )
-            SBUTTONS = bt_selection_buttons(ext_hash)
+            s_buttons = bt_selection_buttons(ext_hash)
             msg = "Your download paused. Choose files then press Done Selecting button to start downloading."
-            await sendMessage(listener.message, msg, SBUTTONS)
+            await send_message(listener.message, msg, s_buttons)
         else:
             await sendStatusMessage(listener.message)
 
@@ -135,7 +135,7 @@ async def add_qb_torrent(link, path, listener, ratio, seed_time):
             async with queue_dict_lock:
                 non_queued_dl.add(listener.uid)
     except Exception as e:
-        await sendMessage(listener.message, str(e))
+        await send_message(listener.message, str(e))
     finally:
         if await aiopath.exists(link):
             await aioremove(link)

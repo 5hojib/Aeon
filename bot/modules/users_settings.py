@@ -27,10 +27,10 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import (
     sendFile,
-    editMessage,
-    sendMessage,
-    deleteMessage,
+    edit_message,
+    send_message,
     sendCustomMsg,
+    delete_message,
     five_minute_del,
 )
 from bot.helper.mirror_leech_utils.upload_utils.gdriveTools import GoogleDriveHelper
@@ -262,7 +262,7 @@ async def update_user_settings(
     thumbnail = f"Thumbnails/{user_id}.jpg"
     if not ospath.exists(thumbnail):
         thumbnail = "https://graph.org/file/73ae908d18c6b38038071.jpg"
-    await editMessage(query.message, msg, button, thumbnail)
+    await edit_message(query.message, msg, button, thumbnail)
 
 
 @new_thread
@@ -272,9 +272,9 @@ async def user_settings(_, message):
     thumbnail = f"Thumbnails/{user_id}.jpg"
     if not ospath.exists(thumbnail):
         thumbnail = "https://graph.org/file/73ae908d18c6b38038071.jpg"
-    x = await sendMessage(message, msg, button, thumbnail)
+    x = await send_message(message, msg, button, thumbnail)
     await five_minute_del(message)
-    await deleteMessage(x)
+    await delete_message(x)
 
 
 async def set_yt_options(_, message, pre_event):
@@ -609,7 +609,7 @@ async def edit_user_settings(client, query):
         buttons.callback("Yes", f"userset {user_id} reset_now y")
         buttons.callback("No", f"userset {user_id} reset_now n")
         buttons.callback("Close", f"userset {user_id} close", "footer")
-        await editMessage(
+        await edit_message(
             message, "Do you want to Reset Settings ?", buttons.column(2)
         )
         return None
@@ -643,7 +643,7 @@ async def edit_user_settings(client, query):
             await DbManager().update_user_data(user_id)
             await DbManager().update_user_doc(user_id, "thumb")
             await DbManager().update_user_doc(user_id, "rclone")
-        await editMessage(message, f"Data Reset for {user_id}")
+        await edit_message(message, f"Data Reset for {user_id}")
         return None
     handler_dict[user_id] = False
     await query.answer()
@@ -652,7 +652,7 @@ async def edit_user_settings(client, query):
     return None
 
 
-async def getUserInfo(client, id):
+async def get_user_info(client, id):
     try:
         return (await client.get_users(id)).mention(style="html")
     except Exception:
@@ -689,9 +689,9 @@ async def send_users_settings(client, message):
                 ofile.name = "users_settings.txt"
                 await sendFile(message, ofile)
         else:
-            await sendMessage(message, msg, button)
+            await send_message(message, msg, button)
     elif int(userid) in user_data:
-        msg = f"{await getUserInfo(client, userid)} ( <code>{userid}</code> ):"
+        msg = f"{await get_user_info(client, userid)} ( <code>{userid}</code> ):"
         if data := user_data[int(userid)]:
             buttons = ButtonMaker()
             buttons.callback(
@@ -706,9 +706,9 @@ async def send_users_settings(client, message):
         else:
             msg += "\nThis User has not Saved anything."
             button = None
-        await sendMessage(message, msg, button)
+        await send_message(message, msg, button)
     else:
-        await sendMessage(message, f"{userid} have not saved anything..")
+        await send_message(message, f"{userid} have not saved anything..")
 
 
 bot.add_handler(

@@ -13,7 +13,7 @@ from bot import LOGGER, bot, user
 from bot.helper.ext_utils.bot_utils import new_task
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
-from bot.helper.telegram_helper.message_utils import sendFile, sendMessage
+from bot.helper.telegram_helper.message_utils import sendFile, send_message
 
 
 def create_execution_environment(message):
@@ -42,7 +42,7 @@ async def send_response(msg, message):
             msg = "MessageEmpty"
         elif not bool(match(r"<(spoiler|b|i|code|s|u)>", msg)):
             msg = f"<pre>{msg}</pre>"
-        await sendMessage(message, msg)
+        await send_message(message, msg)
 
 
 @new_task
