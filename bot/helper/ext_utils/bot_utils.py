@@ -189,7 +189,7 @@ def source(self):
 
 
 def get_readable_message():
-    msg = '𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 𝐑𝐮𝐥𝐟...♨️\n\n'
+    msg = '<b>Pᴏᴡᴇʀᴇᴅ Bʏ Aᴇᴏɴ</b>\n\n'
     button = None
     tasks = len(download_dict)
     currentTime = get_readable_time(time() - botStartTime)
