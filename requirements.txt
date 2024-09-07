@@ -38,7 +38,6 @@ requests
 speedtest-cli
 telegraph
 tenacity
-tgcrypto
 uv
 uvloop
 xattr
