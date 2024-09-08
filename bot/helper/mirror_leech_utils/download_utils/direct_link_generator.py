@@ -438,24 +438,26 @@ def uploadee(url):
         return link[0]
     raise DirectDownloadLinkError("ERROR: Direct Link not found")
 
-
 def terabox(url, video_quality="HD Video", save_dir="HD_Video"):
     """Terabox direct link generator
     https://github.com/Dawn-India/Z-Mirror"""
 
     pattern = r"/s/(\w+)|surl=(\w+)"
     if not search(pattern, url):
-        raise DirectDownloadLinkError("ERROR: Invalid terabox URL")
+        raise DirectDownloadLinkException("ERROR: Invalid terabox URL")
 
     netloc = urlparse(url).netloc
-    terabox_url = url.replace(netloc, "1024tera.com")
+    terabox_url = url.replace(
+        netloc,
+        "1024tera.com"
+    )
 
     urls = [
         "https://ytshorts.savetube.me/api/v1/terabox-downloader",
         f"https://teraboxvideodownloader.nepcoderdevs.workers.dev/?url={terabox_url}",
         f"https://terabox.udayscriptsx.workers.dev/?url={terabox_url}",
         f"https://mavimods.serv00.net/Mavialt.php?url={terabox_url}",
-        f"https://mavimods.serv00.net/Mavitera.php?url={terabox_url}",
+        f"https://mavimods.serv00.net/Mavitera.php?url={terabox_url}"
     ]
 
     headers = {
@@ -467,42 +469,54 @@ def terabox(url, video_quality="HD Video", save_dir="HD_Video"):
         "Alt-Used": "ytshorts.savetube.me",
         "Sec-Fetch-Dest": "empty",
         "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-Site": "same-origin"
     }
 
     for base_url in urls:
         try:
             if "api/v1" in base_url:
-                response = post(base_url, headers=headers, json={"url": terabox_url})
+                response = post(
+                    base_url,
+                    headers=headers,
+                    json={"url": terabox_url}
+                )
             else:
                 response = get(base_url)
 
             if response.status_code == 200:
                 break
-        except Exception as e:
-            raise DirectDownloadLinkError(f"ERROR: {e.__class__.__name__}") from e
+        except RequestException as e:
+            raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}") from e
     else:
-        raise DirectDownloadLinkError("ERROR: Unable to fetch the JSON data")
+        raise DirectDownloadLinkException("ERROR: Unable to fetch the JSON data")
 
     data = response.json()
-    details = {"contents": [], "title": "", "total_size": 0}
+    details = {
+        "contents": [],
+        "title": "",
+        "total_size": 0
+    }
 
     for item in data["response"]:
         title = item["title"]
-        resolutions = item.get("resolutions", {})
-        links = resolutions.get(video_quality)
-        if links:
-            details["contents"].append(
-                {
-                    "url": links,
-                    "filename": title,
-                    "path": path.join(title, save_dir),
-                }
-            )
+        resolutions = item.get(
+            "resolutions",
+            {}
+        )
+        link = resolutions.get(video_quality)
+        if link:
+            details["contents"].append({
+                "url": link,
+                "filename": title,
+                "path": ospath.join(
+                    title,
+                    save_dir
+                )
+            })
         details["title"] = title
 
     if not details["contents"]:
-        raise DirectDownloadLinkError("ERROR: No valid download links found")
+        raise DirectDownloadLinkException("ERROR: No valid download links found")
 
     if len(details["contents"]) == 1:
         return details["contents"][0]["url"]
