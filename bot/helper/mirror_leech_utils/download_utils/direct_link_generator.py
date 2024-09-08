@@ -630,26 +630,31 @@ def linkBox(url: str):
     parsed_url = urlparse(url)
     try:
         shareToken = parsed_url.path.split("/")[-1]
-    except Exception:
-        raise DirectDownloadLinkError("ERROR: invalid URL")
+    except:
+        raise DirectDownloadLinkException("ERROR: invalid URL")
 
-    details = {"contents": [], "title": "", "total_size": 0}
+    details = {
+        "contents": [],
+        "title": "",
+        "total_size": 0
+    }
 
     def __singleItem(session, itemId):
         try:
             _json = session.get(
-                "https://www.linkbox.to/api/file/detail", params={"itemId": itemId}
+                "https://www.linkbox.to/api/file/detail",
+                params={"itemId": itemId},
             ).json()
         except Exception as e:
-            raise DirectDownloadLinkError(f"ERROR: {e.__class__.__name__}")
+            raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}") from e
         data = _json["data"]
         if not data:
             if "msg" in _json:
-                raise DirectDownloadLinkError(f"ERROR: {_json['msg']}")
-            raise DirectDownloadLinkError("ERROR: data not found")
+                raise DirectDownloadLinkException(f"ERROR: {_json['msg']}")
+            raise DirectDownloadLinkException("ERROR: data not found")
         itemInfo = data["itemInfo"]
         if not itemInfo:
-            raise DirectDownloadLinkError("ERROR: itemInfo not found")
+            raise DirectDownloadLinkException("ERROR: itemInfo not found")
         filename = itemInfo["name"]
         sub_type = itemInfo.get("sub_type")
         if sub_type and not filename.endswith(sub_type):
@@ -676,41 +681,59 @@ def linkBox(url: str):
         }
         try:
             _json = session.get(
-                "https://www.linkbox.to/api/file/share_out_list", params=params
+                "https://www.linkbox.to/api/file/share_out_list",
+                params=params,
             ).json()
         except Exception as e:
-            raise DirectDownloadLinkError(f"ERROR: {e.__class__.__name__}")
+            raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}") from e
         data = _json["data"]
         if not data:
             if "msg" in _json:
-                raise DirectDownloadLinkError(f"ERROR: {_json['msg']}")
-            raise DirectDownloadLinkError("ERROR: data not found")
-        if data["shareType"] == "singleItem":
-            return __singleItem(session, data["itemId"])
+                raise DirectDownloadLinkException(f"ERROR: {_json['msg']}")
+            raise DirectDownloadLinkException("ERROR: data not found")
+        try:
+            if data["shareType"] == "singleItem":
+                return __singleItem(
+                    session,
+                    data["itemId"]
+                )
+        except:
+            pass
         if not details["title"]:
             details["title"] = data["dirName"]
         contents = data["list"]
         if not contents:
-            return None
+            return
         for content in contents:
             if content["type"] == "dir" and "url" not in content:
                 if not folderPath:
-                    newFolderPath = path.join(details["title"], content["name"])
+                    newFolderPath = ospath.join(
+                        details["title"],
+                        content["name"]
+                    )
                 else:
-                    newFolderPath = path.join(folderPath, content["name"])
+                    newFolderPath = ospath.join(
+                        folderPath,
+                        content["name"]
+                    )
                 if not details["title"]:
                     details["title"] = content["name"]
-                __fetch_links(session, content["id"], newFolderPath)
+                __fetch_links(
+                    session,
+                    content["id"],
+                    newFolderPath
+                )
             elif "url" in content:
                 if not folderPath:
                     folderPath = details["title"]
                 filename = content["name"]
-                if (sub_type := content.get("sub_type")) and not filename.endswith(
-                    sub_type
+                if (
+                    (sub_type := content.get("sub_type"))
+                    and not filename.endswith(sub_type)
                 ):
                     filename += f".{sub_type}"
                 item = {
-                    "path": path.join(folderPath),
+                    "path": ospath.join(folderPath),
                     "filename": filename,
                     "url": content["url"],
                 }
@@ -720,12 +743,11 @@ def linkBox(url: str):
                         size = float(size)
                     details["total_size"] += size
                 details["contents"].append(item)
-        return None
 
     try:
         with Session() as session:
             __fetch_links(session)
-    except DirectDownloadLinkError as e:
+    except DirectDownloadLinkException as e:
         raise e
     return details
 
