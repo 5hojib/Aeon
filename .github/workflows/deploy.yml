@@ -12,6 +12,9 @@ on:
       HEROKU_EMAIL:
         description: "Heroku email address"
         required: true
+      HK_TEAM_NAME:
+        description: "Heroku Team Name"
+        required: false
       BOT_TOKEN:
         description: "Telegram bot token"
         required: true
@@ -42,6 +45,7 @@ jobs:
           heroku_api_key: ${{inputs.HEROKU_API_KEY}}
           heroku_app_name: ${{inputs.HEROKU_APP_NAME}}
           heroku_email: ${{inputs.HEROKU_EMAIL}}
+          team: ${{ inputs.HK_TEAM_NAME != '' && format('team={0}', inputs.HK_TEAM_NAME) || '' }}
           usedocker: true
           docker_heroku_process_type: web
           stack: "container"
