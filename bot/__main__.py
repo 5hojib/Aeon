@@ -230,7 +230,7 @@ async def aeon_callback(_, query):
         return await query.answer(text="This message not your's!", show_alert=True)
     if data[2] == "logdisplay":
         await query.answer()
-        async with aiopen("log.txt", "r") as f:
+        async with aiopen("log.txt") as f:
             log_file_lines = (await f.read()).splitlines()
 
         def parseline(line):

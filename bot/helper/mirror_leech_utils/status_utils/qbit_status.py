@@ -21,7 +21,7 @@ class QbittorrentStatus:
     def __init__(self, listener, seeding=False, queued=False):
         self.__client = xnox_client
         self.__listener = listener
-        self.__info = get_download(self.__client, f'{self.__listener.uid}')
+        self.__info = get_download(self.__client, f"{self.__listener.uid}")
         self.queued = queued
         self.seeding = seeding
         self.message = listener.message
@@ -93,7 +93,7 @@ class QbittorrentStatus:
     def hash(self):
         self.__update()
         return self.__info.hash
-    
+
     def client(self):
         return self.__client
 
@@ -118,7 +118,9 @@ class QbittorrentStatus:
                 torrent_hashes=self.__info.hash,
                 delete_files=True,
             )
-            await sync_to_async(self.__client.torrents_delete_tags, tags=self.__info.tags)
+            await sync_to_async(
+                self.__client.torrents_delete_tags, tags=self.__info.tags
+            )
             async with qb_listener_lock:
                 if self.__info.tags in QbTorrents:
                     del QbTorrents[self.__info.tags]
