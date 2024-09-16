@@ -45,7 +45,7 @@ jobs:
           heroku_api_key: ${{inputs.HEROKU_API_KEY}}
           heroku_app_name: ${{inputs.HEROKU_APP_NAME}}
           heroku_email: ${{inputs.HEROKU_EMAIL}}
-          team : ${{inputs.TEAM}}
+          team: ${{ inputs.TEAM != '' && format('team={0}', inputs.TEAM) || '' }}
           usedocker: true
           docker_heroku_process_type: web
           stack: "container"
