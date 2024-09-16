@@ -88,7 +88,7 @@ domain_dict = {
         "teraboxlink.com",
         "freeterabox.com",
         "1024terabox.com",
-        "teraboxshare.com"
+        "teraboxshare.com",
     ],
     "filewish": [
         "filelions.co",

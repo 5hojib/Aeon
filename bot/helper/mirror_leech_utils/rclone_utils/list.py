@@ -264,7 +264,7 @@ class RcloneList:
 
     async def list_remotes(self):
         config = ConfigParser()
-        async with aiopen(self.config_path, "r") as f:
+        async with aiopen(self.config_path) as f:
             contents = await f.read()
             config.read_string(contents)
         if config.has_section("combine"):

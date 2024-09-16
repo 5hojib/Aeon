@@ -473,7 +473,7 @@ class RcloneTransferHelper:
     @staticmethod
     async def __get_remote_options(config_path, remote):
         config = ConfigParser()
-        async with aiopen(config_path, "r") as f:
+        async with aiopen(config_path) as f:
             contents = await f.read()
             config.read_string(contents)
         options = config.options(remote)
