@@ -218,7 +218,7 @@ async def restart_notification():
         cmd = r"""remote_url=$(git config --get remote.origin.url) &&
             if echo "$remote_url" | grep -qE "github\.com[:/](.*)/(.*?)(\.git)?$"; then
                 last_commit=$(git log -1 --pretty=format:'%h') &&
-                commit_link="https://github.com/5hojib/Aeon-Alt/commit/$last_commit" &&
+                commit_link="https://github.com/5hojib/Aeon/commit/$last_commit" &&
                 echo $commit_link;
             else
                 echo "Failed to extract repository name and owner name from the remote URL.";
