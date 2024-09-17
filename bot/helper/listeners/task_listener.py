@@ -101,7 +101,7 @@ class TaskListener(TaskConfig):
             download = task_dict[self.mid]
             self.name = download.name()
             gid = download.gid()
-   
+
         if not (self.isTorrent or self.isQbit):
             self.seed = False
 
