@@ -16,7 +16,7 @@ from bot import (
 )
 
 
-class DbManager:
+class Database:
     def __init__(self):
         self.__err = False
         self.__db = None
@@ -51,7 +51,7 @@ class DbManager:
                 uid = row["_id"]
                 del row["_id"]
                 thumb_path = f"Thumbnails/{uid}.jpg"
-                rclone_path = f"tanha/{uid}.conf"
+                rclone_path = f"rclone/{uid}.conf"
                 if row.get("thumb"):
                     if not await aiopath.exists("Thumbnails"):
                         await makedirs("Thumbnails")
@@ -59,8 +59,8 @@ class DbManager:
                         await f.write(row["thumb"])
                     row["thumb"] = thumb_path
                 if row.get("rclone"):
-                    if not await aiopath.exists("tanha"):
-                        await makedirs("tanha")
+                    if not await aiopath.exists("rclone"):
+                        await makedirs("rclone")
                     async with aiopen(rclone_path, "wb+") as f:
                         await f.write(row["rclone"])
                     row["rclone"] = rclone_path
@@ -100,11 +100,13 @@ class DbManager:
     async def update_user_data(self, user_id):
         if self.__err:
             return
-        data = user_data[user_id]
+        data = user_data.get(user_id, {})
         if data.get("thumb"):
             del data["thumb"]
-        if data.get("rclone"):
-            del data["rclone"]
+        if data.get("rclone_config"):
+            del data["rclone_config"]
+        if data.get("token_pickle"):
+            del data["token_pickle"]
         if data.get("token"):
             del data["token"]
         if data.get("time"):
@@ -192,5 +194,4 @@ class DbManager:
         self.__conn.close
 
 
-if DATABASE_URL:
-    bot_loop.run_until_complete(DbManager().db_load())
+bot_loop.run_until_complete(Database().db_load())

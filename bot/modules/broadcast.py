@@ -5,9 +5,10 @@ from pyrogram.errors import FloodWait, UserIsBlocked, InputUserDeactivated
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 
-from bot import DATABASE_URL, bot
-from bot.helper.ext_utils.bot_utils import new_task, get_readable_time
-from bot.helper.ext_utils.db_handler import DbManager
+from bot import bot
+from bot.helper.ext_utils.bot_utils import new_task
+from bot.helper.ext_utils.db_handler import Database
+from bot.helper.ext_utils.status_utils import get_readable_time
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.message_utils import edit_message, send_message
@@ -15,10 +16,6 @@ from bot.helper.telegram_helper.message_utils import edit_message, send_message
 
 @new_task
 async def broadcast(_, message):
-    if not DATABASE_URL:
-        await send_message(message, "DATABASE_URL not provided!")
-        return
-
     if not message.reply_to_message:
         await send_message(
             message, "Reply to any message to broadcast messages to users in Bot PM."
@@ -30,7 +27,7 @@ async def broadcast(_, message):
     updater = time()
     broadcast_message = await send_message(message, "Broadcast in progress...")
 
-    for uid in await DbManager().get_pm_uids():
+    for uid in await Database().get_pm_uids():
         try:
             await message.reply_to_message.copy(uid)
             successful += 1
@@ -39,7 +36,7 @@ async def broadcast(_, message):
             await message.reply_to_message.copy(uid)
             successful += 1
         except (UserIsBlocked, InputUserDeactivated):
-            await DbManager().rm_pm_user(uid)
+            await Database().rm_pm_user(uid)
             blocked += 1
         except Exception:
             unsuccessful += 1

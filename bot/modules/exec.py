@@ -46,7 +46,7 @@ async def send_response(msg, message):
 
 
 @new_task
-async def evaluate(_, message):
+async def evaluate(client, message):
     content = message.text.split(maxsplit=1)
     if len(content) == 1:
         await send_response("No command to execute.", message)
@@ -55,7 +55,7 @@ async def evaluate(_, message):
 
 
 @new_task
-async def execute(_, message):
+async def execute(client, message):
     content = message.text.split(maxsplit=1)
     if len(content) == 1:
         await send_response("No command to execute.", message)
@@ -106,21 +106,21 @@ async def execute_code(func, message):
 
 bot.add_handler(
     MessageHandler(
-        evaluate, filters=command(BotCommands.EvalCommand) & CustomFilters.sudo
+        evaluate, filters=command(BotCommands.AExecCommand) & CustomFilters.owner
     )
 )
 bot.add_handler(
     MessageHandler(
-        execute, filters=command(BotCommands.ExecCommand) & CustomFilters.sudo
+        execute, filters=command(BotCommands.ExecCommand) & CustomFilters.owner
     )
 )
 bot.add_handler(
     EditedMessageHandler(
-        evaluate, filters=command(BotCommands.EvalCommand) & CustomFilters.sudo
+        evaluate, filters=command(BotCommands.AExecCommand) & CustomFilters.owner
     )
 )
 bot.add_handler(
     EditedMessageHandler(
-        execute, filters=command(BotCommands.ExecCommand) & CustomFilters.sudo
+        execute, filters=command(BotCommands.ExecCommand) & CustomFilters.owner
     )
 )

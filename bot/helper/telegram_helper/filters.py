@@ -2,22 +2,23 @@ from pyrogram.enums import ChatType
 from pyrogram.filters import create
 
 from bot import OWNER_ID, user_data
-from bot.helper.telegram_helper.message_utils import chat_info
+from bot.helper.aeon_utils.access_check import get_chat_info
 
 
 class CustomFilters:
-    async def owner_filter(self, _, message):
+    @staticmethod
+    async def owner_filter(_, message):
         user = message.from_user or message.sender_chat
-        uid = user.id
-        return uid == OWNER_ID
+        return user.id == OWNER_ID
 
     owner = create(owner_filter)
 
-    async def authorized_user(self, _, message):
+    @staticmethod
+    async def authorized_user(_, message):
         user = message.from_user or message.sender_chat
         uid = user.id
         chat_id = message.chat.id
-        return bool(
+        return (
             uid == OWNER_ID
             or (
                 uid in user_data
@@ -31,10 +32,12 @@ class CustomFilters:
 
     authorized = create(authorized_user)
 
-    async def authorized_usetting(self, _, message):
-        uid = (message.from_user or message.sender_chat).id
+    @staticmethod
+    async def authorized_usetting(_, message):
+        user = message.from_user or message.sender_chat
+        uid = user.id
         chat_id = message.chat.id
-        isExists = False
+
         if (
             uid == OWNER_ID
             or (
@@ -46,29 +49,29 @@ class CustomFilters:
             )
             or (chat_id in user_data and user_data[chat_id].get("is_auth", False))
         ):
-            isExists = True
-        elif message.chat.type == ChatType.PRIVATE:
-            for channel_id in user_data:
-                if not (
-                    user_data[channel_id].get("is_auth")
-                    and str(channel_id).startswith("-100")
-                ):
-                    continue
-                try:
-                    if await (await chat_info(str(channel_id))).get_member(uid):
-                        isExists = True
-                        break
-                except Exception:
-                    continue
-        return isExists
+            return True
+
+        if message.chat.type == ChatType.PRIVATE:
+            for channel_id, data in user_data.items():
+                if data.get("is_auth") and str(channel_id).startswith("-100"):
+                    try:
+                        if await (await get_chat_info(str(channel_id))).get_member(
+                            uid
+                        ):
+                            return True
+                    except Exception:
+                        continue
+
+        return False
 
     authorized_uset = create(authorized_usetting)
 
-    async def sudo_user(self, _, message):
+    @staticmethod
+    async def sudo_user(_, message):
         user = message.from_user or message.sender_chat
         uid = user.id
-        return bool(
-            uid == OWNER_ID or uid in user_data and user_data[uid].get("is_sudo")
+        return uid == OWNER_ID or (
+            uid in user_data and user_data[uid].get("is_sudo", False)
         )
 
     sudo = create(sudo_user)

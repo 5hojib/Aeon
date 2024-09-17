@@ -20,7 +20,6 @@ select = [
     "W",    # pycodestyle: warning
     "UP",   # pyupgrade
     "F",    # pyflakes
-    "N",
     "SIM",  # flake8-simplify
     "RET",  # flake8-return
     "C4",   # flake8-comprehensions
@@ -31,9 +30,14 @@ select = [
     "FA",   # flake8-future-annotations
     "PL",   # pylint
     "ARG",  # flake8-unused-arguments
+    "N",    # Naming
 ]
 
 ignore = [
     "E501",
     "PLR2004",
+    "N806",
+    "PLR0913",
+    "PLR0915",
+    "PLR0912",
 ]
