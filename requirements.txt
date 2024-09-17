@@ -19,7 +19,7 @@ google-auth-httplib2
 google-auth-oauthlib
 gunicorn
 httpx
-langcodes[data]
+langcodes
 lxml
 motor
 mutagen
@@ -32,7 +32,6 @@ pycountry
 python-dotenv
 pyshorteners
 python-magic
-quoters
 qbittorrent-api
 requests
 speedtest-cli
