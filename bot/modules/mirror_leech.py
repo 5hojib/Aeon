@@ -290,9 +290,6 @@ class Mirror(TaskListener):
             await delete_links(self.message)
             return await five_minute_del(x)
 
-        if self.link:
-            LOGGER.info(self.link)
-
         try:
             await self.beforeStart()
         except Exception as e:
@@ -319,8 +316,6 @@ class Mirror(TaskListener):
                     self.link = await sync_to_async(direct_link_generator, self.link)
                     if isinstance(self.link, tuple):
                         self.link, headers = self.link
-                    elif isinstance(self.link, str):
-                        LOGGER.info(f"Generated link: {self.link}")
                 except DirectDownloadLinkException as e:
                     e = str(e)
                     if "This link requires a password!" not in e:

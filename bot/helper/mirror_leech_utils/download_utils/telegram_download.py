@@ -52,7 +52,6 @@ class TelegramDownloadHelper:
             await self._listener.on_download_start()
             if self._listener.multi <= 1:
                 await sendStatusMessage(self._listener.message)
-            LOGGER.info(f"Download from Telegram: {self._listener.name}")
         else:
             LOGGER.info(
                 f"Start Queued Download from Telegram: {self._listener.name}"
@@ -133,7 +132,6 @@ class TelegramDownloadHelper:
 
                 add_to_queue, event = await check_running_tasks(self._listener)
                 if add_to_queue:
-                    LOGGER.info(f"Added to Queue/Download: {self._listener.name}")
                     async with task_dict_lock:
                         task_dict[self._listener.mid] = QueueStatus(
                             self._listener, gid, "dl"

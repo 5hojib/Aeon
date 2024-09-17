@@ -310,7 +310,7 @@ class TgUploader:
                     try:
                         await self._send_media_group(subkey, key, msgs)
                     except Exception as e:
-                        LOGGER.info(
+                        LOGGER.error(
                             f"While sending media group at the end of task. Error: {e}"
                         )
         if self._listener.isCancelled:

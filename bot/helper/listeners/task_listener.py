@@ -101,8 +101,7 @@ class TaskListener(TaskConfig):
             download = task_dict[self.mid]
             self.name = download.name()
             gid = download.gid()
-        LOGGER.info(f"Download completed: {self.name}")
-
+   
         if not (self.isTorrent or self.isQbit):
             self.seed = False
 
@@ -213,7 +212,6 @@ class TaskListener(TaskConfig):
             self.size -= s
 
         if self.is_leech:
-            LOGGER.info(f"Leech Name: {self.name}")
             tg = TgUploader(self, up_dir)
             async with task_dict_lock:
                 task_dict[self.mid] = TelegramStatus(self, tg, gid, "up")
