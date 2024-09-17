@@ -453,20 +453,14 @@ class TgUploader:
         await self._copy_message(m, cap_mono)
 
     async def _copy_message(self, m, cap_mono):
+        msg = await bot.get_messages(self._listener.upDest, m.id)
         try:
-            await bot.copy_message(
-                self._user_id, self._listener.upDest, m.id, cap_mono
-            )
+            await msg.copy(self._user_id, caption=cap_mono)
         except Exception as e:
-            LOGGER.error(e, f"id {m.id}")
+            LOGGER.error(e)
         if self._user_dump:
             try:
-                await bot.copy_message(
-                    self._user_dump,
-                    self._listener.upDest,
-                    m.id,
-                    cap_mono,
-                )
+                await msg.copy(self._user_dump, caption=cap_mono)
             except Exception as e:
                 LOGGER.error(e)
 
