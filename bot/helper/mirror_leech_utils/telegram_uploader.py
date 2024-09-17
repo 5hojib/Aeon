@@ -461,7 +461,7 @@ class TgUploader:
                     await msg.copy(target, caption=caption)
                     return
                 except Exception as e:
-                    LOGGER.error(f"Attempt {attempt + 1} failed: {e}")
+                    LOGGER.error(f"Attempt {attempt + 1} failed: {e} {msg.id}")
                     if attempt < retries - 1:
                         await sleep(0.2)
             LOGGER.error(f"Failed to copy message after {retries} attempts")
