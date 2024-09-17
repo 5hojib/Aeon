@@ -463,7 +463,7 @@ class TgUploader:
                 except Exception as e:
                     LOGGER.error(f"Attempt {attempt + 1} failed: {e}")
                     if attempt < retries - 1:
-                        await asyncio.sleep(2)
+                        await sleep(0.2)
             LOGGER.error(f"Failed to copy message after {retries} attempts")
 
         await retry_copy(self._user_id, cap_mono)
