@@ -241,7 +241,7 @@ config_dict = {
     "STREAMWISH_API": environ.get("STREAMWISH_API", ""),
     "SUDO_USERS": environ.get("SUDO_USERS", ""),
     "TOKEN_TIMEOUT": get_env_int("TOKEN_TIMEOUT"),
-    "UPSTREAM_REPO": environ.get("UPSTREAM_REPO", "https://github.com/5hojib/Aeon")
+    "UPSTREAM_REPO": environ.get("UPSTREAM_REPO", "https://github.com/5hojib/Aeon"),
     "UPSTREAM_BRANCH": environ.get("UPSTREAM_BRANCH", "main"),
     "USER_SESSION_STRING": environ.get("USER_SESSION_STRING", ""),
     "USE_SA": environ.get("USE_SA", "").lower() == "true",
