@@ -1,9 +1,11 @@
 from random import choice
 from asyncio import sleep
 from urllib.parse import quote
-from bot import shorteners_list
+
 from aiohttp import ClientSession
 from pyshorteners import Shortener
+
+from bot import shorteners_list
 
 
 async def short(long_url):
