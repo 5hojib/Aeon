@@ -435,6 +435,7 @@ async def load_config():
         )
 
     UPSTREAM_BRANCH = environ.get("UPSTREAM_BRANCH", "main")
+    UPSTREAM_REPO = environ.get("UPSTREAM_REPO", "https://github.com/5hojib/Aeon")
     DRIVES_IDS.clear()
     DRIVES_NAMES.clear()
     INDEX_URLS.clear()
@@ -485,6 +486,7 @@ async def load_config():
             "SUDO_USERS": SUDO_USERS,
             "TOKEN_TIMEOUT": TOKEN_TIMEOUT,
             "UPSTREAM_BRANCH": UPSTREAM_BRANCH,
+            "UPSTREAM_REPO": UPSTREAM_REPO,
             "USER_SESSION_STRING": USER_SESSION_STRING,
             "USE_SA": USE_SA,
             "YT_DLP_OPTIONS": YT_DLP_OPTIONS,
