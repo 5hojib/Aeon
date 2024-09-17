@@ -454,15 +454,22 @@ class TgUploader:
 
     async def _copy_message(self, m, cap_mono):
         msg = await bot.get_messages(self._listener.upDest, m.id)
-        try:
-            await msg.copy(self._user_id, caption=cap_mono)
-        except Exception as e:
-            LOGGER.error(e)
+    
+        async def retry_copy(target, caption, retries=5):
+            for attempt in range(retries):
+                try:
+                    await msg.copy(target, caption=caption)
+                    return
+                except Exception as e:
+                    LOGGER.error(f"Attempt {attempt + 1} failed: {e}")
+                    if attempt < retries - 1:
+                        await asyncio.sleep(2)
+            LOGGER.error(f"Failed to copy message after {retries} attempts")
+
+        await retry_copy(self._user_id, cap_mono)
+
         if self._user_dump:
-            try:
-                await msg.copy(self._user_dump, caption=cap_mono)
-            except Exception as e:
-                LOGGER.error(e)
+            await retry_copy(self._user_dump, cap_mono)
 
     def _get_image_dimensions(self, thumb):
         if thumb:
