@@ -454,9 +454,7 @@ class TgUploader:
 
     async def _copy_message(self, m, cap_mono):
         try:
-            await bot.copy_message(
-                self._user_id, m.chat.id, m.id, cap_mono
-            )
+            await bot.copy_message(self._user_id, m.chat.id, m.id, cap_mono)
         except Exception as e:
             LOGGER.error(e)
         if self._user_dump:
