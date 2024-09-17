@@ -458,7 +458,7 @@ class TgUploader:
                 self._user_id, self._listener.upDest, m.id, cap_mono
             )
         except Exception as e:
-            LOGGER.error(e)
+            LOGGER.error(e, f"id {m.id}")
         if self._user_dump:
             try:
                 await bot.copy_message(
