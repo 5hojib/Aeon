@@ -5,7 +5,6 @@ from re import match as re_match
 from time import time
 from asyncio import sleep
 from logging import getLogger
-from contextlib import suppress
 
 from PIL import Image
 from natsort import natsorted
@@ -454,18 +453,22 @@ class TgUploader:
         await self._copy_message(cap_mono)
 
     async def _copy_message(self, cap_mono):
-        with suppress(Exception):
+        try:
             await bot.copy_message(
                 self._user_id, self._sent_msg.chat.id, self._sent_msg.id, cap_mono
             )
+        except Exception as e:
+            LOGGER.error(e)
         if self._user_dump:
-            with suppress(Exception):
+            try:
                 await bot.copy_message(
                     self._user_dump,
                     self._sent_msg.chat.id,
                     self._sent_msg.id,
                     cap_mono,
                 )
+            except Exception as e:
+                LOGGER.error(e)
 
     def _get_image_dimensions(self, thumb):
         if thumb:
