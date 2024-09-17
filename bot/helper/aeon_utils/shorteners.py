@@ -1,16 +1,9 @@
 from random import choice
 from asyncio import sleep
 from urllib.parse import quote
-
+from bot import shorteners_list
 from aiohttp import ClientSession
 from pyshorteners import Shortener
-
-shorteners_list = [
-    {
-        "domain": "modijiurl.com",
-        "api_key": "cd5b3b10ed0e7c30e795e7ab3c8778f799cafb5b",
-    }
-]
 
 
 async def short(long_url):

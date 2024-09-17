@@ -9,7 +9,7 @@ from bot import (
     DOWNLOAD_DIR,
     task_dict,
     status_dict,
-    botStartTime,
+    bot_start_time,
     task_dict_lock,
 )
 from bot.helper.ext_utils.bot_utils import sync_to_async
@@ -225,5 +225,5 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
         buttons.callback("Next", f"status {sid} nex", position="header")
         button = buttons.menu(8)
     msg += f"<b>\nFree disk:</b> {get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)}"
-    msg += f"\n<b>Bot uptime:</b> {get_readable_time(time() - botStartTime)}"
+    msg += f"\n<b>Bot uptime:</b> {get_readable_time(time() - bot_start_time)}"
     return msg, button

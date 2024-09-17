@@ -10,7 +10,7 @@ from bot import (
     bot,
     task_dict,
     status_dict,
-    botStartTime,
+    bot_start_time,
     task_dict_lock,
 )
 from bot.helper.ext_utils.bot_utils import new_task
@@ -34,7 +34,7 @@ async def mirror_status(_, message):
     async with task_dict_lock:
         count = len(task_dict)
     if count == 0:
-        currentTime = get_readable_time(time() - botStartTime)
+        currentTime = get_readable_time(time() - bot_start_time)
         free = get_readable_file_size(disk_usage(DOWNLOAD_DIR).free)
         msg = "No downloads are currently in progress.\n"
         msg += f"\n<b>Bot uptime</b>: {currentTime}"

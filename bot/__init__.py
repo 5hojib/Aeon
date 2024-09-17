@@ -37,7 +37,7 @@ DOWNLOAD_DIR = "/usr/src/app/downloads/"
 
 install()
 setdefaulttimeout(600)
-botStartTime = time()
+bot_start_time = time()
 bot_loop = get_event_loop()
 
 getLogger("pyrogram").setLevel(ERROR)
@@ -84,6 +84,7 @@ GLOBAL_EXTENSION_FILTER = [
     "aspx",
 ]
 user_data = {}
+shorteners_list = []
 aria2_options, qbit_options = {}, {}
 queued_dl, queued_up = {}, {}
 non_queued_dl, non_queued_up = set(), set()
@@ -147,6 +148,14 @@ initialize_database()
 if not ospath.exists(".netrc"):
     with open(".netrc", "w"):
         pass
+
+if ospath.exists("shorteners.txt"):
+    with open("shorteners.txt", "r+") as f:
+        lines = f.readlines()
+        for line in lines:
+            temp = line.strip().split()
+            if len(temp) == 2:
+                shorteners_list.append({"domain": temp[0], "api_key": temp[1]})
 
 
 def init_user_client():
