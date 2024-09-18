@@ -458,7 +458,7 @@ class TgUploader:
         async def copy(target, retries=2):
             for attempt in range(retries):
                 try:
-                    await msg.copyf(target)
+                    await msg.copy(target)
                     return
                 except Exception as e:
                     LOGGER.error(f"Attempt {attempt + 1} failed: {e} {msg.id}")
