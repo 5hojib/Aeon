@@ -45,7 +45,6 @@ async def generate_caption(file, dirpath, lcaption):
 
     format_info = ffresult.get("format")
     if not format_info:
-        LOGGER.error(f"Media Info Sections: {result}")
         return file
 
     duration = round(float(format_info.get("duration", 0)))
