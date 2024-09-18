@@ -391,7 +391,7 @@ class TgUploader:
             thumb = await create_thumbnail(self._up_path, None)
         if self._listener.isCancelled:
             return
-        self._sent_msg = m = await self._sent_msg.reply_document(
+        self._sent_msg = await self._sent_msg.reply_document(
             document=self._up_path,
             quote=True,
             thumb=thumb,
@@ -400,7 +400,7 @@ class TgUploader:
             disable_notification=True,
             progress=self._upload_progress,
         )
-        await self._copy_message(m, cap_mono)
+        await self._copy_message()
 
     async def _upload_video(self, cap_mono, thumb):
         duration = (await get_media_info(self._up_path))[0]
@@ -409,7 +409,7 @@ class TgUploader:
         width, height = self._get_image_dimensions(thumb)
         if self._listener.isCancelled:
             return
-        self._sent_msg = m = await self._sent_msg.reply_video(
+        self._sent_msg = await self._sent_msg.reply_video(
             video=self._up_path,
             quote=True,
             caption=cap_mono,
@@ -421,13 +421,13 @@ class TgUploader:
             disable_notification=True,
             progress=self._upload_progress,
         )
-        await self._copy_message(m, cap_mono)
+        await self._copy_message()
 
     async def _upload_audio(self, cap_mono, thumb):
         duration, artist, title = await get_media_info(self._up_path)
         if self._listener.isCancelled:
             return
-        self._sent_msg = m = await self._sent_msg.reply_audio(
+        self._sent_msg = await self._sent_msg.reply_audio(
             audio=self._up_path,
             quote=True,
             caption=cap_mono,
@@ -438,27 +438,27 @@ class TgUploader:
             disable_notification=True,
             progress=self._upload_progress,
         )
-        await self._copy_message(m, cap_mono)
+        await self._copy_message()
 
     async def _upload_photo(self, cap_mono, thumb):
         if self._listener.isCancelled:
             return
-        self._sent_msg = m = await self._sent_msg.reply_photo(
+        self._sent_msg = await self._sent_msg.reply_photo(
             photo=self._up_path,
             quote=True,
             caption=cap_mono,
             disable_notification=True,
             progress=self._upload_progress,
         )
-        await self._copy_message(m, cap_mono)
+        await self._copy_message()
 
-    async def _copy_message(self, m, cap_mono):
-        msg = await bot.get_messages(self._listener.upDest, m.id)
+    async def _copy_message(self):
+        msg = await bot.get_messages(self._listener.upDest, self._sent_msg.id)
 
-        async def retry_copy(target, caption, retries=5):
-            for attempt in range(retries):
+        async def copy(target):
+            for attempt in range(5):
                 try:
-                    await msg.copy(target, caption=caption)
+                    await msg.copy(target)
                     return
                 except Exception as e:
                     LOGGER.error(f"Attempt {attempt + 1} failed: {e} {msg.id}")
@@ -466,10 +466,10 @@ class TgUploader:
                         await sleep(0.5)
             LOGGER.error(f"Failed to copy message after {retries} attempts")
 
-        await retry_copy(self._user_id, cap_mono)
+        await copy(self._user_id)
 
         if self._user_dump:
-            await retry_copy(self._user_dump, cap_mono)
+            await copy(self._user_dump)
 
     def _get_image_dimensions(self, thumb):
         if thumb:
