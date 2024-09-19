@@ -340,7 +340,7 @@ class TgUploader:
         if self._thumb and not await aiopath.exists(self._thumb):
             self._thumb = None
         thumb = self._thumb
-        is_doc = Flase
+        is_doc = False
         self._is_corrupted = False
 
         try:
