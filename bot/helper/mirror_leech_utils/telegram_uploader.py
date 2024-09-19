@@ -340,6 +340,7 @@ class TgUploader:
         if self._thumb and not await aiopath.exists(self._thumb):
             self._thumb = None
         thumb = self._thumb
+        is_doc = Flase
         self._is_corrupted = False
 
         try:
@@ -358,7 +359,7 @@ class TgUploader:
                 or force_document
                 or (not is_video and not is_audio and not is_image)
             ):
-                isDoc = True
+                is_doc = True
                 await self._upload_document(cap_mono, thumb, is_video)
             elif is_video:
                 await self._upload_video(cap_mono, thumb)
@@ -381,7 +382,7 @@ class TgUploader:
                 await remove(thumb)
             err_type = "RPCError: " if isinstance(err, RPCError) else ""
             LOGGER.error(f"{err_type}{err}. Path: {self._up_path}")
-            if "Telegram says: [400" in str(err) and not isDoc:
+            if "Telegram says: [400" in str(err) and not is_doc:
                 LOGGER.error(f"Retrying As Document. Path: {self._up_path}")
                 return await self._upload_file(cap_mono, file, o_path, True)
             raise err

@@ -25,6 +25,7 @@ nsfw_keywords = [
     "orgy",
     "horny",
     "swingers",
+    "ullu",
 ]
 
 
