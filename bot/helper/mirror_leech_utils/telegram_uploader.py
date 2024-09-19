@@ -453,9 +453,10 @@ class TgUploader:
         await self._copy_message()
 
     async def _copy_message(self):
+        await sleep(2)
         msg = await bot.get_messages(self._listener.upDest, self._sent_msg.id)
 
-        async def copy(target, retries=2):
+        async def _copy(target, retries=2):
             for attempt in range(retries):
                 try:
                     await msg.copy(target)
@@ -466,10 +467,10 @@ class TgUploader:
                         await sleep(0.5)
             LOGGER.error(f"Failed to copy message after {retries} attempts")
 
-        await copy(self._user_id)
+        await _copy(self._user_id)
 
         if self._user_dump:
-            await copy(self._user_dump)
+            await _copy(self._user_dump)
 
     def _get_image_dimensions(self, thumb):
         if thumb:
