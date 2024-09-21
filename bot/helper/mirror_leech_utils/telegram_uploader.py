@@ -457,7 +457,9 @@ class TgUploader:
         async def _copy(target, retries=3):
             for attempt in range(retries):
                 try:
-                    msg = await bot.get_messages(self._listener.upDest, self._sent_msg.id)
+                    msg = await bot.get_messages(
+                        self._listener.upDest, self._sent_msg.id
+                    )
                     await msg.copy(target)
                     return
                 except Exception as e:
