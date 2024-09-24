@@ -455,6 +455,7 @@ class TgUploader:
 
     async def _copy_message(self):
         await sleep(1)
+
         async def _copy(target, retries=3):
             for attempt in range(retries):
                 try:
