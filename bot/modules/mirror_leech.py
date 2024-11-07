@@ -273,7 +273,7 @@ async def _mirror_leech(
             or reply_to.animation
             or None
         )
-        
+
         if file_ is None:
             reply_text = reply_to.text.split("\n", 1)[0].strip()
             if (
