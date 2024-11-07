@@ -2,72 +2,54 @@ from secrets import token_hex
 
 from bot import (
     LOGGER,
+    task_dict,
     aria2_options,
     aria2c_global,
-    download_dict,
     non_queued_dl,
+    task_dict_lock,
     queue_dict_lock,
-    download_dict_lock,
 )
 from bot.helper.ext_utils.bot_utils import sync_to_async
-from bot.helper.aeon_utils.nsfw_check import is_nsfw_data
 from bot.helper.ext_utils.task_manager import (
-    is_queued,
-    limit_checker,
+    check_running_tasks,
     stop_duplicate_check,
 )
 from bot.helper.listeners.direct_listener import DirectListener
-from bot.helper.telegram_helper.message_utils import (
-    delete_links,
-    send_message,
-    one_minute_del,
-    sendStatusMessage,
-)
+from bot.helper.telegram_helper.message_utils import sendStatusMessage
 from bot.helper.mirror_leech_utils.status_utils.queue_status import QueueStatus
 from bot.helper.mirror_leech_utils.status_utils.direct_status import DirectStatus
 
 
-async def add_direct_download(details, path, listener, foldername):
+async def add_direct_download(listener, path):
+    details = listener.link
     if not (contents := details.get("contents")):
-        await send_message(listener.message, "There is nothing to download!")
+        await listener.onDownloadError("There is nothing to download!")
         return
-    size = details["total_size"]
-    if not foldername:
-        foldername = details["title"]
-    if is_nsfw_data(details):
-        await listener.onDownloadError("NSFW detected")
-        return
-    path = f"{path}/{foldername}"
-    msg, button = await stop_duplicate_check(foldername, listener)
+    listener.size = details["total_size"]
+
+    if not listener.name:
+        listener.name = details["title"]
+    path = f"{path}/{listener.name}"
+
+    msg, button = await stop_duplicate_check(listener)
     if msg:
-        msg = await send_message(listener.message, msg, button)
-        await delete_links(listener.message)
-        await one_minute_del(msg)
-        return
-    if limit_exceeded := await limit_checker(size, listener):
-        LOGGER.info(f"Limit Exceeded: {foldername} | {size}")
-        msg = await send_message(listener.message, limit_exceeded)
-        await delete_links(listener.message)
-        await one_minute_del(msg)
+        await listener.onDownloadError(msg, button)
         return
 
     gid = token_hex(4)
-    added_to_queue, event = await is_queued(listener.uid)
-    if added_to_queue:
-        LOGGER.info(f"Added to Queue/Download: {foldername}")
-        async with download_dict_lock:
-            download_dict[listener.uid] = QueueStatus(
-                foldername, size, gid, listener, "dl"
-            )
+    add_to_queue, event = await check_running_tasks(listener)
+    if add_to_queue:
+        LOGGER.info(f"Added to Queue/Download: {listener.name}")
+        async with task_dict_lock:
+            task_dict[listener.mid] = QueueStatus(listener, gid, "dl")
         await listener.on_download_start()
-        await sendStatusMessage(listener.message)
+        if listener.multi <= 1:
+            await sendStatusMessage(listener.message)
         await event.wait()
-        async with download_dict_lock:
-            if listener.uid not in download_dict:
-                return
-        from_queue = True
-    else:
-        from_queue = False
+        if listener.isCancelled:
+            return
+        async with queue_dict_lock:
+            non_queued_dl.add(listener.mid)
 
     a2c_opt = {**aria2_options}
     [a2c_opt.pop(k) for k in aria2c_global if k in aria2_options]
@@ -75,19 +57,17 @@ async def add_direct_download(details, path, listener, foldername):
         a2c_opt["header"] = header
     a2c_opt["follow-torrent"] = "false"
     a2c_opt["follow-metalink"] = "false"
-    directListener = DirectListener(foldername, size, path, listener, a2c_opt)
-    async with download_dict_lock:
-        download_dict[listener.uid] = DirectStatus(directListener, gid, listener)
+    directListener = DirectListener(path, listener, a2c_opt)
 
-    async with queue_dict_lock:
-        non_queued_dl.add(listener.uid)
+    async with task_dict_lock:
+        task_dict[listener.mid] = DirectStatus(listener, directListener, gid)
 
-    if from_queue:
-        LOGGER.info(f"Start Queued Download from Direct Download: {foldername}")
+    if add_to_queue:
+        LOGGER.info(f"Start Queued Download from Direct Download: {listener.name}")
     else:
-        LOGGER.info(f"Download from Direct Download: {foldername}")
+        LOGGER.info(f"Download from Direct Download: {listener.name}")
         await listener.on_download_start()
-        await sendStatusMessage(listener.message)
+        if listener.multi <= 1:
+            await sendStatusMessage(listener.message)
 
-    await delete_links(listener.message)
     await sync_to_async(directListener.download, contents)

@@ -1,5 +1,3 @@
-# ruff: noqa: F401
-import contextlib
 from os import execl as osexecl
 from sys import executable
 from html import escape
@@ -8,59 +6,64 @@ from uuid import uuid4
 from signal import SIGINT, signal
 from asyncio import gather, create_subprocess_exec
 
-from psutil import boot_time, disk_usage, cpu_percent, virtual_memory
+from psutil import (
+    boot_time,
+    cpu_count,
+    disk_usage,
+    cpu_percent,
+    swap_memory,
+    virtual_memory,
+    net_io_counters,
+)
 from aiofiles import open as aiopen
 from aiofiles.os import path as aiopath
-from aiofiles.os import remove as aioremove
+from aiofiles.os import remove
 from pyrogram.filters import regex, command
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 
 from bot import (
     LOGGER,
-    DATABASE_URL,
-    Interval,
-    QbInterval,
+    Intervals,
     bot,
-    bot_name,
     scheduler,
     user_data,
     config_dict,
+    bot_username,
     bot_start_time,
 )
 
-from .modules import (
-    list,
+from .modules import (  # noqa: F401
+    exec,
+    help,
     clone,
-    count,
     shell,
     ytdlp,
-    delete,
-    images,
     status,
-    executor,
+    gd_count,
     authorize,
     broadcast,
+    gd_delete,
+    gd_search,
     mediainfo,
-    speedtest,
+    cancel_task,
     bot_settings,
     mirror_leech,
-    cancel_mirror,
+    file_selector,
     torrent_search,
-    torrent_select,
     users_settings,
 )
 from .helper.ext_utils.bot_utils import (
+    cmd_exec,
     new_task,
-    new_thread,
-    set_commands,
     sync_to_async,
-    get_readable_time,
-    get_readable_file_size,
+    create_help_buttons,
 )
-from .helper.ext_utils.db_handler import DbManager
-from .helper.ext_utils.files_utils import clean_all, exit_clean_up, start_cleanup
+from .helper.ext_utils.db_handler import Database
+from .helper.ext_utils.files_utils import clean_all, exit_clean_up
+from .helper.ext_utils.status_utils import get_readable_time, get_readable_file_size
 from .helper.telegram_helper.filters import CustomFilters
 from .helper.listeners.aria2_listener import start_aria2_listener
+from .helper.ext_utils.telegraph_helper import telegraph
 from .helper.telegram_helper.bot_commands import BotCommands
 from .helper.telegram_helper.button_build import ButtonMaker
 from .helper.telegram_helper.message_utils import (
@@ -68,103 +71,58 @@ from .helper.telegram_helper.message_utils import (
     edit_message,
     send_message,
     delete_message,
-    one_minute_del,
     five_minute_del,
 )
 
-if config_dict["GDRIVE_ID"]:
-    help_string = f"""<b>NOTE: Try each command without any arguments to see more details.</b>
 
-<blockquote expandable>/{BotCommands.MirrorCommand[0]} - Start mirroring to Google Drive.
-/{BotCommands.LeechCommand[0]} - Start leeching to Telegram.
-/{BotCommands.YtdlCommand[0]} - Mirror links supported by yt-dlp.
-/{BotCommands.YtdlLeechCommand[0]} - Leech links supported by yt-dlp.
-/{BotCommands.CloneCommand[0]} - Copy files/folders to Google Drive.
-/{BotCommands.CountCommand} - Count files/folders in Google Drive.
-/{BotCommands.ListCommand} - Search in Google Drive(s).
-/{BotCommands.UserSetCommand} - Open the settings panel.
-/{BotCommands.MediaInfoCommand} - View MediaInfo from a file or link.
-/{BotCommands.StopAllCommand[0]} - Cancel all active tasks.
-/{BotCommands.SearchCommand} - Search for torrents using API or plugins.
-/{BotCommands.StatusCommand[0]} - Show the status of all downloads.
-/{BotCommands.StatsCommand[0]} - Display machine stats hosting the bot.</blockquote>
-"""
-else:
-    help_string = f"""<b>NOTE: Try each command without any arguments to see more details.</b>
-
-<blockquote expandable>/{BotCommands.LeechCommand[0]} - Start leeching to Telegram.
-/{BotCommands.YtdlLeechCommand[0]} - Leech links supported by yt-dlp.
-/{BotCommands.UserSetCommand} - Open the settings panel.
-/{BotCommands.MediaInfoCommand} - View MediaInfo from a file or link.
-/{BotCommands.StopAllCommand[0]} - Cancel all active tasks.
-/{BotCommands.SearchCommand} - Search for torrents using API or plugins.
-/{BotCommands.StatusCommand[0]} - Show the status of all downloads.
-/{BotCommands.StatsCommand[0]} - Display machine stats hosting the bot.</blockquote>
-"""
-
-
-@new_thread
 async def stats(_, message):
+    if await aiopath.exists(".git"):
+        last_commit = await cmd_exec(
+            "git log -1 --date=short --pretty=format:'%cd <b>From</b> %cr'", True
+        )
+        last_commit = last_commit[0]
+    else:
+        last_commit = "No UPSTREAM_REPO"
     total, used, free, disk = disk_usage("/")
+    swap = swap_memory()
     memory = virtual_memory()
-    current_time = get_readable_time(time() - bot_start_time)
-    os_uptime = get_readable_time(time() - boot_time())
-    cpu_usage = cpu_percent(interval=0.5)
-    limit_mapping = {
-        "Torrent": config_dict.get("TORRENT_LIMIT", "∞"),
-        "Gdrive": config_dict.get("GDRIVE_LIMIT", "∞"),
-        "Ytdlp": config_dict.get("YTDLP_LIMIT", "∞"),
-        "Direct": config_dict.get("DIRECT_LIMIT", "∞"),
-        "Leech": config_dict.get("LEECH_LIMIT", "∞"),
-        "Clone": config_dict.get("CLONE_LIMIT", "∞"),
-        "Mega": config_dict.get("MEGA_LIMIT", "∞"),
-        "User task": config_dict.get("USER_MAX_TASKS", "∞"),
-    }
-    system_info = (
-        f"<code>• Bot uptime :</code> {current_time}\n"
-        f"<code>• Sys uptime :</code> {os_uptime}\n"
-        f"<code>• CPU usage  :</code> {cpu_usage}%\n"
-        f"<code>• RAM usage  :</code> {memory.percent}%\n"
-        f"<code>• Disk usage :</code> {disk}%\n"
-        f"<code>• Free space :</code> {get_readable_file_size(free)}\n"
-        f"<code>• Total space:</code> {get_readable_file_size(total)}\n\n"
+    stats = (
+        f"<b>Commit Date:</b> {last_commit}\n\n"
+        f"<b>Bot Uptime:</b> {get_readable_time(time() - bot_start_time)}\n"
+        f"<b>OS Uptime:</b> {get_readable_time(time() - boot_time())}\n\n"
+        f"<b>Total Disk Space:</b> {get_readable_file_size(total)}\n"
+        f"<b>Used:</b> {get_readable_file_size(used)} | <b>Free:</b> {get_readable_file_size(free)}\n\n"
+        f"<b>Upload:</b> {get_readable_file_size(net_io_counters().bytes_sent)}\n"
+        f"<b>Download:</b> {get_readable_file_size(net_io_counters().bytes_recv)}\n\n"
+        f"<b>CPU:</b> {cpu_percent(interval=0.5)}%\n"
+        f"<b>RAM:</b> {memory.percent}%\n"
+        f"<b>DISK:</b> {disk}%\n\n"
+        f"<b>Physical Cores:</b> {cpu_count(logical=False)}\n"
+        f"<b>Total Cores:</b> {cpu_count(logical=True)}\n\n"
+        f"<b>SWAP:</b> {get_readable_file_size(swap.total)} | <b>Used:</b> {swap.percent}%\n"
+        f"<b>Memory Total:</b> {get_readable_file_size(memory.total)}\n"
+        f"<b>Memory Free:</b> {get_readable_file_size(memory.available)}\n"
+        f"<b>Memory Used:</b> {get_readable_file_size(memory.used)}\n"
     )
-
-    limitations = "<b>LIMITATIONS</b>\n\n"
-
-    for k, v in limit_mapping.items():
-        if v == "":
-            value = "∞"
-        elif k != "User task":
-            value = f"{v}GB/Link"
-        else:
-            value = f"{v} Tasks/user"
-        limitations += f"<code>• {k:<11}:</code> {value}\n"
-
-    stats = system_info + limitations
-    reply_message = await send_message(message, stats, photo="Random")
-    await delete_message(message)
-    await one_minute_del(reply_message)
+    await send_message(message, stats)
 
 
-@new_thread
 async def start(client, message):
     if len(message.command) > 1 and message.command[1] == "private":
         await delete_message(message)
     elif len(message.command) > 1 and len(message.command[1]) == 36:
         userid = message.from_user.id
         input_token = message.command[1]
-        if DATABASE_URL:
-            stored_token = await DbManager().get_user_token(userid)
-            if stored_token is None:
-                return await send_message(
-                    message,
-                    "<b>This token is not for you!</b>\n\nPlease generate your own.",
-                )
-            if input_token != stored_token:
-                return await send_message(
-                    message, "Invalid token.\n\nPlease generate a new one."
-                )
+        stored_token = await Database().get_user_token(userid)
+        if stored_token is None:
+            return await send_message(
+                message,
+                "<b>This token is not for you!</b>\n\nPlease generate your own.",
+            )
+        if input_token != stored_token:
+            return await send_message(
+                message, "Invalid token.\n\nPlease generate a new one."
+            )
         if userid not in user_data:
             return await send_message(
                 message, "This token is not yours!\n\nKindly generate your own."
@@ -180,31 +138,36 @@ async def start(client, message):
         data["token"] = token
         data["time"] = token_time
         user_data[userid].update(data)
-        if DATABASE_URL:
-            await DbManager().update_user_tdata(userid, token, token_time)
+        await Database().update_user_tdata(userid, token, token_time)
         msg = "Your token has been successfully generated!\n\n"
         msg += f'It will be valid for {get_readable_time(int(config_dict["TOKEN_TIMEOUT"]), True)}'
         return await send_message(message, msg)
     elif await CustomFilters.authorized(client, message):
         help_command = f"/{BotCommands.HelpCommand}"
         start_string = f"This bot can mirror all your links|files|torrents to Google Drive or any rclone cloud or to telegram.\n<b>Type {help_command} to get a list of available commands</b>"
-        await send_message(message, start_string, photo="Random")
+        await send_message(message, start_string)
     else:
-        await send_message(message, "You are not a authorized user!", photo="Random")
-    await DbManager().update_pm_users(message.from_user.id)
+        await send_message(message, "You are not a authorized user!")
+    await Database().update_pm_users(message.from_user.id)
     return None
 
 
 async def restart(_, message):
+    Intervals["stopAll"] = True
     restart_message = await send_message(message, "Restarting...")
     if scheduler.running:
         scheduler.shutdown(wait=False)
-    for interval in [QbInterval, Interval]:
-        if interval:
-            interval[0].cancel()
+    if qb := Intervals["qb"]:
+        qb.cancel()
+    if st := Intervals["status"]:
+        for intvl in list(st.values()):
+            intvl.cancel()
     await sync_to_async(clean_all)
     proc1 = await create_subprocess_exec(
-        "pkill", "-9", "-f", "-e", "gunicorn|xria|xnox|xtra|xone"
+        "pkill",
+        "-9",
+        "-f",
+        "gunicorn|xria|xnox|xtra|xone",
     )
     proc2 = await create_subprocess_exec("python3", "update.py")
     await gather(proc1.wait(), proc2.wait())
@@ -215,14 +178,71 @@ async def restart(_, message):
 
 async def ping(_, message):
     start_time = int(round(time() * 1000))
-    reply = await send_message(message, "Starting ping...")
+    reply = await send_message(message, "Starting Ping")
     end_time = int(round(time() * 1000))
-    value = end_time - start_time
-    await edit_message(reply, f"{value} ms.")
+    await edit_message(reply, f"{end_time - start_time} ms")
 
 
 @new_task
-async def aeon_callback(_, query):
+async def log(_, message):
+    buttons = ButtonMaker()
+    buttons.callback("Log display", f"aeon {message.from_user.id} logdisplay")
+    reply_message = await sendFile(message, "log.txt", buttons=buttons.menu(1))
+    await delete_message(message)
+    await five_minute_del(reply_message)
+
+
+help_string = f"""
+NOTE: Try each command without any argument to see more detalis.
+
+/{BotCommands.MirrorCommand[0]}: Start mirroring to cloud.
+/{BotCommands.YtdlCommand[0]}: Mirror yt-dlp supported link.
+/{BotCommands.LeechCommand[0]}: Start leeching to Telegram.
+/{BotCommands.YtdlLeechCommand[0]}: Leech yt-dlp supported link.
+/{BotCommands.CloneCommand[0]} [drive_url]: Copy file/folder to Google Drive.
+/{BotCommands.CountCommand} [drive_url]: Count file/folder of Google Drive.
+/{BotCommands.UserSetCommand} [query]: Users settings.
+/{BotCommands.CancelAllCommand} [query]: Cancel all [status] tasks.
+/{BotCommands.ListCommand} [query]: Search in Google Drive(s).
+/{BotCommands.SearchCommand} [query]: Search for torrents with API.
+/{BotCommands.StatusCommand[0]}: Shows a status of all the downloads.
+/{BotCommands.StatsCommand[0]}: Show stats of the machine where the bot is hosted in."""
+
+
+async def bot_help(_, message):
+    await send_message(message, help_string)
+
+
+async def restart_notification():
+    if await aiopath.isfile(".restartmsg"):
+        cmd = r"""remote_url=$(git config --get remote.origin.url) &&
+            if echo "$remote_url" | grep -qE "github\.com[:/](.*)/(.*?)(\.git)?$"; then
+                last_commit=$(git log -1 --pretty=format:'%h') &&
+                commit_link="https://github.com/5hojib/Aeon/commit/$last_commit" &&
+                echo $commit_link;
+            else
+                echo "Failed to extract repository name and owner name from the remote URL.";
+            fi"""
+
+        result = await cmd_exec(cmd, True)
+
+        commit_link = result[0]
+
+        with open(".restartmsg") as f:
+            chat_id, msg_id = map(int, f)
+        try:
+            await bot.edit_message_text(
+                chat_id=chat_id,
+                message_id=msg_id,
+                text=f'<a href="{commit_link}">Restarted Successfully!</a>',
+            )
+        except Exception as e:
+            print(f"Failed to edit message: {e}")
+        await remove(".restartmsg")
+
+
+@new_task
+async def AeonCallback(_, query):
     message = query.message
     user_id = query.from_user.id
     data = query.data.split()
@@ -231,7 +251,7 @@ async def aeon_callback(_, query):
     if data[2] == "logdisplay":
         await query.answer()
         async with aiopen("log.txt") as f:
-            log_file_lines = (await f.read()).splitlines()
+            logFileLines = (await f.read()).splitlines()
 
         def parseline(line):
             try:
@@ -239,19 +259,19 @@ async def aeon_callback(_, query):
             except IndexError:
                 return line
 
-        ind, log_lines = 1, ""
+        ind, Loglines = 1, ""
         try:
-            while len(log_lines) <= 3500:
-                log_lines = parseline(log_file_lines[-ind]) + "\n" + log_lines
-                if ind == len(log_file_lines):
+            while len(Loglines) <= 3500:
+                Loglines = parseline(logFileLines[-ind]) + "\n" + Loglines
+                if ind == len(logFileLines):
                     break
                 ind += 1
-            start_line = "<pre language='python'>"
-            end_line = "</pre>"
+            startLine = "<pre language='python'>"
+            endLine = "</pre>"
             btn = ButtonMaker()
             btn.callback("Close", f"aeon {user_id} close")
             reply_message = await send_message(
-                message, start_line + escape(log_lines) + end_line, btn.column(1)
+                message, startLine + escape(Loglines) + endLine, btn.menu(1)
             )
             await query.edit_message_reply_markup(None)
             await delete_message(message)
@@ -259,7 +279,7 @@ async def aeon_callback(_, query):
         except Exception as err:
             LOGGER.error(f"TG Log Display : {err!s}")
     elif data[2] == "private":
-        await query.answer(url=f"https://t.me/{bot_name}?start=private")
+        await query.answer(url=f"https://t.me/{bot_username}?start=private")
         return None
     else:
         await query.answer()
@@ -267,41 +287,17 @@ async def aeon_callback(_, query):
         return None
 
 
-@new_task
-async def log(_, message):
-    buttons = ButtonMaker()
-    buttons.callback("Log display", f"aeon {message.from_user.id} logdisplay")
-    reply_message = await sendFile(message, "log.txt", buttons=buttons.column(1))
-    await delete_message(message)
-    await five_minute_del(reply_message)
-
-
-@new_task
-async def bot_help(_, message):
-    reply_message = await send_message(message, help_string)
-    await delete_message(message)
-    await one_minute_del(reply_message)
-
-
-async def restart_notification():
-    if await aiopath.isfile(".restartmsg"):
-        with open(".restartmsg") as f:
-            chat_id, msg_id = map(int, f)
-        with contextlib.suppress(Exception):
-            await bot.edit_message_text(
-                chat_id=chat_id, message_id=msg_id, text="Restarted Successfully!"
-            )
-        await aioremove(".restartmsg")
-
-
 async def main():
+    await Database().db_load()
     await gather(
-        start_cleanup(),
+        sync_to_async(clean_all),
         torrent_search.initiate_search_tools(),
         restart_notification(),
-        set_commands(bot),
+        telegraph.create_account(),
+        sync_to_async(start_aria2_listener, wait=False),
     )
-    await sync_to_async(start_aria2_listener, wait=False)
+    create_help_buttons()
+
     bot.add_handler(MessageHandler(start, filters=command(BotCommands.StartCommand)))
     bot.add_handler(
         MessageHandler(
@@ -330,7 +326,7 @@ async def main():
             filters=command(BotCommands.StatsCommand) & CustomFilters.authorized,
         )
     )
-    bot.add_handler(CallbackQueryHandler(aeon_callback, filters=regex(r"^aeon")))
+    bot.add_handler(CallbackQueryHandler(AeonCallback, filters=regex(r"^aeon")))
     LOGGER.info("Bot Started!")
     signal(SIGINT, exit_clean_up)
 

@@ -11,11 +11,12 @@ accounts/*
 MediaInfo/*
 Images/*
 Thumbnails/*
-tanha/*
+rclone/*
+tokens/*
 list_drives.txt
+shorteners.txt
 cookies.txt
 downloads
-bot.session
-user.session
+bot.session*
 terabox.txt
-rcl.conf
+rclone.conf

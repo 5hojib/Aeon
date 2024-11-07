@@ -6,11 +6,9 @@ from asyncio.subprocess import PIPE
 from bot import LOGGER
 
 
-async def change_metadata(file, dirpath, key):
+async def change_metadata(file, key):
     LOGGER.info(f"Starting metadata modification for file: {file}")
     temp_file = f"{file}.temp.mkv"
-    full_file_path = os.path.join(dirpath, file)
-    temp_file_path = os.path.join(dirpath, temp_file)
 
     cmd = [
         "ffprobe",
@@ -20,14 +18,14 @@ async def change_metadata(file, dirpath, key):
         "-print_format",
         "json",
         "-show_streams",
-        full_file_path,
+        file,
     ]
     process = await create_subprocess_exec(*cmd, stdout=PIPE, stderr=PIPE)
     stdout, stderr = await process.communicate()
 
     if process.returncode != 0:
         LOGGER.error(f"Error getting stream info: {stderr.decode().strip()}")
-        return file
+        return
 
     try:
         streams = json.loads(stdout)["streams"]
@@ -35,7 +33,7 @@ async def change_metadata(file, dirpath, key):
         LOGGER.error(
             f"No streams found in the ffprobe output: {stdout.decode().strip()}"
         )
-        return file
+        return
 
     languages = {}
     for stream in streams:
@@ -48,7 +46,7 @@ async def change_metadata(file, dirpath, key):
         "xtra",
         "-y",
         "-i",
-        full_file_path,
+        file,
         "-map_metadata",
         "-1",
         "-c",
@@ -122,7 +120,7 @@ async def change_metadata(file, dirpath, key):
         else:
             cmd.extend(["-map", f"0:{stream_index}"])
 
-    cmd.append(temp_file_path)
+    cmd.append(temp_file)
 
     process = await create_subprocess_exec(*cmd, stderr=PIPE, stdout=PIPE)
     stdout, stderr = await process.communicate()
@@ -131,33 +129,30 @@ async def change_metadata(file, dirpath, key):
         err = stderr.decode().strip()
         LOGGER.error(err)
         LOGGER.error(f"Error modifying metadata for file: {file}")
-        return file
+        return
 
-    os.replace(temp_file_path, full_file_path)
+    os.replace(temp_file, file)
     LOGGER.info(f"Metadata modified successfully for file: {file}")
-    return file
+    return
 
 
-async def add_attachment(file, dirpath, attachment_path):
+async def add_attachment(file, attachment_path):
     LOGGER.info(f"Adding photo attachment to file: {file}")
 
     temp_file = f"{file}.temp.mkv"
-    full_file_path = os.path.join(dirpath, file)
-    temp_file_path = os.path.join(dirpath, temp_file)
 
     attachment_ext = attachment_path.split(".")[-1].lower()
+    mime_type = "application/octet-stream"
     if attachment_ext in ["jpg", "jpeg"]:
         mime_type = "image/jpeg"
     elif attachment_ext == "png":
         mime_type = "image/png"
-    else:
-        mime_type = "application/octet-stream"
 
     cmd = [
         "xtra",
         "-y",
         "-i",
-        full_file_path,
+        file,
         "-attach",
         attachment_path,
         "-metadata:s:t",
@@ -166,7 +161,7 @@ async def add_attachment(file, dirpath, attachment_path):
         "copy",
         "-map",
         "0",
-        temp_file_path,
+        temp_file,
     ]
 
     process = await create_subprocess_exec(*cmd, stderr=PIPE, stdout=PIPE)
@@ -176,8 +171,8 @@ async def add_attachment(file, dirpath, attachment_path):
         err = stderr.decode().strip()
         LOGGER.error(err)
         LOGGER.error(f"Error adding photo attachment to file: {file}")
-        return file
+        return
 
-    os.replace(temp_file_path, full_file_path)
+    os.replace(temp_file, file)
     LOGGER.info(f"Photo attachment added successfully to file: {file}")
-    return file
+    return

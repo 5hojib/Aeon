@@ -2,45 +2,34 @@ from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 
 from bot import LOGGER, bot
-from bot.helper.ext_utils.bot_utils import new_task, sync_to_async, is_gdrive_link
+from bot.helper.ext_utils.bot_utils import new_task, sync_to_async
+from bot.helper.ext_utils.links_utils import is_gdrive_link
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.message_utils import (
     send_message,
-    delete_message,
-    one_minute_del,
+    auto_delete_message,
 )
-from bot.helper.mirror_leech_utils.upload_utils.gdriveTools import GoogleDriveHelper
-
-
-async def delete_file(link):
-    try:
-        LOGGER.info(link)
-        drive = GoogleDriveHelper()
-        return await sync_to_async(drive.deletefile, link)
-    except Exception as e:
-        LOGGER.error(f"Error deleting Google Drive file: {e!s}")
-        return f"An error occurred: {e!s}"
+from bot.helper.mirror_leech_utils.gdrive_utils.delete import gdDelete
 
 
 @new_task
 async def deletefile(_, message):
     args = message.text.split()
+    user = message.from_user or message.sender_chat
     if len(args) > 1:
         link = args[1]
     elif reply_to := message.reply_to_message:
         link = reply_to.text.split(maxsplit=1)[0].strip()
     else:
         link = ""
-
     if is_gdrive_link(link):
-        msg = await delete_file(link)
+        LOGGER.info(link)
+        msg = await sync_to_async(gdDelete().deletefile, link, user.id)
     else:
-        msg = "Send a Google Drive link along with the command or reply to the link with the command."
-
+        msg = "Send Gdrive link along with command or by replying to the link by command"
     reply_message = await send_message(message, msg)
-    await delete_message(message)
-    await one_minute_del(reply_message)
+    await auto_delete_message(message, reply_message)
 
 
 bot.add_handler(

@@ -1,46 +1,36 @@
-from bot import LOGGER
-from bot.helper.ext_utils.bot_utils import MirrorStatus, get_readable_file_size
+from bot import LOGGER, subprocess_lock
+from bot.helper.ext_utils.status_utils import MirrorStatus, get_readable_file_size
 
 
 class SplitStatus:
-    def __init__(self, name, size, gid, listener):
-        self.__name = name
-        self.__gid = gid
-        self.__size = size
-        self.__listener = listener
+    def __init__(self, listener, gid):
+        self.listener = listener
+        self._gid = gid
+        self._size = self.listener.size
         self.message = listener.message
 
     def gid(self):
-        return self.__gid
-
-    def progress(self):
-        return "0"
-
-    def speed(self):
-        return "0"
+        return self._gid
 
     def name(self):
-        return self.__name
+        return self.listener.name
 
     def size(self):
-        return get_readable_file_size(self.__size)
-
-    def eta(self):
-        return "0s"
+        return get_readable_file_size(self._size)
 
     def status(self):
         return MirrorStatus.STATUS_SPLITTING
 
-    def processed_bytes(self):
-        return 0
-
-    def download(self):
+    def task(self):
         return self
 
-    async def cancel_download(self):
-        LOGGER.info(f"Cancelling Split: {self.__name}")
-        if self.__listener.suproc is not None:
-            self.__listener.suproc.kill()
-        else:
-            self.__listener.suproc = "cancelled"
-        await self.__listener.onUploadError("splitting stopped by user!")
+    async def cancel_task(self):
+        LOGGER.info(f"Cancelling Split: {self.listener.name}")
+        self.listener.isCancelled = True
+        async with subprocess_lock:
+            if (
+                self.listener.suproc is not None
+                and self.listener.suproc.returncode is None
+            ):
+                self.listener.suproc.kill()
+        await self.listener.onUploadError("splitting stopped by user!")

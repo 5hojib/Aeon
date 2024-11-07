@@ -2,6 +2,8 @@ from re import findall as re_findall
 
 from anytree import NodeMixin
 
+DOWNLOAD_DIR = "/usr/src/app/downloads/"
+
 
 class TorNode(NodeMixin):
     def __init__(
@@ -23,7 +25,7 @@ class TorNode(NodeMixin):
         if parent is not None:
             self.parent = parent
         if size is not None:
-            self.size = size
+            self.fsize = size
         if priority is not None:
             self.priority = priority
         if file_id is not None:
@@ -37,13 +39,13 @@ def qb_get_folders(path):
 
 
 def get_folders(path):
-    fs = re_findall("/usr/src/app/downloads/[0-9]+/(.+)", path)[0]
+    fs = re_findall(f"{DOWNLOAD_DIR}[0-9]+/(.+)", path)[0]
     return fs.split("/")
 
 
-def make_tree(res, aria2=False):
-    parent = TorNode("Torrent")
-    if not aria2:
+def make_tree(res, tool=False):
+    if tool == "qbit":
+        parent = TorNode("Torrent")
         for i in res:
             folders = qb_get_folders(i.name)
             if len(folders) > 1:
@@ -78,7 +80,8 @@ def make_tree(res, aria2=False):
                     file_id=i.id,
                     progress=round(i.progress * 100, 5),
                 )
-    else:
+    elif tool == "aria":
+        parent = TorNode("Torrent")
         for i in res:
             folders = get_folders(i["path"])
             priority = 1
@@ -120,6 +123,24 @@ def make_tree(res, aria2=False):
                         (int(i["completedLength"]) / int(i["length"])) * 100, 5
                     ),
                 )
+
+    else:
+        parent = TorNode("Torrent")
+        priority = 1
+        for i in res["files"]:
+            TorNode(
+                i["filename"],
+                is_file=True,
+                parent=parent,
+                size=float(i["mb"]) * 1048576,
+                priority=priority,
+                file_id=i["nzf_id"],
+                progress=round(
+                    ((float(i["mb"]) - float(i["mbleft"])) / float(i["mb"])) * 100,
+                    5,
+                ),
+            )
+
     return create_list(parent, ["", 0])
 
 
@@ -127,8 +148,8 @@ def create_list(par, msg):
     if par.name != ".unwanted":
         msg[0] += "<ul>"
     for i in par.children:
+        msg[0] += "<li>"
         if i.is_folder:
-            msg[0] += "<li>"
             if i.name != ".unwanted":
                 msg[0] += (
                     f'<input type="checkbox" name="foldernode_{msg[1]}"> <label for="{i.name}">{i.name}</label>'
@@ -137,14 +158,13 @@ def create_list(par, msg):
             msg[0] += "</li>"
             msg[1] += 1
         else:
-            msg[0] += "<li>"
             if i.priority == 0:
                 msg[0] += (
-                    f'<input type="checkbox" name="filenode_{i.file_id}" data-size="{i.size}"> <label data-size="{i.size}" for="filenode_{i.file_id}">{i.name}</label> / {i.progress}%'
+                    f'<input type="checkbox" name="filenode_{i.file_id}" data-size="{i.fsize}"> <label data-size="{i.fsize}" for="filenode_{i.file_id}">{i.name}</label> / {i.progress}%'
                 )
             else:
                 msg[0] += (
-                    f'<input type="checkbox" checked name="filenode_{i.file_id}" data-size="{i.size}"> <label data-size="{i.size}" for="filenode_{i.file_id}">{i.name}</label> / {i.progress}%'
+                    f'<input type="checkbox" checked name="filenode_{i.file_id}" data-size="{i.fsize}"> <label data-size="{i.fsize}" for="filenode_{i.file_id}">{i.name}</label> / {i.progress}%'
                 )
             msg[0] += (
                 f'<input type="hidden" value="off" name="filenode_{i.file_id}">'

@@ -13,12 +13,18 @@ from pyrogram.handlers import MessageHandler
 
 from bot import LOGGER, bot
 from bot.helper.ext_utils.bot_utils import cmd_exec
+from bot.helper.aeon_utils.access_check import token_check
 from bot.helper.telegram_helper.filters import CustomFilters
+from bot.helper.aeon_utils.gen_mediainfo import parseinfo
 from bot.helper.ext_utils.telegraph_helper import telegraph
 from bot.helper.telegram_helper.bot_commands import BotCommands
-from bot.helper.telegram_helper.message_utils import edit_message, send_message
-
-section_dict = {"General", "Video", "Audio", "Text", "Menu"}
+from bot.helper.telegram_helper.button_build import ButtonMaker
+from bot.helper.telegram_helper.message_utils import (
+    delete_links,
+    edit_message,
+    send_message,
+    five_minute_del,
+)
 
 
 async def gen_mediainfo(message, link=None, media=None, msg=None):
@@ -34,14 +40,12 @@ async def gen_mediainfo(message, link=None, media=None, msg=None):
             headers = {
                 "user-agent": "Mozilla/5.0 (Linux; Android 12; 2201116PI) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36"
             }
-            async with (
-                aiohttp.ClientSession() as session,
-                session.get(link, headers=headers) as response,
-                aiopen(des_path, "wb") as f,
-            ):
-                async for chunk in response.content.iter_chunked(10000000):
-                    await f.write(chunk)
-                    break
+            async with aiohttp.ClientSession() as session:
+                async with session.get(link, headers=headers) as response:
+                    async with aiopen(des_path, "wb") as f:
+                        async for chunk in response.content.iter_chunked(10000000):
+                            await f.write(chunk)
+                            break
         elif media:
             des_path = ospath.join(path, media.file_name)
             if media.file_size <= 50000000:
@@ -69,27 +73,16 @@ async def gen_mediainfo(message, link=None, media=None, msg=None):
     )
 
 
-def parseinfo(out):
-    tc = ""
-    trigger = False
-    for line in out.split("\n"):
-        for section in section_dict:
-            if line.startswith(section):
-                trigger = True
-                if not line.startswith("General"):
-                    tc += "</pre><br>"
-                tc += f"<h4>{line.replace('Text', 'Subtitle')}</h4>"
-                break
-        if trigger:
-            tc += "<br><pre>"
-            trigger = False
-        else:
-            tc += line + "\n"
-    tc += "</pre><br>"
-    return tc
-
-
 async def mediainfo(_, message):
+    user_id = message.from_user.id
+    buttons = ButtonMaker()
+    if message.chat.type != message.chat.type.PRIVATE:
+        msg, buttons = await token_check(user_id, buttons)
+        if msg is not None:
+            reply_message = await send_message(message, msg, buttons.menu(1))
+            await delete_links(message)
+            await five_minute_del(reply_message)
+            return
     reply = message.reply_to_message
     help_msg = (
         "<b>By replying to media:</b>"

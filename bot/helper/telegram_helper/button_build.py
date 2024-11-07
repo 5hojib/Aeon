@@ -3,52 +3,55 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 class ButtonMaker:
     def __init__(self):
-        self.main_buttons = []
-        self.header_buttons = []
-        self.footer_buttons = []
+        self._button = []
+        self._header_button = []
+        self._footer_button = []
 
-    def url(self, text, url, position=None):
-        button = InlineKeyboardButton(text=text, url=url)
-        if position == "header":
-            self.header_buttons.append(button)
+    def url(self, key, link, position=None):
+        if not position:
+            self._button.append(InlineKeyboardButton(text=key, url=link))
+        elif position == "header":
+            self._header_button.append(InlineKeyboardButton(text=key, url=link))
         elif position == "footer":
-            self.footer_buttons.append(button)
-        else:
-            self.main_buttons.append(button)
+            self._footer_button.append(InlineKeyboardButton(text=key, url=link))
 
-    def callback(self, text, callback_data, position=None):
-        button = InlineKeyboardButton(text=text, callback_data=callback_data)
-        if position == "header":
-            self.header_buttons.append(button)
+    def callback(self, key, data, position=None):
+        if not position:
+            self._button.append(InlineKeyboardButton(text=key, callback_data=data))
+        elif position == "header":
+            self._header_button.append(
+                InlineKeyboardButton(text=key, callback_data=data)
+            )
         elif position == "footer":
-            self.footer_buttons.append(button)
-        else:
-            self.main_buttons.append(button)
+            self._footer_button.append(
+                InlineKeyboardButton(text=key, callback_data=data)
+            )
 
-    def column(self, main_columns=1, header_columns=8, footer_columns=8):
-        keyboard = [
-            self.main_buttons[i : i + main_columns]
-            for i in range(0, len(self.main_buttons), main_columns)
+    def menu(self, b_cols=1, h_cols=8, f_cols=8):
+        menu = [
+            self._button[i : i + b_cols] for i in range(0, len(self._button), b_cols)
         ]
-
-        if self.header_buttons:
-            if len(self.header_buttons) > header_columns:
-                header_chunks = [
-                    self.header_buttons[i : i + header_columns]
-                    for i in range(0, len(self.header_buttons), header_columns)
+        if self._header_button:
+            h_cnt = len(self._header_button)
+            if h_cnt > h_cols:
+                header_buttons = [
+                    self._header_button[i : i + h_cols]
+                    for i in range(0, len(self._header_button), h_cols)
                 ]
-                keyboard = header_chunks + keyboard
+                menu = header_buttons + menu
             else:
-                keyboard.insert(0, self.header_buttons)
-
-        if self.footer_buttons:
-            if len(self.footer_buttons) > footer_columns:
-                footer_chunks = [
-                    self.footer_buttons[i : i + footer_columns]
-                    for i in range(0, len(self.footer_buttons), footer_columns)
+                menu.insert(0, self._header_button)
+        if self._footer_button:
+            if len(self._footer_button) > f_cols:
+                [
+                    menu.append(self._footer_button[i : i + f_cols])
+                    for i in range(0, len(self._footer_button), f_cols)
                 ]
-                keyboard += footer_chunks
             else:
-                keyboard.append(self.footer_buttons)
+                menu.append(self._footer_button)
+        return InlineKeyboardMarkup(menu)
 
-        return InlineKeyboardMarkup(keyboard)
+    def reset(self):
+        self._button = []
+        self._header_button = []
+        self._footer_button = []
